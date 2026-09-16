@@ -9,6 +9,8 @@ try:
         CortexRead,
         FuzzyMemory,
         FuzzyMemoryRead,
+        GraphEvidence,
+        GraphEvidenceRead,
         native_version,
     )
     NATIVE_AVAILABLE = True
@@ -27,9 +29,11 @@ except ImportError as exc:  # source-tree use before maturin build
     Cortex = _MissingNative
     Articulation = _MissingNative
     FuzzyMemory = _MissingNative
+    GraphEvidence = _MissingNative
     CortexRead = None
     ArticulationRead = None
     FuzzyMemoryRead = None
+    GraphEvidenceRead = None
 
     def native_version() -> str:
         return "unavailable"
@@ -41,6 +45,8 @@ __all__ = [
     "CortexRead",
     "FuzzyMemory",
     "FuzzyMemoryRead",
+    "GraphEvidence",
+    "GraphEvidenceRead",
     "NATIVE_AVAILABLE",
     "native_version",
 ]
