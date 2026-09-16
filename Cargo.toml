@@ -4,6 +4,7 @@ members = [
     "crates/cortex-core",
     "crates/cortex-graph",
     "crates/cortex-memory",
+    "crates/cortex-runtime",
     "crates/cortex-python",
 ]
 resolver = "2"
