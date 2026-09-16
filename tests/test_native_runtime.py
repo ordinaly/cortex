@@ -51,7 +51,9 @@ def _causal_pairs(state, changed):
 
 def test_full_native_runtime_matches_frozen_composed_stack():
     feature_dim = 8
-    max_entities = 16
+    # Use the historical articulation capacity here so noisy binding does not
+    # turn this semantic-equivalence replay into a capacity-exhaustion test.
+    max_entities = 96
     budget = 24
 
     world = SyntheticIntegratedWorld(
