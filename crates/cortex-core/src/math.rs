@@ -1,10 +1,14 @@
-use std::cmp::Ordering;
-
 pub const EPS: f64 = 1.0e-12;
 
 #[inline]
 pub fn clip(v: f64, lo: f64, hi: f64) -> f64 {
-    if v < lo { lo } else if v > hi { hi } else { v }
+    if v < lo {
+        lo
+    } else if v > hi {
+        hi
+    } else {
+        v
+    }
 }
 
 #[inline]
@@ -38,13 +42,25 @@ pub fn rms(a: &[f64], b: &[f64]) -> f64 {
 
 pub fn canonicalize_direction(mut u: Vec<f64>) -> Vec<f64> {
     let n = norm(&u);
-    if n <= EPS { return u; }
-    for x in &mut u { *x /= n; }
-    if let Some((j, _)) = u.iter().enumerate().max_by(|(_, a), (_, b)| {
-        a.abs().partial_cmp(&b.abs()).unwrap_or(Ordering::Equal)
-    }) {
-        if u[j] < 0.0 {
-            for x in &mut u { *x = -*x; }
+    if n <= EPS {
+        return u;
+    }
+    for x in &mut u {
+        *x /= n;
+    }
+    // Match np.argmax(np.abs(u)): preserve the first index on exact ties.
+    let mut j = 0usize;
+    let mut best = f64::NEG_INFINITY;
+    for (idx, value) in u.iter().enumerate() {
+        let score = value.abs();
+        if score > best {
+            best = score;
+            j = idx;
+        }
+    }
+    if u[j] < 0.0 {
+        for x in &mut u {
+            *x = -*x;
         }
     }
     u
@@ -52,11 +68,18 @@ pub fn canonicalize_direction(mut u: Vec<f64>) -> Vec<f64> {
 
 /// Symmetric Jacobi eigensolver for small dense matrices.
 /// Returns (eigenvalues, eigenvectors), where eigenvector `j` is the j-th column.
-pub fn jacobi_eigen_symmetric(a: &[f64], n: usize, max_sweeps: usize, tol: f64) -> (Vec<f64>, Vec<f64>) {
+pub fn jacobi_eigen_symmetric(
+    a: &[f64],
+    n: usize,
+    max_sweeps: usize,
+    tol: f64,
+) -> (Vec<f64>, Vec<f64>) {
     assert_eq!(a.len(), n * n);
     let mut m = a.to_vec();
     let mut v = vec![0.0; n * n];
-    for i in 0..n { v[i * n + i] = 1.0; }
+    for i in 0..n {
+        v[i * n + i] = 1.0;
+    }
 
     for _ in 0..max_sweeps {
         let mut p = 0usize;
@@ -65,15 +88,23 @@ pub fn jacobi_eigen_symmetric(a: &[f64], n: usize, max_sweeps: usize, tol: f64) 
         for i in 0..n {
             for j in (i + 1)..n {
                 let x = m[i * n + j].abs();
-                if x > max_off { max_off = x; p = i; q = j; }
+                if x > max_off {
+                    max_off = x;
+                    p = i;
+                    q = j;
+                }
             }
         }
-        if max_off <= tol { break; }
+        if max_off <= tol {
+            break;
+        }
 
         let app = m[p * n + p];
         let aqq = m[q * n + q];
         let apq = m[p * n + q];
-        if apq.abs() <= tol { continue; }
+        if apq.abs() <= tol {
+            continue;
+        }
 
         let tau = (aqq - app) / (2.0 * apq);
         let t = if tau >= 0.0 {
@@ -90,8 +121,10 @@ pub fn jacobi_eigen_symmetric(a: &[f64], n: usize, max_sweeps: usize, tol: f64) 
                 let mkq = m[k * n + q];
                 let npv = c * mkp - s * mkq;
                 let nqv = s * mkp + c * mkq;
-                m[k * n + p] = npv; m[p * n + k] = npv;
-                m[k * n + q] = nqv; m[q * n + k] = nqv;
+                m[k * n + p] = npv;
+                m[p * n + k] = npv;
+                m[k * n + q] = nqv;
+                m[q * n + k] = nqv;
             }
         }
         m[p * n + p] = app - t * apq;
