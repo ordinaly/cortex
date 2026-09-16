@@ -1,0 +1,70 @@
+name: patch-articulation-profiler-once
+
+on:
+  push:
+    branches:
+      - bench/articulation-attribution-v1
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: bench/articulation-attribution-v1
+      - uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          components: rustfmt
+      - name: Patch Rust/Python profiling surface and parity test
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('crates/cortex-articulation/src/lib.rs')
+          s = p.read_text()
+          old = 'use serde::{Deserialize, Serialize};\n\nconst EPS: f64 = 1.0e-12;'
+          new = 'mod profiling;\npub use profiling::{ArticulationStageTimings, ArticulationWork, ProfiledArticulationRead};\n\nuse serde::{Deserialize, Serialize};\n\nconst EPS: f64 = 1.0e-12;'
+          assert old in s
+          p.write_text(s.replace(old, new, 1))
+
+          p = Path('crates/cortex-python/src/lib.rs')
+          s = p.read_text()
+          old = 'use cortex_articulation::{ArticulationConfig, ArticulationState};'
+          new = '''use cortex_articulation::{\n    ArticulationConfig, ArticulationStageTimings, ArticulationState, ArticulationWork,\n};'''
+          assert old in s
+          s = s.replace(old, new, 1)
+
+          marker = '''#[pyclass(name = "Articulation", module = "cortex._cortex_native")]\npub struct PyArticulation {'''
+          insert = '''#[pyclass(name = "ArticulationStageTimings", module = "cortex._cortex_native", frozen)]\n#[derive(Clone)]\npub struct PyArticulationStageTimings {\n    #[pyo3(get)]\n    pub validation_ns: u64,\n    #[pyo3(get)]\n    pub match_scoring_ns: u64,\n    #[pyo3(get)]\n    pub assignment_ns: u64,\n    #[pyo3(get)]\n    pub bind_finalize_ns: u64,\n    #[pyo3(get)]\n    pub entity_update_ns: u64,\n    #[pyo3(get)]\n    pub subgroup_evidence_ns: u64,\n    #[pyo3(get)]\n    pub dedup_ns: u64,\n    #[pyo3(get)]\n    pub prototype_reliability_ns: u64,\n    #[pyo3(get)]\n    pub noise_state_ns: u64,\n    #[pyo3(get)]\n    pub subgroup_select_ns: u64,\n    #[pyo3(get)]\n    pub total_ns: u64,\n}\n\nimpl From<ArticulationStageTimings> for PyArticulationStageTimings {\n    fn from(t: ArticulationStageTimings) -> Self {\n        Self {\n            validation_ns: t.validation_ns,\n            match_scoring_ns: t.match_scoring_ns,\n            assignment_ns: t.assignment_ns,\n            bind_finalize_ns: t.bind_finalize_ns,\n            entity_update_ns: t.entity_update_ns,\n            subgroup_evidence_ns: t.subgroup_evidence_ns,\n            dedup_ns: t.dedup_ns,\n            prototype_reliability_ns: t.prototype_reliability_ns,\n            noise_state_ns: t.noise_state_ns,\n            subgroup_select_ns: t.subgroup_select_ns,\n            total_ns: t.total_ns,\n        }\n    }\n}\n\n#[pyclass(name = "ArticulationWork", module = "cortex._cortex_native", frozen)]\n#[derive(Clone)]\npub struct PyArticulationWork {\n    #[pyo3(get)]\n    pub detections: usize,\n    #[pyo3(get)]\n    pub entities_before: usize,\n    #[pyo3(get)]\n    pub match_group_size: usize,\n    #[pyo3(get)]\n    pub pair_scores: usize,\n    #[pyo3(get)]\n    pub transform_evaluations: usize,\n    #[pyo3(get)]\n    pub assignment_rows: usize,\n    #[pyo3(get)]\n    pub assignment_cols: usize,\n    #[pyo3(get)]\n    pub spawned: usize,\n    #[pyo3(get)]\n    pub subgroup_evidence_detections: usize,\n    #[pyo3(get)]\n    pub subgroup_transform_evaluations: usize,\n}\n\nimpl From<ArticulationWork> for PyArticulationWork {\n    fn from(w: ArticulationWork) -> Self {\n        Self {\n            detections: w.detections,\n            entities_before: w.entities_before,\n            match_group_size: w.match_group_size,\n            pair_scores: w.pair_scores,\n            transform_evaluations: w.transform_evaluations,\n            assignment_rows: w.assignment_rows,\n            assignment_cols: w.assignment_cols,\n            spawned: w.spawned,\n            subgroup_evidence_detections: w.subgroup_evidence_detections,\n            subgroup_transform_evaluations: w.subgroup_transform_evaluations,\n        }\n    }\n}\n\n#[pyclass(name = "Articulation", module = "cortex._cortex_native")]\npub struct PyArticulation {'''
+          assert marker in s
+          s = s.replace(marker, insert, 1)
+
+          marker = '''    fn snapshot_json(&self) -> PyResult<String> {\n        serde_json::to_string(&self.inner.snapshot())\n            .map_err(|e| PyRuntimeError::new_err(e.to_string()))\n    }\n\n    #[getter]\n    fn active_entities(&self) -> usize {'''
+          insert = '''    fn profile_step(\n        &mut self,\n        detections: Vec<Vec<f64>>,\n    ) -> PyResult<(PyArticulationRead, PyArticulationStageTimings, PyArticulationWork)> {\n        let profiled = self\n            .inner\n            .observe_profiled(&detections)\n            .map_err(PyValueError::new_err)?;\n        let r = profiled.read;\n        Ok((\n            PyArticulationRead {\n                bindings: r.bindings,\n                shifts: r.shifts,\n                subgroup: r.subgroup,\n                subgroup_margin: r.subgroup_margin,\n                entity_changed: r.entity_changed,\n                noise_changed: r.noise_changed,\n                active_entities: r.active_entities,\n            },\n            profiled.timings.into(),\n            profiled.work.into(),\n        ))\n    }\n\n    fn snapshot_json(&self) -> PyResult<String> {\n        serde_json::to_string(&self.inner.snapshot())\n            .map_err(|e| PyRuntimeError::new_err(e.to_string()))\n    }\n\n    #[getter]\n    fn active_entities(&self) -> usize {'''
+          assert marker in s
+          s = s.replace(marker, insert, 1)
+
+          marker = '''    m.add_class::<PyArticulation>()?;\n    m.add_class::<PyArticulationRead>()?;'''
+          insert = '''    m.add_class::<PyArticulation>()?;\n    m.add_class::<PyArticulationRead>()?;\n    m.add_class::<PyArticulationStageTimings>()?;\n    m.add_class::<PyArticulationWork>()?;'''
+          assert marker in s
+          s = s.replace(marker, insert, 1)
+          p.write_text(s)
+
+          p = Path('tests/test_native_layers.py')
+          s = p.read_text()
+          marker = '\n\ndef test_native_fuzzy_memory_matches_frozen_v08_reference():'
+          test = r'''\n\ndef test_profiled_articulation_matches_production_path():\n    dim = 8\n    normal = Articulation(feature_dim=dim, max_entities=8)\n    profiled = Articulation(feature_dim=dim, max_entities=8)\n\n    a = np.array([0.0, 0.2, 1.1, -0.4, 0.7, -0.9, 0.35, 0.05])\n    b = np.array([1.3, -0.2, 0.45, 0.95, -0.65, 0.1, -0.85, 0.55])\n    schedule = [(0, 0), (2, 4), (4, 6), (6, 2), (0, 4), (4, 0), (2, 6), (6, 4)]\n\n    for ga, gb in schedule:\n        obs = [np.roll(a, ga).tolist(), np.roll(b, gb).tolist()]\n        expected = normal.step(obs)\n        actual, timings, work = profiled.profile_step(obs)\n\n        assert list(actual.bindings) == list(expected.bindings)\n        assert list(actual.shifts) == list(expected.shifts)\n        assert list(actual.subgroup) == list(expected.subgroup)\n        assert actual.subgroup_margin == pytest.approx(expected.subgroup_margin, abs=1e-12)\n        assert list(actual.entity_changed) == list(expected.entity_changed)\n        assert list(actual.noise_changed) == list(expected.noise_changed)\n        assert actual.active_entities == expected.active_entities\n\n        stage_sum = sum(\n            getattr(timings, name)\n            for name in (\n                "validation_ns",\n                "match_scoring_ns",\n                "assignment_ns",\n                "bind_finalize_ns",\n                "entity_update_ns",\n                "subgroup_evidence_ns",\n                "dedup_ns",\n                "prototype_reliability_ns",\n                "noise_state_ns",\n                "subgroup_select_ns",\n            )\n        )\n        assert timings.total_ns >= stage_sum\n        assert work.detections == len(obs)\n        assert work.transform_evaluations == work.pair_scores * work.match_group_size\n\n    assert json.loads(profiled.snapshot_json()) == json.loads(normal.snapshot_json())\n'''
+          assert marker in s
+          p.write_text(s.replace(marker, test + marker, 1))
+          PY
+          cargo fmt --all
+          rm .github/workflows/patch-articulation-profiler-once.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates/cortex-articulation/src/lib.rs crates/cortex-articulation/src/profiling.rs crates/cortex-python/src/lib.rs tests/test_native_layers.py .github/workflows/patch-articulation-profiler-once.yml
+          git commit -m "Expose articulation sub-stage profiling"
+          git push origin HEAD:bench/articulation-attribution-v1
