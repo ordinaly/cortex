@@ -419,32 +419,41 @@ mod tests {
         let detections = fixture_detections();
 
         let expected = normal
-            .step(
-                &detections,
-                &[(0, 1, 1)],
-                Some(0),
-                &[(1, 1)],
-                Some(1.0),
-            )
+            .step(&detections, &[(0, 1, 1)], Some(0), &[(1, 1)], Some(1.0))
             .unwrap();
         let measured = profiled
-            .step_profiled(
-                &detections,
-                &[(0, 1, 1)],
-                Some(0),
-                &[(1, 1)],
-                Some(1.0),
-            )
+            .step_profiled(&detections, &[(0, 1, 1)], Some(0), &[(1, 1)], Some(1.0))
             .unwrap();
 
-        assert_eq!(expected.articulation.bindings, measured.read.articulation.bindings);
-        assert_eq!(expected.graph.relation_changed, measured.read.graph.relation_changed);
-        assert_eq!(expected.graph.causal_changed, measured.read.graph.causal_changed);
-        assert_eq!(expected.articulation_vector, measured.read.articulation_vector);
+        assert_eq!(
+            expected.articulation.bindings,
+            measured.read.articulation.bindings
+        );
+        assert_eq!(
+            expected.graph.relation_changed,
+            measured.read.graph.relation_changed
+        );
+        assert_eq!(
+            expected.graph.causal_changed,
+            measured.read.graph.causal_changed
+        );
+        assert_eq!(
+            expected.articulation_vector,
+            measured.read.articulation_vector
+        );
         assert_eq!(expected.memory.stored, measured.read.memory.stored);
-        assert_eq!(expected.continual.prediction, measured.read.continual.prediction);
-        assert_eq!(expected.continual.memberships, measured.read.continual.memberships);
-        assert_eq!(expected.continual.current_id, measured.read.continual.current_id);
+        assert_eq!(
+            expected.continual.prediction,
+            measured.read.continual.prediction
+        );
+        assert_eq!(
+            expected.continual.memberships,
+            measured.read.continual.memberships
+        );
+        assert_eq!(
+            expected.continual.current_id,
+            measured.read.continual.current_id
+        );
         assert_eq!(expected.continual.stored, measured.read.continual.stored);
 
         let t = measured.timings;
