@@ -16,5 +16,6 @@ cortex-articulation = { path = "../cortex-articulation" }
 cortex-core = { path = "../cortex-core" }
 cortex-graph = { path = "../cortex-graph" }
 cortex-memory = { path = "../cortex-memory" }
+cortex-runtime = { path = "../cortex-runtime" }
 pyo3.workspace = true
 serde_json.workspace = true
