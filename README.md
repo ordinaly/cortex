@@ -126,15 +126,28 @@ These measurements are **workload-specific performance characterization, not a u
 
 Full methodology, raw repetitions, caveats, and interpretation are in [`docs/FULL_RUNTIME_BENCHMARK.md`](docs/FULL_RUNTIME_BENCHMARK.md).
 
-## Next phase: native scaling envelope
+## Native scaling envelope — first optimization pass
 
-With semantic migration complete, the next phase is not to add more mechanisms by default. It is to determine where the native architecture actually becomes expensive.
+The first native scaling campaign is complete. It swept 25 configurations across entity count, visible entities per frame, feature dimension, co-visibility topology, regime-memory budget, and tensor/refinement duty cycle, with three repetitions per configuration.
 
-The upcoming benchmark campaign will vary entity count, visible entities per frame, feature dimension, graph density, regime-memory budget, and tensor/refinement duty cycle while measuring semantic correctness, p50/p95/p99 latency, throughput, memory footprint, and structural behavior.
+That campaign exposed an accidental hot-path cost: the 12-dimensional articulation summary was materializing and deterministically sorting the entire accumulated sparse relation/causal graph on every frame even though it needed only three graph-state counts. The runtime now maintains those counts incrementally through a lightweight `EvidenceSummary`; full graph snapshots remain available for inspection, serialization, and differential checking, but are no longer required by the per-frame summary path.
 
-That campaign will establish a declared **resource envelope** for Cortex v1.0 and identify real computational bottlenecks. SIMD, parallel execution, low-rank curvature, specialized sparse structures, or other optimizations should only be introduced when profiling demonstrates that they improve a measured bottleneck without weakening the behavioral contract.
+Re-running the exact same 25-case campaign produced a median **31.96% reduction in mean step time** across cases. The effect grows sharply when the represented graph is large:
 
-After the resource envelope is characterized, the main scientific gate is untouched external structured-data validation with frozen configuration and fair baselines.
+| scaling case | before | after | speedup |
+|---|---:|---:|---:|
+| 64 nominal entities | 528.97 µs | 196.77 µs | 2.69× |
+| 96 nominal entities | 1,006.25 µs | 264.35 µs | 3.81× |
+| 8 visible entities | 528.82 µs | 202.98 µs | 2.61× |
+| dense co-visibility, 1 cluster | 528.72 µs | 196.02 µs | 2.70× |
+
+The topology sweep is especially diagnostic. Before the fix, changing from one dense co-visibility cluster to eight sparse clusters reduced mean step time from about 529 µs to 259 µs because fewer historical graph cells had to be snapshotted and sorted. After the fix, the same sweep is approximately 196–219 µs. Accumulated represented-graph size is therefore no longer the dominant per-frame cost.
+
+The A/B runs preserve the same structural counters, graph occupancy, memory/regime state, tensor activity, and differential-test behavior; the optimization removes redundant work rather than changing Cortex semantics. The committed medians are in [`benchmarks/results/native_scaling_summary_optimized_medians.csv`](benchmarks/results/native_scaling_summary_optimized_medians.csv), with the direct before/after comparison in [`benchmarks/results/native_scaling_summary_ab.csv`](benchmarks/results/native_scaling_summary_ab.csv).
+
+The next profiling target is now narrower. Remaining scaling is driven primarily by work tied to the current frame—especially visible-pair processing and feature-dimensional articulation—rather than by the total historical graph size. Before introducing SIMD, parallelism, alternative sparse structures, or low-rank approximations, the next benchmark pass should attribute frame time across articulation/binding, graph observation, public-summary construction, fuzzy memory, and continual plasticity. Regime-budget stress also needs a separate fixture that actually realizes enough regimes to create budget pressure; the current sweep usually realizes only two or three.
+
+After the native resource envelope is characterized further, the main scientific gate remains untouched external structured-data validation with frozen configuration and fair baselines.
 
 ## Reference freeze
 
@@ -199,7 +212,7 @@ Cortex is still an experimental research system. v1.0-RC1 means the architecture
 
 The strongest current claims are about the implemented contracts: bounded state, explicit structural plasticity, reversible refinement, sparse native relation/causal storage, cross-language behavioral parity on the frozen migration fixtures, and the measured performance of the published benchmark workloads.
 
-Open work includes systematic native scaling characterization, long-duration resource stress, untouched external full-stack structured benchmarks, broader baseline comparison, and formal results for selected consistency/boundedness properties.
+Open work includes continued native scaling attribution after the first optimization pass, long-duration resource stress, regime-budget saturation fixtures, untouched external full-stack structured benchmarks, broader baseline comparison, and formal results for selected consistency/boundedness properties.
 
 ## License and attribution
 
