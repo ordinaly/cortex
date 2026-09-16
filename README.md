@@ -2,9 +2,9 @@
 
 **Cortex** is an experimental architecture for **continual structural reasoning**.
 
-In simple terms, Cortex is designed to watch a stream of structured observations, build a compact picture of the recurring situations it encounters, and keep that picture up to date without relearning everything from scratch every time the world changes.
+In simple terms, Cortex watches a stream of structured observations, builds a compact model of the recurring situations it encounters, and keeps that model up to date without relearning everything from scratch whenever the world changes.
 
-It is not a chatbot, a language model, or a raw perception system. Cortex sits one level above perception: it assumes that observations have already been turned into useful features, events, entities, or relations, then tries to reason about how those structures persist, change, return, split apart, or disappear over time.
+It is not a chatbot, a language model, or a raw perception system. Cortex sits one level above perception: it assumes observations have already been turned into useful features, entities, events, or relations, then reasons about how those structures persist, change, return, split apart, merge again, or become genuinely novel.
 
 **Author and project creator:** Arnold von Bauer-Gauss
 
@@ -12,21 +12,13 @@ It is not a chatbot, a language model, or a raw perception system. Cortex sits o
 
 Many learning systems work well when the task and data distribution stay mostly fixed. Real environments are messier. The same situations can return after a long absence, known situations can drift gradually, one apparent concept can turn out to contain several distinct cases, and genuinely new situations can appear.
 
-A system that reacts to every change by creating a new model will eventually fill its memory with duplicates. A system that never creates new structure becomes rigid. Cortex is an attempt to find a middle ground.
+A system that reacts to every change by creating a new model will eventually fill its memory with duplicates. A system that never creates new structure becomes rigid. Cortex is an attempt to find a useful middle ground.
 
 Its guiding principle is:
 
 > **Explain new evidence with the smallest structural change that future evidence can justify.**
 
-When something changes, Cortex tries increasingly expensive explanations instead of immediately assuming that the world contains a brand-new concept.
-
-For example, it can decide that:
-
-1. an old situation has simply returned, so an existing concept should be reactivated;
-2. the current concept is still correct but its parameters have shifted, so it should adapt locally;
-3. one concept actually contains two predictively different substructures, so it should be refined into two children;
-4. a distinction that used to matter no longer matters, so two children can be merged again;
-5. nothing already known explains the evidence well enough, so a genuinely new concept should be created.
+When something changes, Cortex tries increasingly expensive explanations instead of immediately assuming that the world contains a brand-new concept. It can reactivate a known situation, adapt an existing one, refine one concept into predictively distinct substructures, merge distinctions that stop mattering, or create genuinely new structure when the existing model is no longer sufficient.
 
 This makes structural complexity reversible rather than a one-way accumulation of memories.
 
@@ -34,53 +26,115 @@ This makes structural complexity reversible rather than a one-way accumulation o
 
 Imagine Cortex is observing a machine over several years.
 
-At first it learns a normal operating regime. Later the machine starts behaving differently in winter. Cortex may discover that this is not a new machine state at all, but a recurring seasonal regime it has seen before. Months later, one operating regime may slowly drift as parts wear down; Cortex can adapt the existing concept instead of inventing another one. If that regime eventually separates into two reliably different patterns, Cortex can test a possible split in the background and only accept it if future observations show that the distinction improves prediction.
+At first it learns a normal operating regime. Later the machine starts behaving differently in winter. Cortex may discover that this is not a new machine state at all, but a recurring seasonal regime it has seen before. Months later, one operating regime may slowly drift as parts wear down; Cortex can adapt the existing concept instead of inventing another one. If that regime eventually separates into two reliably different patterns, Cortex can test a possible split prospectively and only accept it if future observations show that the distinction improves prediction.
 
 If the two patterns later become indistinguishable again, Cortex can merge them.
 
 The goal is therefore not merely to predict the next observation. The goal is to maintain a **small, useful, revisable internal structure** for an environment that changes over time.
 
+## How Cortex reasons
+
+The current native runtime follows a layered transition:
+
+```text
+structured observations
+        ↓
+entity identity + nuisance-transform handling + binding
+        ↓
+sparse relation and intervention-sensitive causal evidence
+        ↓
+12-dimensional public articulation summary
+        ├──────────────→ bounded fuzzy historical memory
+        └──────────────→ continual regime reasoning and plasticity
+```
+
+The two downstream paths deliberately receive the same public articulation summary. Fuzzy-memory reconstruction is not fed back into the continual controller. This preserves the semantics of the frozen Python research stack while keeping approximate historical compression separate from active reasoning.
+
+At the continual level, Cortex distinguishes several kinds of plasticity: recurrence/reactivation, local parametric adaptation, structural splitting, later reconciliation/merging, and genuine novelty. Small residual tensors can detect structured predictive error inside an otherwise stable concept, but those tensor computations are conditionally activated rather than being paid for continuously.
+
 ## What makes Cortex different
 
-Cortex is built around bounded, explicit state rather than an ever-growing history. It keeps a limited library of concepts or regimes, tracks confidence and prediction statistics for them, and exposes memory pressure instead of silently pretending that capacity is unlimited.
+Cortex is built around bounded, explicit state rather than an ever-growing history. It keeps finite concept and memory budgets, tracks prediction evidence and structural confidence, and exposes unresolved or budget-pressure states instead of silently pretending that capacity is unlimited.
 
-Its plasticity is also separated into different kinds of change. Reactivating an old concept is cheaper than modifying one, modifying one is cheaper than splitting it, and splitting is cheaper than declaring something genuinely novel. This gives Cortex a way to balance stability against adaptability instead of controlling everything with one global learning rate.
+Structural decisions are also evidence-gated. A possible split is only a proposal until future observations justify the additional complexity. A previously useful split can later be merged. Known recurrence is preferred over rediscovery. The intended behavior is therefore conservative with structure but plastic when evidence becomes persistent and predictive.
 
-Recent versions also use small residual tensors to detect whether prediction errors contain coherent internal structure. Those tensor computations are themselves conditional: Cortex can put them to sleep when a concept is stable and wake them when cheap monitors indicate that more detailed reasoning is justified.
+The architecture also separates exact active reasoning from approximate historical memory. Compression is allowed only through declared distortion budgets; exhausting a budget does not silently authorize a lossy structural edit.
 
-The current research prototype has been tested on controlled continual-learning fixtures and several chronological real-world streams. These experiments are evidence about the behavior of the architecture, not a claim that Cortex is a universal predictor or a complete AGI system.
+The project has been tested on controlled continual-learning fixtures, chronological real-world streams, structured synthetic worlds, and cross-language differential replays. These are empirical and engineering validation results, not evidence that Cortex is a universal predictor or a complete AGI system.
 
 ## What Cortex does not do
 
-Cortex v1.0 is intentionally scoped as a **reasoning layer over structured observations**. It does not currently learn vision, audio, or language representations directly from raw data. A future system could place a neural or other perceptual encoder in front of Cortex:
+Cortex v1.0 is intentionally scoped as a **continual structural reasoning architecture over structured observations**. It does not currently learn vision, audio, or language representations directly from raw data. A future system can place a neural or other perceptual encoder in front of Cortex:
 
 ```text
 raw data -> perceptual encoder -> structured observations -> Cortex
 ```
 
-Cortex also does not assume that every change has a clean task boundary. The continual-learning controller is designed to work on a stream where changes may be gradual, recurrent, ambiguous, or previously unseen.
+Cortex also does not assume clean task boundaries. Changes may be gradual, recurrent, ambiguous, compositional, or previously unseen.
 
-## Why Rust and Python
+## Native Rust runtime + Python research interface
 
-The v1.0 architecture separates the project into two layers.
+The v1.0 architecture now has a **fully composed native stateful runtime**.
 
-**Rust owns the stateful reasoning core.** It is responsible for bounded regime memory, recurrence and novelty evidence, tensor plasticity, split/merge logic, sparse relation state, and other operations that are performed on every observation.
+Rust owns the state transitions that occur on every frame. Python remains the research layer for datasets, experiments, baseline comparisons, plotting, notebooks, and analysis. The public boundary is deliberately coarse-grained: one `CortexRuntime.step(...)` call crosses into Rust once and executes the complete reasoning transition there.
 
-**Python owns the research interface.** It remains responsible for loading datasets, running experiments, comparing baselines, plotting results, notebooks, and scientific analysis.
+The native workspace is divided by responsibility:
 
-The Python API is intentionally coarse-grained: one call to `Cortex.step()` performs one complete observation update inside Rust. This avoids moving dozens of tiny operations back and forth across the Python/Rust boundary.
+```text
+crates/
+  cortex-articulation/   entity identity, invariance, binding, residual/noise state
+  cortex-graph/          sparse relation, causal and dependency state
+  cortex-memory/         bounded Fuzzy Accordion Memory and certified recompression
+  cortex-core/           continual recurrence, tensor plasticity, split/merge/novelty
+  cortex-runtime/        full-frame composition of the native layers
+  cortex-python/         thin PyO3 research interface
+```
 
-The previous Python implementation, Cortex v0.9.5-alpha, is frozen in this repository as an **executable specification**. The Rust implementation must reproduce its behavioral contracts before it is allowed to become the default backend.
+The lower-level Python-facing `Articulation`, `GraphEvidence`, `FuzzyMemory`, and `Cortex` objects remain available for research and debugging. `CortexRuntime` is the complete composed execution path.
 
-## Current repository status
+## Current project status — v1.0-RC1
 
-This repository is the **Cortex v1.0-RC1 Rust migration workspace**.
+The migration from the frozen Python research implementation to Rust is now **functionally complete at the stateful runtime level**.
 
-The frozen Python reference implementation lives under `reference/v0_9_5/`. The native reasoning engine is being migrated into `crates/cortex-core`, the sparse relation/dependency layer lives in `crates/cortex-graph`, the Python extension is implemented with PyO3 in `crates/cortex-python`, and the research-facing Python package lives under `python/cortex/`.
+The frozen Python v0.9.5 tree remains in `reference/v0_9_5/` as an executable specification. Native modules are accepted only after deterministic differential tests reproduce the relevant Python behavior. The current composed runtime has passed end-to-end replay covering entity binding, nuisance transformations, subgroup inference, relation and causal state changes, fuzzy memory, continual prediction, recurrence/plasticity decisions, and final structural state.
 
-Golden behavioral traces under `tests/fixtures/` cover local adaptation, concept splitting, genuine novelty, and split-followed-by-merge behavior. Continuous integration is expected to replay those traces through the native implementation and compare the results against the frozen Python reference within explicit numerical tolerances.
+CI currently verifies canonical Rust formatting, strict Clippy, release-mode Rust tests, the PyO3 extension, frozen-reference integrity, Python 3.11 and 3.13 differential suites, and a locked Maturin wheel build.
+
+The project has also removed the old dense relation/causal preallocation from the native runtime. Relation and directed causal cells are now created lazily when evidence actually appears, changing the default storage model from an up-front quadratic carrier to sparse represented state. The worst case can still become quadratic if the environment itself produces evidence for every possible pair.
 
 The canonical release-candidate configuration is `configs/v1_rc1.json`.
+
+For the detailed migration record, see [`docs/NATIVE_MIGRATION.md`](docs/NATIVE_MIGRATION.md).
+
+## First full-stack native performance result
+
+After completing the native composition, Cortex was benchmarked in three fresh-process modes over the same deterministic 1,400-frame structured workload: frozen Python, a hybrid Python/Rust path, and the fully native `CortexRuntime` path.
+
+Median results across three runs were:
+
+| execution mode | mean step | p50 latency | peak process RSS |
+|---|---:|---:|---:|
+| Frozen Python | 10,315.3 µs | 9,863.6 µs | 87.43 MiB |
+| Hybrid | 10,141.9 µs | 9,719.4 µs | 86.93 MiB |
+| Fully native | **78.66 µs** | **72.63 µs** | **21.99 MiB** |
+
+On this particular controlled workload, the fully native path was about **131× faster by mean step time** and used about **4× less peak process memory** than the frozen Python full stack. The native median p95 and p99 latencies were approximately 101.6 µs and 129.3 µs respectively.
+
+All three modes finished with the same final prediction/state fingerprint. The large difference appeared only after the complete stateful transition moved behind one Rust boundary; migrating the continual controller alone barely changed full-frame latency. This indicates that, for this workload, Python object/allocation/orchestration overhead in articulation, binding, relation processing, and memory dominated the full Python execution cost.
+
+These measurements are **workload-specific performance characterization, not a universal speedup claim**. Hardware, graph density, feature dimension, entity count, tensor activity, regime count, and caller language can materially change the result.
+
+Full methodology, raw repetitions, caveats, and interpretation are in [`docs/FULL_RUNTIME_BENCHMARK.md`](docs/FULL_RUNTIME_BENCHMARK.md).
+
+## Next phase: native scaling envelope
+
+With semantic migration complete, the next phase is not to add more mechanisms by default. It is to determine where the native architecture actually becomes expensive.
+
+The upcoming benchmark campaign will vary entity count, visible entities per frame, feature dimension, graph density, regime-memory budget, and tensor/refinement duty cycle while measuring semantic correctness, p50/p95/p99 latency, throughput, memory footprint, and structural behavior.
+
+That campaign will establish a declared **resource envelope** for Cortex v1.0 and identify real computational bottlenecks. SIMD, parallel execution, low-rank curvature, specialized sparse structures, or other optimizations should only be introduced when profiling demonstrates that they improve a measured bottleneck without weakening the behavioral contract.
+
+After the resource envelope is characterized, the main scientific gate is untouched external structured-data validation with frozen configuration and fair baselines.
 
 ## Reference freeze
 
@@ -98,7 +152,23 @@ pytest tests/test_freeze.py
 
 Files in `reference/v0_9_5/` should not be edited. A semantic change to the executable specification requires a new reference version.
 
-## Build
+## Differential migration contract
+
+The Rust implementation is not considered equivalent merely because it compiles or produces similar aggregate benchmark scores.
+
+Differential gates replay the same chronological observations through the frozen Python implementation and the native implementation, then compare numerical predictions and state as well as discrete structural decisions. Floating-point quantities use explicit tolerances; structural decisions are expected to agree.
+
+This gives Cortex two complementary roles:
+
+```text
+Python v0.9.5     = readable executable specification
+Rust v1.0-RC1     = native stateful reasoning implementation
+Python package    = research and experiment interface
+```
+
+Future low-level optimizations can therefore be checked against the same behavioral oracle instead of silently changing the algorithm while improving performance.
+
+## Build and test
 
 Prerequisites:
 
@@ -109,31 +179,27 @@ Prerequisites:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -U pip maturin==1.15.0 pytest numpy
-pip install -e .
+python -m pip install -U pip
+python -m pip install "maturin==1.15.0" pytest numpy scipy
+python -m pip install -e .
 pytest
 ```
 
-## Differential migration gate
+For the Rust workspace directly:
 
-The Rust implementation is not considered equivalent merely because it compiles or produces similar aggregate benchmark scores.
-
-The migration gate replays the same chronological observations through the frozen Python implementation and the native implementation, then checks prediction values, current concept identity, structural events, prototype counts, memory pressure, and final structural state. Floating-point quantities use explicit tolerances; discrete structural decisions are expected to agree.
-
-This gives the project two complementary implementations:
-
-```text
-Python v0.9.5  = readable executable specification
-Rust v1.0 core = optimized production implementation
+```bash
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets
+cargo test --workspace --release
 ```
 
-Future low-level optimizations can therefore be checked against the same behavioral oracle.
+## Research maturity and claims
 
-## Current scope of the migration
+Cortex is still an experimental research system. v1.0-RC1 means the architecture has a reproducible native implementation and increasingly explicit behavioral contracts; it does **not** mean that every research question around the architecture is closed.
 
-The first Rust migration targets the v0.9.5 continual-learning and plasticity hot path. Earlier Cortex work on entity formation, invariance, binding, relations, and causal structure is a separate migration phase.
+The strongest current claims are about the implemented contracts: bounded state, explicit structural plasticity, reversible refinement, sparse native relation/causal storage, cross-language behavioral parity on the frozen migration fixtures, and the measured performance of the published benchmark workloads.
 
-This is deliberate. The project is being moved into native code behind explicit behavioral contracts rather than rewritten all at once.
+Open work includes systematic native scaling characterization, long-duration resource stress, untouched external full-stack structured benchmarks, broader baseline comparison, and formal results for selected consistency/boundedness properties.
 
 ## License and attribution
 

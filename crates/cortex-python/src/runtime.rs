@@ -129,6 +129,10 @@ impl PyCortexRuntime {
             .map_err(|e| PyRuntimeError::new_err(e.to_string()))
     }
 
+    fn config_json(&self) -> PyResult<String> {
+        serde_json::to_string(&self.inner.cfg).map_err(|e| PyRuntimeError::new_err(e.to_string()))
+    }
+
     fn articulation_vector(&self) -> Vec<f64> {
         self.inner.articulation_vector()
     }
