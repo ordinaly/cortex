@@ -16,7 +16,9 @@ use cortex_articulation::{
 use cortex_core::{
     Config as ContinualConfig, CortexReasoner, Read as ContinualRead, Snapshot as ContinualSnapshot,
 };
-use cortex_graph::{EvidenceConfig, EvidenceRead, EvidenceSnapshot, SparseEvidenceGraph};
+use cortex_graph::{
+    EvidenceConfig, EvidenceRead, EvidenceSnapshot, EvidenceSummary, SparseEvidenceGraph,
+};
 use cortex_memory::{FuzzyAccordionMemory, MemoryConfig, MemoryRead, MemorySnapshot};
 use serde::{Deserialize, Serialize};
 
@@ -129,8 +131,7 @@ impl NativeCortexRuntime {
 
     pub fn articulation_vector(&self) -> Vec<f64> {
         let art = self.articulation.snapshot();
-        let graph = self.graph.snapshot();
-        build_articulation_vector(&self.cfg.articulation, &art, &graph)
+        build_articulation_vector_from_summary(&self.cfg.articulation, &art, self.graph.summary())
     }
 
     pub fn snapshot(&self) -> RuntimeSnapshot {
@@ -144,10 +145,39 @@ impl NativeCortexRuntime {
     }
 }
 
+/// Compatibility builder for callers that already hold a full graph snapshot.
+///
+/// The native runtime hot path uses `build_articulation_vector_from_summary`
+/// instead, avoiding snapshot materialization and deterministic sorting.
 pub fn build_articulation_vector(
     cfg: &ArticulationConfig,
     art: &ArticulationSnapshot,
     graph: &EvidenceSnapshot,
+) -> Vec<f64> {
+    let summary = EvidenceSummary {
+        relation_active: graph
+            .relations
+            .iter()
+            .filter(|e| e.evidence.state == 1)
+            .count(),
+        relation_resolved: graph
+            .relations
+            .iter()
+            .filter(|e| e.evidence.state != 0)
+            .count(),
+        causal_active: graph
+            .causal
+            .iter()
+            .filter(|e| e.evidence.state == 1)
+            .count(),
+    };
+    build_articulation_vector_from_summary(cfg, art, summary)
+}
+
+pub fn build_articulation_vector_from_summary(
+    cfg: &ArticulationConfig,
+    art: &ArticulationSnapshot,
+    graph: EvidenceSummary,
 ) -> Vec<f64> {
     let ne = art.active_entities;
     let mut gvec = [0.0; 4];
@@ -186,36 +216,21 @@ pub fn build_articulation_vector(
     // Unrepresented active-entity pairs have state 0, exactly like frozen v0.7.
     let relation_den = ne.saturating_mul(ne.saturating_sub(1)) / 2;
     let causal_den = ne.saturating_mul(ne.saturating_sub(1));
-    let relation_active = graph
-        .relations
-        .iter()
-        .filter(|e| e.evidence.state == 1)
-        .count();
-    let relation_resolved = graph
-        .relations
-        .iter()
-        .filter(|e| e.evidence.state != 0)
-        .count();
-    let causal_active = graph
-        .causal
-        .iter()
-        .filter(|e| e.evidence.state == 1)
-        .count();
 
     let rel_active_fraction = if relation_den == 0 {
         0.0
     } else {
-        relation_active as f64 / relation_den as f64
+        graph.relation_active as f64 / relation_den as f64
     };
     let rel_resolved_fraction = if relation_den == 0 {
         0.0
     } else {
-        relation_resolved as f64 / relation_den as f64
+        graph.relation_resolved as f64 / relation_den as f64
     };
     let causal_active_fraction = if causal_den == 0 {
         0.0
     } else {
-        causal_active as f64 / causal_den as f64
+        graph.causal_active as f64 / causal_den as f64
     };
 
     vec![
@@ -288,5 +303,12 @@ mod tests {
         assert_eq!(read.articulation_vector.len(), 12);
         assert_eq!(read.memory.stored, 1);
         assert_eq!(read.continual.stored, 1);
+
+        let snapshot_path = build_articulation_vector(
+            &rt.cfg.articulation,
+            &rt.articulation.snapshot(),
+            &rt.graph.snapshot(),
+        );
+        assert_eq!(rt.articulation_vector(), snapshot_path);
     }
 }
