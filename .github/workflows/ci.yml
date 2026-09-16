@@ -19,12 +19,13 @@ jobs:
           cargo clippy
           -p cortex-core
           -p cortex-articulation
+          -p cortex-graph
           -p cortex-memory
           --all-targets --
           -D warnings
           -A clippy::needless_range_loop
           -A clippy::unnecessary_unwrap
-      - run: cargo test -p cortex-core -p cortex-articulation -p cortex-memory --release
+      - run: cargo test -p cortex-core -p cortex-articulation -p cortex-graph -p cortex-memory --release
       - run: cargo check -p cortex-python --release
 
   python-differential:
@@ -50,6 +51,7 @@ jobs:
           tests/test_api.py
           tests/test_golden.py
           tests/test_native_layers.py
+          tests/test_native_graph.py
           -q
 
   wheel:
