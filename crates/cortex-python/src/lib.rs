@@ -1,3 +1,5 @@
+mod graph;
+
 use cortex_articulation::{ArticulationConfig, ArticulationState};
 use cortex_core::{Config, CortexReasoner, VERSION};
 use cortex_memory::{FuzzyAccordionMemory, MemoryConfig};
@@ -273,6 +275,7 @@ fn _cortex_native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyArticulationRead>()?;
     m.add_class::<PyFuzzyMemory>()?;
     m.add_class::<PyFuzzyMemoryRead>()?;
+    graph::register(m)?;
     m.add_function(wrap_pyfunction!(native_version, m)?)?;
     Ok(())
 }
