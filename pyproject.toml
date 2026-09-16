@@ -1,0 +1,28 @@
+[build-system]
+requires = ["maturin>=1.15,<2"]
+build-backend = "maturin"
+
+[project]
+name = "cortex-reasoner"
+version = "1.0.0rc1"
+description = "Cortex continual structural reasoning runtime — Rust core with Python research interface"
+requires-python = ">=3.11"
+authors = [{name = "Arnold von Bauer-Gauss"}]
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Rust",
+  "Operating System :: OS Independent",
+]
+
+[tool.maturin]
+manifest-path = "crates/cortex-python/Cargo.toml"
+python-source = "python"
+module-name = "cortex._cortex_native"
+features = ["pyo3/extension-module"]
+strip = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
