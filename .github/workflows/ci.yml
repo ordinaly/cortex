@@ -63,6 +63,7 @@ jobs:
           tests/test_native_layers.py
           tests/test_native_graph.py
           tests/test_native_runtime.py
+          tests/test_versioning.py
           -q
 
   wheel:
