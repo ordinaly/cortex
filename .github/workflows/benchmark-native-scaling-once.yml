@@ -1,0 +1,35 @@
+name: benchmark-native-scaling-once
+
+on:
+  push:
+    branches:
+      - benchmark/native-scaling-envelope
+
+jobs:
+  scaling:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" numpy scipy
+      - run: python -m pip install -e .
+      - name: Run native scaling campaign
+        run: |
+          python benchmarks/benchmark_native_scaling.py \
+            --campaign \
+            --repetitions 3 \
+            --output native-scaling-results.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-native-scaling-results
+          path: native-scaling-results.jsonl
