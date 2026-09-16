@@ -5,6 +5,9 @@
 //! updates; those belong to `cortex-graph` and will be integrated through the
 //! top-level runtime after differential parity is established here.
 
+mod profiling;
+pub use profiling::{ArticulationStageTimings, ArticulationWork, ProfiledArticulationRead};
+
 use serde::{Deserialize, Serialize};
 
 const EPS: f64 = 1.0e-12;

@@ -34,8 +34,24 @@ def test_native_articulation_matches_frozen_entity_invariance_path():
 
     a = np.array([0.0, 0.2, 1.1, -0.4, 0.7, -0.9, 0.35, 0.05])
     b = np.array([1.3, -0.2, 0.45, 0.95, -0.65, 0.1, -0.85, 0.55])
-    schedule = [(0, 0), (2, 4), (4, 6), (6, 2), (0, 4), (4, 0), (2, 6), (6, 4),
-                (0, 2), (2, 0), (4, 2), (6, 6), (0, 0), (2, 4), (4, 6), (6, 2)]
+    schedule = [
+        (0, 0),
+        (2, 4),
+        (4, 6),
+        (6, 2),
+        (0, 4),
+        (4, 0),
+        (2, 6),
+        (6, 4),
+        (0, 2),
+        (2, 0),
+        (4, 2),
+        (6, 6),
+        (0, 0),
+        (2, 4),
+        (4, 6),
+        (6, 2),
+    ]
 
     for ga, gb in schedule:
         obs = [np.roll(a, ga), np.roll(b, gb)]
@@ -51,9 +67,59 @@ def test_native_articulation_matches_frozen_entity_invariance_path():
         assert snap["active_entities"] == len(py.state.entities)
         assert snap["subgroup"] == list(py.state.subgroup)
         assert snap["subgroup_margin"] == pytest.approx(py.state.subgroup_margin, abs=1e-11)
-        assert np.asarray(snap["prototypes"]) == pytest.approx(np.asarray(py.state.prototypes), abs=1e-12)
-        assert np.asarray(snap["reliability"]) == pytest.approx(np.asarray(py.state.reliability), abs=1e-12)
-        assert np.array_equal(np.asarray(snap["noise_state"], dtype=np.int8), np.asarray(py.state.noise_state))
+        assert np.asarray(snap["prototypes"]) == pytest.approx(
+            np.asarray(py.state.prototypes), abs=1e-12
+        )
+        assert np.asarray(snap["reliability"]) == pytest.approx(
+            np.asarray(py.state.reliability), abs=1e-12
+        )
+        assert np.array_equal(
+            np.asarray(snap["noise_state"], dtype=np.int8), np.asarray(py.state.noise_state)
+        )
+
+
+def test_profiled_articulation_matches_production_path():
+    dim = 8
+    normal = Articulation(feature_dim=dim, max_entities=8)
+    profiled = Articulation(feature_dim=dim, max_entities=8)
+
+    a = np.array([0.0, 0.2, 1.1, -0.4, 0.7, -0.9, 0.35, 0.05])
+    b = np.array([1.3, -0.2, 0.45, 0.95, -0.65, 0.1, -0.85, 0.55])
+    schedule = [(0, 0), (2, 4), (4, 6), (6, 2), (0, 4), (4, 0), (2, 6), (6, 4)]
+
+    for ga, gb in schedule:
+        obs = [np.roll(a, ga).tolist(), np.roll(b, gb).tolist()]
+        expected = normal.step(obs)
+        actual, timings, work = profiled.profile_step(obs)
+
+        assert list(actual.bindings) == list(expected.bindings)
+        assert list(actual.shifts) == list(expected.shifts)
+        assert list(actual.subgroup) == list(expected.subgroup)
+        assert actual.subgroup_margin == pytest.approx(expected.subgroup_margin, abs=1e-12)
+        assert list(actual.entity_changed) == list(expected.entity_changed)
+        assert list(actual.noise_changed) == list(expected.noise_changed)
+        assert actual.active_entities == expected.active_entities
+
+        stage_sum = sum(
+            getattr(timings, name)
+            for name in (
+                "validation_ns",
+                "match_scoring_ns",
+                "assignment_ns",
+                "bind_finalize_ns",
+                "entity_update_ns",
+                "subgroup_evidence_ns",
+                "dedup_ns",
+                "prototype_reliability_ns",
+                "noise_state_ns",
+                "subgroup_select_ns",
+            )
+        )
+        assert timings.total_ns >= stage_sum
+        assert work.detections == len(obs)
+        assert work.transform_evaluations == work.pair_scores * work.match_group_size
+
+    assert json.loads(profiled.snapshot_json()) == json.loads(normal.snapshot_json())
 
 
 def test_native_fuzzy_memory_matches_frozen_v08_reference():
@@ -89,7 +155,9 @@ def test_native_fuzzy_memory_matches_frozen_v08_reference():
         py_read = py.step(x)
         rs_read = rs.step(raw)
 
-        assert np.asarray(rs_read.reconstruction) == pytest.approx(py_read.reconstruction, abs=1e-12)
+        assert np.asarray(rs_read.reconstruction) == pytest.approx(
+            py_read.reconstruction, abs=1e-12
+        )
         assert np.asarray(rs_read.memberships) == pytest.approx(py_read.memberships, abs=1e-12)
         assert list(rs_read.active_ids) == list(py_read.active_ids)
         assert rs_read.nearest_id == py_read.nearest_id

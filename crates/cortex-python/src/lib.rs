@@ -1,7 +1,9 @@
 mod graph;
 mod runtime;
 
-use cortex_articulation::{ArticulationConfig, ArticulationState};
+use cortex_articulation::{
+    ArticulationConfig, ArticulationStageTimings, ArticulationState, ArticulationWork,
+};
 use cortex_core::{Config, CortexReasoner, VERSION};
 use cortex_memory::{FuzzyAccordionMemory, MemoryConfig};
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
@@ -117,6 +119,97 @@ pub struct PyArticulationRead {
     pub active_entities: usize,
 }
 
+#[pyclass(
+    name = "ArticulationStageTimings",
+    module = "cortex._cortex_native",
+    frozen
+)]
+#[derive(Clone)]
+pub struct PyArticulationStageTimings {
+    #[pyo3(get)]
+    pub validation_ns: u64,
+    #[pyo3(get)]
+    pub match_scoring_ns: u64,
+    #[pyo3(get)]
+    pub assignment_ns: u64,
+    #[pyo3(get)]
+    pub bind_finalize_ns: u64,
+    #[pyo3(get)]
+    pub entity_update_ns: u64,
+    #[pyo3(get)]
+    pub subgroup_evidence_ns: u64,
+    #[pyo3(get)]
+    pub dedup_ns: u64,
+    #[pyo3(get)]
+    pub prototype_reliability_ns: u64,
+    #[pyo3(get)]
+    pub noise_state_ns: u64,
+    #[pyo3(get)]
+    pub subgroup_select_ns: u64,
+    #[pyo3(get)]
+    pub total_ns: u64,
+}
+
+impl From<ArticulationStageTimings> for PyArticulationStageTimings {
+    fn from(t: ArticulationStageTimings) -> Self {
+        Self {
+            validation_ns: t.validation_ns,
+            match_scoring_ns: t.match_scoring_ns,
+            assignment_ns: t.assignment_ns,
+            bind_finalize_ns: t.bind_finalize_ns,
+            entity_update_ns: t.entity_update_ns,
+            subgroup_evidence_ns: t.subgroup_evidence_ns,
+            dedup_ns: t.dedup_ns,
+            prototype_reliability_ns: t.prototype_reliability_ns,
+            noise_state_ns: t.noise_state_ns,
+            subgroup_select_ns: t.subgroup_select_ns,
+            total_ns: t.total_ns,
+        }
+    }
+}
+
+#[pyclass(name = "ArticulationWork", module = "cortex._cortex_native", frozen)]
+#[derive(Clone)]
+pub struct PyArticulationWork {
+    #[pyo3(get)]
+    pub detections: usize,
+    #[pyo3(get)]
+    pub entities_before: usize,
+    #[pyo3(get)]
+    pub match_group_size: usize,
+    #[pyo3(get)]
+    pub pair_scores: usize,
+    #[pyo3(get)]
+    pub transform_evaluations: usize,
+    #[pyo3(get)]
+    pub assignment_rows: usize,
+    #[pyo3(get)]
+    pub assignment_cols: usize,
+    #[pyo3(get)]
+    pub spawned: usize,
+    #[pyo3(get)]
+    pub subgroup_evidence_detections: usize,
+    #[pyo3(get)]
+    pub subgroup_transform_evaluations: usize,
+}
+
+impl From<ArticulationWork> for PyArticulationWork {
+    fn from(w: ArticulationWork) -> Self {
+        Self {
+            detections: w.detections,
+            entities_before: w.entities_before,
+            match_group_size: w.match_group_size,
+            pair_scores: w.pair_scores,
+            transform_evaluations: w.transform_evaluations,
+            assignment_rows: w.assignment_rows,
+            assignment_cols: w.assignment_cols,
+            spawned: w.spawned,
+            subgroup_evidence_detections: w.subgroup_evidence_detections,
+            subgroup_transform_evaluations: w.subgroup_transform_evaluations,
+        }
+    }
+}
+
 #[pyclass(name = "Articulation", module = "cortex._cortex_native")]
 pub struct PyArticulation {
     inner: ArticulationState,
@@ -154,6 +247,34 @@ impl PyArticulation {
             noise_changed: r.noise_changed,
             active_entities: r.active_entities,
         })
+    }
+
+    fn profile_step(
+        &mut self,
+        detections: Vec<Vec<f64>>,
+    ) -> PyResult<(
+        PyArticulationRead,
+        PyArticulationStageTimings,
+        PyArticulationWork,
+    )> {
+        let profiled = self
+            .inner
+            .observe_profiled(&detections)
+            .map_err(PyValueError::new_err)?;
+        let r = profiled.read;
+        Ok((
+            PyArticulationRead {
+                bindings: r.bindings,
+                shifts: r.shifts,
+                subgroup: r.subgroup,
+                subgroup_margin: r.subgroup_margin,
+                entity_changed: r.entity_changed,
+                noise_changed: r.noise_changed,
+                active_entities: r.active_entities,
+            },
+            profiled.timings.into(),
+            profiled.work.into(),
+        ))
     }
 
     fn snapshot_json(&self) -> PyResult<String> {
@@ -274,6 +395,8 @@ fn _cortex_native(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCortexRead>()?;
     m.add_class::<PyArticulation>()?;
     m.add_class::<PyArticulationRead>()?;
+    m.add_class::<PyArticulationStageTimings>()?;
+    m.add_class::<PyArticulationWork>()?;
     m.add_class::<PyFuzzyMemory>()?;
     m.add_class::<PyFuzzyMemoryRead>()?;
     graph::register(m)?;
