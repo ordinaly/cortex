@@ -547,10 +547,12 @@ mod tests {
 
     #[test]
     fn summary_counts_follow_relation_state_transitions() {
-        let mut cfg = EvidenceConfig::default();
-        cfg.relation_min_exposure = 1;
-        cfg.relation_active_threshold = 0.75;
-        cfg.relation_absent_threshold = 0.25;
+        let cfg = EvidenceConfig {
+            relation_min_exposure: 1,
+            relation_active_threshold: 0.75,
+            relation_absent_threshold: 0.25,
+            ..Default::default()
+        };
         let mut g = SparseEvidenceGraph::new(cfg).unwrap();
 
         for _ in 0..2 {
