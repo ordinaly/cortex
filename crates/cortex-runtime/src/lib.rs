@@ -10,8 +10,12 @@
 //! Memory reconstruction is deliberately *not* fed into the continual core;
 //! frozen v0.9.x sends the same public articulation summary to both consumers.
 
-use cortex_articulation::{ArticulationConfig, ArticulationRead, ArticulationSnapshot, ArticulationState};
-use cortex_core::{Config as ContinualConfig, CortexReasoner, Read as ContinualRead, Snapshot as ContinualSnapshot};
+use cortex_articulation::{
+    ArticulationConfig, ArticulationRead, ArticulationSnapshot, ArticulationState,
+};
+use cortex_core::{
+    Config as ContinualConfig, CortexReasoner, Read as ContinualRead, Snapshot as ContinualSnapshot,
+};
 use cortex_graph::{EvidenceConfig, EvidenceRead, EvidenceSnapshot, SparseEvidenceGraph};
 use cortex_memory::{FuzzyAccordionMemory, MemoryConfig, MemoryRead, MemorySnapshot};
 use serde::{Deserialize, Serialize};
