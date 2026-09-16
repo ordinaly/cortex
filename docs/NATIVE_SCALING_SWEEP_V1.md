@@ -136,10 +136,12 @@ Campaign source:
 benchmarks/benchmark_native_scaling.py
 ```
 
-Raw JSONL from Actions run `35094091811` is committed alongside this report under:
+The three-repetition median table is committed as:
 
 ```text
-benchmarks/results/native_scaling_sweep_v1.jsonl
+benchmarks/results/native_scaling_sweep_v1_medians.csv
 ```
 
-The temporary one-shot workflow used to obtain the hosted-runner measurements should be removed after the raw results are committed, so ordinary development pushes do not repeatedly consume benchmark resources.
+The complete 75-run JSONL remains attached to GitHub Actions run `35094091811` as artifact `cortex-native-scaling-results` (artifact ID `10445611186`). Keeping the full hosted-runner output as the immutable Actions artifact avoids bloating the source tree while preserving the raw measurements.
+
+The temporary one-shot workflow used to obtain the hosted-runner measurements should be removed after the campaign record is complete, so ordinary development pushes do not repeatedly consume benchmark resources.
