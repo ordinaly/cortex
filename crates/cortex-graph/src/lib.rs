@@ -21,10 +21,16 @@ pub struct SparseRelationStore {
 }
 
 impl SparseRelationStore {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
-    pub fn len(&self) -> usize { self.directed.len() }
-    pub fn is_empty(&self) -> bool { self.directed.is_empty() }
+    pub fn len(&self) -> usize {
+        self.directed.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.directed.is_empty()
+    }
 
     pub fn get(&self, a: NodeId, b: NodeId) -> Option<&RelationCell> {
         self.directed.get(&(a, b))
@@ -39,18 +45,34 @@ impl SparseRelationStore {
     pub fn remove(&mut self, a: NodeId, b: NodeId) -> Option<RelationCell> {
         let old = self.directed.remove(&(a, b));
         if old.is_some() {
-            if let Some(s) = self.outgoing.get_mut(&a) { s.remove(&b); if s.is_empty() { self.outgoing.remove(&a); } }
-            if let Some(s) = self.incoming.get_mut(&b) { s.remove(&a); if s.is_empty() { self.incoming.remove(&b); } }
+            if let Some(s) = self.outgoing.get_mut(&a) {
+                s.remove(&b);
+                if s.is_empty() {
+                    self.outgoing.remove(&a);
+                }
+            }
+            if let Some(s) = self.incoming.get_mut(&b) {
+                s.remove(&a);
+                if s.is_empty() {
+                    self.incoming.remove(&b);
+                }
+            }
         }
         old
     }
 
     pub fn outgoing(&self, a: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-        self.outgoing.get(&a).into_iter().flat_map(|s| s.iter().copied())
+        self.outgoing
+            .get(&a)
+            .into_iter()
+            .flat_map(|s| s.iter().copied())
     }
 
     pub fn incoming(&self, b: NodeId) -> impl Iterator<Item = NodeId> + '_ {
-        self.incoming.get(&b).into_iter().flat_map(|s| s.iter().copied())
+        self.incoming
+            .get(&b)
+            .into_iter()
+            .flat_map(|s| s.iter().copied())
     }
 }
 
@@ -60,21 +82,35 @@ pub struct DependencyGraph {
 }
 
 impl DependencyGraph {
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     pub fn add_dependency(&mut self, source: NodeId, dependent: NodeId) {
         let v = self.dependents.entry(source).or_default();
-        if !v.contains(&dependent) { v.push(dependent); }
+        if !v.contains(&dependent) {
+            v.push(dependent);
+        }
     }
 
     pub fn closure<I>(&self, dirty: I) -> Vec<NodeId>
-    where I: IntoIterator<Item = NodeId> {
+    where
+        I: IntoIterator<Item = NodeId>,
+    {
         let mut q = VecDeque::new();
         let mut seen = HashSet::new();
-        for n in dirty { if seen.insert(n) { q.push_back(n); } }
+        for n in dirty {
+            if seen.insert(n) {
+                q.push_back(n);
+            }
+        }
         while let Some(n) = q.pop_front() {
             if let Some(ds) = self.dependents.get(&n) {
-                for &d in ds { if seen.insert(d) { q.push_back(d); } }
+                for &d in ds {
+                    if seen.insert(d) {
+                        q.push_back(d);
+                    }
+                }
             }
         }
         let mut out: Vec<_> = seen.into_iter().collect();
@@ -90,7 +126,15 @@ mod tests {
     #[test]
     fn sparse_store_only_allocates_present_edges() {
         let mut s = SparseRelationStore::new();
-        s.upsert(1, 9, RelationCell { value: 0.7, confidence: 0.8, last_updated: 1 });
+        s.upsert(
+            1,
+            9,
+            RelationCell {
+                value: 0.7,
+                confidence: 0.8,
+                last_updated: 1,
+            },
+        );
         assert_eq!(s.len(), 1);
         assert_eq!(s.outgoing(1).collect::<Vec<_>>(), vec![9]);
         assert!(s.get(9, 1).is_none());
@@ -101,7 +145,9 @@ mod tests {
     #[test]
     fn dependency_closure_is_local_and_transitive() {
         let mut g = DependencyGraph::new();
-        g.add_dependency(1, 2); g.add_dependency(2, 3); g.add_dependency(9, 10);
-        assert_eq!(g.closure([1]), vec![1,2,3]);
+        g.add_dependency(1, 2);
+        g.add_dependency(2, 3);
+        g.add_dependency(9, 10);
+        assert_eq!(g.closure([1]), vec![1, 2, 3]);
     }
 }

@@ -5,19 +5,32 @@ use pyo3::prelude::*;
 #[pyclass(name = "CortexRead", module = "cortex._cortex_native", frozen)]
 #[derive(Clone)]
 pub struct PyCortexRead {
-    #[pyo3(get)] pub prediction: f64,
-    #[pyo3(get)] pub memberships: Vec<f64>,
-    #[pyo3(get)] pub active_ids: Vec<usize>,
-    #[pyo3(get)] pub current_id: Option<usize>,
-    #[pyo3(get)] pub nearest_id: Option<usize>,
-    #[pyo3(get)] pub nearest_dist: f64,
-    #[pyo3(get)] pub revision: bool,
-    #[pyo3(get)] pub reactivated: bool,
-    #[pyo3(get)] pub discovered: bool,
-    #[pyo3(get)] pub unresolved: bool,
-    #[pyo3(get)] pub budget_pressure: bool,
-    #[pyo3(get)] pub stored: usize,
-    #[pyo3(get)] pub comparisons: usize,
+    #[pyo3(get)]
+    pub prediction: f64,
+    #[pyo3(get)]
+    pub memberships: Vec<f64>,
+    #[pyo3(get)]
+    pub active_ids: Vec<usize>,
+    #[pyo3(get)]
+    pub current_id: Option<usize>,
+    #[pyo3(get)]
+    pub nearest_id: Option<usize>,
+    #[pyo3(get)]
+    pub nearest_dist: f64,
+    #[pyo3(get)]
+    pub revision: bool,
+    #[pyo3(get)]
+    pub reactivated: bool,
+    #[pyo3(get)]
+    pub discovered: bool,
+    #[pyo3(get)]
+    pub unresolved: bool,
+    #[pyo3(get)]
+    pub budget_pressure: bool,
+    #[pyo3(get)]
+    pub stored: usize,
+    #[pyo3(get)]
+    pub comparisons: usize,
 }
 
 #[pyclass(name = "Cortex", module = "cortex._cortex_native")]
@@ -61,7 +74,8 @@ impl PyCortex {
     }
 
     fn snapshot_json(&self) -> PyResult<String> {
-        serde_json::to_string(&self.inner.snapshot()).map_err(|e| PyRuntimeError::new_err(e.to_string()))
+        serde_json::to_string(&self.inner.snapshot())
+            .map_err(|e| PyRuntimeError::new_err(e.to_string()))
     }
 
     fn config_json(&self) -> PyResult<String> {
@@ -69,14 +83,20 @@ impl PyCortex {
     }
 
     #[getter]
-    fn stored(&self) -> usize { self.inner.prototypes.len() }
+    fn stored(&self) -> usize {
+        self.inner.prototypes.len()
+    }
 
     #[getter]
-    fn current_id(&self) -> Option<usize> { self.inner.current_id }
+    fn current_id(&self) -> Option<usize> {
+        self.inner.current_id
+    }
 }
 
 #[pyfunction]
-fn native_version() -> &'static str { VERSION }
+fn native_version() -> &'static str {
+    VERSION
+}
 
 #[pymodule]
 fn _cortex_native(m: &Bound<'_, PyModule>) -> PyResult<()> {

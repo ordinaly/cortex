@@ -206,7 +206,10 @@ impl DirectionShadow {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum CandidatePhase { Select, Validate }
+pub enum CandidatePhase {
+    Select,
+    Validate,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SplitCandidate {
