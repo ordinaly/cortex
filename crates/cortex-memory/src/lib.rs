@@ -191,10 +191,9 @@ impl FuzzyAccordionMemory {
                 self.counts[nearest] = c + 1.0;
                 self.prototype_updates += 1;
                 compressed = true;
-            } else if self.prototypes.len() < self.cfg.budget {
-                self.append(x);
-                structural_change = true;
-            } else if self.certified_recompress() {
+            } else if self.prototypes.len() < self.cfg.budget || self.certified_recompress() {
+                // Short-circuiting preserves the v0.8 rule: recompression is
+                // attempted only when the memory budget is already full.
                 self.append(x);
                 structural_change = true;
             } else {

@@ -638,7 +638,7 @@ fn linear_sum_assignment(cost: &[Vec<f64>]) -> Result<Vec<usize>, String> {
             assignment[p[j] - 1] = j - 1;
         }
     }
-    if assignment.iter().any(|&j| j == usize::MAX) {
+    if assignment.contains(&usize::MAX) {
         return Err("assignment failed to cover every row".into());
     }
     Ok(assignment)
