@@ -29,7 +29,7 @@ DIM = 12
 
 def regime_vector(index: int) -> list[float]:
     # Binary codewords at amplitude 2.0 keep even one-bit neighbors far outside
-    # the default stay/recurrence tolerances in RMS distance.
+    # the configured stay and recurrence tolerances in RMS distance.
     return [2.0 if (index >> bit) & 1 else -2.0 for bit in range(DIM)]
 
 
@@ -71,6 +71,7 @@ def run_case(case: dict, repetition: int) -> dict:
 
     latencies_us: list[float] = []
     first_pressure_step = None
+    comparison_count = 0
     step_index = 0
     last = None
     for regime in range(attempted_regimes):
@@ -82,6 +83,7 @@ def run_case(case: dict, repetition: int) -> dict:
             last = cortex.step(x, y)
             t1 = time.perf_counter_ns()
             latencies_us.append((t1 - t0) / 1000.0)
+            comparison_count += int(last.comparisons)
             if last.budget_pressure and first_pressure_step is None:
                 first_pressure_step = step_index
 
@@ -90,6 +92,7 @@ def run_case(case: dict, repetition: int) -> dict:
     pressure = int(snap["budget_pressure_count"])
     discoveries = int(snap["discovery_count"])
     unresolved = int(snap["unresolved_count"])
+    expected_first_pressure = budget * repeats + 1
 
     if stored > budget:
         raise RuntimeError(f"budget invariant violated: stored={stored}, budget={budget}")
@@ -100,6 +103,11 @@ def run_case(case: dict, repetition: int) -> dict:
     if pressure <= 0 or first_pressure_step is None:
         raise RuntimeError(
             f"saturation fixture did not expose budget pressure for budget={budget}"
+        )
+    if first_pressure_step != expected_first_pressure:
+        raise RuntimeError(
+            "unexpected budget-pressure onset: "
+            f"got={first_pressure_step}, expected={expected_first_pressure}, budget={budget}"
         )
 
     return {
@@ -113,8 +121,9 @@ def run_case(case: dict, repetition: int) -> dict:
         "budget_pressure_count": pressure,
         "unresolved_count": unresolved,
         "recompression_count": int(snap["recompression_count"]),
-        "comparison_count": int(snap["comparison_count"]),
+        "comparison_count": comparison_count,
         "first_pressure_step": first_pressure_step,
+        "expected_first_pressure_step": expected_first_pressure,
         "mean_us": statistics.fmean(latencies_us),
         "p50_us": percentile(latencies_us, 0.50),
         "p95_us": percentile(latencies_us, 0.95),
@@ -148,11 +157,16 @@ def run_campaign(repetitions: int, output: Path) -> None:
                 proc = subprocess.run(
                     [sys.executable, __file__, "--case-json", payload],
                     cwd=ROOT,
-                    check=True,
+                    check=False,
                     text=True,
                     capture_output=True,
                     env={**os.environ, "PYTHONHASHSEED": "0"},
                 )
+                if proc.returncode != 0:
+                    raise RuntimeError(
+                        f"regime-saturation child failed for {case['case']} rep={rep}:\n"
+                        f"stdout:\n{proc.stdout}\nstderr:\n{proc.stderr}"
+                    )
                 line = proc.stdout.strip().splitlines()[-1]
                 result = json.loads(line.removeprefix("CORTEX_SATURATION="))
                 fh.write(json.dumps(result, sort_keys=True) + "\n")
