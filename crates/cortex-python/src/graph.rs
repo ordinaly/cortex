@@ -46,12 +46,7 @@ impl PyGraphEvidence {
     ) -> PyResult<PyGraphEvidenceRead> {
         let r = self
             .inner
-            .observe(
-                &bindings,
-                &relation_obs,
-                intervention_src_det,
-                &outcomes,
-            )
+            .observe(&bindings, &relation_obs, intervention_src_det, &outcomes)
             .map_err(PyValueError::new_err)?;
         Ok(PyGraphEvidenceRead {
             relation_changed: r.relation_changed,
