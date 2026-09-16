@@ -1,6 +1,9 @@
 """Python research interface for the native Cortex runtime."""
 from __future__ import annotations
 
+__version__ = "1.0.0rc2"
+__spec_version__ = "spec-v0.9.5"
+
 try:
     from ._cortex_native import (
         Articulation,
@@ -9,6 +12,7 @@ try:
         CortexRead,
         CortexRuntime,
         CortexRuntimeRead,
+        CortexRuntimeStageTimings,
         FuzzyMemory,
         FuzzyMemoryRead,
         GraphEvidence,
@@ -35,6 +39,7 @@ except ImportError as exc:  # source-tree use before maturin build
     GraphEvidence = _MissingNative
     CortexRead = None
     CortexRuntimeRead = None
+    CortexRuntimeStageTimings = None
     ArticulationRead = None
     FuzzyMemoryRead = None
     GraphEvidenceRead = None
@@ -49,10 +54,13 @@ __all__ = [
     "CortexRead",
     "CortexRuntime",
     "CortexRuntimeRead",
+    "CortexRuntimeStageTimings",
     "FuzzyMemory",
     "FuzzyMemoryRead",
     "GraphEvidence",
     "GraphEvidenceRead",
     "NATIVE_AVAILABLE",
+    "__spec_version__",
+    "__version__",
     "native_version",
 ]

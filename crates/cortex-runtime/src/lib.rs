@@ -21,6 +21,7 @@ use cortex_graph::{
 };
 use cortex_memory::{FuzzyAccordionMemory, MemoryConfig, MemoryRead, MemorySnapshot};
 use serde::{Deserialize, Serialize};
+use std::time::Instant;
 
 pub const ARTICULATION_VECTOR_DIM: usize = 12;
 
@@ -54,6 +55,27 @@ pub struct RuntimeRead {
     pub articulation_vector: Vec<f64>,
     pub memory: MemoryRead,
     pub continual: ContinualRead,
+}
+
+/// Opt-in stage timings for research profiling.
+///
+/// The normal `step` path performs no timing. `step_profiled` executes the same
+/// state transitions while measuring the major native stages independently.
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct RuntimeStageTimings {
+    pub articulation_ns: u64,
+    pub binding_ns: u64,
+    pub graph_ns: u64,
+    pub summary_ns: u64,
+    pub memory_ns: u64,
+    pub continual_ns: u64,
+    pub total_ns: u64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ProfiledRuntimeRead {
+    pub read: RuntimeRead,
+    pub timings: RuntimeStageTimings,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -107,13 +129,7 @@ impl NativeCortexRuntime {
         outcome: Option<f64>,
     ) -> Result<RuntimeRead, String> {
         let articulation = self.articulation.observe(detections)?;
-        let mut bindings = Vec::with_capacity(articulation.bindings.len());
-        for &id in &articulation.bindings {
-            bindings.push(
-                u32::try_from(id)
-                    .map_err(|_| format!("entity id {id} exceeds native graph NodeId capacity"))?,
-            );
-        }
+        let bindings = graph_bindings(&articulation)?;
         let graph = self
             .graph
             .observe(&bindings, relation_obs, intervention_src_det, outcomes)?;
@@ -126,6 +142,68 @@ impl NativeCortexRuntime {
             articulation_vector,
             memory,
             continual,
+        })
+    }
+
+    /// Execute one normal state transition with opt-in per-stage timing.
+    ///
+    /// This method exists for benchmark attribution and is intentionally
+    /// separate from `step` so production execution pays no timing overhead.
+    #[allow(clippy::too_many_arguments)]
+    pub fn step_profiled(
+        &mut self,
+        detections: &[Vec<f64>],
+        relation_obs: &[(usize, usize, u8)],
+        intervention_src_det: Option<usize>,
+        outcomes: &[(usize, u8)],
+        outcome: Option<f64>,
+    ) -> Result<ProfiledRuntimeRead, String> {
+        let total_start = Instant::now();
+
+        let stage_start = Instant::now();
+        let articulation = self.articulation.observe(detections)?;
+        let articulation_ns = elapsed_ns(stage_start);
+
+        let stage_start = Instant::now();
+        let bindings = graph_bindings(&articulation)?;
+        let binding_ns = elapsed_ns(stage_start);
+
+        let stage_start = Instant::now();
+        let graph = self
+            .graph
+            .observe(&bindings, relation_obs, intervention_src_det, outcomes)?;
+        let graph_ns = elapsed_ns(stage_start);
+
+        let stage_start = Instant::now();
+        let articulation_vector = self.articulation_vector();
+        let summary_ns = elapsed_ns(stage_start);
+
+        let stage_start = Instant::now();
+        let memory = self.memory.step(&articulation_vector)?;
+        let memory_ns = elapsed_ns(stage_start);
+
+        let stage_start = Instant::now();
+        let continual = self.continual.step(&articulation_vector, outcome)?;
+        let continual_ns = elapsed_ns(stage_start);
+
+        let total_ns = elapsed_ns(total_start);
+        Ok(ProfiledRuntimeRead {
+            read: RuntimeRead {
+                articulation,
+                graph,
+                articulation_vector,
+                memory,
+                continual,
+            },
+            timings: RuntimeStageTimings {
+                articulation_ns,
+                binding_ns,
+                graph_ns,
+                summary_ns,
+                memory_ns,
+                continual_ns,
+                total_ns,
+            },
         })
     }
 
@@ -143,6 +221,21 @@ impl NativeCortexRuntime {
             articulation_vector: self.articulation_vector(),
         }
     }
+}
+
+fn graph_bindings(articulation: &ArticulationRead) -> Result<Vec<u32>, String> {
+    let mut bindings = Vec::with_capacity(articulation.bindings.len());
+    for &id in &articulation.bindings {
+        bindings.push(
+            u32::try_from(id)
+                .map_err(|_| format!("entity id {id} exceeds native graph NodeId capacity"))?,
+        );
+    }
+    Ok(bindings)
+}
+
+fn elapsed_ns(start: Instant) -> u64 {
+    u64::try_from(start.elapsed().as_nanos()).unwrap_or(u64::MAX)
 }
 
 /// Compatibility builder for callers that already hold a full graph snapshot.
@@ -271,6 +364,13 @@ fn resolved_group_candidates(cfg: &ArticulationConfig) -> Vec<Vec<usize>> {
 mod tests {
     use super::*;
 
+    fn fixture_detections() -> Vec<Vec<f64>> {
+        vec![
+            vec![0.0, 1.0, 0.2, -0.4, 0.8, 0.1, -0.7, 0.3],
+            vec![1.0, -0.2, 0.5, 0.7, -0.3, 0.9, 0.1, -0.5],
+        ]
+    }
+
     #[test]
     fn runtime_default_summary_has_frozen_dimension() {
         let rt = NativeCortexRuntime::new(RuntimeConfig::default()).unwrap();
@@ -287,10 +387,7 @@ mod tests {
         let mut rt = NativeCortexRuntime::new(cfg).unwrap();
         let read = rt
             .step(
-                &[
-                    vec![0.0, 1.0, 0.2, -0.4, 0.8, 0.1, -0.7, 0.3],
-                    vec![1.0, -0.2, 0.5, 0.7, -0.3, 0.9, 0.1, -0.5],
-                ],
+                &fixture_detections(),
                 &[(0, 1, 1)],
                 Some(0),
                 &[(1, 1)],
@@ -310,5 +407,63 @@ mod tests {
             &rt.graph.snapshot(),
         );
         assert_eq!(rt.articulation_vector(), snapshot_path);
+    }
+
+    #[test]
+    fn profiled_step_preserves_normal_step_semantics() {
+        let mut cfg = RuntimeConfig::default();
+        cfg.articulation.feature_dim = 8;
+        cfg.articulation.max_entities = 8;
+        let mut normal = NativeCortexRuntime::new(cfg.clone()).unwrap();
+        let mut profiled = NativeCortexRuntime::new(cfg).unwrap();
+        let detections = fixture_detections();
+
+        let expected = normal
+            .step(&detections, &[(0, 1, 1)], Some(0), &[(1, 1)], Some(1.0))
+            .unwrap();
+        let measured = profiled
+            .step_profiled(&detections, &[(0, 1, 1)], Some(0), &[(1, 1)], Some(1.0))
+            .unwrap();
+
+        assert_eq!(
+            expected.articulation.bindings,
+            measured.read.articulation.bindings
+        );
+        assert_eq!(
+            expected.graph.relation_changed,
+            measured.read.graph.relation_changed
+        );
+        assert_eq!(
+            expected.graph.causal_changed,
+            measured.read.graph.causal_changed
+        );
+        assert_eq!(
+            expected.articulation_vector,
+            measured.read.articulation_vector
+        );
+        assert_eq!(expected.memory.stored, measured.read.memory.stored);
+        assert_eq!(
+            expected.continual.prediction,
+            measured.read.continual.prediction
+        );
+        assert_eq!(
+            expected.continual.memberships,
+            measured.read.continual.memberships
+        );
+        assert_eq!(
+            expected.continual.current_id,
+            measured.read.continual.current_id
+        );
+        assert_eq!(expected.continual.stored, measured.read.continual.stored);
+
+        let t = measured.timings;
+        let attributed = t.articulation_ns
+            + t.binding_ns
+            + t.graph_ns
+            + t.summary_ns
+            + t.memory_ns
+            + t.continual_ns;
+        assert!(t.total_ns > 0);
+        assert!(t.total_ns >= attributed);
     }
 }

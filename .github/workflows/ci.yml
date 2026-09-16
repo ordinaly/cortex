@@ -5,6 +5,15 @@ on:
   pull_request:
 
 jobs:
+  version-consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python scripts/check_version_consistency.py
+
   rust-core:
     runs-on: ubuntu-latest
     steps:
@@ -54,6 +63,7 @@ jobs:
           tests/test_native_layers.py
           tests/test_native_graph.py
           tests/test_native_runtime.py
+          tests/test_versioning.py
           -q
 
   wheel:

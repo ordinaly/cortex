@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "cortex-reasoner"
-version = "1.0.0rc1"
+version = "1.0.0rc2"
 description = "Cortex continual structural reasoning runtime — Rust core with Python research interface"
 requires-python = ">=3.11"
 authors = [{name = "Arnold von Bauer-Gauss"}]

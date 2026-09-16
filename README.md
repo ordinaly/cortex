@@ -92,19 +92,35 @@ crates/
 
 The lower-level Python-facing `Articulation`, `GraphEvidence`, `FuzzyMemory`, and `Cortex` objects remain available for research and debugging. `CortexRuntime` is the complete composed execution path.
 
-## Current project status — v1.0-RC1
+## Current project status — v1.0.0-rc.2
 
 The migration from the frozen Python research implementation to Rust is now **functionally complete at the stateful runtime level**.
 
-The frozen Python v0.9.5 tree remains in `reference/v0_9_5/` as an executable specification. Native modules are accepted only after deterministic differential tests reproduce the relevant Python behavior. The current composed runtime has passed end-to-end replay covering entity binding, nuisance transformations, subgroup inference, relation and causal state changes, fuzzy memory, continual prediction, recurrence/plasticity decisions, and final structural state.
+The frozen Python `spec-v0.9.5` tree remains in `reference/v0_9_5/` as an executable specification. Native modules are accepted only after deterministic differential tests reproduce the relevant Python behavior. The current composed runtime has passed end-to-end replay covering entity binding, nuisance transformations, subgroup inference, relation and causal state changes, fuzzy memory, continual prediction, recurrence/plasticity decisions, and final structural state.
 
-CI currently verifies canonical Rust formatting, strict Clippy, release-mode Rust tests, the PyO3 extension, frozen-reference integrity, Python 3.11 and 3.13 differential suites, and a locked Maturin wheel build.
+CI currently verifies canonical Rust formatting, strict Clippy, release-mode Rust tests, the PyO3 extension, frozen-reference integrity, Python 3.11 and 3.13 differential suites, a locked Maturin wheel build, and mechanical release/specification version consistency. Relevant runtime and benchmark changes additionally run the versioned research-benchmark workflow.
 
 The project has also removed the old dense relation/causal preallocation from the native runtime. Relation and directed causal cells are now created lazily when evidence actually appears, changing the default storage model from an up-front quadratic carrier to sparse represented state. The worst case can still become quadratic if the environment itself produces evidence for every possible pair.
 
-The canonical release-candidate configuration is `configs/v1_rc1.json`.
+The canonical release-candidate configuration is `configs/v1.0.0-rc.2.json`. The older `configs/v1_rc1.json` file remains as historical provenance rather than being rewritten.
 
 For the detailed migration record, see [`docs/NATIVE_MIGRATION.md`](docs/NATIVE_MIGRATION.md).
+
+## Versioning and reproducibility
+
+Cortex now separates three provenance coordinates explicitly:
+
+```text
+software release        v1.0.0-rc.2
+executable specification spec-v0.9.5
+benchmark protocol       e.g. stage-attribution-v1
+```
+
+The canonical software version lives in `VERSION`; the frozen specification identifier lives in `SPEC_VERSION`. Rust uses the SemVer spelling `1.0.0-rc.2`, while the Python package uses the equivalent PEP 440 spelling `1.0.0rc2`. `scripts/check_version_consistency.py` prevents those surfaces from drifting in CI.
+
+Benchmark protocols are versioned independently so the same experimental method can be rerun on later Cortex releases without confusing software evolution with methodology evolution. Result rows record the Cortex release, native version, Python package version, specification version, protocol identifier, exact Git SHA, runtime, seeds, repetitions, and relevant configuration.
+
+The full convention and release rules are documented in [`docs/VERSIONING.md`](docs/VERSIONING.md).
 
 ## First full-stack native performance result
 
@@ -128,7 +144,7 @@ Full methodology, raw repetitions, caveats, and interpretation are in [`docs/FUL
 
 ## Native scaling envelope — first optimization pass
 
-The first native scaling campaign is complete. It swept 25 configurations across entity count, visible entities per frame, feature dimension, co-visibility topology, regime-memory budget, and tensor/refinement duty cycle, with three repetitions per configuration.
+The first native scaling campaign swept 25 configurations across entity count, visible entities per frame, feature dimension, co-visibility topology, regime-memory budget, and tensor/refinement duty cycle, with three repetitions per configuration.
 
 That campaign exposed an accidental hot-path cost: the 12-dimensional articulation summary was materializing and deterministically sorting the entire accumulated sparse relation/causal graph on every frame even though it needed only three graph-state counts. The runtime now maintains those counts incrementally through a lightweight `EvidenceSummary`; full graph snapshots remain available for inspection, serialization, and differential checking, but are no longer required by the per-frame summary path.
 
@@ -145,13 +161,30 @@ The topology sweep is especially diagnostic. Before the fix, changing from one d
 
 The A/B runs preserve the same structural counters, graph occupancy, memory/regime state, tensor activity, and differential-test behavior; the optimization removes redundant work rather than changing Cortex semantics. The committed medians are in [`benchmarks/results/native_scaling_summary_optimized_medians.csv`](benchmarks/results/native_scaling_summary_optimized_medians.csv), with the direct before/after comparison in [`benchmarks/results/native_scaling_summary_ab.csv`](benchmarks/results/native_scaling_summary_ab.csv).
 
-The next profiling target is now narrower. Remaining scaling is driven primarily by work tied to the current frame—especially visible-pair processing and feature-dimensional articulation—rather than by the total historical graph size. Before introducing SIMD, parallelism, alternative sparse structures, or low-rank approximations, the next benchmark pass should attribute frame time across articulation/binding, graph observation, public-summary construction, fuzzy memory, and continual plasticity. Regime-budget stress also needs a separate fixture that actually realizes enough regimes to create budget pressure; the current sweep usually realizes only two or three.
+## Native stage attribution and budget saturation
+
+`stage-attribution-v1` now measures the actual composed native transition through an opt-in profiled runtime path while leaving normal `CortexRuntime.step()` uninstrumented. Across all six tested stress cases, **articulation is the dominant stage, accounting for approximately 83–95% of attributed native time**.
+
+| case | internal mean | articulation share | next-largest measured cost |
+|---|---:|---:|---|
+| baseline | 126.92 µs | 89.6% | graph 5.2% |
+| 96 nominal entities | 281.00 µs | 92.2% | public summary 4.6% |
+| 16 visible entities | 442.11 µs | 85.8% | graph 11.6% |
+| 64-D features | 384.51 µs | 95.1% | public summary 2.7% |
+| sparse topology | 229.36 µs | 86.4% | public summary 10.1% |
+| high tensor duty | 131.63 µs | 82.9% | continual core 7.8% |
+
+This makes the next profiling target explicit: entity/invariance articulation must be decomposed internally before Cortex adopts broader SIMD, parallelization, caching, or a different assignment strategy. The public-summary path is a smaller secondary target because it still clones more articulation state than the 12-D vector strictly requires.
+
+The separate `regime-saturation-v1` fixture now genuinely reaches the configured regime capacity. Budgets 2, 4, 8, and 16 fill **exactly** to their declared bounds and never exceed them. Budget pressure begins at steps 13, 25, 49, and 97 respectively—the first frame of the first novel regime beyond capacity—and the additional observations are surfaced as explicit `budget_pressure` / `unresolved` states rather than hidden structural growth.
+
+Full methodology and interpretation are in [`docs/NATIVE_STAGE_ATTRIBUTION.md`](docs/NATIVE_STAGE_ATTRIBUTION.md). The committed median results are [`benchmarks/results/stage_attribution_v1_medians.csv`](benchmarks/results/stage_attribution_v1_medians.csv) and [`benchmarks/results/regime_saturation_v1_medians.csv`](benchmarks/results/regime_saturation_v1_medians.csv).
 
 After the native resource envelope is characterized further, the main scientific gate remains untouched external structured-data validation with frozen configuration and fair baselines.
 
 ## Reference freeze
 
-The exact files frozen from v0.9.5 are hashed in:
+The exact files frozen as `spec-v0.9.5` are hashed in:
 
 ```text
 reference/v0_9_5/SHA256SUMS.txt
@@ -163,7 +196,7 @@ Verify them with:
 pytest tests/test_freeze.py
 ```
 
-Files in `reference/v0_9_5/` should not be edited. A semantic change to the executable specification requires a new reference version.
+Files in `reference/v0_9_5/` should not be edited. A semantic change to the executable specification requires a new specification version.
 
 ## Differential migration contract
 
@@ -171,12 +204,12 @@ The Rust implementation is not considered equivalent merely because it compiles 
 
 Differential gates replay the same chronological observations through the frozen Python implementation and the native implementation, then compare numerical predictions and state as well as discrete structural decisions. Floating-point quantities use explicit tolerances; structural decisions are expected to agree.
 
-This gives Cortex two complementary roles:
+This gives Cortex complementary provenance roles:
 
 ```text
-Python v0.9.5     = readable executable specification
-Rust v1.0-RC1     = native stateful reasoning implementation
-Python package    = research and experiment interface
+Python spec-v0.9.5      = readable executable specification
+Rust v1.0.0-rc.2        = native stateful reasoning implementation
+Python package 1.0.0rc2 = research and experiment interface
 ```
 
 Future low-level optimizations can therefore be checked against the same behavioral oracle instead of silently changing the algorithm while improving performance.
@@ -195,6 +228,7 @@ source .venv/bin/activate
 python -m pip install -U pip
 python -m pip install "maturin==1.15.0" pytest numpy scipy
 python -m pip install -e .
+python scripts/check_version_consistency.py
 pytest
 ```
 
@@ -208,11 +242,11 @@ cargo test --workspace --release
 
 ## Research maturity and claims
 
-Cortex is still an experimental research system. v1.0-RC1 means the architecture has a reproducible native implementation and increasingly explicit behavioral contracts; it does **not** mean that every research question around the architecture is closed.
+Cortex is still an experimental research system. `v1.0.0-rc.2` means the architecture has a reproducible native implementation, an explicit release/specification/protocol provenance model, and increasingly explicit behavioral contracts; it does **not** mean that every research question around the architecture is closed.
 
-The strongest current claims are about the implemented contracts: bounded state, explicit structural plasticity, reversible refinement, sparse native relation/causal storage, cross-language behavioral parity on the frozen migration fixtures, and the measured performance of the published benchmark workloads.
+The strongest current claims are about the implemented contracts: bounded state, explicit structural plasticity, reversible refinement, sparse native relation/causal storage, cross-language behavioral parity on the frozen migration fixtures, measured regime-budget pressure behavior under the saturation fixture, and the measured performance of the published benchmark workloads.
 
-Open work includes continued native scaling attribution after the first optimization pass, long-duration resource stress, regime-budget saturation fixtures, untouched external full-stack structured benchmarks, broader baseline comparison, and formal results for selected consistency/boundedness properties.
+Open work includes internal articulation-stage attribution and optimization, long-duration resource stress, untouched external full-stack structured benchmarks, broader baseline comparison, and formal results for selected consistency/boundedness properties.
 
 ## License and attribution
 
