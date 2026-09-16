@@ -184,6 +184,17 @@ pub struct EvidenceRead {
     pub represented_causal: usize,
 }
 
+/// Lightweight graph-state statistics needed by the public articulation vector.
+///
+/// These counters are maintained incrementally so the hot path does not need to
+/// materialize or sort a full graph snapshot on every frame.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+pub struct EvidenceSummary {
+    pub relation_active: usize,
+    pub relation_resolved: usize,
+    pub causal_active: usize,
+}
+
 /// Sparse online sufficient statistics for v0.7 relation and causal semantics.
 ///
 /// Relation cells are undirected and normalized as `(min(a,b), max(a,b))`.
@@ -194,6 +205,9 @@ pub struct SparseEvidenceGraph {
     pub cfg: EvidenceConfig,
     relations: HashMap<(NodeId, NodeId), RelationEvidence>,
     causal: HashMap<(NodeId, NodeId), CausalEvidence>,
+    relation_active: usize,
+    relation_resolved: usize,
+    causal_active: usize,
     time: u64,
 }
 
@@ -219,6 +233,9 @@ impl SparseEvidenceGraph {
             cfg,
             relations: HashMap::new(),
             causal: HashMap::new(),
+            relation_active: 0,
+            relation_resolved: 0,
+            causal_active: 0,
             time: 0,
         })
     }
@@ -229,6 +246,14 @@ impl SparseEvidenceGraph {
 
     pub fn represented_causal(&self) -> usize {
         self.causal.len()
+    }
+
+    pub fn summary(&self) -> EvidenceSummary {
+        EvidenceSummary {
+            relation_active: self.relation_active,
+            relation_resolved: self.relation_resolved,
+            causal_active: self.causal_active,
+        }
     }
 
     pub fn relation(&self, a: NodeId, b: NodeId) -> Option<&RelationEvidence> {
@@ -293,7 +318,20 @@ impl SparseEvidenceGraph {
                 cell.last_updated = self.time;
                 let next = derive_relation_state(self.cfg, *cell);
                 if next != cell.state {
+                    let previous = cell.state;
                     cell.state = next;
+                    if previous == 1 {
+                        self.relation_active -= 1;
+                    }
+                    if next == 1 {
+                        self.relation_active += 1;
+                    }
+                    if previous != 0 {
+                        self.relation_resolved -= 1;
+                    }
+                    if next != 0 {
+                        self.relation_resolved += 1;
+                    }
                     relation_changed.push(key);
                 }
             }
@@ -322,7 +360,14 @@ impl SparseEvidenceGraph {
                 cell.last_updated = self.time;
                 let next = derive_causal_state(self.cfg, *cell);
                 if next != cell.state {
+                    let previous = cell.state;
                     cell.state = next;
+                    if previous == 1 {
+                        self.causal_active -= 1;
+                    }
+                    if next == 1 {
+                        self.causal_active += 1;
+                    }
                     causal_changed.push(key);
                 }
             }
@@ -485,10 +530,48 @@ mod tests {
         }
         assert_eq!(g.relation(0, 1).unwrap().state, 1);
         assert_eq!(g.causal(0, 1).unwrap().state, 0); // no controls yet
+        assert_eq!(
+            g.summary(),
+            EvidenceSummary {
+                relation_active: 1,
+                relation_resolved: 1,
+                causal_active: 0,
+            }
+        );
         for _ in 0..8 {
-            g.observe(&[0, 1], &[(0, 1, 1)], None, &[(1, 0)]).unwrap();
+            g.observe(&[0, 1], &[(0, 1, 1)], None, &[(1, 0)])
+                .unwrap();
         }
         assert_eq!(g.causal(0, 1).unwrap().state, 1);
+        assert_eq!(g.summary().causal_active, 1);
+    }
+
+    #[test]
+    fn summary_counts_follow_relation_state_transitions() {
+        let mut cfg = EvidenceConfig::default();
+        cfg.relation_min_exposure = 1;
+        cfg.relation_active_threshold = 0.75;
+        cfg.relation_absent_threshold = 0.25;
+        let mut g = SparseEvidenceGraph::new(cfg).unwrap();
+
+        for _ in 0..2 {
+            g.observe(&[0, 1], &[(0, 1, 1)], None, &[]).unwrap();
+        }
+        assert_eq!(g.relation(0, 1).unwrap().state, 1);
+        assert_eq!(g.summary().relation_active, 1);
+        assert_eq!(g.summary().relation_resolved, 1);
+
+        g.observe(&[0, 1], &[(0, 1, 0)], None, &[]).unwrap();
+        assert_eq!(g.relation(0, 1).unwrap().state, 0);
+        assert_eq!(g.summary().relation_active, 0);
+        assert_eq!(g.summary().relation_resolved, 0);
+
+        for _ in 0..7 {
+            g.observe(&[0, 1], &[(0, 1, 0)], None, &[]).unwrap();
+        }
+        assert_eq!(g.relation(0, 1).unwrap().state, -1);
+        assert_eq!(g.summary().relation_active, 0);
+        assert_eq!(g.summary().relation_resolved, 1);
     }
 
     #[test]
