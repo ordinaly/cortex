@@ -6,7 +6,10 @@ on:
     paths:
       - "VERSION"
       - "SPEC_VERSION"
-      - "benchmarks/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "pyproject.toml"
+      - "benchmarks/*.py"
       - "crates/cortex-runtime/**"
       - "crates/cortex-python/src/runtime.rs"
       - "python/cortex/__init__.py"
@@ -23,6 +26,8 @@ jobs:
       MKL_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: dtolnay/rust-toolchain@1.98.1
       - uses: actions/setup-python@v5
         with:
@@ -52,6 +57,8 @@ jobs:
       MKL_NUM_THREADS: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: dtolnay/rust-toolchain@1.98.1
       - uses: actions/setup-python@v5
         with:
