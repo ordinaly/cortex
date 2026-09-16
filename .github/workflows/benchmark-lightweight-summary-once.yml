@@ -1,3 +1,4 @@
+# One-shot controlled A/B run against the PR #7 scaling fixture.
 name: benchmark-lightweight-summary-once
 
 on:
