@@ -41,8 +41,20 @@ dependencies = [
  "cortex-core",
  "cortex-graph",
  "cortex-memory",
+ "cortex-runtime",
  "pyo3",
  "serde_json",
+]
+
+[[package]]
+name = "cortex-runtime"
+version = "1.0.0-rc1"
+dependencies = [
+ "cortex-articulation",
+ "cortex-core",
+ "cortex-graph",
+ "cortex-memory",
+ "serde",
 ]
 
 [[package]]

@@ -1,5 +1,5 @@
 [package]
-name = "cortex-python"
+name = "cortex-runtime"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -7,15 +7,9 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 
-[lib]
-name = "_cortex_native"
-crate-type = ["cdylib"]
-
 [dependencies]
 cortex-articulation = { path = "../cortex-articulation" }
 cortex-core = { path = "../cortex-core" }
 cortex-graph = { path = "../cortex-graph" }
 cortex-memory = { path = "../cortex-memory" }
-cortex-runtime = { path = "../cortex-runtime" }
-pyo3.workspace = true
-serde_json.workspace = true
+serde.workspace = true

@@ -7,6 +7,8 @@ try:
         ArticulationRead,
         Cortex,
         CortexRead,
+        CortexRuntime,
+        CortexRuntimeRead,
         FuzzyMemory,
         FuzzyMemoryRead,
         GraphEvidence,
@@ -27,10 +29,12 @@ except ImportError as exc:  # source-tree use before maturin build
             ) from _NATIVE_IMPORT_ERROR
 
     Cortex = _MissingNative
+    CortexRuntime = _MissingNative
     Articulation = _MissingNative
     FuzzyMemory = _MissingNative
     GraphEvidence = _MissingNative
     CortexRead = None
+    CortexRuntimeRead = None
     ArticulationRead = None
     FuzzyMemoryRead = None
     GraphEvidenceRead = None
@@ -43,6 +47,8 @@ __all__ = [
     "ArticulationRead",
     "Cortex",
     "CortexRead",
+    "CortexRuntime",
+    "CortexRuntimeRead",
     "FuzzyMemory",
     "FuzzyMemoryRead",
     "GraphEvidence",
