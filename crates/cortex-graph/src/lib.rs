@@ -539,8 +539,7 @@ mod tests {
             }
         );
         for _ in 0..8 {
-            g.observe(&[0, 1], &[(0, 1, 1)], None, &[(1, 0)])
-                .unwrap();
+            g.observe(&[0, 1], &[(0, 1, 1)], None, &[(1, 0)]).unwrap();
         }
         assert_eq!(g.causal(0, 1).unwrap().state, 1);
         assert_eq!(g.summary().causal_active, 1);

@@ -131,11 +131,7 @@ impl NativeCortexRuntime {
 
     pub fn articulation_vector(&self) -> Vec<f64> {
         let art = self.articulation.snapshot();
-        build_articulation_vector_from_summary(
-            &self.cfg.articulation,
-            &art,
-            self.graph.summary(),
-        )
+        build_articulation_vector_from_summary(&self.cfg.articulation, &art, self.graph.summary())
     }
 
     pub fn snapshot(&self) -> RuntimeSnapshot {
