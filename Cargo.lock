@@ -3,6 +3,14 @@
 version = 4
 
 [[package]]
+name = "cortex-articulation"
+version = "1.0.0-rc1"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cortex-core"
 version = "1.0.0-rc1"
 dependencies = [
@@ -18,10 +26,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "cortex-memory"
+version = "1.0.0-rc1"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cortex-python"
 version = "1.0.0-rc1"
 dependencies = [
+ "cortex-articulation",
  "cortex-core",
+ "cortex-memory",
  "pyo3",
  "serde_json",
 ]

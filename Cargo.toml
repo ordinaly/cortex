@@ -1,5 +1,11 @@
 [workspace]
-members = ["crates/cortex-core", "crates/cortex-graph", "crates/cortex-python"]
+members = [
+    "crates/cortex-articulation",
+    "crates/cortex-core",
+    "crates/cortex-graph",
+    "crates/cortex-memory",
+    "crates/cortex-python",
+]
 resolver = "2"
 
 [workspace.package]
@@ -8,7 +14,7 @@ edition = "2024"
 rust-version = "1.85"
 authors = ["Arnold von Bauer-Gauss"]
 license = "Apache-2.0"
-repository = "https://example.invalid/cortex"
+repository = "https://github.com/ordinaly/cortex"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

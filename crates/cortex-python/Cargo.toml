@@ -5,12 +5,15 @@ edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
+repository.workspace = true
 
 [lib]
 name = "_cortex_native"
 crate-type = ["cdylib"]
 
 [dependencies]
+cortex-articulation = { path = "../cortex-articulation" }
 cortex-core = { path = "../cortex-core" }
+cortex-memory = { path = "../cortex-memory" }
 pyo3.workspace = true
 serde_json.workspace = true
