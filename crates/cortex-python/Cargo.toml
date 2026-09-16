@@ -14,6 +14,7 @@ crate-type = ["cdylib"]
 [dependencies]
 cortex-articulation = { path = "../cortex-articulation" }
 cortex-core = { path = "../cortex-core" }
+cortex-graph = { path = "../cortex-graph" }
 cortex-memory = { path = "../cortex-memory" }
 pyo3.workspace = true
 serde_json.workspace = true
