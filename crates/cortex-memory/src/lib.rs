@@ -269,10 +269,7 @@ impl FuzzyAccordionMemory {
     }
 
     fn distances(&self, x: &[f64]) -> Vec<f64> {
-        self.prototypes
-            .iter()
-            .map(|c| rms_distance(x, c))
-            .collect()
+        self.prototypes.iter().map(|c| rms_distance(x, c)).collect()
     }
 
     fn memberships_from_distances(&self, distances: &[f64]) -> Vec<f64> {
@@ -328,8 +325,7 @@ impl FuzzyAccordionMemory {
         let wj = self.counts[j];
         let mut merged = vec![0.0; self.cfg.dim];
         for (f, slot) in merged.iter_mut().enumerate() {
-            *slot = (wi * self.prototypes[i][f] + wj * self.prototypes[j][f])
-                / (wi + wj).max(EPS);
+            *slot = (wi * self.prototypes[i][f] + wj * self.prototypes[j][f]) / (wi + wj).max(EPS);
         }
         if rms_distance(&merged, &self.prototypes[i])
             .max(rms_distance(&merged, &self.prototypes[j]))
@@ -353,12 +349,7 @@ impl FuzzyAccordionMemory {
 
 fn rms_distance(a: &[f64], b: &[f64]) -> f64 {
     debug_assert_eq!(a.len(), b.len());
-    let mean = a
-        .iter()
-        .zip(b)
-        .map(|(x, y)| (x - y).powi(2))
-        .sum::<f64>()
-        / a.len().max(1) as f64;
+    let mean = a.iter().zip(b).map(|(x, y)| (x - y).powi(2)).sum::<f64>() / a.len().max(1) as f64;
     mean.sqrt()
 }
 

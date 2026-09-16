@@ -488,9 +488,7 @@ impl ArticulationState {
         for (hi, score) in scores.iter_mut().enumerate() {
             let mut vals: Vec<f64> = eligible
                 .iter()
-                .map(|&e| {
-                    self.group_evidence_by_entity[e][hi] / self.group_obs_by_entity[e] as f64
-                })
+                .map(|&e| self.group_evidence_by_entity[e][hi] / self.group_obs_by_entity[e] as f64)
                 .collect();
             vals.sort_by(f64::total_cmp);
             *score = median_sorted(&vals);

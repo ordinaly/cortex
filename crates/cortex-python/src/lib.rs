@@ -123,11 +123,7 @@ pub struct PyArticulation {
 impl PyArticulation {
     #[new]
     #[pyo3(signature = (feature_dim=16, max_entities=96, config_json=None))]
-    fn new(
-        feature_dim: usize,
-        max_entities: usize,
-        config_json: Option<String>,
-    ) -> PyResult<Self> {
+    fn new(feature_dim: usize, max_entities: usize, config_json: Option<String>) -> PyResult<Self> {
         let mut cfg = if let Some(s) = config_json {
             serde_json::from_str::<ArticulationConfig>(&s)
                 .map_err(|e| PyValueError::new_err(e.to_string()))?
