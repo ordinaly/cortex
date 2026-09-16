@@ -1,0 +1,30 @@
+name: normalize-native-once
+
+on:
+  push:
+    branches:
+      - feature/native-articulation-memory
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    if: ${{ !contains(github.event.head_commit.message, '[native-fmt]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/native-articulation-memory
+      - uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          components: rustfmt
+      - run: cargo fmt --all
+      - name: Commit canonical Rust formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add crates
+          git diff --cached --quiet && exit 0
+          git commit -m "Normalize native migration Rust [native-fmt]"
+          git push origin HEAD:feature/native-articulation-memory
