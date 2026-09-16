@@ -1,4 +1,4 @@
-use cortex_runtime::{NativeCortexRuntime, RuntimeConfig};
+use cortex_runtime::{NativeCortexRuntime, RuntimeConfig, RuntimeRead, RuntimeStageTimings};
 use pyo3::exceptions::{PyRuntimeError, PyValueError};
 use pyo3::prelude::*;
 
@@ -45,9 +45,68 @@ pub struct PyCortexRuntimeRead {
     pub stored: usize,
 }
 
+#[pyclass(
+    name = "CortexRuntimeStageTimings",
+    module = "cortex._cortex_native",
+    frozen
+)]
+#[derive(Clone)]
+pub struct PyCortexRuntimeStageTimings {
+    #[pyo3(get)]
+    pub articulation_ns: u64,
+    #[pyo3(get)]
+    pub binding_ns: u64,
+    #[pyo3(get)]
+    pub graph_ns: u64,
+    #[pyo3(get)]
+    pub summary_ns: u64,
+    #[pyo3(get)]
+    pub memory_ns: u64,
+    #[pyo3(get)]
+    pub continual_ns: u64,
+    #[pyo3(get)]
+    pub total_ns: u64,
+}
+
 #[pyclass(name = "CortexRuntime", module = "cortex._cortex_native")]
 pub struct PyCortexRuntime {
     inner: NativeCortexRuntime,
+}
+
+fn to_py_read(read: RuntimeRead) -> PyCortexRuntimeRead {
+    PyCortexRuntimeRead {
+        bindings: read.articulation.bindings,
+        subgroup: read.articulation.subgroup,
+        subgroup_margin: read.articulation.subgroup_margin,
+        relation_changed: read.graph.relation_changed,
+        causal_changed: read.graph.causal_changed,
+        articulation_vector: read.articulation_vector,
+        memory_stored: read.memory.stored,
+        memory_unresolved: read.memory.unresolved,
+        prediction: read.continual.prediction,
+        memberships: read.continual.memberships,
+        current_id: read.continual.current_id,
+        nearest_id: read.continual.nearest_id,
+        nearest_dist: read.continual.nearest_dist,
+        revision: read.continual.revision,
+        reactivated: read.continual.reactivated,
+        discovered: read.continual.discovered,
+        unresolved: read.continual.unresolved,
+        budget_pressure: read.continual.budget_pressure,
+        stored: read.continual.stored,
+    }
+}
+
+fn to_py_timings(t: RuntimeStageTimings) -> PyCortexRuntimeStageTimings {
+    PyCortexRuntimeStageTimings {
+        articulation_ns: t.articulation_ns,
+        binding_ns: t.binding_ns,
+        graph_ns: t.graph_ns,
+        summary_ns: t.summary_ns,
+        memory_ns: t.memory_ns,
+        continual_ns: t.continual_ns,
+        total_ns: t.total_ns,
+    }
 }
 
 #[pymethods]
@@ -101,27 +160,35 @@ impl PyCortexRuntime {
                 outcome,
             )
             .map_err(PyValueError::new_err)?;
-        Ok(PyCortexRuntimeRead {
-            bindings: read.articulation.bindings,
-            subgroup: read.articulation.subgroup,
-            subgroup_margin: read.articulation.subgroup_margin,
-            relation_changed: read.graph.relation_changed,
-            causal_changed: read.graph.causal_changed,
-            articulation_vector: read.articulation_vector,
-            memory_stored: read.memory.stored,
-            memory_unresolved: read.memory.unresolved,
-            prediction: read.continual.prediction,
-            memberships: read.continual.memberships,
-            current_id: read.continual.current_id,
-            nearest_id: read.continual.nearest_id,
-            nearest_dist: read.continual.nearest_dist,
-            revision: read.continual.revision,
-            reactivated: read.continual.reactivated,
-            discovered: read.continual.discovered,
-            unresolved: read.continual.unresolved,
-            budget_pressure: read.continual.budget_pressure,
-            stored: read.continual.stored,
-        })
+        Ok(to_py_read(read))
+    }
+
+    #[pyo3(signature = (
+        detections,
+        relation_obs=Vec::new(),
+        intervention_src_det=None,
+        outcomes=Vec::new(),
+        outcome=None
+    ))]
+    fn profile_step(
+        &mut self,
+        detections: Vec<Vec<f64>>,
+        relation_obs: Vec<(usize, usize, u8)>,
+        intervention_src_det: Option<usize>,
+        outcomes: Vec<(usize, u8)>,
+        outcome: Option<f64>,
+    ) -> PyResult<(PyCortexRuntimeRead, PyCortexRuntimeStageTimings)> {
+        let profiled = self
+            .inner
+            .step_profiled(
+                &detections,
+                &relation_obs,
+                intervention_src_det,
+                &outcomes,
+                outcome,
+            )
+            .map_err(PyValueError::new_err)?;
+        Ok((to_py_read(profiled.read), to_py_timings(profiled.timings)))
     }
 
     fn snapshot_json(&self) -> PyResult<String> {
@@ -141,5 +208,6 @@ impl PyCortexRuntime {
 pub fn register(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<PyCortexRuntime>()?;
     m.add_class::<PyCortexRuntimeRead>()?;
+    m.add_class::<PyCortexRuntimeStageTimings>()?;
     Ok(())
 }
