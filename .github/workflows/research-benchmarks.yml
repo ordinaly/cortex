@@ -50,6 +50,37 @@ jobs:
           name: cortex-stabilization-v1
           path: stabilization-v1.jsonl
 
+  camera:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python scripts/check_version_consistency.py
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" numpy scipy
+      - run: python -m pip install -e .
+      - name: Run camera-v1
+        run: >-
+          python benchmarks/benchmark_camera.py
+          --campaign
+          --repetitions 3
+          --output camera-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-camera-v1
+          path: camera-v1.jsonl
+
   characterization:
     runs-on: ubuntu-latest
     env:
