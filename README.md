@@ -6,8 +6,6 @@ In simple terms, Cortex watches a stream of structured observations, builds a co
 
 It is not a chatbot, a language model, or a raw perception system. Cortex sits one level above perception: it assumes observations have already been turned into useful features, entities, events, or relations, then reasons about how those structures persist, change, return, split apart, merge again, or become genuinely novel.
 
-**Author and project creator:** Arnold von Bauer-Gauss
-
 ## What Cortex is trying to solve
 
 Many learning systems work well when the task and data distribution stay mostly fixed. Real environments are messier. The same situations can return after a long absence, known situations can drift gradually, one apparent concept can turn out to contain several distinct cases, and genuinely new situations can appear.
