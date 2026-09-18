@@ -65,3 +65,17 @@ def test_connection_depth_distinguishes_direct_relation_from_unrelated_symbol():
 
     assert hammer_nail is not None
     assert hammer_moon is None
+
+
+def test_each_resolution_obeys_triangle_inequality():
+    _names, phi0, adjacency = hammer_nail_fixture()
+    for rho in [0.0, 0.25, 0.5, 1.0, 2.0]:
+        distances = resolution_result(phi0, adjacency, rho).distances
+        n = distances.shape[0]
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    assert (
+                        distances[i, k]
+                        <= distances[i, j] + distances[j, k] + 1.0e-12
+                    )
