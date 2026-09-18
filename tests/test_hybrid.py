@@ -37,7 +37,7 @@ def test_adapter_rejects_zero_and_non_finite_embeddings():
 def test_hybrid_defaults_to_identity_only_nuisance_group():
     hybrid = HybridCortexRuntime(embedding_dim=4, max_entities=8, budget=4)
     cfg = json.loads(hybrid.config_json())
-    assert cfg["articulation"]["group_candidates"] == [[0]]
+    assert cfg["articulation"]["fixed_group"] == [0]
 
 
 def test_hybrid_is_exact_wrapper_over_adapted_native_vectors():
