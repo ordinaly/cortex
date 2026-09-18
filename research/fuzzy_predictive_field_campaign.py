@@ -243,6 +243,7 @@ def run_case(
     hard_semantics = semantic_features(hard_outcomes)
     oracle_semantics = semantic_features(oracle_outcomes)
 
+    fuzzy_bridge = fuzzy.bridge()
     hard_bridge = fit_bridge_from_counts(hard_semantics, hard_pairs)
     oracle_bridge = fit_bridge_from_counts(oracle_semantics, oracle_pairs)
 
@@ -299,6 +300,7 @@ def run_case(
             source_observation,
             target_observation,
             eta=eta_rare,
+            bridge=fuzzy_bridge,
         ).scores
 
         source_weights = fuzzy.perceptual_weights(source_observation)
