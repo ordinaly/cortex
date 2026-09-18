@@ -33,7 +33,7 @@ jobs:
           python research/resolution_scaling_crossover_campaign.py
           --seeds 3
           --output resolution-scaling-crossover-v1.jsonl
-      - name: Enforce scaling gates
+      - name: Validate campaign and report hypotheses
         run: >-
           python research/resolution_scaling_crossover_gate.py
           resolution-scaling-crossover-v1.jsonl
