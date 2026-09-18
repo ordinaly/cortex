@@ -3,8 +3,8 @@
 Status: **research model / not a software release**.
 
 This document proposes the next Cortex research model after Hybrid Stage I. It
-does not replace the current `v1.0.0-rc.2` software version or the frozen
-`spec-v0.9.5` executable specification.
+does not replace the current \`v1.0.0-rc.2\` software version or the frozen
+\`spec-v0.9.5\` executable specification.
 
 ## Core idea
 
@@ -20,28 +20,29 @@ Cortex instead learns a semantic geometry from:
    to influence semantic proximity.
 
 The resulting object is not one global distance. For each symbol pair
-((i,j)), Cortex obtains a **resolution spectrum**
+\(i,j\), Cortex obtains a **resolution spectrum**
 
-[
-mathcal D_{ij} = {d_ho(i,j): ho ge 0}.
-]
+\[
+\mathcal D_{ij} = \{d_\rho(i,j): \rho \ge 0\}.
+\]
 
 At fine resolution, symbols are compared by their own functional/predictive
 roles. At coarser resolution, relational neighborhoods increasingly influence
 their meaning.
 
-A hammer and a nail may therefore be far apart at (ho=0), because their
-functions differ, while becoming progressively closer for (ho>0), because
+A hammer and a nail may therefore be far apart at \(\rho=0\), because their
+functions differ, while becoming progressively closer for \(\rho>0\), because
 they repeatedly participate in the same relational structure.
 
 ## Why semantic proximity is not identity
 
 This distinction is mandatory:
 
-[
-	ext{semantic proximity at coarse resolution} 
-eq 	ext{identity}.
-]
+\[
+\text{semantic proximity at coarse resolution}
+\neq
+\text{identity}.
+\]
 
 A hammer and a nail can become semantically close without becoming the same
 entity or the same functional concept.
@@ -52,16 +53,16 @@ Therefore:
 - structural merge decisions require fine-scale predictive equivalence;
 - coarse semantic geometry is used for association, analogy, context and
   higher-order reasoning;
-- no merge may be justified solely because (d_ho) is small for large
-  (ho).
+- no merge may be justified solely because \(d_\rho\) is small for large
+  \(\rho\).
 
 ## 1. Fine-scale informational representation
 
-For each stable Cortex symbol (i), let
+For each stable Cortex symbol \(i\), let
 
-[
+\[
 q_i^{(k)}
-]
+\]
 
 be a learned probability distribution describing one informational role
 channel, for example:
@@ -74,57 +75,57 @@ channel, for example:
 
 For each channel we use the square-root probability embedding
 
-[
-phi_i^{(k)} = sqrt{q_i^{(k)}}
-]
+\[
+\phi_i^{(k)} = \sqrt{q_i^{(k)}}
+\]
 
 elementwise, and concatenate channels with non-negative weights:
 
-[
-phi_0(i)
+\[
+\phi_0(i)
 =
-igoplus_k sqrt{omega_k},phi_i^{(k)}.
-]
+\bigoplus_k \sqrt{\omega_k}\,\phi_i^{(k)}.
+\]
 
 Then the fine-scale distance
 
-[
+\[
 d_0(i,j)
 =
-rac{1}{sqrt 2}
-left|
-phi_0(i)-phi_0(j)
-ight|_2
-]
+\frac{1}{\sqrt 2}
+\left\|
+\phi_0(i)-\phi_0(j)
+\right\|_2
+\]
 
 is a weighted Hellinger-style informational distance.
 
 The neural embedding is **not** part of this semantic distance by default. It
 is evidence used to articulate and maintain symbols. If Cortex has
-insufficient structural evidence to estimate (phi_0(i)), semantic distance
+insufficient structural evidence to estimate \(\phi_0(i)\), semantic distance
 is unresolved rather than silently replaced by visual similarity.
 
 ## 2. Learned semantic relation graph
 
 Let Cortex maintain a non-negative symmetric semantic-affinity matrix
 
-[
-A in mathbb R_{ge0}^{N	imes N}.
-]
+\[
+A \in \mathbb R_{\ge0}^{N\times N}.
+\]
 
-An entry (A_{ij}) represents supported semantic connection evidence between
-symbols (i) and (j).
+An entry \(A_{ij}\) represents supported semantic connection evidence between
+symbols \(i\) and \(j\).
 
 A general typed construction is
 
-[
+\[
 A
 =
-sum_{ellinmathcal R}
-	heta_ell A^{(ell)},
-qquad
-	heta_ellge0,
-]
+\sum_{\ell\in\mathcal R}
+\theta_\ell A^{(\ell)},
+\qquad
+\theta_\ell\ge0,
+\]
 
 where relation channels may include co-use, co-occurrence, spatial relation,
 shared event membership, or other explicitly defined symmetric affinities.
@@ -135,107 +136,114 @@ object unless a separately specified causal-association channel is justified.
 
 Define the weighted graph Laplacian
 
-[
+\[
 L = D-A,
-qquad
-D_{ii}=sum_j A_{ij}.
-]
+\qquad
+D_{ii}=\sum_j A_{ij}.
+\]
 
 ## 3. Resolution operator
 
-Resolution is represented by a diffusion scale (hoge0).
+Resolution is represented by a diffusion scale \(\rho\ge0\).
 
 Define the heat operator
 
-[
-H_ho = e^{-ho L}.
-]
+\[
+H_\rho = e^{-\rho L}.
+\]
 
 The contextual semantic representation is
 
-[
-Phi_ho = H_hoPhi_0,
-]
+\[
+\Phi_\rho = H_\rho\Phi_0,
+\]
 
-where row (i) of (Phi_0) is (phi_0(i)).
+where row \(i\) of \(\Phi_0\) is \(\phi_0(i)\).
 
-The semantic distance at resolution (ho) is
+The semantic distance at resolution \(\rho\) is
 
-[
-oxed{
-d_ho(i,j)
+\[
+\boxed{
+d_\rho(i,j)
 =
-rac{1}{sqrt2}
-left|
-Phi_ho(i)-Phi_ho(j)
-ight|_2
+\frac{1}{\sqrt2}
+\left\|
+\Phi_\rho(i)-\Phi_\rho(j)
+\right\|_2
 }
-]
+\]
 
-At (ho=0),
+At \(\rho=0\),
 
-[
+\[
 H_0=I
-quadLongrightarrowquad
-d_ho=d_0.
-]
+\quad\Longrightarrow\quad
+d_\rho=d_0.
+\]
 
-For larger (ho), each symbol is increasingly represented through the
+For every fixed \(\rho\), \(d_\rho\) is a **pseudometric** because it is
+ordinary Euclidean distance between rows of the contextual representation
+\(\Phi_\rho\): it is non-negative, symmetric, and obeys the triangle
+inequality. Identity of indiscernibles may intentionally fail at coarser
+resolution when two distinct symbols become contextually indistinguishable.
+That failure is semantic coarsening, not entity merging.
+
+For larger \(\rho\), each symbol is increasingly represented through the
 semantic structure around it.
 
 For implementation, user-facing discrete resolutions may be
 
-[
-ho_r = rDelta,qquad r=0,1,2,ldots
-]
+\[
+\rho_r = r\Delta,\qquad r=0,1,2,\ldots
+\]
 
 while the mathematical model remains continuous.
 
 ## 4. Exact hammer–nail result
 
-Consider only two symbols, hammer (h) and nail (n), connected by edge
-weight (w>0):
+Consider only two symbols, hammer \(h\) and nail \(n\), connected by edge
+weight \(w>0\):
 
-[
+\[
 A=
-egin{pmatrix}
+\begin{pmatrix}
 0&w\\
 w&0
-end{pmatrix}.
-]
+\end{pmatrix}.
+\]
 
 Then
 
-[
+\[
 L=
-egin{pmatrix}
+\begin{pmatrix}
 w&-w\\
 -w&w
-end{pmatrix}
-]
+\end{pmatrix}
+\]
 
-and the difference vector is an eigenvector of (L) with eigenvalue (2w).
+and the difference vector is an eigenvector of \(L\) with eigenvalue \(2w\).
 
 Therefore
 
-[
-Phi_ho(h)-Phi_ho(n)
+\[
+\Phi_\rho(h)-\Phi_\rho(n)
 =
-e^{-2who}
-left[
-Phi_0(h)-Phi_0(n)
-ight]
-]
+e^{-2w\rho}
+\left[
+\Phi_0(h)-\Phi_0(n)
+\right]
+\]
 
 and hence
 
-[
-oxed{
-d_ho(h,n)
+\[
+\boxed{
+d_\rho(h,n)
 =
-e^{-2who}d_0(h,n).
+e^{-2w\rho}d_0(h,n).
 }
-]
+\]
 
 So two functionally distinct but strongly related symbols become
 exponentially closer as resolution broadens.
@@ -247,19 +255,19 @@ resolution operator.
 
 The matrix exponential expands as
 
-[
-e^{-ho L}
+\[
+e^{-\rho L}
 =
-I-ho L
-+rac{ho^2L^2}{2!}
--rac{ho^3L^3}{3!}
-+cdots.
-]
+I-\rho L
++\frac{\rho^2L^2}{2!}
+-\frac{\rho^3L^3}{3!}
++\cdots.
+\]
 
 Consequently:
 
-- first-order relational structure enters at order (ho);
-- two-step relational structure enters through (L^2);
+- first-order relational structure enters at order \(\rho\);
+- two-step relational structure enters through \(L^2\);
 - deeper paths progressively enter at higher orders.
 
 Resolution therefore controls how much relational depth contributes to
@@ -274,24 +282,24 @@ This also allows a practical discrete interpretation:
 
 ## 6. Connection depth
 
-For a chosen semantic tolerance (arepsilon), define
+For a chosen semantic tolerance \(\varepsilon\), define
 
-[
-r_arepsilon(i,j)
+\[
+r_\varepsilon(i,j)
 =
-inf
-{rinmathbb N:
-d_{rDelta}(i,j)learepsilon
-}.
-]
+\inf
+\{r\in\mathbb N:
+d_{r\Delta}(i,j)\le\varepsilon
+\}.
+\]
 
 This is the **connection depth** of two symbols.
 
 Interpretation:
 
-- small (r_arepsilon): deeply/directly connected concepts;
-- larger (r_arepsilon): connection appears only through broader context;
-- (+infty): the tested resolution range never makes them semantically close.
+- small \(r_\varepsilon\): deeply/directly connected concepts;
+- larger \(r_\varepsilon\): connection appears only through broader context;
+- \(+\infty\): the tested resolution range never makes them semantically close.
 
 Cortex can therefore ask not only
 
@@ -306,26 +314,26 @@ but
 
 For practical reasoning, Cortex should retain
 
-[
-mathbf d_{ij}
+\[
+\mathbf d_{ij}
 =
 [
 d_0(i,j),
-d_{Delta}(i,j),
-d_{2Delta}(i,j),
-ldots,
-d_{RDelta}(i,j)
+d_{\Delta}(i,j),
+d_{2\Delta}(i,j),
+\ldots,
+d_{R\Delta}(i,j)
 ].
-]
+\]
 
 Two symbol pairs can have the same distance at one resolution while having very
 different spectra.
 
 Examples:
 
-- **functional analogues**: small (d_0), little additional contraction;
-- **complementary objects**: large (d_0), rapid contraction at low resolution;
-- **domain relatives**: large (d_0), slow contraction over several scales;
+- **functional analogues**: small \(d_0\), little additional contraction;
+- **complementary objects**: large \(d_0\), rapid contraction at low resolution;
+- **domain relatives**: large \(d_0\), slow contraction over several scales;
 - **unrelated symbols**: large distance across the whole tested spectrum.
 
 The spectrum therefore contains more information than any single scalarized
@@ -372,28 +380,35 @@ in common structures, and at what resolution those distinctions matter.
 ## 9. Operations affected by resolution
 
 ### Identity
+
 Use perceptual-temporal evidence and fine structural evidence. Coarse semantic
 proximity must not collapse persistent identities.
 
 ### Split
+
 A split remains justified when fine-scale predictive/causal evidence requires a
 distinction.
 
 ### Merge
+
 A merge requires fine-scale equivalence. Small coarse-scale distance is
 insufficient.
 
 ### Association
-Use (d_ho) at a task-selected non-zero resolution.
+
+Use \(d_\rho\) at a task-selected non-zero resolution.
 
 ### Analogy
+
 Compare semantic spectra and relation-conditioned neighborhoods rather than
 only base embeddings.
 
 ### Retrieval
+
 A query can request nearby symbols at a specific resolution.
 
 ### Novelty
+
 A symbol may be perceptually novel while semantically close at coarse
 resolution, or perceptually familiar while structurally novel. These become
 different measurable events.
@@ -404,7 +419,7 @@ Every informational channel and graph edge carries evidence support.
 
 Cortex should expose semantic distance as unresolved when support is
 insufficient. A future implementation should propagate uncertainty through
-(Phi_0), (A), and (H_ho) rather than converting low evidence into a
+\(\Phi_0\), \(A\), and \(H_\rho\) rather than converting low evidence into a
 false precise metric.
 
 ## 11. Complexity warning
@@ -417,7 +432,7 @@ The dense exponential is appropriate only for small research fixtures.
 
 Potential scalable approximations include:
 
-- sparse Krylov action (e^{-ho L}X);
+- sparse Krylov action \(e^{-\rho L}X\);
 - Chebyshev polynomial approximation;
 - bounded iterative diffusion;
 - local neighborhood truncation with explicit error bounds.
@@ -448,11 +463,13 @@ The immediate research target is narrower:
    screwdriver at resolution 0 but closer to nail at a coarser resolution.
 3. **Disconnected control** — verify unrelated components do not acquire the
    same spectrum as directly related concepts.
-4. **No-merge invariant** — coarse semantic proximity must not trigger entity
+4. **Pseudometric check** — verify triangle inequality at every tested
+   resolution while permitting coarse contextual collapse.
+5. **No-merge invariant** — coarse semantic proximity must not trigger entity
    identity merging.
-5. **Synthetic compositional world** — objects, tools, actions and outcomes;
+6. **Synthetic compositional world** — objects, tools, actions and outcomes;
    test whether relationally meaningful groups emerge at different scales.
-6. **Neural stream** — apply the geometry to persistent entities learned from
+7. **Neural stream** — apply the geometry to persistent entities learned from
    frozen neural embeddings and compare against cosine-only retrieval.
 
 A successful result would be a stable, interpretable semantic spectrum whose
