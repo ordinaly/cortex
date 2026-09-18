@@ -1,0 +1,22 @@
+{
+  "protocol": "sparse-cached-resolution-v1",
+  "seeds": 5,
+  "cached_speedup_vs_reference": 1.5762774595029376,
+  "sparse_speedup_vs_reference": 1.6741158970006071,
+  "sparse_speedup_vs_cached": 1.0620927344311692,
+  "exact_max_prediction_error": 0,
+  "exact_resolution_disagreement": 0,
+  "exact_max_complexity_error": 0,
+  "sparse_mean_tv": 0.000020134997010143824,
+  "sparse_max_tv": 0.0006690849026756339,
+  "sparse_resolution_disagreement": 0.0006666666666666666,
+  "cached_divergent_nll": 0.5052270874836091,
+  "sparse_divergent_nll": 0.5052229602082402,
+  "sparse_recoarsened_fraction": 1,
+  "sparse_kernel_row_refresh_fraction": 0.12168332716277921,
+  "sparse_anchor_scan_fraction": 0.3206818181818182,
+  "sparse_svd_fraction": 0.032728619029988894,
+  "sparse_complexity_audit_mean_abs_error": 0.009853004958842485,
+  "sparse_complexity_audit_max_abs_error": 0.14440964910391196,
+  "all_gates_passed": true
+}
