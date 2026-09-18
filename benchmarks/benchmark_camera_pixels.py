@@ -50,7 +50,7 @@ PROTOCOL = "camera-pixels-v1"
 FEATURE_DIM = 16
 MAX_ENTITIES = 256
 HIST_SCALE = 4.0
-OFFICIAL_BASE = "https://groups.inf.ed.ac.uk/vision/DATASETS/CAVIAR/CAVIARDATA1"
+OFFICIAL_BASE = "https://homepages.inf.ed.ac.uk/rbf/CAVIARDATA1"
 GT_REPO = "jasonfilippou/Prob-EC"
 GT_SHA = "c6b1a8d4aaf82e7b44efb3329d425cdbf92e0f31"
 
