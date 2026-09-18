@@ -47,6 +47,8 @@ except ImportError as exc:  # source-tree use before maturin build
     def native_version() -> str:
         return "unavailable"
 
+from .hybrid import FrozenEncoder, HybridCortexRuntime, NeuralObservation, cosine_mse_embedding
+
 __all__ = [
     "Articulation",
     "ArticulationRead",
@@ -55,12 +57,16 @@ __all__ = [
     "CortexRuntime",
     "CortexRuntimeRead",
     "CortexRuntimeStageTimings",
+    "FrozenEncoder",
     "FuzzyMemory",
     "FuzzyMemoryRead",
     "GraphEvidence",
     "GraphEvidenceRead",
+    "HybridCortexRuntime",
     "NATIVE_AVAILABLE",
+    "NeuralObservation",
     "__spec_version__",
     "__version__",
+    "cosine_mse_embedding",
     "native_version",
 ]
