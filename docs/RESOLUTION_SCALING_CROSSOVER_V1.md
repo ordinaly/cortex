@@ -136,3 +136,100 @@ The scaling sweep tells us whether the existing \(O(A^2)\) geometry path or the
 remaining \(O(A)\) field-statistics path is actually limiting performance in
 the range relevant to Cortex. The next implementation step should follow that
 measurement rather than complexity intuition alone.
+
+
+## 7. Campaign result
+
+The three-seed characterization completed successfully at all five anchor
+counts. Behavioral validity checks passed at every scale. One originally
+declared performance hypothesis did not.
+
+### Sparse crossover
+
+Median paired timings were:
+
+| anchors | dense sampled | sparse | sparse speedup |
+|---:|---:|---:|---:|
+| 9 | 654.2 us/step | 687.8 us/step | 0.950x |
+| 18 | 954.0 us/step | 954.9 us/step | 0.999x |
+| 36 | 1549.8 us/step | 1475.7 us/step | 1.049x |
+| 72 | 2879.6 us/step | 2525.2 us/step | **1.140x** |
+| 144 | 6134.9 us/step | 4784.3 us/step | **1.281x** |
+
+The first tested case exceeding the declared 1.10x sparse-maintenance crossover
+was therefore
+
+\[
+\boxed{A=72}.
+\]
+
+This establishes an empirical implementation crossover for the declared
+Python/NumPy fixture. It is not an asymptotic theorem.
+
+### Behavioral fidelity
+
+Sparse approximation remained highly faithful across the sweep. At 144 anchors:
+
+- mean total-variation prediction error: **1.99e-6**;
+- maximum total variation: **8.12e-6**;
+- local-resolution disagreement fraction: **0.0**;
+- kernel-row refresh duty: **15.52%**;
+- regional scan duty: **31.38%**;
+- SVD duty: **3.32%**.
+
+Thus the larger-scale speedup is not explained by a material behavioral change.
+
+### SVD hypothesis: not supported
+
+The protocol predicted at least a 1.30x benefit from sampled complexity SVD by
+36 anchors. The observed median speedup was only
+
+\[
+\boxed{1.054\times}.
+\]
+
+The original check therefore **failed** and is retained as a negative result.
+Its threshold is not weakened after observing the campaign.
+
+At 9 and 18 anchors the sampled-SVD speedups were similarly modest, about
+1.065x and 1.060x respectively.
+
+This means the next optimization should not focus primarily on further SVD
+engineering at these scales.
+
+## 8. Consequence for the next optimization
+
+The scaling data point to the remaining dense predictive application.
+
+Even when semantic geometry is sparsely maintained, candidate prediction still
+computes
+
+\[
+w^\top K_{\rho_r}
+\]
+
+against full \(A\times A\) kernels for every candidate resolution. The local
+readout similarly multiplies the perceptual responsibility vector against the
+full local operator.
+
+If perceptual responsibility is concentrated on a small support, these products
+can be reduced from approximately
+
+\[
+O(mA^2)
+\]
+
+per candidate bank application to
+
+\[
+O(mkA),
+\qquad
+k\ll A,
+\]
+
+by retaining a controlled perceptual support and applying only the corresponding
+kernel rows.
+
+The next research increment should therefore test **support-sparse predictive
+application**, with explicit retained-mass/error bounds and differential
+prediction audits. This is a better-supported target than additional SVD work.
