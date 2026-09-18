@@ -1,0 +1,54 @@
+name: cortex-v1-5-research
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/robust_articulation.py"
+      - "research/robust_articulation_campaign.py"
+      - "research/latent_event_discovery.py"
+      - "research/latent_event_discovery_campaign.py"
+      - "tests/test_robust_articulation.py"
+      - "tests/test_latent_event_discovery.py"
+      - "docs/ROBUST_ARTICULATION_LATENT_EVENTS_V1.md"
+      - ".github/workflows/v1-5-research.yml"
+
+jobs:
+  v1-5-research:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" numpy scipy pytest
+      - run: python -m pip install -e .
+      - run: >-
+          pytest
+          tests/test_robust_articulation.py
+          tests/test_latent_event_discovery.py
+          -q
+      - name: Run robust articulation campaign
+        run: >-
+          python research/robust_articulation_campaign.py
+          --seeds 8
+          --output robust-articulation-v1.jsonl
+      - name: Run latent event discovery campaign
+        run: >-
+          python research/latent_event_discovery_campaign.py
+          --seeds 12
+          --output latent-event-discovery-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-v1-5-research
+          path: |
+            robust-articulation-v1.jsonl
+            latent-event-discovery-v1.jsonl
