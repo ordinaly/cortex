@@ -149,7 +149,7 @@ class AdaptiveResolutionController:
         self,
         observation: Sequence[float],
         outcome: int,
-    ) -> ResolutionDecision:
+    ) -> None:
         if not 0 <= outcome < self.field.outcomes:
             raise ValueError("invalid outcome")
 
@@ -176,4 +176,3 @@ class AdaptiveResolutionController:
         self.observations += 1
 
         self.field.observe_outcome(observation, outcome)
-        return self.decision()
