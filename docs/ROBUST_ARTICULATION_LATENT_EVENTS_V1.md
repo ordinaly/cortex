@@ -184,3 +184,109 @@ Neither implementation is approved for the production hot path.
 
 A native implementation should be considered only after the research campaign
 shows a measurable downstream benefit.
+
+
+## Campaign results
+
+### Robust articulation
+
+Across eight seeds, the provisional/reconciliation layer preserved near-perfect
+purity in regimes where direct hard binding degraded sharply.
+
+At perception noise \(0.25\) with no sparse corruption:
+
+\[
+\text{hard Cortex purity}=0.242,
+\qquad
+\text{robust purity}=0.965,
+\]
+
+with resolved-evidence coverage \(0.940\).
+
+At noise \(0.25\) with 10% sparse corruption:
+
+\[
+\text{hard purity}=0.244,
+\qquad
+\text{robust purity}=0.949,
+\]
+
+with coverage \(0.867\).
+
+The price is explicit unresolved evidence and, in moderate-noise regimes,
+residual fragmentation. The gain is that uncertain observations do not
+immediately contaminate committed entity state.
+
+### Latent event discovery
+
+The original label-free DP-means-like learner behaved well at low noise but
+over-segmented severely at high event noise.
+
+| Event noise | Baseline clusters | Baseline pair-F1 | Robust clusters | Robust pair-F1 | Robust coverage |
+|---:|---:|---:|---:|---:|---:|
+| 0.08 | 6.0 | 1.000 | 6.0 | 0.997 | 1.000 |
+| 0.18 | 8.33 | 0.951 | 6.0 | 0.995 | 0.985 |
+| 0.30 | 163.83 | 0.121 | 8.92 | 0.863 | 0.967 |
+
+At noise \(0.30\), baseline event purity remained deceptively high at \(0.986\)
+despite catastrophic fragmentation. Provisional event concepts reduce that
+structural explosion while preserving most evidence.
+
+This repeats the central v1.5-R lesson at the event level:
+
+\[
+\boxed{
+\text{uncertain evidence should not automatically create permanent ontology}.
+}
+\]
+
+### Combined world-model prediction
+
+Latent event structure was discovered perfectly in the combined fixture
+(pair-F1 \(=1\)), allowing identity quality to be isolated.
+
+At perceptual noise \(0.12\):
+
+\[
+\text{hard-ID future Hit@1}=0.275,
+\]
+
+\[
+\text{robust-ID Hit@1}=0.550,
+\]
+
+\[
+\text{oracle-ID Hit@1}=0.825.
+\]
+
+At perceptual noise \(0.25\):
+
+\[
+\text{hard-ID Hit@1}=0.163,
+\]
+
+\[
+\text{robust-ID Hit@1}=0.629,
+\]
+
+\[
+\text{oracle-ID Hit@1}=0.825.
+\]
+
+Thus robust articulation restores a substantial fraction of the downstream
+forecasting capacity lost to incorrect evidence ownership. It does not reach
+the oracle ceiling, which motivates replacing forced identity commitment with a
+fully soft predictive representation in the next research phase.
+
+## v1.6-R motivation
+
+v1.5-R still assumes that provisional uncertainty should eventually resolve
+into discrete committed identities and event concepts.
+
+The next research question is more fundamental:
+
+> Does Cortex need discrete persistent ontology internally at all?
+
+v1.6-R will test a fuzzy predictive field in which evidence can remain
+distributed across possibilities and hard entity/concept identity is only an
+optional downstream projection.
