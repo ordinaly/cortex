@@ -131,10 +131,16 @@ class FuzzyPredictiveField:
         self.global_relation_counts = np.zeros(relations, dtype=float)
 
     def possibility(self, observation: Sequence[float]) -> np.ndarray:
-        return perceptual_possibility(
-            observation,
-            self.anchors,
-            temperature=self.perceptual_temperature,
+        # self.anchors are normalized exactly once in __init__. Re-normalizing
+        # every stored row on every observation is redundant and dominated the
+        # fused research path in v1.13-R stage attribution.
+        x = _normalize(observation)
+        distances = np.maximum(
+            0.0,
+            1.0 - self.anchors @ x,
+        )
+        return np.exp(
+            -distances / self.perceptual_temperature
         )
 
     def perceptual_weights(self, observation: Sequence[float]) -> np.ndarray:
