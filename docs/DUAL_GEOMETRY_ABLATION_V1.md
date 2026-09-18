@@ -183,3 +183,103 @@ It would not establish:
 
 The next external test would need neural/Cortex entities and naturally
 occurring typed event streams.
+
+
+## Results
+
+### Base ablation — 50 seeds
+
+All 16 evaluated pairs per seed were completely absent from tensor fitting.
+
+| Method | Hit@1 | MRR | Mean rare-event margin |
+|---|---:|---:|---:|
+| Semantic-only | 0.2500 | 0.5208 | 0.0000 |
+| Interaction-marginal-only | 0.2538 | 0.5236 | -0.0006 |
+| Tensor, no interaction resolution | 0.0000 | 0.3333 | +0.0733 |
+| **Full dual geometry** | **1.0000** | **1.0000** | **+0.0733** |
+| Shuffled-semantic control | 0.2213 | 0.4975 | -0.0065 |
+
+The tensor without interaction resolution already learns which **rare** relation
+belongs to the semantic pair, as shown by its positive rare-event margin.
+However, the globally common \`near\` relation still wins the unfiltered
+six-way event ranking, giving 0% Hit@1 for the prospective rare event.
+
+At coarse interaction resolution, the full model predicts the common \`near\`
+event with 100% accuracy. At fine rarity resolution, it predicts the held-out
+rare typed event with 100% accuracy.
+
+No evaluated held-out pair appeared in tensor fitting.
+
+This isolates the role of the two components:
+
+\[
+\text{tensor bridge}
+\Rightarrow
+\text{which rare event fits this semantic conjunction},
+\]
+
+while
+
+\[
+\text{interaction resolution}
+\Rightarrow
+\text{which frequency/specificity regime is being queried}.
+\]
+
+### Hardness sweep
+
+Because the base task is intentionally clean, a second campaign varied semantic
+feature noise and the fraction of observed training pairs. Each cell averages
+20 deterministic seeds.
+
+| Semantic noise | Training pairs kept | Fine rare Hit@1 |
+|---:|---:|---:|
+| 0.025 | 100% | 1.000 |
+| 0.025 | 50% | 1.000 |
+| 0.025 | 25% | 0.991 |
+| 0.025 | 12.5% | 0.919 |
+| 0.10 | 100% | 1.000 |
+| 0.10 | 50% | 1.000 |
+| 0.10 | 25% | 0.994 |
+| 0.10 | 12.5% | 0.903 |
+| 0.20 | 100% | 1.000 |
+| 0.20 | 50% | 1.000 |
+| 0.20 | 25% | 0.969 |
+| 0.20 | 12.5% | 0.884 |
+| 0.35 | 100% | 0.878 |
+| 0.35 | 50% | 0.856 |
+| 0.35 | 25% | 0.781 |
+| 0.35 | 12.5% | 0.659 |
+
+Chance rare-type Hit@1 is 0.25.
+
+The degradation is therefore orderly rather than binary. Reducing pair coverage
+hurts, but the stronger boundary in this fixture is semantic corruption: with
+high-quality semantic coordinates, the bridge generalizes surprisingly well
+from sparse pair coverage; once semantic families overlap substantially,
+transfer quality falls even when all training pairs are retained.
+
+This is consistent with the intended architecture:
+
+> the tensor cannot transfer structure that the semantic geometry no longer
+> represents reliably.
+
+### What this finite experiment supports
+
+Within the tested compositional world:
+
+1. semantic information alone does not identify the future typed event;
+2. interaction marginals alone do not identify it;
+3. a semantic-pair tensor learns the rare relation structure;
+4. interaction rarity resolution is necessary to surface that rare event over
+   common background interactions;
+5. destroying semantic alignment destroys transfer;
+6. performance degrades as semantic geometry becomes noisy or pair evidence
+   becomes sparse.
+
+The result is therefore evidence that the two components carry complementary
+information in this fixture.
+
+It is not evidence that this dense tensor is the optimal bridge, or that the
+same advantage will survive neural perception and natural real-world event
+streams.
