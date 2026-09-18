@@ -57,17 +57,37 @@ def heat_kernel(adjacency: np.ndarray, rho: float) -> np.ndarray:
     return expm(-rho * laplacian)
 
 
-def _rank_metrics(labels: list[int], scores: list[float]) -> dict[str, float]:
-    order = sorted(range(len(scores)), key=lambda k: (-scores[k], k))
-    positives = [k for k, y in enumerate(labels) if y == 1]
-    positive_ranks = []
-    for positive in positives:
-        rank = order.index(positive) + 1
-        positive_ranks.append(rank)
+def _query_rank_metrics(
+    labels: list[int],
+    scores: list[float],
+    queries: list[list[int]],
+) -> dict[str, float]:
+    """Tie-aware ranking metrics with one future-positive pair per query.
+
+    A tie is interpreted as uniformly random ordering inside the tied block.
+    This prevents candidate-list order from leaking the positive label.
+    """
+
+    reciprocal = []
+    hit1 = []
+    hit3 = []
+    for query in queries:
+        positive = [index for index in query if labels[index] == 1]
+        if len(positive) != 1:
+            raise ValueError("each query must contain exactly one positive")
+        positive = positive[0]
+        score = scores[positive]
+        greater = sum(scores[index] > score + 1.0e-15 for index in query)
+        tied = sum(abs(scores[index] - score) <= 1.0e-15 for index in query)
+        best_rank = greater + 1
+        ranks = list(range(best_rank, best_rank + tied))
+        reciprocal.append(float(np.mean([1.0 / rank for rank in ranks])))
+        hit1.append(float(np.mean([rank <= 1 for rank in ranks])))
+        hit3.append(float(np.mean([rank <= 3 for rank in ranks])))
     return {
-        "mrr": float(np.mean([1.0 / r for r in positive_ranks])),
-        "hit_at_1": float(np.mean([r <= 1 for r in positive_ranks])),
-        "hit_at_3": float(np.mean([r <= 3 for r in positive_ranks])),
+        "mrr": float(np.mean(reciprocal)),
+        "hit_at_1": float(np.mean(hit1)),
+        "hit_at_3": float(np.mean(hit3)),
     }
 
 
@@ -86,14 +106,46 @@ def _auc(labels: list[int], scores: list[float]) -> float:
 
 
 def _average_precision(labels: list[int], scores: list[float]) -> float:
-    order = sorted(range(len(scores)), key=lambda k: (-scores[k], k))
-    hits = 0
-    precisions = []
-    for rank, index in enumerate(order, start=1):
-        if labels[index]:
-            hits += 1
-            precisions.append(hits / rank)
-    return float(np.mean(precisions))
+    """Expected AP under uniformly random ordering inside exact score ties."""
+
+    order = sorted(range(len(scores)), key=lambda index: -scores[index])
+    total_positives = sum(labels)
+    higher_items = 0
+    higher_positives = 0
+    contribution = 0.0
+    cursor = 0
+
+    while cursor < len(order):
+        score = scores[order[cursor]]
+        block = []
+        while (
+            cursor < len(order)
+            and abs(scores[order[cursor]] - score) <= 1.0e-15
+        ):
+            block.append(order[cursor])
+            cursor += 1
+
+        block_size = len(block)
+        block_positives = sum(labels[index] for index in block)
+        if block_positives:
+            if block_size == 1:
+                contribution += (higher_positives + 1) / (higher_items + 1)
+            else:
+                for position in range(1, block_size + 1):
+                    probability_positive = block_positives / block_size
+                    expected_prior_positives = (
+                        (position - 1)
+                        * (block_positives - 1)
+                        / (block_size - 1)
+                    )
+                    contribution += probability_positive * (
+                        higher_positives + 1 + expected_prior_positives
+                    ) / (higher_items + position)
+
+        higher_items += block_size
+        higher_positives += block_positives
+
+    return contribution / total_positives
 
 
 def run_seed(
@@ -171,6 +223,18 @@ def run_seed(
 
     candidates = held_positive + held_negative
     labels = [1] * len(held_positive) + [0] * len(held_negative)
+    candidate_index = {pair: index for index, pair in enumerate(candidates)}
+    queries = []
+    for d in range(domains):
+        actor = d * (2 * per_role)
+        query_pairs = [_pair(actor, actor + per_role)]
+        for other in range(domains):
+            if other == d:
+                continue
+            query_pairs.append(
+                _pair(actor, other * (2 * per_role) + per_role)
+            )
+        queries.append([candidate_index[pair] for pair in query_pairs])
 
     # All evaluated pairs have zero direct exposure by construction.
     direct_scores = [0.5 for _ in candidates]
@@ -191,7 +255,7 @@ def run_seed(
         metrics[name] = {
             "auc": _auc(labels, scores),
             "average_precision": _average_precision(labels, scores),
-            **_rank_metrics(labels, scores),
+            **_query_rank_metrics(labels, scores, queries),
         }
 
     return {
