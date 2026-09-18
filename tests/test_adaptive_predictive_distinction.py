@@ -64,3 +64,56 @@ def test_unchanged_anchors_remain_mutually_close():
     )
 
     assert stable_affinity > changed_affinity + 0.40
+
+
+def test_resolution_controls_predictive_distinction_strength():
+    rows = [run_seed(seed, post_cycles=800) for seed in range(6)]
+
+    fine_affinity = np.mean(
+        [
+            row["resolution_sweep"]["0.03"][
+                "changed_to_stable_affinity"
+            ]
+            for row in rows
+        ]
+    )
+    coarse_affinity = np.mean(
+        [
+            row["resolution_sweep"]["0.25"][
+                "changed_to_stable_affinity"
+            ]
+            for row in rows
+        ]
+    )
+    fine_rank = np.mean(
+        [
+            row["resolution_sweep"]["0.03"]["effective_rank"]
+            for row in rows
+        ]
+    )
+    coarse_rank = np.mean(
+        [
+            row["resolution_sweep"]["0.25"]["effective_rank"]
+            for row in rows
+        ]
+    )
+    fine_changed_future = np.mean(
+        [
+            row["resolution_sweep"]["0.03"][
+                "changed_future_probability"
+            ]
+            for row in rows
+        ]
+    )
+    coarse_changed_future = np.mean(
+        [
+            row["resolution_sweep"]["0.25"][
+                "changed_future_probability"
+            ]
+            for row in rows
+        ]
+    )
+
+    assert fine_affinity < coarse_affinity - 0.40
+    assert fine_rank > coarse_rank + 0.40
+    assert fine_changed_future > coarse_changed_future + 0.05
