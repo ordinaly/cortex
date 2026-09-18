@@ -134,6 +134,15 @@ class FuzzyPredictiveField:
         # self.anchors are normalized exactly once in __init__. Re-normalizing
         # every stored row on every observation is redundant and dominated the
         # fused research path in v1.13-R stage attribution.
+        if (
+            self.perceptual_temperature <= 0
+            or not np.isfinite(
+                self.perceptual_temperature
+            )
+        ):
+            raise ValueError(
+                "temperature must be finite and positive"
+            )
         x = _normalize(observation)
         distances = np.maximum(
             0.0,
