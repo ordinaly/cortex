@@ -383,6 +383,9 @@ def run_case(
         nuisance_mode="identity-only",
     )
     experience = Experience()
+    oracle_identity = Experience()
+    for entity in range(ENTITIES):
+        oracle_identity.last_binding[entity] = entity
 
     probe_schedule = [
         entity
@@ -402,6 +405,7 @@ def run_case(
         )
         outcome = int(rng.choice(OUTCOMES, p=probe_distribution(entity)))
         experience.add_semantic_outcome(binding, outcome)
+        oracle_identity.add_semantic_outcome(entity, outcome)
 
     held_true = {(s, t) for s, t, _truth in heldout_true_pairs()}
     interaction_schedule = []
@@ -441,12 +445,17 @@ def run_case(
             target_binding,
             relation,
         )
+        oracle_identity.add_interaction(source, target, relation)
 
         if index in checkpoint_indices:
             fraction = checkpoint_indices[index]
             checkpoints[str(fraction)] = checkpoint_prediction(
                 experience,
                 rng_seed=seed + index * 1009,
+            )
+            checkpoints[str(fraction)]["oracle_identity"] = checkpoint_prediction(
+                oracle_identity,
+                rng_seed=seed + index * 1009 + 17,
             )
 
     ids = identity_metrics(experience.identity_records)
@@ -481,6 +490,12 @@ def run_case(
         "final_shuffled_hit_at_1": (
             final["methods"]["shuffled-semantic-control"]
             if final.get("available")
+            else None
+        ),
+        "final_oracle_identity_hit_at_1": (
+            final["oracle_identity"]["methods"]["full-learned-world-model"]
+            if final.get("available")
+            and final.get("oracle_identity", {}).get("available")
             else None
         ),
     }
@@ -578,6 +593,11 @@ def campaign(base_seeds: int, sweep_seeds: int, output: Path) -> None:
                         [row["final_shuffled_hit_at_1"] for row in base]
                     )
                 ),
+                "oracle_identity_hit100": float(
+                    np.mean(
+                        [row["final_oracle_identity_hit_at_1"] for row in base]
+                    )
+                ),
             },
             sort_keys=True,
         )
@@ -627,6 +647,14 @@ def campaign(base_seeds: int, sweep_seeds: int, output: Path) -> None:
                             np.mean(
                                 [
                                     row["final_full_hit_at_1"]
+                                    for row in subset
+                                ]
+                            )
+                        ),
+                        "oracle_identity_hit100": float(
+                            np.mean(
+                                [
+                                    row["final_oracle_identity_hit_at_1"]
                                     for row in subset
                                 ]
                             )
