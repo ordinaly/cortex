@@ -1,0 +1,44 @@
+name: cortex-resolution-scaling-crossover
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/resolution_scaling_crossover_campaign.py"
+      - "research/resolution_scaling_crossover_gate.py"
+      - "tests/test_resolution_scaling_crossover.py"
+      - "docs/RESOLUTION_SCALING_CROSSOVER_V1.md"
+      - ".github/workflows/resolution-scaling-crossover.yml"
+
+jobs:
+  resolution-scaling-crossover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy pytest
+      - name: Scaling smoke tests
+        run: pytest tests/test_resolution_scaling_crossover.py -q
+      - name: Run scaling crossover campaign
+        run: >-
+          python research/resolution_scaling_crossover_campaign.py
+          --seeds 3
+          --output resolution-scaling-crossover-v1.jsonl
+      - name: Enforce scaling gates
+        run: >-
+          python research/resolution_scaling_crossover_gate.py
+          resolution-scaling-crossover-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-resolution-scaling-crossover-v1
+          path: resolution-scaling-crossover-v1.jsonl
