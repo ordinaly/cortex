@@ -742,7 +742,7 @@ mod tests {
         };
         let mut s = ArticulationState::new(cfg).unwrap();
         let a = vec![2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-        s.observe(&[a.clone()]).unwrap();
+        s.observe(std::slice::from_ref(&a)).unwrap();
 
         // This is exactly the same vector under a native cyclic shift, but a
         // fixed identity group must not use that transform to rescue the match.
