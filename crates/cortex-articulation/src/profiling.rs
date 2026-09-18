@@ -93,7 +93,7 @@ impl ArticulationState {
 
             let mut evidence_ns = 0u64;
             let established = self.entities[e].count > 2;
-            if established && bind_cost <= 0.35 {
+            if self.cfg.fixed_group.is_none() && established && bind_cost <= 0.35 {
                 let evidence_start = Instant::now();
                 work.subgroup_evidence_detections += 1;
                 work.subgroup_transform_evaluations += self.all_shifts.len();
@@ -217,6 +217,8 @@ impl ArticulationState {
         let ne = self.entities.len();
         if ne == 0 {
             let stage_start = Instant::now();
+            let initial_group = self.active_match_group();
+            let initial_weight = 1.0 / initial_group.len() as f64;
             let mut bindings = Vec::with_capacity(k);
             let mut shifts = Vec::with_capacity(k);
             let mut evidence = Vec::with_capacity(k);
@@ -226,8 +228,8 @@ impl ArticulationState {
                 bindings.push(e);
                 shifts.push(0);
                 evidence.push(TransformEvidence {
-                    shifts: self.all_shifts.clone(),
-                    weights: vec![1.0 / self.cfg.feature_dim as f64; self.cfg.feature_dim],
+                    shifts: initial_group.clone(),
+                    weights: vec![initial_weight; initial_group.len()],
                 });
             }
             timings.bind_finalize_ns = elapsed_ns(stage_start);
@@ -242,18 +244,9 @@ impl ArticulationState {
             ));
         }
 
-        let confident = self.subgroup_margin > 0.01;
-        let match_group = if confident {
-            self.subgroup.clone()
-        } else {
-            self.all_shifts.clone()
-        };
+        let match_group = self.active_match_group();
         work.match_group_size = match_group.len();
-        let spawn_gate = if confident {
-            self.cfg.spawn_cost
-        } else {
-            self.cfg.spawn_cost.min(self.cfg.bootstrap_spawn_cost)
-        };
+        let spawn_gate = self.active_spawn_gate();
 
         let stage_start = Instant::now();
         let cols = ne + k;
@@ -297,9 +290,10 @@ impl ArticulationState {
                 work.spawned += 1;
                 bindings[i] = e;
                 shifts[i] = 0;
+                let weight = 1.0 / match_group.len() as f64;
                 evidence.push(TransformEvidence {
-                    shifts: self.all_shifts.clone(),
-                    weights: vec![1.0 / self.cfg.feature_dim as f64; self.cfg.feature_dim],
+                    shifts: match_group.clone(),
+                    weights: vec![weight; match_group.len()],
                 });
             }
         }
