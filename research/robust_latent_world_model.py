@@ -198,7 +198,15 @@ def build_tensor_prediction(
         for identity in (source, target)
     ] + list(last_by_true.values())
     if not all_ids:
-        return {"available": False}
+        return {
+            "available": False,
+            "reason": "no-identities",
+            "fit_samples": 0,
+            "internal_heldout_collisions": 0,
+            "full_hit_at_1": 0.0,
+            "interaction_only_hit_at_1": 0.0,
+            "shuffled_hit_at_1": 0.0,
+        }
 
     max_identity = max(all_ids)
     semantics = semantic_matrix(semantic_records, max_identity)
@@ -244,7 +252,15 @@ def build_tensor_prediction(
             )
         )
     if len(samples) < 8:
-        return {"available": False}
+        return {
+            "available": False,
+            "reason": "insufficient-distinct-pairs",
+            "fit_samples": len(samples),
+            "internal_heldout_collisions": 0,
+            "full_hit_at_1": 0.0,
+            "interaction_only_hit_at_1": 0.0,
+            "shuffled_hit_at_1": 0.0,
+        }
 
     bridge = fit_tensor_bridge(semantics, samples, ridge=1.0e-3)
     surprisal = relation_surprisal(global_counts + 1.0)
