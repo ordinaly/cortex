@@ -229,3 +229,115 @@ If retained support remains small and predictive application becomes cheaper,
 the next plausible target is approximate nearest-anchor retrieval or a
 hierarchical support index. That step would affect perception itself and
 therefore requires a separate error contract.
+
+
+## 10. Campaign result
+
+The three-seed campaign completed successfully at 36, 72, 144, and 288
+anchors. All behavioral validity conditions passed.
+
+### Exact fusion
+
+The full-support fused controller reproduced the v1.9-R sparse path to floating
+point precision:
+
+- maximum candidate-prediction error: approximately \(2.2\times10^{-16}\);
+- maximum local-prediction error: approximately \(2.2\times10^{-16}\);
+- local-resolution-state disagreement: **0.0** at every tested scale.
+
+Despite preserving behavior, fusion produced a large speedup:
+
+| anchors | v1.9-R legacy | fused full support | speedup |
+|---:|---:|---:|---:|
+| 36 | 1465.3 us/step | 672.7 us/step | **2.184x** |
+| 72 | 2540.8 us/step | 1055.5 us/step | **2.459x** |
+| 144 | 4712.0 us/step | 1843.2 us/step | **2.550x** |
+| 288 | 9505.1 us/step | 3955.6 us/step | **2.403x** |
+
+Thus the dominant optimization in v1.11-R is not perceptual support truncation;
+it is elimination of duplicate perceptual and predictive work inside one
+prequential step.
+
+### 99.9% retained-mass support
+
+The support-compressed path preserved predictive behavior extremely well.
+
+At 144 anchors:
+
+- mean local prediction TV: \(1.57\times10^{-7}\);
+- maximum local prediction TV: \(9.48\times10^{-7}\);
+- local-resolution disagreement: **0.0**;
+- divergent NLL: **0.7046765** versus **0.7046764** for full support;
+- reconverged-tail fully coarse fraction: **1.0**.
+
+At 288 anchors:
+
+- mean local prediction TV: \(5.49\times10^{-8}\);
+- maximum local prediction TV: \(3.16\times10^{-7}\);
+- local-resolution disagreement: **0.0**;
+- divergent NLL: **0.8446255** for both paths to the shown precision;
+- reconverged-tail fully coarse fraction: **1.0**.
+
+The exact responsibility-mass contract was also respected: maximum discarded
+mass remained below 0.001 in every case.
+
+### Support sparsity hypothesis: not supported
+
+The 0.999 retained-mass target was too conservative for this perceptual
+geometry. Mean retained support fractions were approximately:
+
+| anchors | mean support fraction |
+|---:|---:|
+| 36 | **0.876** |
+| 72 | **0.875** |
+| 144 | **0.872** |
+| 288 | **0.868** |
+
+The support therefore remains close to dense even as anchor count grows.
+
+As a consequence, support compression itself did not improve runtime:
+
+| anchors | support vs fused |
+|---:|---:|
+| 36 | 0.964x |
+| 72 | 0.964x |
+| 144 | 0.987x |
+| 288 | 1.032x |
+
+The preregistered support-fraction and support-speedup hypotheses at 144 and 288
+anchors therefore failed. Their thresholds are retained unchanged as negative
+results.
+
+### Combined result
+
+Because exact fusion is already large, the support path still remains much
+faster than the old v1.9-R execution path:
+
+- **2.522x** at 144 anchors;
+- **2.483x** at 288 anchors.
+
+These gains should be attributed primarily to exact fusion, not to support
+compression.
+
+## 11. Next implication
+
+v1.11-R changes the optimization priority again.
+
+The validated result supports promoting **one-pass prequential fusion** as the
+new research baseline.
+
+The retained-mass idea remains mathematically controlled but is not useful at
+\(q=0.999\) because the perceptual distribution is too diffuse. The next
+experiment should not silently lower \(q\) under this protocol. Instead, a new
+protocol should sweep more aggressive retained masses, for example
+
+\[
+q\in\{0.99,0.995,0.999\},
+\]
+
+and measure the full prediction-error/speed/support tradeoff.
+
+If useful speedup only appears after discarding enough mass to damage predictive
+behavior, support truncation should be abandoned in favor of a different
+perceptual acceleration strategy, such as indexed approximate neighbor
+retrieval or hierarchical anchor organization.
