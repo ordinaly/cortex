@@ -17,6 +17,7 @@ import json
 import math
 import random
 import sys
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -93,6 +94,48 @@ def encode_scene(frames, model, transform, torch):
                 )
             )
     return encoded
+
+
+def hybrid_identity_metrics(records: list[tuple[str, int]]) -> dict[str, Any]:
+    """Extend legacy camera metrics with merge/fragmentation-balanced B-cubed."""
+
+    legacy = identity_metrics(records)
+    if not records:
+        return {
+            **legacy,
+            "bcubed_precision": 0.0,
+            "bcubed_recall": 0.0,
+            "bcubed_f1": 0.0,
+            "contingency": {},
+        }
+
+    by_binding: dict[int, Counter[str]] = defaultdict(Counter)
+    by_truth: dict[str, Counter[int]] = defaultdict(Counter)
+    for truth, binding in records:
+        by_binding[binding][truth] += 1
+        by_truth[truth][binding] += 1
+
+    precision_sum = 0.0
+    recall_sum = 0.0
+    for truth, binding in records:
+        intersection = by_binding[binding][truth]
+        precision_sum += intersection / sum(by_binding[binding].values())
+        recall_sum += intersection / sum(by_truth[truth].values())
+    precision = precision_sum / len(records)
+    recall = recall_sum / len(records)
+    f1 = 0.0 if precision + recall == 0.0 else 2.0 * precision * recall / (precision + recall)
+
+    contingency = {
+        str(binding): dict(sorted(counts.items()))
+        for binding, counts in sorted(by_binding.items())
+    }
+    return {
+        **legacy,
+        "bcubed_precision": precision,
+        "bcubed_recall": recall,
+        "bcubed_f1": f1,
+        "contingency": contingency,
+    }
 
 
 class OnlinePrototypeBaseline:
@@ -227,7 +270,7 @@ def _result_row(
     nuisance_mode: str,
     baseline_update: str | None,
 ) -> dict[str, Any]:
-    metrics = identity_metrics(accumulator.records)
+    metrics = hybrid_identity_metrics(accumulator.records)
     checkpoints, increments = inventory_windows(accumulator.inventory)
     final_active = accumulator.inventory[-1] if accumulator.inventory else 0
     return {
@@ -258,6 +301,8 @@ def _result_row(
         "max_covisible": accumulator.max_covisible,
         "active_entities": final_active,
         "oversegmentation_ratio": final_active / max(1, len(accumulator.truth_ids)),
+        "entity_count_error": final_active - len(accumulator.truth_ids),
+        "absolute_entity_count_error": abs(final_active - len(accumulator.truth_ids)),
         "inventory_checkpoints": checkpoints,
         "new_entities_by_window": increments,
         "injectivity_violations": accumulator.injectivity_violations,
