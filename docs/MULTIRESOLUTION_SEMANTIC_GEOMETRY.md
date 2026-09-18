@@ -280,7 +280,82 @@ This also allows a practical discrete interpretation:
 - resolution 2: relations-of-relations become significant;
 - higher resolution: broader semantic communities and domains become visible.
 
-## 6. Connection depth
+## 6. Spectral interpretation
+
+Because \(L\) is symmetric and positive semidefinite,
+
+\[
+L=U\Lambda U^\top
+\]
+
+with eigenvalues
+
+\[
+0=\lambda_0\le\lambda_1\le\cdots.
+\]
+
+Therefore
+
+\[
+H_\rho
+=
+Ue^{-\rho\Lambda}U^\top
+\]
+
+and
+
+\[
+\Phi_\rho
+=
+\sum_k
+e^{-\rho\lambda_k}
+u_ku_k^\top\Phi_0.
+\]
+
+Large-\(\lambda_k\) graph modes encode rapidly varying/local distinctions and
+are suppressed quickly as \(\rho\) grows. Small-\(\lambda_k\) modes encode
+broader structures and survive to coarser resolutions.
+
+This gives resolution a precise semantic reading:
+
+\[
+\boxed{
+\text{increasing resolution scale}
+=
+\text{suppress local distinctions and expose broader relational modes}.
+}
+\]
+
+The architecture can therefore preserve that hammer and nail have distinct
+fine-scale functions while also representing that both belong to the same
+coarser interaction structure.
+
+### Relation-conditioned geometry
+
+Different kinds of relation need not induce the same semantics. A future
+extension can retain one adjacency channel \(A^{(\ell)}\) per relation type and
+construct a query-conditioned graph
+
+\[
+A(q)=
+\sum_{\ell}
+\theta_\ell(q)A^{(\ell)}.
+\]
+
+Then Cortex obtains
+
+\[
+d_{\rho,q}(i,j),
+\]
+
+a distance conditioned jointly on resolution and reasoning context. For
+example, hammer and screwdriver may be close under a *functional-tool* query,
+while hammer and nail become close under a *used-together* query.
+
+The v1.1-R prototype deliberately tests only one non-negative symmetric
+affinity graph before introducing this additional axis.
+
+## 7. Connection depth
 
 For a chosen semantic tolerance \(\varepsilon\), define
 
@@ -310,7 +385,7 @@ but
 > At what resolution do these symbols become part of the same semantic
 > structure?
 
-## 7. Semantic spectrum
+## 8. Semantic spectrum
 
 For practical reasoning, Cortex should retain
 
@@ -339,7 +414,7 @@ Examples:
 The spectrum therefore contains more information than any single scalarized
 semantic distance.
 
-## 8. Neural/Cortex architecture
+## 9. Neural/Cortex architecture
 
 The hybrid architecture becomes:
 
@@ -377,7 +452,7 @@ The neural network answers what the current observation looks like.
 Cortex learns what distinctions remain informative, which symbols participate
 in common structures, and at what resolution those distinctions matter.
 
-## 9. Operations affected by resolution
+## 10. Operations affected by resolution
 
 ### Identity
 
@@ -413,7 +488,7 @@ A symbol may be perceptually novel while semantically close at coarse
 resolution, or perceptually familiar while structurally novel. These become
 different measurable events.
 
-## 10. Confidence and unresolved semantics
+## 11. Confidence and unresolved semantics
 
 Every informational channel and graph edge carries evidence support.
 
@@ -422,7 +497,7 @@ insufficient. A future implementation should propagate uncertainty through
 \(\Phi_0\), \(A\), and \(H_\rho\) rather than converting low evidence into a
 false precise metric.
 
-## 11. Complexity warning
+## 12. Complexity warning
 
 A dense matrix exponential costs roughly cubic time and quadratic memory in the
 number of symbols. Using it directly in the online Cortex hot path would worsen
@@ -440,7 +515,7 @@ Potential scalable approximations include:
 Any production method must be benchmarked against the exact small-graph
 reference before adoption.
 
-## 12. Research claims and non-claims
+## 13. Research claims and non-claims
 
 The proposed construction gives a precise mechanism by which relational
 resolution changes semantic distance. It does not yet establish that this is
@@ -456,7 +531,7 @@ The immediate research target is narrower:
 > cannot be recovered from neural embedding distance or one-scale Cortex
 > structure alone?
 
-## 13. First falsifiable experiments
+## 14. First falsifiable experiments
 
 1. **Hammer/nail toy world** — verify exact two-node contraction.
 2. **Resolution-order reversal** — construct a case where hammer is closer to
