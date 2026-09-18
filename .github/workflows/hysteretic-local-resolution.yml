@@ -1,0 +1,45 @@
+name: cortex-hysteretic-local-resolution
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/hysteretic_local_resolution.py"
+      - "research/hysteretic_local_resolution_campaign.py"
+      - "research/hysteretic_local_resolution_gate.py"
+      - "tests/test_hysteretic_local_resolution.py"
+      - "docs/HYSTERETIC_LOCAL_RESOLUTION_V1.md"
+      - ".github/workflows/hysteretic-local-resolution.yml"
+
+jobs:
+  hysteretic-local-resolution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy pytest
+      - name: Unit and smoke tests
+        run: pytest tests/test_hysteretic_local_resolution.py -q
+      - name: Run frozen 20-seed campaign
+        run: >-
+          python research/hysteretic_local_resolution_campaign.py
+          --seeds 20
+          --output hysteretic-local-resolution-v1.jsonl
+      - name: Enforce frozen success gates
+        run: >-
+          python research/hysteretic_local_resolution_gate.py
+          hysteretic-local-resolution-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-hysteretic-local-resolution-v1
+          path: hysteretic-local-resolution-v1.jsonl
