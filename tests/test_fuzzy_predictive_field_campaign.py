@@ -57,3 +57,12 @@ def test_fuzzy_prediction_remains_robust_as_exact_identity_drops():
 
     assert hard_identity < easy_identity - 0.15
     assert hard_fuzzy_prediction > 0.75
+
+
+def test_fuzzy_field_approaches_predictive_role_oracle():
+    rows = [run_case(seed) for seed in range(8)]
+    fuzzy = np.mean([row["fuzzy_future_hit_at_1"] for row in rows])
+    role_oracle = np.mean(
+        [row["predictive_role_oracle_hit_at_1"] for row in rows]
+    )
+    assert abs(fuzzy - role_oracle) < 0.12
