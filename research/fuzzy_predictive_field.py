@@ -220,6 +220,7 @@ class FuzzyPredictiveField:
         eta: float | None = None,
         interaction_bandwidth: float = 0.45,
         resolution: float | None = None,
+        bridge: TensorBridge | None = None,
     ) -> Prediction:
         features = self.features()
         source_field = self.field(
@@ -233,8 +234,8 @@ class FuzzyPredictiveField:
         source_semantic = source_field @ features
         target_semantic = target_field @ features
 
-        bridge = self.bridge()
-        rates = bridge.predict(source_semantic, target_semantic)
+        active_bridge = self.bridge() if bridge is None else bridge
+        rates = active_bridge.predict(source_semantic, target_semantic)
 
         surprisal = relation_surprisal(
             self.global_relation_counts + 1.0
