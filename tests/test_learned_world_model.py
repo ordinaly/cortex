@@ -97,3 +97,21 @@ def test_harder_perception_or_sparse_semantic_evidence_can_degrade():
         ]
     )
     assert easy > hard
+
+
+def test_oracle_identity_localizes_high_noise_failure_to_articulation():
+    rows = [
+        run_case(
+            seed,
+            perception_noise=0.25,
+            probes_per_entity=40,
+            interactions_per_pair=6,
+        )
+        for seed in range(4)
+    ]
+    cortex_bound = np.mean([row["final_full_hit_at_1"] for row in rows])
+    oracle_bound = np.mean(
+        [row["final_oracle_identity_hit_at_1"] for row in rows]
+    )
+    assert oracle_bound > 0.65
+    assert oracle_bound > cortex_bound + 0.20
