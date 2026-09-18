@@ -1,0 +1,81 @@
+{
+  "protocol": "support-mass-tradeoff-v1",
+  "seeds": 3,
+  "anchor_cases": [
+    72,
+    144,
+    288
+  ],
+  "retained_masses": [
+    0.99,
+    0.995,
+    0.999
+  ],
+  "fastest_fully_admissible_mass_at_288": 0.99,
+  "all_tested_points_fully_admissible": true,
+  "failed_hypotheses": [
+    "q_099_speedup_288",
+    "q_0995_speedup_288"
+  ],
+  "cases": {
+    "72": {
+      "0.99": {
+        "speedup_vs_full": 0.9738534349692027,
+        "mean_support_fraction": 0.6487139917695474,
+        "mean_local_tv": 0.0000031277011558600093,
+        "max_local_tv": 0.00001768110776388665,
+        "resolution_disagreement": 0
+      },
+      "0.995": {
+        "speedup_vs_full": 0.9733048962248081,
+        "mean_support_fraction": 0.7297839506172841
+      },
+      "0.999": {
+        "speedup_vs_full": 0.9699995784581422,
+        "mean_support_fraction": 0.8677983539094652
+      }
+    },
+    "144": {
+      "0.99": {
+        "speedup_vs_full": 0.9939981352830274,
+        "mean_support_fraction": 0.6487397119341564,
+        "mean_local_tv": 0.0000014255163036043568,
+        "max_local_tv": 0.000005138149300143446,
+        "resolution_disagreement": 0
+      },
+      "0.995": {
+        "speedup_vs_full": 0.9916707421682899,
+        "mean_support_fraction": 0.729038065843621
+      },
+      "0.999": {
+        "speedup_vs_full": 0.9852306219816559,
+        "mean_support_fraction": 0.8638888888888887
+      }
+    },
+    "288": {
+      "0.99": {
+        "speedup_vs_full": 1.0496211861390605,
+        "mean_support_fraction": 0.6410236625514402,
+        "max_support_fraction": 0.9097222222222222,
+        "mean_dropped_mass": 0.00986020180421467,
+        "max_dropped_mass": 0.009998692520165053,
+        "mean_local_tv": 4.0265321178380424e-7,
+        "max_local_tv": 0.0000017807107391965005,
+        "mean_candidate_tv": 0.0000064599327523960175,
+        "max_candidate_tv": 0.00007277362836519141,
+        "resolution_disagreement": 0,
+        "baseline_divergent_nll": 0.8460232050990129,
+        "compressed_divergent_nll": 0.8460233974963779,
+        "recoarsened_fraction": 1
+      },
+      "0.995": {
+        "speedup_vs_full": 1.038169010962556,
+        "mean_support_fraction": 0.722350823045267
+      },
+      "0.999": {
+        "speedup_vs_full": 1.0277652942930728,
+        "mean_support_fraction": 0.8586033950617286
+      }
+    }
+  }
+}
