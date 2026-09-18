@@ -274,3 +274,43 @@ insufficient by construction.
 
 The result therefore supports **deep relational inference in the tested
 synthetic world**, not a universal forecasting claim.
+
+
+## 12. Variable-depth discrimination
+
+A second campaign tested whether the heat potential merely behaves like a
+fixed low-order path heuristic.
+
+For each query, the future-positive endpoint was supported first by a path of
+length 3, 5, or 7. Three distractors were placed at progressively larger path
+depths. Edge weights were independently perturbed in \([0.85,1.15]\) for 30
+seeds.
+
+Mean Hit@1:
+
+| First supporting depth | \(A^3\) | \(A^5\) | \(A^7\) | Heat potential |
+|---:|---:|---:|---:|---:|
+| 3 | 1.00 | 1.00 | 1.00 | **1.00** |
+| 5 | 0.25 | 1.00 | 1.00 | **1.00** |
+| 7 | 0.25 | 0.25 | 1.00 | **1.00** |
+
+Tie-level Hit@1 is 0.25 because each query has four candidates.
+
+This demonstrates the intended structural difference: a fixed path-power
+predictor must choose an order large enough to reach the relevant dependency,
+while
+
+\[
+K_\rho=e^{-\rho L}
+\]
+
+contains contributions from all path orders in one operator.
+
+The result does **not** prove that heat diffusion is superior to every graph
+link-prediction method. An \(A^7\) score covers all depths deliberately included
+in this finite test. The stronger observation is that the diffusion model did
+not require the dependency depth to be specified in advance.
+
+The next discriminator should therefore use mixed, changing and cyclic
+dependency depths together with graph noise, then move the same prospective
+protocol onto neural/Cortex entities.
