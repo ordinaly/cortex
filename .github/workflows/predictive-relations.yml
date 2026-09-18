@@ -1,0 +1,36 @@
+name: cortex-predictive-relations
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/predictive_relations.py"
+      - "tests/test_predictive_relations.py"
+      - "docs/PREDICTIVE_RELATIONAL_INFERENCE.md"
+      - ".github/workflows/predictive-relations.yml"
+
+jobs:
+  predictive-relations:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy scipy pytest
+      - run: pytest tests/test_predictive_relations.py -q
+      - name: Run prospective relation campaign
+        run: >-
+          python research/predictive_relations.py
+          --seeds 50
+          --output predictive-relations-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-predictive-relations-v1
+          path: predictive-relations-v1.jsonl
