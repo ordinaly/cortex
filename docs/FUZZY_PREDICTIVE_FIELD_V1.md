@@ -345,3 +345,105 @@ outcome channels.
 
 The experiment tests only whether a fuzzy predictive representation can make
 hard internal identity unnecessary for the downstream reasoning task.
+
+
+## 12. Base campaign result
+
+The first v1.6-R campaign completed successfully on 20 deterministic seeds.
+
+Mean base results:
+
+| Quantity | Result |
+|---|---:|
+| Exact physical identity top-1 | 0.480 |
+| Correct predictive-family possibility mass | 0.9998 |
+| Hard-projection future Hit@1 | 0.706 |
+| **Fuzzy-field future Hit@1** | **0.909** |
+| Oracle hard-identity Hit@1 | 0.622 |
+| Oracle identity + predictive field Hit@1 | 0.781 |
+| Effective predictive rank | 8.64 |
+| Physical anchors | 24 |
+
+The synthetic world contained eight predictive roles and three physical
+individuals per role.
+
+Thus the field retained substantially less effective predictive complexity than
+the physical anchor count while achieving better prospective accuracy than the
+hard correspondence projection.
+
+The correct interpretation is not that inaccurate knowledge is intrinsically
+superior to accurate identity. In this sparse fixture, physically distinct
+individuals have equivalent futures, so hard identity divides evidence across
+distinctions that do not help prediction.
+
+The result supports:
+
+\[
+\boxed{
+\text{predictive sufficiency can survive poor exact identity fidelity}.
+}
+\]
+
+### Perceptual noise sweep
+
+| Perceptual noise | Exact identity | Correct-family mass | Fuzzy Hit@1 | Hard Hit@1 |
+|---:|---:|---:|---:|---:|
+| 0.08 | 0.638 | ~1.000 | 0.831 | 0.619 |
+| 0.12 | 0.535 | ~1.000 | 0.831 | 0.631 |
+| 0.20 | 0.456 | 0.997 | 0.819 | 0.650 |
+| 0.25 | 0.423 | 0.977 | 0.806 | 0.594 |
+
+The forecast therefore degrades much more slowly than exact physical
+correspondence.
+
+## 13. Adaptive predictive distinction campaign
+
+The second v1.6-R campaign tests reversibility of fuzzy equivalence.
+
+Three perceptually similar physical anchors begin with the same future-outcome
+distribution. Their predictive field should therefore form one basin.
+
+After the initial phase, one physical anchor develops a different future.
+No identity split, concept split or symbolic reclassification is supplied.
+
+The model is evaluated on:
+
+- exact perceptual top-1 identity;
+- affinity between the changed and unchanged anchors;
+- affinity between the two unchanged anchors;
+- effective predictive rank;
+- probability assigned to the newly characteristic future outcome;
+- adaptation trajectory over time.
+
+The desired behavior is
+
+\[
+K_\rho(a_0,a_1)
+\downarrow
+\]
+
+while
+
+\[
+K_\rho(a_1,a_2)
+\]
+
+remains high, together with
+
+\[
+N_{\rm eff}
+\uparrow.
+\]
+
+This is a direct falsification of the principle
+
+\[
+\boxed{
+\text{prediction creates distinctions when they become useful}.
+}
+\]
+
+Exact physical identity is deliberately imperfect in this fixture. The
+experiment therefore asks whether repeated weak correspondence evidence plus
+divergent futures are sufficient for the field to sharpen without requiring
+discrete ontology.
