@@ -36,6 +36,10 @@ jobs:
           numpy
           scipy
           pillow
+      - name: Install CPU-only neural stack
+        run: >-
+          python -m pip install
+          --index-url https://download.pytorch.org/whl/cpu
           "torch==2.14.0"
           "torchvision==0.29.0"
       - run: python -m pip install -e .
