@@ -1,0 +1,36 @@
+name: cortex-dual-geometry-ablation
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/dual_geometry_ablation.py"
+      - "tests/test_dual_geometry_ablation.py"
+      - "docs/DUAL_GEOMETRY_ABLATION_V1.md"
+      - ".github/workflows/dual-geometry-ablation.yml"
+
+jobs:
+  dual-geometry-ablation:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy pytest
+      - run: pytest tests/test_dual_geometry_ablation.py -q
+      - name: Run dual-geometry ablation campaign
+        run: >-
+          python research/dual_geometry_ablation.py
+          --seeds 50
+          --output dual-geometry-ablation-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-dual-geometry-ablation-v1
+          path: dual-geometry-ablation-v1.jsonl
