@@ -1,0 +1,28 @@
+name: cortex-multiresolution-semantic
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/multiresolution_semantic.py"
+      - "tests/test_multiresolution_semantic.py"
+      - "docs/MULTIRESOLUTION_SEMANTIC_GEOMETRY.md"
+      - ".github/workflows/multiresolution-semantic.yml"
+
+jobs:
+  semantic-geometry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy scipy pytest
+      - run: pytest tests/test_multiresolution_semantic.py -q
+      - name: Emit hammer-nail resolution spectrum
+        run: python research/multiresolution_semantic.py | tee multiresolution-semantic-v0.1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-multiresolution-semantic-v0.1
+          path: multiresolution-semantic-v0.1.jsonl
