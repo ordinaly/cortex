@@ -62,11 +62,18 @@ Generic latent coordinates have no meaningful cyclic ordering. Feeding them
 directly into the current articulation nuisance group would make coordinate
 shifts semantically arbitrary.
 
-Stage I therefore defaults to the identity nuisance group:
+Stage I therefore defaults to an explicit fixed identity nuisance group:
 
-    group_candidates = [[0]]
+    fixed_group = [0]
 
-unless an encoder explicitly defines a compatible group action.
+A fixed group is not inferred from evidence: it is applied from the first
+matching decision, uses the normal spawn gate immediately, and disables
+subgroup-evidence accumulation. This is distinct from merely supplying one
+learnable group candidate, which would otherwise remain in bootstrap mode
+because no evidence margin can exist between a single candidate and itself.
+
+An encoder may opt into the native learned nuisance mechanism only when its
+coordinate action has an intentional domain meaning.
 
 Raw neural embeddings are L2-normalized and scaled:
 
