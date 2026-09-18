@@ -217,3 +217,99 @@ need local rather than global resolution.
 
 The experiment does not establish optimal predictive rate-distortion, nor does
 it prove that effective rank is the correct universal rate measure.
+
+
+## 9. Campaign result
+
+The frozen 20-seed campaign passed without changing the protocol constants.
+
+### Resolution and complexity
+
+| Phase | Mean selected \(\rho\) | Coarsest fraction | Finest-two fraction | Mean effective rank |
+|---|---:|---:|---:|---:|
+| Equivalent futures | **0.250** | **1.000** | — | **1.022** |
+| Divergent future | **0.113** | — | **0.384** | **2.120** |
+| Reconverged futures | **0.250** | **1.000** | — | **1.020** |
+
+Thus the controller spends minimal predictive complexity when the three anchors
+have equivalent futures, adds structure when one future diverges, and returns
+to the coarse field after reconvergence.
+
+Every one of the 20 seeds finished at
+
+\[
+\rho=0.25.
+\]
+
+### Predictive distortion during divergence
+
+Mean prequential negative log loss:
+
+| Readout | NLL |
+|---|---:|
+| Always coarse \(\rho=0.25\) | 0.807 |
+| **Adaptive rate-distortion** | **0.769** |
+| Always fine \(\rho=0.03\) | 0.757 |
+
+The adaptive controller therefore reduces divergent-phase NLL by approximately
+
+\[
+0.038
+\]
+
+nats relative to always-coarse prediction while remaining only approximately
+
+\[
+0.012
+\]
+
+nats above the always-fine reference.
+
+Across individual seeds, adaptive prediction beat always-coarse prediction in
+19 of 20 runs and remained within 0.08 nats of always-fine prediction in all
+20 runs.
+
+The aggregate adaptive improvement recovers most of the predictive benefit of
+fine resolution without maintaining fine complexity in the equivalent and
+reconverged phases.
+
+### Structural interpretation
+
+The finite result supports the intended constrained objective:
+
+\[
+\boxed{
+\text{use additional representational complexity only when coarse structure
+causes measurable predictive distortion}.
+}
+\]
+
+In the equivalent phase, all candidate resolutions make sufficiently similar
+predictions, so effective-rank minimization selects the coarse field.
+
+When one regional future diverges, its prequential loss makes the coarse
+representation inadmissible often enough that the controller sharpens.
+
+When the futures reconverge and decayed evidence forgets the obsolete
+distinction, the coarse representation again enters the distortion band and is
+selected because its effective rank is lower.
+
+No external phase label or split/merge instruction enters the controller.
+
+## 10. Stability and implementation caveat
+
+The first reference is deliberately reactive. During the divergent phase it
+changed selected resolution approximately 29.6 times on average over the full
+phase, versus about one transition in the equivalent and reconverged phases.
+
+This does not invalidate the predictive result, but it identifies a real
+engineering/research target:
+
+- hysteresis or minimum dwell time;
+- local rather than global resolution;
+- cached/incremental complexity estimates.
+
+These should be introduced as a new protocol rather than tuned into the frozen
+v1.7-R result after observing the benchmark.
+
+The production hot path remains unchanged.
