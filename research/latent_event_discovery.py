@@ -154,3 +154,170 @@ def clustering_metrics(
         "pair_f1": pair_f1,
         "clusters": float(len(by_cluster)),
     }
+
+
+@dataclass(frozen=True)
+class EventToken:
+    provisional: bool
+    identity: int
+
+
+@dataclass
+class _RobustEventCluster:
+    samples: list[np.ndarray]
+    last_seen: int
+
+    @property
+    def support(self) -> int:
+        return len(self.samples)
+
+    def add(self, signature: np.ndarray, time: int, max_samples: int) -> None:
+        self.samples.append(signature)
+        if len(self.samples) > max_samples:
+            del self.samples[: len(self.samples) - max_samples]
+        self.last_seen = time
+
+    def prototype(self) -> np.ndarray:
+        return np.median(np.stack(self.samples, axis=0), axis=0)
+
+
+class RobustLatentEventDiscoverer:
+    """Provisional event-concept discovery.
+
+    This is the event-level analogue of robust articulation: anomalous single
+    events are buffered as provisional hypotheses and only become persistent
+    event concepts after repeated compatible evidence.
+    """
+
+    def __init__(
+        self,
+        *,
+        accept_distance: float = 0.85,
+        provisional_distance: float = 1.50,
+        reconcile_distance: float = 1.10,
+        commit_support: int = 4,
+        provisional_ttl: int = 150,
+        max_samples: int = 32,
+    ) -> None:
+        self.accept_distance = accept_distance
+        self.provisional_distance = provisional_distance
+        self.reconcile_distance = reconcile_distance
+        self.commit_support = commit_support
+        self.provisional_ttl = provisional_ttl
+        self.max_samples = max_samples
+        self.time = 0
+        self.committed: dict[int, _RobustEventCluster] = {}
+        self.provisional: dict[int, _RobustEventCluster] = {}
+        self.reconciled: dict[int, int] = {}
+        self.next_committed = 0
+        self.next_provisional = 0
+
+    def _prune(self) -> None:
+        for identity in list(self.provisional):
+            if identity in self.reconciled:
+                del self.provisional[identity]
+                continue
+            if (
+                self.time - self.provisional[identity].last_seen
+                > self.provisional_ttl
+            ):
+                del self.provisional[identity]
+
+    def observe(self, signature: Sequence[float]) -> EventToken:
+        self.time += 1
+        x = np.asarray(signature, dtype=float)
+        if x.shape != (SIGNATURE_DIM,) or not np.all(np.isfinite(x)):
+            raise ValueError("invalid event signature")
+
+        if self.committed:
+            distances = [
+                (
+                    float(np.linalg.norm(x - cluster.prototype())),
+                    identity,
+                )
+                for identity, cluster in self.committed.items()
+            ]
+            distance, identity = min(distances)
+            if distance <= self.accept_distance:
+                self.committed[identity].add(
+                    x, self.time, self.max_samples
+                )
+                return EventToken(False, identity)
+
+        self._prune()
+        provisional_id = None
+        if self.provisional:
+            candidates = [
+                (
+                    float(np.linalg.norm(x - cluster.prototype())),
+                    identity,
+                )
+                for identity, cluster in self.provisional.items()
+            ]
+            distance, candidate = min(candidates)
+            if distance <= self.provisional_distance:
+                provisional_id = candidate
+
+        if provisional_id is None:
+            provisional_id = self.next_provisional
+            self.next_provisional += 1
+            self.provisional[provisional_id] = _RobustEventCluster(
+                [x.copy()], self.time
+            )
+        else:
+            self.provisional[provisional_id].add(
+                x, self.time, self.max_samples
+            )
+
+        cluster = self.provisional[provisional_id]
+        if cluster.support < self.commit_support:
+            return EventToken(True, provisional_id)
+
+        prototype = cluster.prototype()
+        if self.committed:
+            candidates = [
+                (
+                    float(np.linalg.norm(prototype - existing.prototype())),
+                    identity,
+                )
+                for identity, existing in self.committed.items()
+            ]
+            distance, identity = min(candidates)
+        else:
+            distance, identity = float("inf"), -1
+
+        if distance <= self.reconcile_distance:
+            for sample in cluster.samples:
+                self.committed[identity].add(
+                    sample, self.time, self.max_samples
+                )
+        else:
+            identity = self.next_committed
+            self.next_committed += 1
+            self.committed[identity] = _RobustEventCluster(
+                list(cluster.samples), self.time
+            )
+
+        self.reconciled[provisional_id] = identity
+        return EventToken(False, identity)
+
+    def resolve(self, token: EventToken) -> int | None:
+        if not token.provisional:
+            return token.identity
+        return self.reconciled.get(token.identity)
+
+    def predict(self, signature: Sequence[float]) -> int:
+        if not self.committed:
+            raise ValueError("no committed event concepts")
+        x = np.asarray(signature, dtype=float)
+        return min(
+            (
+                float(np.linalg.norm(x - cluster.prototype())),
+                identity,
+            )
+            for identity, cluster in self.committed.items()
+        )[1]
+
+    @property
+    def committed_clusters(self) -> int:
+        return len(self.committed)
