@@ -345,3 +345,127 @@ outcome channels.
 
 The experiment tests only whether a fuzzy predictive representation can make
 hard internal identity unnecessary for the downstream reasoning task.
+
+
+## 12. Predictive sufficiency and automatic resolution
+
+A fixed field resolution is only a research convenience. The stronger Cortex
+principle is to retain the **coarsest representation that remains predictively
+sufficient**.
+
+For a candidate resolution \(\rho\), let
+
+\[
+L_{\rm pred}(\rho)
+\]
+
+be prospective prediction loss and let
+
+\[
+C_{\rm eff}(\rho)
+\]
+
+be field complexity, approximated initially by effective kernel rank.
+
+For tolerance \(\varepsilon\), define the admissible set
+
+\[
+\mathcal R_\varepsilon
+=
+\left\{
+\rho:
+L_{\rm pred}(\rho)
+\le
+L_{\rm pred}^{\star}+\varepsilon
+\right\},
+\]
+
+where \(L_{\rm pred}^{\star}\) is the best measured predictive loss.
+
+The preferred resolution is
+
+\[
+\boxed{
+\rho^\star
+=
+\arg\min_{\rho\in\mathcal R_\varepsilon}
+C_{\rm eff}(\rho).
+}
+\]
+
+When complexity decreases monotonically with coarsening, this is equivalent to
+choosing the coarsest predictively sufficient field.
+
+This creates an operational answer to
+
+> How inaccurate may Cortex's internal world become?
+
+Answer:
+
+> As inaccurate/coarse as possible without exceeding the accepted predictive
+> distortion.
+
+A future information-theoretic formulation should replace the effective-rank
+surrogate with a predictive rate term such as
+
+\[
+I(H_t;Z_t)
+\]
+
+while bounding lost future information
+
+\[
+I(H_t;F_t\mid Z_t).
+\]
+
+The current finite experiment deliberately uses an auditable spectral
+complexity surrogate before attempting variational information-bottleneck
+optimization.
+
+## 13. Prediction horizon
+
+Predictive equivalence is horizon dependent.
+
+The eventual kernel should therefore be written
+
+\[
+K_{\rho,H}(a,b),
+\]
+
+where \(H\) denotes the future horizon represented by the behavioral signature.
+
+Two anchors may be equivalent for short-term prediction while diverging at a
+long horizon.
+
+The v1.6-R prototype fixes one synthetic outcome horizon. A future campaign
+should measure a spectrum
+
+\[
+\left\{
+K_{\rho,H_1},
+K_{\rho,H_2},
+\ldots
+\right\}
+\]
+
+rather than assume a universal ontology across timescales.
+
+## 14. Relationship to existing theory
+
+The broad principle that internal state need only preserve information useful
+for predicting the future has established precedents.
+
+Predictive State Representations describe dynamical state through predictions
+of future observable quantities rather than requiring recovery of a privileged
+latent world state. Computational-mechanics causal states group histories that
+induce equivalent future distributions. Predictive rate-distortion and the
+past-future information bottleneck formalize the trade-off between compressed
+representations of the past and retained predictive information.
+
+Possibility theory and possibilistic sequential-decision models provide
+precedent for representing uncertain alternatives without requiring ordinary
+additive probability as the sole internal uncertainty formalism.
+
+v1.6-R should therefore be evaluated as a Cortex-specific synthesis and
+experimental architecture, not as a claim that fuzzy or prediction-sufficient
+state representations are themselves new.
