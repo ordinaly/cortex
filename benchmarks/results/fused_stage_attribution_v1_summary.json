@@ -1,0 +1,126 @@
+{
+  "protocol": "fused-stage-attribution-v1",
+  "seeds": 3,
+  "anchor_cases": [
+    72,
+    144,
+    288
+  ],
+  "dominant_stage_all_scales": "perceptual",
+  "cases": {
+    "72": {
+      "total_us_per_step": 1026.086262962963,
+      "accounted_fraction": 0.9867275821897645,
+      "stages": {
+        "perceptual": {
+          "share": 0.5099509198208944,
+          "us_per_step": 524.1367148148148
+        },
+        "cache_refresh": {
+          "share": 0.19548282506894818,
+          "us_per_step": 200.38287037037037
+        },
+        "candidate_readout": {
+          "share": 0.09553335113969608,
+          "us_per_step": 98.02545925925925
+        },
+        "hysteresis_scan": {
+          "share": 0.09779967586084923,
+          "us_per_step": 98.55053703703703
+        },
+        "complexity": {
+          "share": 0.021229265169504335,
+          "us_per_step": 21.806118518518517
+        },
+        "tracker_update": {
+          "share": 0.04079738198005461,
+          "us_per_step": 42.53745555555555
+        },
+        "local_readout": {
+          "share": 0.02190912105501952,
+          "us_per_step": 22.48064814814815
+        },
+        "field_update": {
+          "share": 0.0041082467585339295,
+          "us_per_step": 4.180933333333334
+        }
+      }
+    },
+    "144": {
+      "total_us_per_step": 1787.132474074074,
+      "accounted_fraction": 0.9920043296009012,
+      "stages": {
+        "perceptual": {
+          "share": 0.5399802627742774,
+          "us_per_step": 965.016262962963
+        },
+        "cache_refresh": {
+          "share": 0.20935139755904436,
+          "us_per_step": 376.17025555555557
+        },
+        "candidate_readout": {
+          "share": 0.07806169217932021,
+          "us_per_step": 140.33724814814815
+        },
+        "hysteresis_scan": {
+          "share": 0.08858562347285875,
+          "us_per_step": 158.31424444444445
+        },
+        "complexity": {
+          "share": 0.030832825906201136,
+          "us_per_step": 55.15881111111111
+        },
+        "tracker_update": {
+          "share": 0.02526482067585663,
+          "us_per_step": 45.26894444444444
+        },
+        "local_readout": {
+          "share": 0.017290040352829404,
+          "us_per_step": 30.89959259259259
+        },
+        "field_update": {
+          "share": 0.002406296116901382,
+          "us_per_step": 4.288811111111111
+        }
+      }
+    },
+    "288": {
+      "total_us_per_step": 3819.4350185185185,
+      "accounted_fraction": 0.9960244323705991,
+      "stages": {
+        "perceptual": {
+          "share": 0.4888556830426311,
+          "us_per_step": 1867.1525148148148
+        },
+        "cache_refresh": {
+          "share": 0.2373030312108746,
+          "us_per_step": 906.3635074074074
+        },
+        "candidate_readout": {
+          "share": 0.11009474248835843,
+          "us_per_step": 421.0517444444444
+        },
+        "hysteresis_scan": {
+          "share": 0.06568745891103556,
+          "us_per_step": 252.11157407407407
+        },
+        "complexity": {
+          "share": 0.06295091026430703,
+          "us_per_step": 240.4369111111111
+        },
+        "tracker_update": {
+          "share": 0.013038254397054165,
+          "us_per_step": 50.041437037037035
+        },
+        "local_readout": {
+          "share": 0.01785130223666831,
+          "us_per_step": 68.18188888888889
+        },
+        "field_update": {
+          "share": 0.001215522627309796,
+          "us_per_step": 4.665233333333334
+        }
+      }
+    }
+  }
+}
