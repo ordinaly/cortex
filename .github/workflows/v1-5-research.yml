@@ -10,6 +10,8 @@ on:
       - "research/latent_event_discovery_campaign.py"
       - "tests/test_robust_articulation.py"
       - "tests/test_latent_event_discovery.py"
+      - "research/robust_latent_world_model.py"
+      - "tests/test_robust_latent_world_model.py"
       - "docs/ROBUST_ARTICULATION_LATENT_EVENTS_V1.md"
       - ".github/workflows/v1-5-research.yml"
 
@@ -35,6 +37,7 @@ jobs:
           pytest
           tests/test_robust_articulation.py
           tests/test_latent_event_discovery.py
+          tests/test_robust_latent_world_model.py
           -q
       - name: Run robust articulation campaign
         run: >-
@@ -46,9 +49,15 @@ jobs:
           python research/latent_event_discovery_campaign.py
           --seeds 12
           --output latent-event-discovery-v1.jsonl
+      - name: Run combined robust-latent world-model campaign
+        run: >-
+          python research/robust_latent_world_model.py
+          --seeds 5
+          --output robust-latent-world-model-v1.jsonl
       - uses: actions/upload-artifact@v4
         with:
           name: cortex-v1-5-research
           path: |
             robust-articulation-v1.jsonl
             latent-event-discovery-v1.jsonl
+            robust-latent-world-model-v1.jsonl
