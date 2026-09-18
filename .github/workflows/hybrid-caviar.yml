@@ -1,0 +1,51 @@
+name: cortex-hybrid-caviar
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "benchmarks/benchmark_hybrid_caviar.py"
+      - "benchmarks/benchmark_camera_pixels.py"
+      - "python/cortex/hybrid.py"
+      - "python/cortex/__init__.py"
+      - "docs/HYBRID_STAGE_I.md"
+      - ".github/workflows/hybrid-caviar.yml"
+
+jobs:
+  hybrid-caviar:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python scripts/check_version_consistency.py
+      - run: python -m pip install --upgrade pip
+      - run: >-
+          python -m pip install
+          "maturin==1.15.0"
+          numpy
+          scipy
+          pillow
+          "torch==2.14.0"
+          "torchvision==0.29.0"
+      - run: python -m pip install -e .
+      - name: Run hybrid-caviar-v1
+        run: >-
+          python benchmarks/benchmark_hybrid_caviar.py
+          --campaign
+          --repetitions 1
+          --output hybrid-caviar-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-hybrid-caviar-v1
+          path: hybrid-caviar-v1.jsonl
