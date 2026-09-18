@@ -8,6 +8,8 @@ on:
       - "research/fuzzy_predictive_field_campaign.py"
       - "tests/test_fuzzy_predictive_field.py"
       - "tests/test_fuzzy_predictive_field_campaign.py"
+      - "research/adaptive_predictive_distinction.py"
+      - "tests/test_adaptive_predictive_distinction.py"
       - "docs/FUZZY_PREDICTIVE_FIELD_V1.md"
       - ".github/workflows/fuzzy-predictive-field.yml"
 
@@ -30,13 +32,21 @@ jobs:
           pytest
           tests/test_fuzzy_predictive_field.py
           tests/test_fuzzy_predictive_field_campaign.py
+          tests/test_adaptive_predictive_distinction.py
           -q
       - name: Run fuzzy predictive field campaign
         run: >-
           python research/fuzzy_predictive_field_campaign.py
           --seeds 20
           --output fuzzy-predictive-field-v1.jsonl
+      - name: Run adaptive predictive-distinction campaign
+        run: >-
+          python research/adaptive_predictive_distinction.py
+          --seeds 20
+          --output adaptive-predictive-distinction-v1.jsonl
       - uses: actions/upload-artifact@v4
         with:
           name: cortex-fuzzy-predictive-field-v1
-          path: fuzzy-predictive-field-v1.jsonl
+          path: |
+            fuzzy-predictive-field-v1.jsonl
+            adaptive-predictive-distinction-v1.jsonl
