@@ -24,13 +24,20 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip
       - run: python -m pip install numpy pytest
-      - run: pytest tests/test_dual_geometry_ablation.py -q
+      - run: pytest tests/test_dual_geometry_ablation.py tests/test_dual_geometry_hardness.py -q
       - name: Run dual-geometry ablation campaign
         run: >-
           python research/dual_geometry_ablation.py
           --seeds 50
           --output dual-geometry-ablation-v1.jsonl
+      - name: Run dual-geometry hardness sweep
+        run: >-
+          python research/dual_geometry_hardness.py
+          --seeds 20
+          --output dual-geometry-hardness-v1.jsonl
       - uses: actions/upload-artifact@v4
         with:
           name: cortex-dual-geometry-ablation-v1
-          path: dual-geometry-ablation-v1.jsonl
+          path: |
+            dual-geometry-ablation-v1.jsonl
+            dual-geometry-hardness-v1.jsonl
