@@ -220,3 +220,92 @@ The narrow claim under test is:
 avoiding most redundant resolution work.}
 }
 \]
+
+
+## 9. Campaign result
+
+The committed five-seed optimization campaign passed all declared gates.
+
+### Exact cache parity
+
+The exact shared-state cache reproduced the v1.8-R reference on the paired
+fixture with:
+
+- maximum prediction error: **0.0**;
+- local-resolution disagreement fraction: **0.0**;
+- maximum effective-complexity error: **0.0**.
+
+Its mean wall-time speedup over the reference path was
+
+\[
+\boxed{1.576\times}.
+\]
+
+This isolates an implementation result: a material fraction of the v1.8-R
+research cost came from rebuilding the same semantic geometry and candidate
+kernels multiple times inside one observation state.
+
+### Sparse mode fidelity
+
+Relative to the exact cached path, the sparse controller achieved:
+
+- mean total-variation prediction error:
+  \(2.01\times10^{-5}\);
+- maximum total variation: **0.000669**;
+- local-resolution disagreement fraction: **0.000667**;
+- divergent NLL: **0.505223** versus **0.505227** for the exact cache;
+- fully coarse reconverged-tail fraction: **1.000**.
+
+The sparse approximation therefore did not produce a measurable predictive
+penalty on this fixture.
+
+### Sparse activity
+
+Mean optimization duty was:
+
+| quantity | mean |
+|---|---:|
+| kernel-row refresh fraction | **0.1217** |
+| anchor scan fraction | **0.3207** |
+| SVD duty fraction | **0.0327** |
+| mean sampled complexity absolute error | **0.00985** |
+| maximum sampled complexity absolute error | **0.1444** |
+
+The complexity error is telemetry error only: sampled complexity does not enter
+the hysteresis transition rule.
+
+### Performance
+
+Mean paired speedups were:
+
+| path | speedup |
+|---|---:|
+| exact cache vs v1.8-R reference | **1.576x** |
+| sparse cache vs exact cache | **1.062x** |
+| sparse cache vs v1.8-R reference | **1.674x** |
+
+The second optimization layer is intentionally smaller than the first at nine
+anchors. This is consistent with the expected crossover behavior: dense NumPy
+operations remain competitive for small matrices, while sparse bookkeeping is
+expected to become more valuable as anchor count grows.
+
+The result therefore supports two distinct conclusions:
+
+\[
+\boxed{
+\text{shared-state caching is an exact optimization on the tested path}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{sparse local refresh preserves v1.8-R behavior to high precision while
+reducing update duty on the tested path.}
+}
+\]
+
+The next campaign should sweep anchor count to locate the empirical crossover
+between dense rebuild and sparse incremental maintenance before a sparse design
+is promoted toward the runtime.
