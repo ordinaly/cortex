@@ -43,7 +43,7 @@ jobs:
         run: >-
           python benchmarks/benchmark_hybrid_caviar.py
           --campaign
-          --repetitions 1
+          --repetitions 3
           --output hybrid-caviar-v1.jsonl
       - uses: actions/upload-artifact@v4
         with:
