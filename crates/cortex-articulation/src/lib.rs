@@ -21,6 +21,10 @@ pub struct ArticulationConfig {
     pub bootstrap_spawn_cost: f64,
     pub residual_threshold: f64,
     pub group_candidates: Option<Vec<Vec<usize>>>,
+    /// Optional fixed nuisance group. When set, matching uses exactly these
+    /// shifts from the first observation and subgroup learning is disabled.
+    #[serde(default)]
+    pub fixed_group: Option<Vec<usize>>,
 }
 
 impl Default for ArticulationConfig {
@@ -33,6 +37,7 @@ impl Default for ArticulationConfig {
             bootstrap_spawn_cost: 0.18,
             residual_threshold: 0.38,
             group_candidates: None,
+            fixed_group: None,
         }
     }
 }
@@ -113,6 +118,17 @@ impl ArticulationState {
         }
         let d = cfg.feature_dim;
         let all_shifts: Vec<usize> = (0..d).collect();
+        if let Some(group) = &cfg.fixed_group {
+            if group.is_empty() || group.iter().any(|&x| x >= d) {
+                return Err("fixed_group must contain valid shifts".into());
+            }
+            let mut unique = group.clone();
+            unique.sort_unstable();
+            unique.dedup();
+            if unique.len() != group.len() {
+                return Err("fixed_group cannot contain duplicate shifts".into());
+            }
+        }
         let group_candidates = if let Some(groups) = cfg.group_candidates.clone() {
             if groups.is_empty() {
                 return Err("group_candidates cannot be empty".into());
@@ -134,12 +150,16 @@ impl ArticulationState {
             ]
         };
         let g = group_candidates.len();
+        let initial_subgroup = cfg
+            .fixed_group
+            .clone()
+            .unwrap_or_else(|| all_shifts.clone());
         Ok(Self {
             group_evidence: vec![0.0; g],
             group_obs: 0,
             group_evidence_by_entity: vec![vec![0.0; g]; cfg.max_entities],
             group_obs_by_entity: vec![0; cfg.max_entities],
-            subgroup: all_shifts.clone(),
+            subgroup: initial_subgroup,
             subgroup_margin: 0.0,
             entities: Vec::new(),
             prototypes: Vec::new(),
@@ -168,6 +188,24 @@ impl ArticulationState {
         }
     }
 
+    fn active_match_group(&self) -> Vec<usize> {
+        if let Some(group) = &self.cfg.fixed_group {
+            group.clone()
+        } else if self.subgroup_margin > 0.01 {
+            self.subgroup.clone()
+        } else {
+            self.all_shifts.clone()
+        }
+    }
+
+    fn active_spawn_gate(&self) -> f64 {
+        if self.cfg.fixed_group.is_some() || self.subgroup_margin > 0.01 {
+            self.cfg.spawn_cost
+        } else {
+            self.cfg.spawn_cost.min(self.cfg.bootstrap_spawn_cost)
+        }
+    }
+
     pub fn bind(&mut self, detections: &[Vec<f64>]) -> Result<BindingResult, String> {
         for x in detections {
             self.validate_vector(x)?;
@@ -182,6 +220,8 @@ impl ArticulationState {
         }
         let ne = self.entities.len();
         if ne == 0 {
+            let initial_group = self.active_match_group();
+            let initial_weight = 1.0 / initial_group.len() as f64;
             let mut bindings = Vec::with_capacity(k);
             let mut shifts = Vec::with_capacity(k);
             let mut evidence = Vec::with_capacity(k);
@@ -190,8 +230,8 @@ impl ArticulationState {
                 bindings.push(e);
                 shifts.push(0);
                 evidence.push(TransformEvidence {
-                    shifts: self.all_shifts.clone(),
-                    weights: vec![1.0 / self.cfg.feature_dim as f64; self.cfg.feature_dim],
+                    shifts: initial_group.clone(),
+                    weights: vec![initial_weight; initial_group.len()],
                 });
             }
             return Ok(BindingResult {
@@ -201,17 +241,8 @@ impl ArticulationState {
             });
         }
 
-        let confident = self.subgroup_margin > 0.01;
-        let match_group = if confident {
-            self.subgroup.clone()
-        } else {
-            self.all_shifts.clone()
-        };
-        let spawn_gate = if confident {
-            self.cfg.spawn_cost
-        } else {
-            self.cfg.spawn_cost.min(self.cfg.bootstrap_spawn_cost)
-        };
+        let match_group = self.active_match_group();
+        let spawn_gate = self.active_spawn_gate();
 
         let cols = ne + k;
         let mut cost = vec![vec![spawn_gate; cols]; k];
@@ -245,9 +276,10 @@ impl ArticulationState {
                 let e = self.spawn(&detections[i])?;
                 bindings[i] = e;
                 shifts[i] = 0;
+                let weight = 1.0 / match_group.len() as f64;
                 evidence.push(TransformEvidence {
-                    shifts: self.all_shifts.clone(),
-                    weights: vec![1.0 / self.cfg.feature_dim as f64; self.cfg.feature_dim],
+                    shifts: match_group.clone(),
+                    weights: vec![weight; match_group.len()],
                 });
             }
         }
@@ -307,7 +339,7 @@ impl ArticulationState {
             }
 
             let established = self.entities[e].count > 2;
-            if established && bind_cost <= 0.35 {
+            if self.cfg.fixed_group.is_none() && established && bind_cost <= 0.35 {
                 let costs: Vec<f64> = self
                     .all_shifts
                     .iter()
@@ -476,6 +508,9 @@ impl ArticulationState {
     }
 
     fn derive_subgroup(&self) -> (Vec<usize>, f64) {
+        if let Some(group) = &self.cfg.fixed_group {
+            return (group.clone(), 0.0);
+        }
         let eligible: Vec<usize> = self
             .group_obs_by_entity
             .iter()
