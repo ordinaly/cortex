@@ -79,3 +79,82 @@ campaign timings.
 
 Stage shares and scaling trends are the primary quantities. The campaign records
 the accounted fraction so instrumentation gaps remain explicit.
+
+
+## 6. Campaign result
+
+The three-seed stage-attribution campaign passed all validity checks, with
+approximately 98.7%-99.6% of instrumented step time accounted for.
+
+### Stage shares
+
+Median shares were:
+
+| stage | 72 anchors | 144 anchors | 288 anchors |
+|---|---:|---:|---:|
+| perceptual responsibilities | **51.0%** | **54.0%** | **48.9%** |
+| cache refresh | 19.5% | 20.9% | 23.7% |
+| candidate readout | 9.6% | 7.8% | 11.0% |
+| hysteresis scan | 9.8% | 8.9% | 6.6% |
+| complexity telemetry | 2.1% | 3.1% | 6.3% |
+| tracker update | 4.1% | 2.5% | 1.3% |
+| local readout | 2.2% | 1.7% | 1.8% |
+| field update | 0.4% | 0.2% | 0.1% |
+
+At 288 anchors the corresponding median stage costs were approximately:
+
+- perceptual: **1867 us/step**;
+- cache refresh: **906 us/step**;
+- candidate readout: **421 us/step**;
+- hysteresis scan: **252 us/step**;
+- complexity: **240 us/step**;
+- local readout: **68 us/step**;
+- tracker update: **50 us/step**;
+- field update: **5 us/step**.
+
+The dominant stage is therefore unambiguous:
+
+\[
+\boxed{
+\text{perceptual responsibility computation}
+}
+\]
+
+at every tested scale.
+
+## 7. Immediate optimization implication
+
+The current field constructor already normalizes and stores every perceptual
+anchor:
+
+\[
+a_i\leftarrow \frac{a_i}{\lVert a_i\rVert}.
+\]
+
+However, the generic perceptual-possibility helper is called on every
+observation and normalizes every stored anchor again before evaluating
+
+\[
+1-a_i^\top x.
+\]
+
+For a `FuzzyPredictiveField`, that repeated anchor normalization is redundant.
+
+A semantically exact fast path can instead normalize only the incoming
+observation and compute
+
+\[
+d_i
+=
+\max\left(0,1-a_i^\top\widehat x\right)
+\]
+
+directly against the already-normalized anchor matrix.
+
+This is the next optimization target because it attacks roughly half of measured
+fused runtime without introducing an approximation or changing the perceptual
+metric.
+
+The generic standalone helper should remain available for arbitrary unnormalized
+anchor inputs; the optimized field path can exploit the stronger constructor
+invariant.
