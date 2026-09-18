@@ -102,12 +102,20 @@ class RobustArticulator:
         return ids, [self.committed[i].prototype() for i in ids]
 
     def _active_provisionals(self):
-        ids = [
-            i
-            for i in sorted(self.provisional)
-            if i not in self.reconciled
-            and self.time - self.provisional[i].last_seen <= self.provisional_ttl
-        ]
+        # Keep provisional state bounded. Reconciled tokens remain resolvable
+        # through self.reconciled; stale unresolved tokens intentionally resolve
+        # to None because their evidence never earned persistent commitment.
+        for identity in list(self.provisional):
+            if identity in self.reconciled:
+                del self.provisional[identity]
+                continue
+            if (
+                self.time - self.provisional[identity].last_seen
+                > self.provisional_ttl
+            ):
+                del self.provisional[identity]
+
+        ids = sorted(self.provisional)
         return ids, [self.provisional[i].prototype() for i in ids]
 
     def observe_frame(
