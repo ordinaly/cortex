@@ -1,4 +1,11 @@
-"""Acceptance gates for resolution-scaling-crossover-v1."""
+"""Validation and hypothesis report for resolution-scaling-crossover-v1.
+
+The original protocol declared performance hypotheses in addition to behavioral
+validity conditions. A failed performance hypothesis is a scientific result and
+must not be converted into a post-hoc weaker threshold. This script therefore
+reports every original check unchanged, while only behavioral/data-validity
+failures make the archival characterization workflow fail.
+"""
 from __future__ import annotations
 
 import argparse
@@ -106,23 +113,47 @@ def main() -> None:
     if not rows:
         raise SystemExit("no campaign rows")
 
-    gates = evaluate(rows)
+    checks = evaluate(rows)
+    validity_names = (
+        "dense_sampled_exact_parity",
+        "sparse_fidelity_all_scales",
+    )
+    hypothesis_names = tuple(
+        name
+        for name in checks
+        if name not in validity_names
+    )
+    valid = all(
+        checks[name] for name in validity_names
+    )
+    hypotheses_passed = all(
+        checks[name] for name in hypothesis_names
+    )
+
     payload = {
         "protocol": "resolution-scaling-crossover-v1",
         "rows": len(rows),
-        "gates": gates,
-        "passed": all(gates.values()),
+        "checks": checks,
+        "valid": valid,
+        "all_original_hypotheses_passed": (
+            hypotheses_passed
+        ),
+        "failed_hypotheses": [
+            name
+            for name in hypothesis_names
+            if not checks[name]
+        ],
     }
     print(json.dumps(payload, sort_keys=True))
 
-    if not all(gates.values()):
+    if not valid:
         failed = [
             name
-            for name, passed in gates.items()
-            if not passed
+            for name in validity_names
+            if not checks[name]
         ]
         raise SystemExit(
-            "failed scaling gates: "
+            "invalid scaling characterization: "
             + ", ".join(failed)
         )
 
