@@ -62,11 +62,15 @@ The project has been tested on controlled continual-learning fixtures, chronolog
 
 ## What Cortex does not do
 
-Cortex v1.0 is intentionally scoped as a **continual structural reasoning architecture over structured observations**. It does not currently learn vision, audio, or language representations directly from raw data. A future system can place a neural or other perceptual encoder in front of Cortex:
+Cortex v1.0 is intentionally scoped as a **continual structural reasoning architecture over structured observations**. It does not learn vision, audio, or language representations directly from raw data.
+
+The research interface now includes **Hybrid Cortex Stage I**, which places a frozen neural encoder in front of the unchanged native reasoning runtime:
 
 ```text
-raw data -> perceptual encoder -> structured observations -> Cortex
+raw data -> frozen neural encoder -> metric-calibrated embeddings -> Cortex
 ```
+
+Generic neural embeddings are L2-normalized and scaled so Cortex MSE has a defined cosine-distance interpretation, and generic latent spaces default to an identity-only coordinate action rather than arbitrary cyclic feature shifts. The neural encoder remains frozen in Stage I, making it possible to measure whether Cortex adds persistent structural inference on top of a fixed representation before introducing any feedback-learning loop. See [`docs/HYBRID_STAGE_I.md`](docs/HYBRID_STAGE_I.md).
 
 Cortex also does not assume clean task boundaries. Changes may be gradual, recurrent, ambiguous, compositional, or previously unseen.
 
