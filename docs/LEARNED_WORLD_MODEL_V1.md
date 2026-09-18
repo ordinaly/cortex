@@ -269,3 +269,143 @@ parameter cost from v1.3-R.
 The online stream itself does not justify moving this dense fit into the native
 hot path. A low-rank or sparse online bridge should be investigated only after
 the learned-semantic experiment establishes that the architecture is useful.
+
+
+## 12. Campaign results
+
+### Base learned-world-model run
+
+The base campaign used:
+
+- 12 deterministic seeds;
+- perceptual noise \(\sigma_P=0.03\);
+- 40 behavioral probe outcomes per real entity;
+- 10 interaction opportunities per observed pair.
+
+Mean results:
+
+| Quantity | Result |
+|---|---:|
+| Identity purity | **1.000** |
+| Identity fragmentation | **1.000** |
+| Semantic separation ratio | **3.610** |
+| Future rare-event Hit@1 at 25% interaction experience | **0.526** |
+| Future rare-event Hit@1 at 50% | **0.667** |
+| Future rare-event Hit@1 at 100% | **0.823** |
+| Interaction-marginal-only Hit@1 at 100% | **0.281** |
+| Shuffled-semantic control Hit@1 at 100% | **0.224** |
+| Oracle-identity learned model Hit@1 | **0.823** |
+
+Chance among the four rare event types is 0.25.
+
+The principal result is therefore a chronological learning curve:
+
+\[
+0.526
+\rightarrow
+0.667
+\rightarrow
+0.823.
+\]
+
+No semantic family coordinate was supplied to the predictor. The semantic
+features used by the bridge were estimated from each Cortex entity's stochastic
+behavioral-outcome history.
+
+The interaction-only and shuffled-semantic controls remain near chance. This
+supports the finite claim that the learned behavioral semantic geometry carries
+transferable information needed by the tensor.
+
+### Identity-noise localization
+
+The perception-noise sweep exposed a sharp composition effect.
+
+At \(\sigma_P=0.03\), Cortex identity remained exact:
+
+\[
+\text{purity}=1,
+\qquad
+\text{fragmentation}=1.
+\]
+
+At \(\sigma_P=0.12\), mean identity purity fell to approximately \(0.57-0.73\)
+and fragmentation rose to approximately \(1.37-1.69\).
+
+At \(\sigma_P=0.25\), purity fell to approximately \(0.33-0.37\) and
+fragmentation rose to approximately \(7.3-8.0\).
+
+The learned semantic geometry collapsed at the same time:
+
+| Perceptual noise | Probe count | Semantic separation | Cortex-bound Hit@1 | Oracle-identity Hit@1 |
+|---:|---:|---:|---:|---:|
+| 0.03 | 5 | 2.300 | 0.700 | 0.700 |
+| 0.03 | 20 | 2.986 | 0.613 | 0.613 |
+| 0.03 | 80 | 4.757 | 0.813 | 0.813 |
+| 0.12 | 5 | 1.393 | 0.363 | 0.700 |
+| 0.12 | 20 | 1.542 | 0.413 | 0.613 |
+| 0.12 | 80 | 1.408 | 0.338 | 0.813 |
+| 0.25 | 5 | 1.053 | 0.250 | 0.700 |
+| 0.25 | 20 | 1.063 | 0.250 | 0.613 |
+| 0.25 | 80 | 1.056 | 0.338 | 0.813 |
+
+Each sweep cell contains five seeds, so the non-monotonic differences between
+5 and 20 probes should not be interpreted as a stable effect. The robust effect
+is the gap between the Cortex-bound and oracle-identity columns once perception
+destabilizes binding.
+
+The oracle control receives the **same observed behavioral outcomes and
+interaction events** but associates them with stable true identities. Its
+prediction quality remains at the clean semantic-learning level even when
+perceptual noise is high.
+
+This localizes the main tested failure chain as
+
+\[
+\boxed{
+\text{perceptual noise}
+\rightarrow
+\text{identity error}
+\rightarrow
+\text{mixed/fragmented behavioral statistics}
+\rightarrow
+\text{semantic collapse}
+\rightarrow
+\text{forecast degradation}.
+}
+\]
+
+It does not support the alternative explanation that the tensor bridge itself
+becomes intrinsically unstable under perceptual noise.
+
+## 13. Updated interpretation
+
+v1.4-R supports, within this finite synthetic world, the following pipeline:
+
+\[
+\boxed{
+\text{stable identity}
++
+\text{behavioral experience}
+\Rightarrow
+\text{learned semantic geometry}
+\Rightarrow
+\text{transfer to unseen pair events}.
+}
+\]
+
+The experiment also identifies a strong architectural dependency:
+
+\[
+\boxed{
+\text{semantic learning cannot repair badly corrupted entity identity
+after the evidence has already been assigned to the wrong symbols}.
+}
+\]
+
+This suggests the next engineering/scientific target should not be a more
+powerful tensor. It should be a more uncertainty-aware articulation boundary:
+provisional identity, delayed commitment, robust observation weighting, and
+retrospective reconciliation.
+
+A second parallel route is to remove the predefined outcome alphabet and ask
+Cortex to infer latent event channels from trajectories themselves.
