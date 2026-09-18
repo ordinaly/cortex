@@ -30,13 +30,20 @@ def _normalize_rows(values: np.ndarray) -> np.ndarray:
     return values / norms
 
 
-def make_world(seed: int):
+def make_world(
+    seed: int,
+    *,
+    semantic_noise: float = 0.025,
+    rate_noise_scale: float = 1.0,
+):
     rng = np.random.default_rng(seed)
+    if semantic_noise < 0 or rate_noise_scale < 0:
+        raise ValueError("noise scales must be non-negative")
 
     source_semantics = np.repeat(np.eye(FAMILIES), INSTANCES, axis=0)
     target_semantics = np.repeat(np.eye(FAMILIES), INSTANCES, axis=0)
-    source_semantics += rng.normal(0.0, 0.025, size=source_semantics.shape)
-    target_semantics += rng.normal(0.0, 0.025, size=target_semantics.shape)
+    source_semantics += rng.normal(0.0, semantic_noise, size=source_semantics.shape)
+    target_semantics += rng.normal(0.0, semantic_noise, size=target_semantics.shape)
     source_semantics = _normalize_rows(source_semantics)
     target_semantics = _normalize_rows(target_semantics)
 
@@ -67,7 +74,10 @@ def make_world(seed: int):
                     rates[true_rare] = 0.08
                     noise = rng.normal(
                         0.0,
-                        [0.018, 0.012, 0.004, 0.004, 0.004, 0.004],
+                        rate_noise_scale
+                        * np.asarray(
+                            [0.018, 0.012, 0.004, 0.004, 0.004, 0.004]
+                        ),
                     )
                     rates = np.clip(rates + noise, 0.0005, 0.95)
                     pair_rates[(source, target)] = rates
