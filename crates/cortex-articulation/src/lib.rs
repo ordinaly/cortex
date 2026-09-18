@@ -712,6 +712,91 @@ mod tests {
     }
 
     #[test]
+    fn fixed_group_uses_normal_spawn_gate_immediately() {
+        let cfg = ArticulationConfig {
+            feature_dim: 4,
+            max_entities: 8,
+            fixed_group: Some(vec![0]),
+            ..ArticulationConfig::default()
+        };
+        let mut s = ArticulationState::new(cfg).unwrap();
+        let first = s.observe(&[vec![0.0; 4]]).unwrap();
+        assert_eq!(first.bindings, vec![0]);
+
+        // MSE = 0.30: above bootstrap_spawn_cost (0.18), below normal
+        // spawn_cost (0.70). Fixed mode must use the normal gate immediately.
+        let delta = 0.3_f64.sqrt();
+        let second = s.observe(&[vec![delta; 4]]).unwrap();
+        assert_eq!(second.bindings, vec![0]);
+        assert_eq!(s.entity_count(), 1);
+        assert_eq!(second.subgroup, vec![0]);
+    }
+
+    #[test]
+    fn fixed_identity_group_cannot_match_by_cyclic_shift() {
+        let cfg = ArticulationConfig {
+            feature_dim: 8,
+            max_entities: 8,
+            fixed_group: Some(vec![0]),
+            ..ArticulationConfig::default()
+        };
+        let mut s = ArticulationState::new(cfg).unwrap();
+        let a = vec![2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+        s.observe(&[a.clone()]).unwrap();
+
+        // This is exactly the same vector under a native cyclic shift, but a
+        // fixed identity group must not use that transform to rescue the match.
+        let shifted = shift_vec(&a, 2);
+        let read = s.observe(&[shifted]).unwrap();
+        assert_eq!(read.bindings, vec![1]);
+        assert_eq!(read.shifts, vec![0]);
+        assert_eq!(s.entity_count(), 2);
+    }
+
+    #[test]
+    fn invalid_fixed_groups_are_rejected() {
+        for group in [vec![], vec![0, 0], vec![4]] {
+            let cfg = ArticulationConfig {
+                feature_dim: 4,
+                fixed_group: Some(group),
+                ..ArticulationConfig::default()
+            };
+            assert!(ArticulationState::new(cfg).is_err());
+        }
+    }
+
+    #[test]
+    fn profiled_fixed_group_preserves_production_semantics() {
+        let cfg = ArticulationConfig {
+            feature_dim: 4,
+            max_entities: 8,
+            fixed_group: Some(vec![0]),
+            ..ArticulationConfig::default()
+        };
+        let mut normal = ArticulationState::new(cfg.clone()).unwrap();
+        let mut profiled = ArticulationState::new(cfg).unwrap();
+        let sequence = [
+            vec![vec![0.0, 0.0, 0.0, 0.0]],
+            vec![vec![0.5, 0.5, 0.5, 0.5]],
+            vec![vec![2.0, 0.0, 0.0, 0.0]],
+        ];
+        for detections in sequence {
+            let expected = normal.observe(&detections).unwrap();
+            let measured = profiled.observe_profiled(&detections).unwrap();
+            assert_eq!(expected.bindings, measured.read.bindings);
+            assert_eq!(expected.shifts, measured.read.shifts);
+            assert_eq!(expected.subgroup, measured.read.subgroup);
+            assert_eq!(normal.snapshot().active_entities, profiled.snapshot().active_entities);
+            if normal.snapshot().active_entities > 0 {
+                assert_eq!(measured.work.match_group_size, 1);
+            }
+        }
+        assert_eq!(normal.snapshot().prototypes, profiled.snapshot().prototypes);
+        assert_eq!(normal.snapshot().reliability, profiled.snapshot().reliability);
+        assert_eq!(normal.snapshot().noise_state, profiled.snapshot().noise_state);
+    }
+
+    #[test]
     fn capacity_failure_is_explicit() {
         let cfg = ArticulationConfig {
             feature_dim: 4,
