@@ -136,17 +136,16 @@ def run_seed(
                     noise=perception_noise,
                 )
 
-                adaptive_prediction, decision = controller.predict_outcome(
+                decision = controller.decision()
+                candidate_predictions = controller.candidate_predictions(
                     observation
                 )
-                fine_prediction = field.predict_outcome(
-                    observation,
-                    resolution=min(RESOLUTIONS),
+                selected_index = controller.resolutions.index(
+                    decision.resolution
                 )
-                coarse_prediction = field.predict_outcome(
-                    observation,
-                    resolution=max(RESOLUTIONS),
-                )
+                adaptive_prediction = candidate_predictions[selected_index]
+                fine_prediction = candidate_predictions[0]
+                coarse_prediction = candidate_predictions[-1]
 
                 distribution = (
                     divergent_future
@@ -166,7 +165,11 @@ def run_seed(
                     "identity": int(identity),
                 }
                 phases[name].append(row)
-                controller.observe_outcome(observation, outcome)
+                controller.observe_outcome(
+                    observation,
+                    outcome,
+                    candidate_predictions=candidate_predictions,
+                )
 
     run_phase("equivalent", equivalent_cycles, divergent=False)
     run_phase("divergent", divergent_cycles, divergent=True)
