@@ -124,9 +124,9 @@ class HybridCortexRuntime:
                 )
 
         if nuisance_mode == "identity-only":
-            cfg["articulation"]["group_candidates"] = [[0]]
+            cfg["articulation"]["fixed_group"] = [0]
         elif nuisance_mode == "native":
-            pass
+            cfg["articulation"]["fixed_group"] = None
         else:
             raise ValueError("nuisance_mode must be 'identity-only' or 'native'")
 
