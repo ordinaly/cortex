@@ -32,6 +32,8 @@ import re
 import statistics
 import sys
 import tarfile
+import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
@@ -85,10 +87,36 @@ def _download(url: str, path: Path) -> None:
     if path.exists() and path.stat().st_size:
         return
     path.parent.mkdir(parents=True, exist_ok=True)
-    req = urllib.request.Request(url, headers={"User-Agent": "cortex-camera-pixels-v1"})
-    with urllib.request.urlopen(req, timeout=90) as response:
-        data = response.read()
-    path.write_bytes(data)
+    retry_codes = {403, 429, 500, 502, 503, 504}
+    last_error: Exception | None = None
+    for attempt in range(5):
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (X11; Linux x86_64) "
+                    "AppleWebKit/537.36 Chrome/140 Safari/537.36 "
+                    "CortexResearch/1.0"
+                ),
+                "Accept": "*/*",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=90) as response:
+                data = response.read()
+            path.write_bytes(data)
+            return
+        except urllib.error.HTTPError as exc:
+            last_error = exc
+            if exc.code not in retry_codes or attempt == 4:
+                raise
+        except urllib.error.URLError as exc:
+            last_error = exc
+            if attempt == 4:
+                raise
+        time.sleep(2 ** attempt)
+    if last_error is not None:
+        raise last_error
 
 
 def sha256_file(path: Path) -> str:
