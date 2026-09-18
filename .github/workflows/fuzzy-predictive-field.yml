@@ -6,8 +6,10 @@ on:
     paths:
       - "research/fuzzy_predictive_field.py"
       - "research/fuzzy_predictive_field_campaign.py"
+      - "research/fuzzy_predictive_resolution.py"
       - "tests/test_fuzzy_predictive_field.py"
       - "tests/test_fuzzy_predictive_field_campaign.py"
+      - "tests/test_fuzzy_predictive_resolution.py"
       - "docs/FUZZY_PREDICTIVE_FIELD_V1.md"
       - ".github/workflows/fuzzy-predictive-field.yml"
 
@@ -30,13 +32,22 @@ jobs:
           pytest
           tests/test_fuzzy_predictive_field.py
           tests/test_fuzzy_predictive_field_campaign.py
+          tests/test_fuzzy_predictive_resolution.py
           -q
       - name: Run fuzzy predictive field campaign
         run: >-
           python research/fuzzy_predictive_field_campaign.py
           --seeds 20
           --output fuzzy-predictive-field-v1.jsonl
+      - name: Run predictive-sufficiency resolution sweep
+        run: >-
+          python research/fuzzy_predictive_resolution.py
+          --seeds 12
+          --prediction-tolerance 0.03
+          --output fuzzy-predictive-resolution-v1.jsonl
       - uses: actions/upload-artifact@v4
         with:
           name: cortex-fuzzy-predictive-field-v1
-          path: fuzzy-predictive-field-v1.jsonl
+          path: |
+            fuzzy-predictive-field-v1.jsonl
+            fuzzy-predictive-resolution-v1.jsonl
