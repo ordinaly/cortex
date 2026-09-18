@@ -447,3 +447,134 @@ Exact physical identity is deliberately imperfect in this fixture. The
 experiment therefore asks whether repeated weak correspondence evidence plus
 divergent futures are sufficient for the field to sharpen without requiring
 discrete ontology.
+
+
+## 14. Adaptive distinction result
+
+The 20-seed adaptive campaign passed.
+
+Before one anchor's future changed, mean predictive affinity between it and an
+equivalent neighbor was
+
+\[
+K_\rho=0.906.
+\]
+
+After the changed future accumulated:
+
+\[
+\boxed{
+K_\rho=0.00021.
+}
+\]
+
+Exact perceptual identity remained imperfect:
+
+\[
+\text{top-1 identity}=0.615.
+\]
+
+Thus the new distinction did not require accurate discrete correspondence.
+
+Mean effective predictive rank increased from
+
+\[
+1.31
+\]
+
+to
+
+\[
+2.60,
+\]
+
+while probability assigned to the changed anchor's newly characteristic future
+rose from
+
+\[
+0.011
+\]
+
+to
+
+\[
+0.434.
+\]
+
+The unchanged anchor still assigned
+
+\[
+0.707
+\]
+
+probability to its original characteristic future.
+
+No symbolic split or entity reclassification was issued.
+
+This supports the finite claim:
+
+\[
+\boxed{
+\text{divergent predictive evidence can create a distinction continuously}.
+}
+\]
+
+### Resolution sweep after divergence
+
+The learned distinction is itself resolution-dependent:
+
+| Predictive resolution \(\rho\) | Changed↔stable affinity | Stable↔stable affinity | Effective rank | Changed-future probability |
+|---:|---:|---:|---:|---:|
+| 0.03 | 0.000002 | 0.413 | 2.72 | 0.440 |
+| 0.06 | 0.010 | 0.725 | 2.40 | 0.425 |
+| 0.12 | 0.203 | 0.913 | 2.02 | 0.395 |
+| 0.25 | 0.657 | 0.978 | 1.54 | 0.345 |
+
+At fine resolution, the changed anchor becomes almost completely separated.
+At coarse resolution, it partially rejoins the broader predictive basin.
+
+The two unchanged anchors show the complementary behavior: their affinity
+approaches one at coarse resolution.
+
+Therefore v1.6-R supports both directions of the proposed mechanism:
+
+\[
+\boxed{
+\text{equivalent futures}
+\Rightarrow
+\text{compressed fuzzy basin}
+}
+\]
+
+and
+
+\[
+\boxed{
+\text{divergent futures}
+\Rightarrow
+\text{emergent predictive distinction}.
+}
+\]
+
+Resolution determines how strongly that distinction is expressed rather than
+whether a permanent ontological split exists.
+
+## 15. Updated research interpretation
+
+Taken together, the base and adaptive campaigns support a different target for
+Cortex than accurate world reconstruction:
+
+\[
+\boxed{
+\text{maintain the lowest-complexity fuzzy structure that preserves useful
+future predictions}.
+}
+\]
+
+Physical correspondence remains available from the neural/perceptual layer when
+a task requires it. Inside Cortex, however, identity can remain an integration
+variable over predictive possibilities.
+
+The next mathematical development should make the compression criterion
+explicit: select resolution and field complexity by minimizing predictive
+distortion subject to a complexity budget, rather than fixing \(\rho\) by hand.
