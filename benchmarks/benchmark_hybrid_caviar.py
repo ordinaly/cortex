@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from PIL import Image
+from scipy.optimize import linear_sum_assignment
 
 from benchmark_camera_pixels import (
     DEFAULT_SCENES,
@@ -32,12 +33,17 @@ from benchmark_camera_pixels import (
 )
 from provenance import benchmark_provenance
 
-from cortex import HybridCortexRuntime, NeuralObservation
+from cortex import (
+    HybridCortexRuntime,
+    NeuralObservation,
+    cosine_mse_embedding,
+)
 
 PROTOCOL = "hybrid-caviar-v1"
 ENCODER_NAME = "torchvision-resnet18-imagenet-default"
 EMBEDDING_DIM = 512
 MAX_ENTITIES = 256
+SPAWN_THRESHOLD = 0.7
 
 
 def make_encoder():
@@ -88,6 +94,187 @@ def encode_scene(frames, model, transform, torch):
     return encoded
 
 
+class OnlinePrototypeBaseline:
+    """Label-free online identity baseline using the same neural metric.
+
+    Every frame uses a rectangular Hungarian assignment over existing
+    prototypes plus spawn columns. This preserves simultaneous injectivity and
+    uses the same 0.7 spawn threshold as fixed-group Cortex, but omits Cortex
+    reliability/noise state, memory, recurrence and graph reasoning.
+    """
+
+    def __init__(self, update_mode: str) -> None:
+        if update_mode not in {"centroid", "last-observation"}:
+            raise ValueError("unsupported baseline update mode")
+        self.update_mode = update_mode
+        self.prototypes: list[list[float]] = []
+        self.counts: list[int] = []
+
+    @staticmethod
+    def _mse(a: list[float], b: list[float]) -> float:
+        return sum((x - y) ** 2 for x, y in zip(a, b)) / len(a)
+
+    def step_embeddings(self, embeddings: list[list[float]]) -> list[int]:
+        vectors = [cosine_mse_embedding(x) for x in embeddings]
+        k = len(vectors)
+        if k == 0:
+            return []
+        ne = len(self.prototypes)
+        if ne == 0:
+            if k > MAX_ENTITIES:
+                raise RuntimeError("baseline entity capacity exhausted")
+            self.prototypes.extend([x[:] for x in vectors])
+            self.counts.extend([1] * k)
+            return list(range(k))
+
+        cols = ne + k
+        cost = [[SPAWN_THRESHOLD for _ in range(cols)] for _ in range(k)]
+        for i, x in enumerate(vectors):
+            for e, prototype in enumerate(self.prototypes):
+                cost[i][e] = self._mse(x, prototype)
+            for j in range(k):
+                cost[i][ne + j] = SPAWN_THRESHOLD + 1.0e-8 * abs(i - j)
+
+        rows, assigned_cols = linear_sum_assignment(cost)
+        assignment = [None] * k
+        for row, col in zip(rows.tolist(), assigned_cols.tolist()):
+            assignment[row] = col
+
+        bindings: list[int] = []
+        for i, x in enumerate(vectors):
+            col = assignment[i]
+            if col is not None and col < ne and cost[i][col] <= SPAWN_THRESHOLD:
+                entity = int(col)
+                bindings.append(entity)
+                if self.update_mode == "centroid":
+                    n = self.counts[entity]
+                    self.prototypes[entity] = [
+                        (n * old + new) / (n + 1)
+                        for old, new in zip(self.prototypes[entity], x)
+                    ]
+                    self.counts[entity] = n + 1
+                else:
+                    self.prototypes[entity] = x[:]
+                    self.counts[entity] += 1
+            else:
+                if len(self.prototypes) >= MAX_ENTITIES:
+                    raise RuntimeError("baseline entity capacity exhausted")
+                entity = len(self.prototypes)
+                self.prototypes.append(x[:])
+                self.counts.append(1)
+                bindings.append(entity)
+
+        if len(bindings) != len(set(bindings)):
+            raise RuntimeError("baseline simultaneous binding lost injectivity")
+        return bindings
+
+    @property
+    def active_entities(self) -> int:
+        return len(self.prototypes)
+
+
+class RunAccumulator:
+    def __init__(self) -> None:
+        self.records: list[tuple[str, int]] = []
+        self.inventory: list[int] = []
+        self.truth_ids: set[str] = set()
+        self.injectivity_violations = 0
+        self.max_covisible = 0
+        self.last_seen: dict[str, tuple[int, int]] = {}
+        self.gap_counts = {10: 0, 25: 0, 100: 0}
+        self.gap_same = {10: 0, 25: 0, 100: 0}
+        self.error: str | None = None
+
+    def observe(
+        self,
+        chronological_index: int,
+        detections,
+        bindings: list[int],
+        active_count: int,
+    ) -> None:
+        if len(bindings) != len(set(bindings)):
+            self.injectivity_violations += 1
+        self.max_covisible = max(self.max_covisible, len(bindings))
+        for (box, _embedding), binding in zip(detections, bindings):
+            self.truth_ids.add(box.truth_id)
+            self.records.append((box.truth_id, binding))
+            previous = self.last_seen.get(box.truth_id)
+            if previous is not None:
+                previous_index, previous_binding = previous
+                gap = chronological_index - previous_index
+                for threshold in self.gap_counts:
+                    if gap >= threshold:
+                        self.gap_counts[threshold] += 1
+                        self.gap_same[threshold] += int(binding == previous_binding)
+            self.last_seen[box.truth_id] = (chronological_index, binding)
+        self.inventory.append(active_count)
+
+
+def _result_row(
+    *,
+    scene: str,
+    repetition: int,
+    seed: int,
+    source_provenance: dict[str, Any],
+    torch_version: str,
+    torchvision_version: str,
+    weights_name: str,
+    model: str,
+    accumulator: RunAccumulator,
+    config_sha256: str,
+    nuisance_mode: str,
+    baseline_update: str | None,
+) -> dict[str, Any]:
+    metrics = identity_metrics(accumulator.records)
+    checkpoints, increments = inventory_windows(accumulator.inventory)
+    final_active = accumulator.inventory[-1] if accumulator.inventory else 0
+    return {
+        **benchmark_provenance(PROTOCOL),
+        **source_provenance,
+        "scene": scene,
+        "repetition": repetition,
+        "order_seed": seed,
+        "model": model,
+        "encoder": ENCODER_NAME,
+        "encoder_weights": weights_name,
+        "torch_version": torch_version,
+        "torchvision_version": torchvision_version,
+        "embedding_dim": EMBEDDING_DIM,
+        "metric_adapter": "l2-normalize;sqrt(d/2)-scale;MSE=1-cosine",
+        "nuisance_mode": nuisance_mode,
+        "baseline_update": baseline_update,
+        "spawn_threshold": SPAWN_THRESHOLD,
+        "frozen_encoder": True,
+        "oracle_detection": True,
+        "ground_truth_input": False,
+        "config_sha256": config_sha256,
+        "capacity_failure": accumulator.error is not None,
+        "model_error": accumulator.error,
+        "frames": len(accumulator.inventory),
+        "observations": len(accumulator.records),
+        "true_tracks": len(accumulator.truth_ids),
+        "max_covisible": accumulator.max_covisible,
+        "active_entities": final_active,
+        "oversegmentation_ratio": final_active / max(1, len(accumulator.truth_ids)),
+        "inventory_checkpoints": checkpoints,
+        "new_entities_by_window": increments,
+        "injectivity_violations": accumulator.injectivity_violations,
+        **metrics,
+        "gap_return_10_count": accumulator.gap_counts[10],
+        "gap_return_10_same_fraction": (
+            accumulator.gap_same[10] / max(1, accumulator.gap_counts[10])
+        ),
+        "gap_return_25_count": accumulator.gap_counts[25],
+        "gap_return_25_same_fraction": (
+            accumulator.gap_same[25] / max(1, accumulator.gap_counts[25])
+        ),
+        "gap_return_100_count": accumulator.gap_counts[100],
+        "gap_return_100_same_fraction": (
+            accumulator.gap_same[100] / max(1, accumulator.gap_counts[100])
+        ),
+    }
+
+
 def run_scene(
     scene: str,
     encoded_frames,
@@ -96,7 +283,7 @@ def run_scene(
     torch_version: str,
     torchvision_version: str,
     weights_name: str,
-) -> dict[str, Any]:
+) -> list[dict[str, Any]]:
     seed = 20260918 + repetition * 1009
     rng = random.Random(seed)
     hybrid = HybridCortexRuntime(
@@ -105,93 +292,120 @@ def run_scene(
         budget=24,
         nuisance_mode="identity-only",
     )
+    centroid = OnlinePrototypeBaseline("centroid")
+    last_observation = OnlinePrototypeBaseline("last-observation")
 
-    records: list[tuple[str, int]] = []
-    inventory: list[int] = []
-    truth_ids: set[str] = set()
-    injectivity_violations = 0
-    max_covisible = 0
-    last_seen: dict[str, tuple[int, int]] = {}
-    gap_counts = {10: 0, 25: 0, 100: 0}
-    gap_same = {10: 0, 25: 0, 100: 0}
-    error = None
+    accumulators = {
+        "cortex": RunAccumulator(),
+        "online-centroid": RunAccumulator(),
+        "last-observation": RunAccumulator(),
+    }
 
-    for chronological_index, (frame_number, detections) in enumerate(encoded_frames):
+    for chronological_index, (_frame_number, detections) in enumerate(encoded_frames):
         shuffled = list(detections)
         rng.shuffle(shuffled)
+        embeddings = [embedding for _box, embedding in shuffled]
         observations = [
             NeuralObservation(
                 embedding=embedding,
                 bbox=(box.xc, box.yc, box.width, box.height),
-                timestamp=frame_number,
+                timestamp=_frame_number,
                 source=scene,
             )
             for box, embedding in shuffled
         ]
-        try:
-            read = hybrid.step(observations)
-        except Exception as exc:
-            error = f"{type(exc).__name__}: {exc}"
-            break
 
-        bindings = list(map(int, read.bindings))
-        if len(bindings) != len(set(bindings)):
-            injectivity_violations += 1
-        max_covisible = max(max_covisible, len(bindings))
-        for (box, _embedding), binding in zip(shuffled, bindings):
-            truth_ids.add(box.truth_id)
-            records.append((box.truth_id, binding))
-            previous = last_seen.get(box.truth_id)
-            if previous is not None:
-                previous_index, previous_binding = previous
-                gap = chronological_index - previous_index
-                for threshold in gap_counts:
-                    if gap >= threshold:
-                        gap_counts[threshold] += 1
-                        gap_same[threshold] += int(binding == previous_binding)
-            last_seen[box.truth_id] = (chronological_index, binding)
-        inventory.append(active_entities(hybrid.runtime))
+        if accumulators["cortex"].error is None:
+            try:
+                read = hybrid.step(observations)
+                accumulators["cortex"].observe(
+                    chronological_index,
+                    shuffled,
+                    list(map(int, read.bindings)),
+                    active_entities(hybrid.runtime),
+                )
+            except Exception as exc:
+                accumulators["cortex"].error = f"{type(exc).__name__}: {exc}"
 
-    metrics = identity_metrics(records)
-    checkpoints, increments = inventory_windows(inventory)
-    final_active = active_entities(hybrid.runtime)
-    config_json = hybrid.config_json()
-    return {
-        **benchmark_provenance(PROTOCOL),
-        **source_provenance,
-        "scene": scene,
-        "repetition": repetition,
-        "order_seed": seed,
-        "encoder": ENCODER_NAME,
-        "encoder_weights": weights_name,
-        "torch_version": torch_version,
-        "torchvision_version": torchvision_version,
-        "embedding_dim": EMBEDDING_DIM,
-        "metric_adapter": "l2-normalize;sqrt(d/2)-scale;Cortex-MSE=1-cosine",
-        "nuisance_mode": "identity-only",
-        "frozen_encoder": True,
-        "oracle_detection": True,
-        "ground_truth_input": False,
-        "config_sha256": hashlib.sha256(config_json.encode()).hexdigest(),
-        "capacity_failure": error is not None,
-        "model_error": error,
-        "frames": len(inventory),
-        "observations": len(records),
-        "true_tracks": len(truth_ids),
-        "max_covisible": max_covisible,
-        "active_entities": final_active,
-        "oversegmentation_ratio": final_active / max(1, len(truth_ids)),
-        "inventory_checkpoints": checkpoints,
-        "new_entities_by_window": increments,
-        "injectivity_violations": injectivity_violations,
-        **metrics,
-        "gap_return_10_count": gap_counts[10],
-        "gap_return_10_same_fraction": gap_same[10] / max(1, gap_counts[10]),
-        "gap_return_25_count": gap_counts[25],
-        "gap_return_25_same_fraction": gap_same[25] / max(1, gap_counts[25]),
-        "gap_return_100_count": gap_counts[100],
-        "gap_return_100_same_fraction": gap_same[100] / max(1, gap_counts[100]),
+        for name, baseline in [
+            ("online-centroid", centroid),
+            ("last-observation", last_observation),
+        ]:
+            if accumulators[name].error is not None:
+                continue
+            try:
+                bindings = baseline.step_embeddings(embeddings)
+                accumulators[name].observe(
+                    chronological_index,
+                    shuffled,
+                    bindings,
+                    baseline.active_entities,
+                )
+            except Exception as exc:
+                accumulators[name].error = f"{type(exc).__name__}: {exc}"
+
+    hybrid_config = hybrid.config_json()
+    cortex_hash = hashlib.sha256(hybrid_config.encode()).hexdigest()
+    baseline_hashes = {
+        mode: hashlib.sha256(
+            json.dumps(
+                {
+                    "metric": "1-cosine",
+                    "spawn_threshold": SPAWN_THRESHOLD,
+                    "max_entities": MAX_ENTITIES,
+                    "assignment": "hungarian+spawn-columns",
+                    "update": mode,
+                },
+                sort_keys=True,
+            ).encode()
+        ).hexdigest()
+        for mode in ["centroid", "last-observation"]
     }
+
+    return [
+        _result_row(
+            scene=scene,
+            repetition=repetition,
+            seed=seed,
+            source_provenance=source_provenance,
+            torch_version=torch_version,
+            torchvision_version=torchvision_version,
+            weights_name=weights_name,
+            model="cortex",
+            accumulator=accumulators["cortex"],
+            config_sha256=cortex_hash,
+            nuisance_mode="fixed-identity",
+            baseline_update=None,
+        ),
+        _result_row(
+            scene=scene,
+            repetition=repetition,
+            seed=seed,
+            source_provenance=source_provenance,
+            torch_version=torch_version,
+            torchvision_version=torchvision_version,
+            weights_name=weights_name,
+            model="online-centroid",
+            accumulator=accumulators["online-centroid"],
+            config_sha256=baseline_hashes["centroid"],
+            nuisance_mode="none",
+            baseline_update="centroid",
+        ),
+        _result_row(
+            scene=scene,
+            repetition=repetition,
+            seed=seed,
+            source_provenance=source_provenance,
+            torch_version=torch_version,
+            torchvision_version=torchvision_version,
+            weights_name=weights_name,
+            model="last-observation",
+            accumulator=accumulators["last-observation"],
+            config_sha256=baseline_hashes["last-observation"],
+            nuisance_mode="none",
+            baseline_update="last-observation",
+        ),
+    ]
 
 
 def campaign(scenes: list[str], repetitions: int, cache_dir: Path, output: Path) -> None:
@@ -206,7 +420,7 @@ def campaign(scenes: list[str], repetitions: int, cache_dir: Path, output: Path)
         for repetition in range(repetitions):
             n += 1
             print(f"[{n:02d}/{total:02d}] {scene} rep={repetition + 1}", file=sys.stderr, flush=True)
-            rows.append(
+            rows.extend(
                 run_scene(
                     scene,
                     encoded,
