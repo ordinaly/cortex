@@ -134,21 +134,36 @@ class AdaptiveResolutionController:
             ),
         )
 
+    def candidate_predictions(
+        self,
+        observation: Sequence[float],
+    ) -> np.ndarray:
+        return np.asarray(
+            [
+                self.field.predict_outcome(
+                    observation,
+                    resolution=resolution,
+                )
+                for resolution in self.resolutions
+            ],
+            dtype=float,
+        )
+
     def predict_outcome(
         self,
         observation: Sequence[float],
     ) -> tuple[np.ndarray, ResolutionDecision]:
         decision = self.decision()
-        prediction = self.field.predict_outcome(
-            observation,
-            resolution=decision.resolution,
-        )
-        return prediction, decision
+        index = self.resolutions.index(decision.resolution)
+        predictions = self.candidate_predictions(observation)
+        return predictions[index], decision
 
     def observe_outcome(
         self,
         observation: Sequence[float],
         outcome: int,
+        *,
+        candidate_predictions: np.ndarray | None = None,
     ) -> None:
         if not 0 <= outcome < self.field.outcomes:
             raise ValueError("invalid outcome")
@@ -156,12 +171,19 @@ class AdaptiveResolutionController:
         # Every candidate is scored on the same pre-update state. The observed
         # outcome enters the controller only after all predictions are frozen.
         weights = self.field.perceptual_weights(observation)
-        candidate_losses = []
-        for resolution in self.resolutions:
-            prediction = self.field.predict_outcome(
-                observation,
-                resolution=resolution,
+        predictions = (
+            self.candidate_predictions(observation)
+            if candidate_predictions is None
+            else np.asarray(candidate_predictions, dtype=float)
+        )
+        expected_shape = (len(self.resolutions), self.field.outcomes)
+        if predictions.shape != expected_shape:
+            raise ValueError(
+                f"candidate_predictions must have shape {expected_shape}"
             )
+
+        candidate_losses = []
+        for prediction in predictions:
             probability = max(
                 float(prediction[outcome]),
                 self.probability_floor,
