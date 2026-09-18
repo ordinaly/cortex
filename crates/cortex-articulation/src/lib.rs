@@ -786,14 +786,23 @@ mod tests {
             assert_eq!(expected.bindings, measured.read.bindings);
             assert_eq!(expected.shifts, measured.read.shifts);
             assert_eq!(expected.subgroup, measured.read.subgroup);
-            assert_eq!(normal.snapshot().active_entities, profiled.snapshot().active_entities);
+            assert_eq!(
+                normal.snapshot().active_entities,
+                profiled.snapshot().active_entities
+            );
             if measured.work.entities_before > 0 {
                 assert_eq!(measured.work.match_group_size, 1);
             }
         }
         assert_eq!(normal.snapshot().prototypes, profiled.snapshot().prototypes);
-        assert_eq!(normal.snapshot().reliability, profiled.snapshot().reliability);
-        assert_eq!(normal.snapshot().noise_state, profiled.snapshot().noise_state);
+        assert_eq!(
+            normal.snapshot().reliability,
+            profiled.snapshot().reliability
+        );
+        assert_eq!(
+            normal.snapshot().noise_state,
+            profiled.snapshot().noise_state
+        );
     }
 
     #[test]
