@@ -131,6 +131,23 @@ def run_seed(
     changed_prediction = field.predict_outcome(anchors[0])
     stable_prediction = field.predict_outcome(anchors[1])
 
+    resolution_sweep = {}
+    for resolution in (0.03, 0.06, 0.12, 0.25):
+        kernel = field.kernel(resolution=resolution)
+        resolution_sweep[str(resolution)] = {
+            "changed_to_stable_affinity": float(kernel[0, 1]),
+            "stable_to_stable_affinity": float(kernel[1, 2]),
+            "effective_rank": field.predictive_complexity(
+                resolution=resolution
+            ),
+            "changed_future_probability": float(
+                field.predict_outcome(
+                    anchors[0],
+                    resolution=resolution,
+                )[2]
+            ),
+        }
+
     return {
         "protocol": "adaptive-predictive-distinction-v1",
         "seed": seed,
@@ -145,6 +162,7 @@ def run_seed(
         "before_changed_future_probability": float(before_prediction[2]),
         "after_changed_future_probability": float(changed_prediction[2]),
         "after_stable_future_probability": float(stable_prediction[0]),
+        "resolution_sweep": resolution_sweep,
         "checkpoints": checkpoints,
     }
 
