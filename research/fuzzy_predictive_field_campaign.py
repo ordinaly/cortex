@@ -106,8 +106,9 @@ def fit_bridge_from_counts(
 ):
     samples = []
     totals = pair_counts.sum(axis=2)
-    for source in range(ENTITIES):
-        for target in range(ENTITIES):
+    n = semantics.shape[0]
+    for source in range(n):
+        for target in range(n):
             total = float(totals[source, target])
             if total <= 1.0e-8:
                 continue
@@ -244,6 +245,25 @@ def run_case(
 
     hard_bridge = fit_bridge_from_counts(hard_semantics, hard_pairs)
     oracle_bridge = fit_bridge_from_counts(oracle_semantics, oracle_pairs)
+
+    role_outcomes = np.zeros((8, OUTCOMES), dtype=float)
+    role_pairs = np.zeros((8, 8, RELATIONS), dtype=float)
+    for entity in range(ENTITIES):
+        role = int(sides[entity]) * FAMILIES + int(families[entity])
+        role_outcomes[role] += oracle_outcomes[entity]
+    for source in range(ENTITIES):
+        source_role = (
+            int(sides[source]) * FAMILIES + int(families[source])
+        )
+        for target in range(ENTITIES):
+            target_role = (
+                int(sides[target]) * FAMILIES + int(families[target])
+            )
+            role_pairs[source_role, target_role] += oracle_pairs[source, target]
+
+    role_semantics = semantic_features(role_outcomes)
+    role_bridge = fit_bridge_from_counts(role_semantics, role_pairs)
+
     oracle_kernel = predictive_kernel(
         oracle_semantics,
         semantic_resolution,
@@ -261,6 +281,7 @@ def run_case(
     hard_hits = []
     oracle_hard_hits = []
     oracle_field_hits = []
+    role_oracle_hits = []
 
     for source, target in sorted(held):
         source_observation = noisy_observation(
@@ -303,6 +324,13 @@ def run_case(
             target_field @ oracle_semantics,
         )
 
+        source_role = int(families[source])
+        target_role = FAMILIES + int(families[target])
+        role_oracle_scores = rarity * role_bridge.predict(
+            role_semantics[source_role],
+            role_semantics[target_role],
+        )
+
         truth = 2 + (
             (int(families[source]) + int(families[target])) % FAMILIES
         )
@@ -313,6 +341,9 @@ def run_case(
         )
         oracle_field_hits.append(
             int(int(np.argmax(oracle_field_scores)) == truth)
+        )
+        role_oracle_hits.append(
+            int(int(np.argmax(role_oracle_scores)) == truth)
         )
 
     return {
@@ -330,6 +361,9 @@ def run_case(
         "hard_projection_future_hit_at_1": float(np.mean(hard_hits)),
         "oracle_hard_future_hit_at_1": float(np.mean(oracle_hard_hits)),
         "oracle_field_future_hit_at_1": float(np.mean(oracle_field_hits)),
+        "predictive_role_oracle_hit_at_1": float(
+            np.mean(role_oracle_hits)
+        ),
         "predictive_effective_rank": fuzzy.predictive_complexity(),
     }
 
@@ -397,6 +431,14 @@ def campaign(seeds: int, output: Path) -> None:
                 "oracle_field_future_hit_at_1": float(
                     np.mean(
                         [row["oracle_field_future_hit_at_1"] for row in base]
+                    )
+                ),
+                "predictive_role_oracle_hit_at_1": float(
+                    np.mean(
+                        [
+                            row["predictive_role_oracle_hit_at_1"]
+                            for row in base
+                        ]
                     )
                 ),
                 "predictive_effective_rank": float(
