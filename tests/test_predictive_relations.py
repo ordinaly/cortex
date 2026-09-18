@@ -66,3 +66,12 @@ def test_heat_kernel_predicts_heldout_future_pairs_across_seeds():
     )
     assert auc > 0.97
     assert ap > 0.90
+
+
+def test_tied_prior_metrics_are_not_candidate_order_biased():
+    row = run_seed(0)
+    prior = row["metrics"]["direct-prior"]
+    assert prior["auc"] == 0.5
+    assert prior["average_precision"] < 0.5
+    assert abs(prior["hit_at_1"] - 0.25) < 1.0e-12
+    assert abs(prior["hit_at_3"] - 0.75) < 1.0e-12
