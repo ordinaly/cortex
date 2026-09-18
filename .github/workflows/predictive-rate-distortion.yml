@@ -1,0 +1,40 @@
+name: cortex-predictive-rate-distortion
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "research/predictive_rate_distortion.py"
+      - "research/predictive_rate_distortion_campaign.py"
+      - "tests/test_predictive_rate_distortion.py"
+      - "docs/PREDICTIVE_RATE_DISTORTION_V1.md"
+      - ".github/workflows/predictive-rate-distortion.yml"
+
+jobs:
+  predictive-rate-distortion:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install numpy pytest
+      - run: >-
+          pytest
+          tests/test_predictive_rate_distortion.py
+          -q
+      - name: Run predictive rate-distortion campaign
+        run: >-
+          python research/predictive_rate_distortion_campaign.py
+          --seeds 20
+          --output predictive-rate-distortion-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-predictive-rate-distortion-v1
+          path: predictive-rate-distortion-v1.jsonl
