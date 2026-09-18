@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import numpy as np
 from PIL import Image
 from scipy.optimize import linear_sum_assignment
 
@@ -107,60 +108,61 @@ class OnlinePrototypeBaseline:
         if update_mode not in {"centroid", "last-observation"}:
             raise ValueError("unsupported baseline update mode")
         self.update_mode = update_mode
-        self.prototypes: list[list[float]] = []
+        self.prototypes: list[np.ndarray] = []
         self.counts: list[int] = []
 
-    @staticmethod
-    def _mse(a: list[float], b: list[float]) -> float:
-        return sum((x - y) ** 2 for x, y in zip(a, b)) / len(a)
-
     def step_embeddings(self, embeddings: list[list[float]]) -> list[int]:
-        vectors = [cosine_mse_embedding(x) for x in embeddings]
-        k = len(vectors)
-        if k == 0:
+        if not embeddings:
             return []
+        vectors = np.asarray(
+            [cosine_mse_embedding(x) for x in embeddings],
+            dtype=np.float64,
+        )
+        k = int(vectors.shape[0])
         ne = len(self.prototypes)
         if ne == 0:
             if k > MAX_ENTITIES:
                 raise RuntimeError("baseline entity capacity exhausted")
-            self.prototypes.extend([x[:] for x in vectors])
+            self.prototypes.extend([x.copy() for x in vectors])
             self.counts.extend([1] * k)
             return list(range(k))
 
+        prototypes = np.stack(self.prototypes, axis=0)
+        existing_cost = np.mean(
+            (vectors[:, None, :] - prototypes[None, :, :]) ** 2,
+            axis=2,
+        )
         cols = ne + k
-        cost = [[SPAWN_THRESHOLD for _ in range(cols)] for _ in range(k)]
-        for i, x in enumerate(vectors):
-            for e, prototype in enumerate(self.prototypes):
-                cost[i][e] = self._mse(x, prototype)
-            for j in range(k):
-                cost[i][ne + j] = SPAWN_THRESHOLD + 1.0e-8 * abs(i - j)
+        cost = np.full((k, cols), SPAWN_THRESHOLD, dtype=np.float64)
+        cost[:, :ne] = existing_cost
+        row_index = np.arange(k)[:, None]
+        spawn_index = np.arange(k)[None, :]
+        cost[:, ne:] += 1.0e-8 * np.abs(row_index - spawn_index)
 
         rows, assigned_cols = linear_sum_assignment(cost)
-        assignment = [None] * k
-        for row, col in zip(rows.tolist(), assigned_cols.tolist()):
-            assignment[row] = col
+        assignment = np.full(k, -1, dtype=np.int64)
+        assignment[rows] = assigned_cols
 
         bindings: list[int] = []
         for i, x in enumerate(vectors):
-            col = assignment[i]
-            if col is not None and col < ne and cost[i][col] <= SPAWN_THRESHOLD:
-                entity = int(col)
+            col = int(assignment[i])
+            if col < ne and float(cost[i, col]) <= SPAWN_THRESHOLD:
+                entity = col
                 bindings.append(entity)
                 if self.update_mode == "centroid":
                     n = self.counts[entity]
-                    self.prototypes[entity] = [
-                        (n * old + new) / (n + 1)
-                        for old, new in zip(self.prototypes[entity], x)
-                    ]
+                    self.prototypes[entity] = (
+                        n * self.prototypes[entity] + x
+                    ) / (n + 1)
                     self.counts[entity] = n + 1
                 else:
-                    self.prototypes[entity] = x[:]
+                    self.prototypes[entity] = x.copy()
                     self.counts[entity] += 1
             else:
                 if len(self.prototypes) >= MAX_ENTITIES:
                     raise RuntimeError("baseline entity capacity exhausted")
                 entity = len(self.prototypes)
-                self.prototypes.append(x[:])
+                self.prototypes.append(x.copy())
                 self.counts.append(1)
                 bindings.append(entity)
 
