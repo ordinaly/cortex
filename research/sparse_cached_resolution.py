@@ -149,8 +149,9 @@ class PredictiveKernelCache:
                 -0.5
                 * (rows / resolution) ** 2
             )
-            self.kernels[index, dirty, :] = kernel_rows
-            self.kernels[index, :, dirty] = kernel_rows.T
+            kernel = self.kernels[index]
+            kernel[dirty, :] = kernel_rows
+            kernel[:, dirty] = kernel_rows.T
 
         self.kernel_revision += 1
         self.partial_refreshes += 1
