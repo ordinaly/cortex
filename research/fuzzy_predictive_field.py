@@ -146,6 +146,27 @@ class FuzzyPredictiveField:
             alpha=self.semantic_alpha,
         )
 
+    def outcome_probabilities(self) -> np.ndarray:
+        return (
+            self.outcome_counts + self.semantic_alpha
+        ) / (
+            self.outcome_counts.sum(axis=1, keepdims=True)
+            + self.semantic_alpha * self.outcomes
+        )
+
+    def predict_outcome(
+        self,
+        observation: Sequence[float],
+        *,
+        resolution: float | None = None,
+    ) -> np.ndarray:
+        field = self.field(observation, resolution=resolution)
+        prediction = field @ self.outcome_probabilities()
+        total = float(prediction.sum())
+        if total <= 1.0e-15:
+            return np.full(self.outcomes, 1.0 / self.outcomes)
+        return prediction / total
+
     def kernel(self, *, resolution: float | None = None) -> np.ndarray:
         return predictive_kernel(
             self.features(),
