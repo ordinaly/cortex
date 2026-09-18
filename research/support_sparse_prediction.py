@@ -133,13 +133,23 @@ class SupportSparsePredictiveCache(PredictiveKernelCache):
         source = support.indices
         weights = support.weights
 
-        candidate_rows = self.kernels[:, source, :]
-        activations = np.einsum(
-            "s,rsb->rb",
-            weights,
-            candidate_rows,
-            optimize=True,
-        )
+        if len(source) == len(self.field.anchors):
+            # Exact full-support path: avoid fancy-index copying of the whole
+            # candidate bank so timing reflects fusion rather than a cache copy.
+            activations = np.einsum(
+                "a,rab->rb",
+                weights,
+                self.kernels,
+                optimize=True,
+            )
+        else:
+            candidate_rows = self.kernels[:, source, :]
+            activations = np.einsum(
+                "s,rsb->rb",
+                weights,
+                candidate_rows,
+                optimize=True,
+            )
         semantic_fields = _normalize_rows(activations)
         candidate_predictions = (
             semantic_fields @ self.probabilities
