@@ -142,6 +142,7 @@ def run_case(
     individual_scale: float = 0.08,
     probes_per_entity: int = 15,
     interactions_per_pair: int = 3,
+    semantic_resolution: float = 0.10,
 ) -> dict:
     rng = np.random.default_rng(seed)
     anchors, families, sides = make_anchors(
@@ -154,7 +155,7 @@ def run_case(
         outcomes=OUTCOMES,
         relations=RELATIONS,
         perceptual_temperature=0.05,
-        semantic_resolution=0.10,
+        semantic_resolution=semantic_resolution,
     )
 
     hard_outcomes = np.zeros((ENTITIES, OUTCOMES), dtype=float)
@@ -243,7 +244,10 @@ def run_case(
 
     hard_bridge = fit_bridge_from_counts(hard_semantics, hard_pairs)
     oracle_bridge = fit_bridge_from_counts(oracle_semantics, oracle_pairs)
-    oracle_kernel = predictive_kernel(oracle_semantics, 0.10)
+    oracle_kernel = predictive_kernel(
+        oracle_semantics,
+        semantic_resolution,
+    )
 
     surprisal = relation_surprisal(global_relations + 1.0)
     eta_rare = float(np.mean(surprisal[2:]))
@@ -318,6 +322,7 @@ def run_case(
         "individual_scale": individual_scale,
         "probes_per_entity": probes_per_entity,
         "interactions_per_pair": interactions_per_pair,
+        "semantic_resolution": semantic_resolution,
         "physical_anchors": ENTITIES,
         "exact_identity_top1": exact_top1 / perceptual_samples,
         "correct_family_possibility_mass": float(np.mean(family_mass)),
