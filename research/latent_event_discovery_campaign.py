@@ -10,6 +10,7 @@ import numpy as np
 from latent_event_discovery import (
     EVENT_TYPES,
     LatentEventDiscoverer,
+    RobustLatentEventDiscoverer,
     clustering_metrics,
     event_center,
     sample_signature,
@@ -22,17 +23,32 @@ EVENT_PROBABILITIES = np.asarray([0.42, 0.25, 0.13, 0.09, 0.07, 0.04])
 def run_case(seed: int, noise: float, events: int = 600) -> dict:
     rng = np.random.default_rng(seed)
     discoverer = LatentEventDiscoverer(novelty_threshold=0.95)
+    robust = RobustLatentEventDiscoverer()
 
     truth = []
     clusters = []
+    robust_tokens = []
     for _ in range(events):
         label = int(rng.choice(EVENT_TYPES, p=EVENT_PROBABILITIES))
         signature = sample_signature(label, rng, noise=noise)
         cluster = discoverer.observe(signature)
+        robust_token = robust.observe(signature)
         truth.append(label)
         clusters.append(cluster)
+        robust_tokens.append(robust_token)
 
     metrics = clustering_metrics(truth, clusters)
+    robust_resolved = [robust.resolve(token) for token in robust_tokens]
+    robust_pairs = [
+        (label, cluster)
+        for label, cluster in zip(truth, robust_resolved)
+        if cluster is not None
+    ]
+    robust_metrics = clustering_metrics(
+        [label for label, _cluster in robust_pairs],
+        [cluster for _label, cluster in robust_pairs],
+    )
+    robust_coverage = len(robust_pairs) / len(truth)
 
     dominant_truth = {}
     for cluster in sorted(set(clusters)):
@@ -55,6 +71,11 @@ def run_case(seed: int, noise: float, events: int = 600) -> dict:
         "noise": noise,
         "events": events,
         **metrics,
+        "robust_purity": robust_metrics["purity"],
+        "robust_fragmentation": robust_metrics["fragmentation"],
+        "robust_pair_f1": robust_metrics["pair_f1"],
+        "robust_clusters": robust_metrics["clusters"],
+        "robust_coverage": robust_coverage,
         "rare_event_cluster": rare_cluster,
         "common_event_cluster": common_cluster,
         "rare_cluster_surprisal": float(surprisals[rare_cluster]),
@@ -101,6 +122,23 @@ def campaign(seeds: int, output: Path) -> None:
                                 for r in subset
                             ]
                         )
+                    ),
+                    "robust_purity": float(
+                        np.mean([r["robust_purity"] for r in subset])
+                    ),
+                    "robust_fragmentation": float(
+                        np.mean(
+                            [r["robust_fragmentation"] for r in subset]
+                        )
+                    ),
+                    "robust_pair_f1": float(
+                        np.mean([r["robust_pair_f1"] for r in subset])
+                    ),
+                    "robust_clusters": float(
+                        np.mean([r["robust_clusters"] for r in subset])
+                    ),
+                    "robust_coverage": float(
+                        np.mean([r["robust_coverage"] for r in subset])
                     ),
                 },
                 sort_keys=True,
