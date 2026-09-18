@@ -241,3 +241,36 @@ entities produced by the neural/Cortex perception stack:
 
 That is the first experiment where Cortex would be asked to reason prospectively
 over what a neural network sees rather than only maintaining identity.
+
+
+## 11. First prospective campaign result
+
+The initial \`predictive-relations-v1\` campaign ran 50 deterministic seeds with
+four hidden interaction domains.
+
+Every evaluated pair had **zero direct training exposure**.
+
+Mean results:
+
+| Method | AUROC | Average precision | MRR | Hit@1 | Hit@3 |
+|---|---:|---:|---:|---:|---:|
+| Direct prior | 0.5000 | 0.3690 | 0.5208 | 0.250 | 0.750 |
+| Fine informational distance | 0.5000 | 0.3690 | 0.5208 | 0.250 | 0.750 |
+| Common neighbors | 0.5000 | 0.3690 | 0.5208 | 0.250 | 0.750 |
+| Three-hop \(A^3\) | 0.9871 | 0.9736 | 0.9942 | 0.990 | 1.000 |
+| Heat potential \(\kappa_{\rho=1}\) | **0.9979** | **0.9959** | **0.9967** | **0.995** | **1.000** |
+
+This finite result supports two conclusions.
+
+First, the future relation signal is genuinely **multi-hop** in this fixture:
+direct pair evidence, fine role information and two-hop common neighbors contain
+no discriminating information, while three-hop structure is highly predictive.
+
+Second, the heat-kernel potential performs slightly better than the explicit
+three-hop score. That difference is encouraging but not yet sufficient to claim
+that summing all path depths is generally superior. A future campaign must vary
+the true dependency depth and graph noise so that \(A^3\) is sometimes
+insufficient by construction.
+
+The result therefore supports **deep relational inference in the tested
+synthetic world**, not a universal forecasting claim.
