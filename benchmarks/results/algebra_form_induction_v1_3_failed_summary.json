@@ -1,0 +1,113 @@
+{
+  "protocol": "algebra-form-induction-v1.3",
+  "status": "failed_preregistered_gates",
+  "rows": 120,
+  "seeds_per_family": 20,
+  "holdout_fraction": 0.4,
+  "grammar_forms": 375,
+  "failed_gates": [
+    "cyclic_rebracketing_discovered",
+    "semilattice_repeat_discovered",
+    "dihedral_precision",
+    "semilattice_precision"
+  ],
+  "interpretation": "A single held-aside predictive cell split eliminated false random-magma closure, but sparse validation suppressed some true forms and independently validated forms could still interact incorrectly during multi-law closure. This motivated cross-fitted predictive evidence and joint law-set admission.",
+  "families": {
+    "cyclic-7": {
+      "patterns": {
+        "left_projection": 0,
+        "rebracket": 0.9,
+        "repeat": 0,
+        "swap": 0.95
+      },
+      "conflicts": 0,
+      "supported": 11.2,
+      "selected": 11.2,
+      "cortex": {
+        "accuracy": 0.9825,
+        "coverage": 0.9825,
+        "resolved_accuracy": 1
+      }
+    },
+    "dihedral-4": {
+      "patterns": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0,
+        "swap": 0
+      },
+      "conflicts": 41.5,
+      "supported": 3.8,
+      "selected": 3.8,
+      "cortex": {
+        "accuracy": 0.9134615384615385,
+        "coverage": 0.9153846153846154,
+        "resolved_accuracy": 0.9976190476190476
+      }
+    },
+    "semilattice-min-6": {
+      "patterns": {
+        "left_projection": 0,
+        "rebracket": 0.2,
+        "repeat": 0.45,
+        "swap": 0.85
+      },
+      "conflicts": 7.5,
+      "supported": 16.5,
+      "selected": 15.05,
+      "cortex": {
+        "accuracy": 0.7464285714285714,
+        "coverage": 0.7464285714285714,
+        "resolved_accuracy": 0.95
+      }
+    },
+    "left-zero-6": {
+      "patterns": {
+        "left_projection": 1,
+        "rebracket": 0.9,
+        "repeat": 0.45,
+        "swap": 0
+      },
+      "conflicts": 0,
+      "supported": 45.9,
+      "selected": 22.2,
+      "cortex": {
+        "accuracy": 1,
+        "coverage": 1,
+        "resolved_accuracy": 1
+      }
+    },
+    "subtraction-7": {
+      "patterns": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "conflicts": 0,
+      "supported": 4.65,
+      "selected": 4.65,
+      "cortex": {
+        "accuracy": 0.975,
+        "coverage": 0.975,
+        "resolved_accuracy": 1
+      }
+    },
+    "random-magma-6": {
+      "patterns": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "conflicts": 0,
+      "supported": 0,
+      "selected": 0,
+      "cortex": {
+        "accuracy": 0,
+        "coverage": 0,
+        "resolved_accuracy": 0
+      }
+    }
+  }
+}
