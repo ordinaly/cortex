@@ -1281,13 +1281,13 @@ A rough architecture-level map is:
 
 | Component | Dominant scaling idea |
 |---|---|
-| Entity/transform scoring | approximately (O(kN|G|d)) |
+| Entity/transform scoring | approximately $O(kN\lvert G\rvert d)$ |
 | Hungarian assignment | polynomial in the frame assignment matrix; measured smaller than transform scoring in current fixtures |
 | Current-frame relation updates | approximately quadratic in visible entities, not total entity capacity |
-| Stored graph memory | (O(R+C)), allocated from observed evidence |
+| Stored graph memory | $O(R+C)$, allocated from observed evidence |
 | Public 12-D summary | constant-dimensional output; graph counts maintained incrementally |
-| Fuzzy memory matching | approximately O(B_m · 12) |
-| Continual regime matching | approximately O(B_r · 12) |
+| Fuzzy memory matching | approximately $O(12B_m)$ |
+| Continual regime matching | approximately $O(12B_r)$ |
 | Exact curvature rank checks | dense in the fixed continual dimension and conditional/sampled rather than every frame |
 
 These expressions are architectural guides, not formal asymptotic theorems for every code path.

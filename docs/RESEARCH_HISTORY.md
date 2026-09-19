@@ -113,7 +113,7 @@ The next research target is an exact perceptual fast path using the invariant th
 Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **systematic relational generalization**, beginning with a kinship/family-relation composition benchmark that holds out graph structure rather than merely surface examples.
+2. **systematic relational generalization**, extending the passed kinship depth-extrapolation gate toward held-out rule induction, conflicting evidence, multi-path proofs, and neural/GNN comparison.
 
 
 ## kinship-composition-v1 — structured logical composition
