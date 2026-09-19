@@ -2,7 +2,7 @@
 
 Status: **frozen protocol / official campaign passed**.
 
-Protocol ID: \`belief-revision-v1\`.
+Protocol ID: `belief-revision-v1`.
 
 This is the second experiment in **Cortex Reasoning Map v1** after the passing
 structural counterfactual benchmark.
@@ -50,7 +50,7 @@ Those belong in later Reasoning Map campaigns.
 
 The revised belief is a Cortex-style causal evidence cell using the same
 thresholds as the stable graph contract and
-\`counterfactual-reasoning-v1\`:
+`counterfactual-reasoning-v1`:
 
 - minimum intervention count: 8;
 - minimum control count: 8;
@@ -420,10 +420,10 @@ record. Any revised official claim must use fresh untouched seeds.
 
 ## Planned files
 
-- \`research/belief_revision.py\`
-- \`research/belief_revision_campaign.py\`
-- \`research/belief_revision_gate.py\`
-- \`tests/test_belief_revision.py\`
+- `research/belief_revision.py`
+- `research/belief_revision_campaign.py`
+- `research/belief_revision_gate.py`
+- `tests/test_belief_revision.py`
 
 The official campaign must not run until preflight is green.
 
@@ -446,6 +446,6 @@ The untouched official campaign on seeds 200–219 passed every frozen gate
 across 60 cases.
 
 See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md) and
-[\`benchmarks/results/belief_revision_v1_summary.json\`](../benchmarks/results/belief_revision_v1_summary.json).
+[`benchmarks/results/belief_revision_v1_summary.json`](../benchmarks/results/belief_revision_v1_summary.json).
 
 The frozen thresholds above were not weakened after evaluation.
