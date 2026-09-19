@@ -311,12 +311,12 @@ however, expose a single scalar such as "entity confidence = 0.87."
 For an existing entity $e$, the articulation layer already computes a
 transformation-minimized matching cost of the form
 
-$
+$$
 d_e(x)
 =
 \min_{g\in G}
 d_w\!\left(x,g\cdot\mu_e\right).
-$
+$$
 
 The selected entity is determined by the **global assignment problem**, with
 new-entity spawn columns competing against existing entities. Therefore the
@@ -346,13 +346,13 @@ A natural future quantity is an **attractor-separation margin**. If $e^*$ is
 the chosen entity and $d_{\mathrm{alt}}$ is the best competing explanation
 (other entity or spawn), then
 
-$
+$$
 \Delta_e
 =
 d_{\mathrm{alt}}
 -
 d_{e^*}.
-$
+$$
 
 Large positive $\Delta_e$ means the selected attractor basin is well separated;
 a value near zero means the observation lies close to a decision boundary.
@@ -360,13 +360,13 @@ a value near zero means the observation lies close to a decision boundary.
 Because binding is solved jointly with the Hungarian assignment, the most
 rigorous confidence would use **global assignment regret**:
 
-$
+$$
 \Delta_{\mathrm{global}}
 =
 C_{\mathrm{best\ alternative\ assignment}}
 -
 C_{\mathrm{optimal\ assignment}}.
-$
+$$
 
 That quantity respects simultaneous competition between detections, whereas a
 simple row-wise margin is only an approximation.
@@ -992,7 +992,7 @@ Different Cortex layers already expose the evidence from which an
 For fuzzy historical memory, a natural non-probabilistic severity measure would
 be the amount by which reconstruction error exceeds the allowed distortion:
 
-$
+$$
 u_{\mathrm{mem}}
 =
 \max\!\left(
@@ -1000,20 +1000,20 @@ u_{\mathrm{mem}}
 \frac{d_{\mathrm{RMS}}(z,\hat z)-\varepsilon_D}
      {\varepsilon_D}
 \right),
-$
+$$
 
 where $\varepsilon_D$ is the configured distortion budget.
 
 For a pending continual transition, an evidence margin could similarly compare
 the accumulated score with the current decision threshold:
 
-$
+$$
 u_{\mathrm{struct}}
 =
 s_{\mathrm{pending}}
 -
 \theta_t.
-$
+$$
 
 These are useful **evidence margins**, but they are not yet part of the frozen
 public runtime contract and should not be described as calibrated
@@ -1322,11 +1322,11 @@ The kinship-composition experiment adds a finite learned relation algebra.
 
 Conceptually,
 
-$
+$$
 s_{t+1}
 =
 C(s_t,r_t),
-$
+$$
 
 where $C$ is learned from solved relation paths.
 
@@ -1336,11 +1336,11 @@ The follow-up `algebra-induction-v1` experiment goes one step further. Cortex re
 
 For example, once associativity is evidence-gated, a missing product can be derived from
 
-$
+$$
 (a\star b)\star c
 =
 a\star(b\star c).
-$
+$$
 
 With 40% of each operation table hidden, this research path recovered held-out products at 1.000 resolved accuracy on both cyclic and noncommutative dihedral groups, while declining to derive products on a non-associative control.
 
