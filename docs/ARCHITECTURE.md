@@ -164,7 +164,7 @@ return all reads
 The system therefore has one explicit public structural bottleneck:
 
 $$
-z_t in \mathbb{R}^{12}.
+z_t \in \mathbb{R}^{12}.
 $$
 
 Everything below articulation and graph evidence is conditioned on this compact state.
@@ -180,7 +180,7 @@ Articulation is the process of turning raw feature vectors into persistent, stru
 Suppose a frame contains detections
 
 $$
-x_1,\ldots,x_k in \mathbb{R}^d.
+x_1,\ldots,x_k \in \mathbb{R}^d.
 $$
 
 Cortex must decide whether each detection corresponds to:
@@ -213,7 +213,7 @@ $$
 \mu_e(f)
 =
 \frac{1}{n_e}
-\sum_{t in e}
+\sum_{t \in e}
 x_t^{\text{aligned}}(f).
 $$
 
@@ -240,7 +240,7 @@ This matters because identity should not depend equally on dimensions that the s
 For an existing entity $e$, Cortex evaluates the observation against transformed versions of the prototype:
 
 $$
-gcdot\mu_e,
+g\cdot\mu_e,
 \qquad
 g\in G.
 $$
@@ -250,7 +250,7 @@ For each candidate transformation,
 $$
 c_g
 =
-d_w(x,gcdot\mu_e).
+d_w(x,g\cdot\mu_e).
 $$
 
 The best transform determines the hard alignment used for the state update, but Cortex also computes a soft transform-evidence distribution:
@@ -386,9 +386,9 @@ Undirected relation cells maintain Beta-style sufficient statistics.
 Conceptually, after binary observations $y ∈ {0,1}$,
 
 $$
-a leftarrow a+y,
+a \leftarrow a+y,
 \qquad
-b leftarrow b+(1-y).
+b \leftarrow b+(1-y).
 $$
 
 The posterior mean is
@@ -459,7 +459,7 @@ $$
 =
 S
 \cup
-{v : \exists u\in S,; u\leadsto v}.
+\{v : \exists u\in S,\; u\leadsto v\}.
 $$
 
 This supports a broader architectural principle:
@@ -484,7 +484,7 @@ The continual reasoner does not consume this complete internal state directly.
 Instead, `cortex-runtime` constructs a fixed 12-dimensional public summary:
 
 $$
-z_t in \mathbb{R}^{12}.
+z_t \in \mathbb{R}^{12}.
 $$
 
 This creates a stable contract between "perceptual/relational articulation" and "continual structural reasoning."
@@ -542,7 +542,7 @@ m_i
 \frac{
 \exp(-d_i/\tau)
 }{
-\\sum_j \exp(-d_j/\tau)
+\sum_j \exp(-d_j/\tau)
 }.
 $$
 
@@ -611,7 +611,7 @@ A fuzzy memory reconstruction is an approximation:
 
 $$
 z_t
-mapsto
+\mapsto
 \hat z_t.
 $$
 
@@ -789,7 +789,7 @@ The tensor machinery is conditional: it can sleep, wake, refresh, and run in bur
 For an active regime with centroid (mu), define local displacement
 
 $$
-\delta_t = z_t-mu.
+\delta_t = z_t-\mu.
 $$
 
 With predictive residual
@@ -801,7 +801,7 @@ $$
 the core maintains a curvature-like matrix using terms of the form
 
 $$
-e_t,\\delta_t\\delta_t^\top.
+e_t\,\delta_t\delta_t^\top.
 $$
 
 The implementation periodically examines the eigenspectrum of this matrix.
@@ -825,7 +825,7 @@ When a split candidate is launched, Cortex creates temporary **shadow directions
 For candidate direction (u), observations are provisionally separated by the sign of
 
 $$
-u^\top(z-mu).
+u^\top(z-\mu).
 $$
 
 Cortex then compares:
@@ -1068,7 +1068,7 @@ Only after that is established should a Stage II experiment consider
 
 $$
 \text{encoder}
-leftrightarrow
+\leftrightarrow
 \text{Cortex}.
 $$
 
@@ -1091,7 +1091,7 @@ At candidate resolution $ρ$,
 $$
 K_\rho(i,j)
 =
-exp
+\exp
 \left[
 -\frac{d_P(i,j)^2}{2\rho^2}
 \right].
