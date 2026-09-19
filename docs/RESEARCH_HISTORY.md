@@ -113,7 +113,9 @@ The next research target is an exact perceptual fast path using the invariant th
 Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **systematic relational generalization**, extending the passed kinship, candidate-law, and bounded law-form discovery gates toward cross-algebra transfer, proof provenance, conflicting evidence, and neural/GNN/symbolic comparison.
+2. **Cortex Reasoning Map v1**, with cross-algebra transfer and structural counterfactual reasoning now passed, and belief revision under contradiction next.
+
+The Reasoning Map then proceeds toward structural analogy/isomorphism, latent-concept induction, explicit proof dependency, planning/replanning, and open-world novelty attribution. See [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 
 ## kinship-composition-v1 — structured logical composition
@@ -218,3 +220,84 @@ Across all 120 cases there were **zero wrong resolved Cortex predictions** and *
 Interpretation: Cortex can discover useful equation forms from a bounded grammar, distinguish law support from applicability, and reuse supported forms for conservative exact closure. This remains bounded form discovery, not unrestricted theorem proving.
 
 See [ALGEBRA_FORM_INDUCTION_V1.md](ALGEBRA_FORM_INDUCTION_V1.md).
+
+
+## algebra-transfer-v1.6 — cross-world abstract law transfer
+
+This campaign tested whether equation forms discovered from several anonymous
+source algebras can become reusable abstractions in independently relabeled
+target algebras with different orders.
+
+The transfer object contains canonical equation forms and source evidence
+metadata, but no source element identities, table cells, or applicability
+basins. Every transferred law is re-grounded against target evidence.
+
+The development history is scientifically important. The first official v1.5
+campaign showed strong compatible transfer but failed the random-magma safety
+controls because adaptively searching many candidate bundles made short
+zero-error streaks possible by chance. That failed result is retained.
+
+v1.6 added a multiplicity-aware evidence requirement and moved official
+evaluation to untouched target/control seeds 100–109.
+
+The v1.6 campaign passed all frozen gates across 170 rows.
+
+Mean compatible held-out coverage:
+
+- 20% target evidence: transfer **0.4363** vs scratch **0.1167**;
+- 30%: **0.6935** vs **0.2074**;
+- 40%: **0.8397** vs **0.3026**.
+
+Coverage gain over scratch was therefore:
+
+- **+0.3196** at 20%;
+- **+0.4862** at 30%;
+- **+0.5371** at 40%.
+
+Safety behavior:
+
+- zero wrong resolved compatible predictions;
+- zero closure conflicts;
+- zero resolved predictions on random-magmas;
+- subtraction rejected the imported rebracketing law;
+- source and target labels/orders were disjoint.
+
+Interpretation: within the declared finite fixtures, a discovered equation form
+can become a reusable cross-world abstraction that reduces target evidence
+requirements while remaining falsifiable on incompatible worlds.
+
+
+## counterfactual-reasoning-v1 — structural causal counterfactual reasoning
+
+This is the first completed experiment in **Cortex Reasoning Map v1**.
+
+Cortex learned directed influence from deterministic controlled local
+intervention/control probes, then reasoned over the learned epistemic graph.
+
+Seven world families and untouched seeds 100–119 produced **140 official
+worlds**.
+
+All frozen gates passed:
+
+- direct causal resolved precision / coverage: **1.000 / 1.000**;
+- causal-edge recall: **1.000**;
+- null-edge recall: **1.000**;
+- correlation-trap rejection: **1.000**;
+- multi-hop accuracy / coverage: **1.000 / 1.000**;
+- direct-edge baseline multi-hop accuracy: **0.000**;
+- negative-query accuracy: **1.000**;
+- edge-removal counterfactual accuracy / coverage: **1.000 / 1.000**;
+- redundant-path preservation: **1.000**;
+- bridge-cut success: **1.000**;
+- missing-bridge unresolved rate: **1.000**;
+- proof-path validity: **1.000**;
+- state-restoration rate: **1.000**.
+
+The evidence was intentionally deterministic, so this benchmark establishes the
+structural reasoning operation rather than noisy real-world causal discovery.
+
+Interpretation: Cortex can temporarily alter a learned causal world, reason
+inside the altered structure, preserve epistemic uncertainty when a required
+bridge is unresolved, and return to the exact original state afterward.
+
+See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
