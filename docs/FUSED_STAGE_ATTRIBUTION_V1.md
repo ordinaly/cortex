@@ -174,3 +174,14 @@ The reproducible research path is:
 
 This document records the v1.13-R measurement result. Later optimizations should
 append new campaign records rather than rewriting these historical measurements.
+
+
+## 9. Follow-up: v1.14-R
+
+The exact optimization identified by this v1.13-R campaign was implemented and validated in v1.14-R.
+
+At 288 anchors, the field-specific perceptual path became **48.26× faster** and the complete paired fused step **1.96× faster**, with zero structural disagreements. Perceptual share fell from about **48.9%** here to **2.2%**.
+
+The new measured bottleneck is **cache refresh** at about **45.5%**.
+
+This document remains the historical v1.13-R attribution record. See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md) for the follow-up result.
