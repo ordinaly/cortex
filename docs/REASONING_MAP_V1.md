@@ -12,11 +12,11 @@ where its explicit unresolved state provides useful epistemic restraint.
 
 | capability | benchmark | status | strongest current result |
 |---|---|---|---|
-| recursive typed composition | \`kinship-composition-v1\` | passed | 1.000 accuracy / 1.000 coverage on unseen depth 6–10 |
-| candidate-law induction | \`algebra-induction-v1\` | passed | exact held-out recovery when supported laws were evidenced |
-| bounded law-form discovery | \`algebra-form-induction-v1.7\` | passed | 375-form grammar; zero wrong resolved predictions in 120 cases |
-| cross-world abstract transfer | \`algebra-transfer-v1.6\` | passed | +0.320 coverage over scratch at 20% target evidence; safe negative transfer |
-| structural counterfactual reasoning | \`counterfactual-reasoning-v1\` | passed | all frozen gates passed across 140 worlds |
+| recursive typed composition | `kinship-composition-v1` | passed | 1.000 accuracy / 1.000 coverage on unseen depth 6–10 |
+| candidate-law induction | `algebra-induction-v1` | passed | exact held-out recovery when supported laws were evidenced |
+| bounded law-form discovery | `algebra-form-induction-v1.7` | passed | 375-form grammar; zero wrong resolved predictions in 120 cases |
+| cross-world abstract transfer | `algebra-transfer-v1.6` | passed | +0.320 coverage over scratch at 20% target evidence; safe negative transfer |
+| structural counterfactual reasoning | `counterfactual-reasoning-v1` | passed | all frozen gates passed across 140 worlds |
 | belief revision under contradiction | `belief-revision-v1` | passed | retraction 7/14/21 batches for prior strengths 1/2/3; exact locality |
 | structural analogy / isomorphism | planned | next | — |
 | latent concept induction | planned | queued | — |
@@ -55,7 +55,7 @@ combine them.
 
 ## Completed axis: structural counterfactual reasoning
 
-\`counterfactual-reasoning-v1\` tested a new reasoning primitive:
+`counterfactual-reasoning-v1` tested a new reasoning primitive:
 
 $$
 G
@@ -90,7 +90,7 @@ See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
 
 ## Completed axis: belief revision under contradiction
 
-\`belief-revision-v1\` tested cumulative revision of one causal belief inside the
+`belief-revision-v1` tested cumulative revision of one causal belief inside the
 only path $A\rightarrow B\rightarrow C$.
 
 Every frozen gate passed across 60 untouched official cases.
