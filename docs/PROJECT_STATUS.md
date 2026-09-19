@@ -126,28 +126,33 @@ Required gates:
 - re-run fused-stage attribution;
 - scale at least through 288 anchors.
 
-### 2. Cortex Reasoning Map v1 — belief revision under contradiction
+### 2. Cortex Reasoning Map v1 — structural analogy / isomorphism
 
-The cross-algebra transfer and first counterfactual-reasoning gates are now passed.
+The counterfactual-reasoning and belief-revision gates are now passed.
 
-\`algebra-transfer-v1.6\` demonstrated reusable law-form transfer across independently relabeled target algebras with different orders. Mean held-out coverage gain over scratch Cortex was **+0.320 at 20% target evidence**, **+0.486 at 30%**, and **+0.537 at 40%**. The final protocol retained zero wrong resolved compatible predictions and complete abstention on random-magmas. The failed v1.5 negative-transfer campaign is preserved as part of the research history.
+`belief-revision-v1` evaluated 60 untouched cases on seeds 200–219. One contradictory batch never erased the established causal belief; sustained contradiction retracted every case through an explicit unresolved state; weaker ambiguous contradiction remained unresolved in every case; and every case recovered when causal evidence returned.
 
-\`counterfactual-reasoning-v1\` then tested a different reasoning primitive. Across 140 untouched causal worlds Cortex achieved **1.000** on all frozen structural metrics: direct intervention-sensitive structure, multi-hop composition, negative reachability, edge-removal counterfactuals, redundant-path preservation, bridge cuts, missing-bridge abstention, proof-path validity, and exact state restoration.
+Revision latency scaled exactly with prior support:
 
-The direct-effect evidence in this first causal benchmark is deterministic by design, so the result establishes structural reasoning rather than noisy causal discovery.
+- prior strength 1: retraction **7** batches, recovery **3**;
+- prior strength 2: retraction **14**, recovery **5**;
+- prior strength 3: retraction **21**, recovery **7**.
 
-The next Reasoning Map axis is **belief revision under contradiction**:
+Downstream reasoning tracked the revised belief state with **1.000 alignment**, confidence margins were monotone in both directions, and unrelated structural evidence was preserved exactly. The evidence is deterministic, so this establishes cumulative-evidence revision behavior rather than noisy real-world epistemology.
 
-- establish a strongly supported structural belief;
-- introduce controlled counterevidence;
-- require confidence to move through active → uncertain → retracted;
-- reverse the regime and test recovery;
-- preserve unrelated structure;
-- measure retraction/recovery latency, calibration, edit count and compute.
+The next Reasoning Map axis is **structural analogy / isomorphism**:
 
-See [REASONING_MAP_V1.md](REASONING_MAP_V1.md), [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md), and [ALGEBRA_TRANSFER_V1_PROTOCOL.md](ALGEBRA_TRANSFER_V1_PROTOCOL.md).
+- independently permute entity labels and relation labels across source and target worlds;
+- infer a structural correspondence rather than reuse names;
+- transfer held-out relational consequences only after the correspondence is evidenced;
+- include near-isomorphic broken-analogy controls;
+- represent symmetric / multiply valid mappings as ambiguous rather than arbitrary certainty;
+- compare target sample efficiency against scratch reasoning;
+- preserve strict no-label-leakage checks.
 
-These are research modules, not stable runtime semantics.
+See [REASONING_MAP_V1.md](REASONING_MAP_V1.md), [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md), and [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
+
+These remain research modules, not stable runtime semantics.
 
 ### 3. Re-profile after exact perception optimization
 
