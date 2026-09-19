@@ -1,8 +1,8 @@
 # Cortex v1.14-R — Exact Perceptual Fast Path
 
-Status: **frozen optimization protocol / official campaign not yet run**.
+Status: **frozen optimization protocol / official campaign passed**.
 
-Protocol ID: \`exact-perceptual-fast-path-v1.14-R\`.
+Protocol ID: `exact-perceptual-fast-path-v1.14-R`.
 
 ## Motivation
 
@@ -14,7 +14,7 @@ scale:
 - 144 anchors: about 54%;
 - 288 anchors: about 49%.
 
-The current \`FuzzyPredictiveField\` constructor already stores every anchor as
+The current `FuzzyPredictiveField` constructor already stores every anchor as
 a unit vector:
 
 $$
@@ -31,7 +31,7 @@ For field-owned anchors this is redundant.
 Keep the generic standalone helper unchanged for arbitrary unnormalized anchor
 inputs.
 
-Inside \`FuzzyPredictiveField.possibility\`, normalize only the incoming
+Inside `FuzzyPredictiveField.possibility`, normalize only the incoming
 observation:
 
 $$
@@ -54,7 +54,7 @@ The official campaign constructs paired controllers:
 
 - **legacy** — a subclass whose possibility method calls the generic helper and
   therefore renormalizes stored anchors every observation;
-- **fast** — the optimized \`FuzzyPredictiveField\`.
+- **fast** — the optimized `FuzzyPredictiveField`.
 
 Both controllers receive:
 
@@ -118,7 +118,7 @@ Three deterministic seeds are used.
 
 ## Stage-attribution rerun
 
-The existing \`fused-stage-attribution-v1\` profiler is rerun on the optimized
+The existing `fused-stage-attribution-v1` profiler is rerun on the optimized
 field at all three anchor scales.
 
 This determines whether perceptual responsibility computation remains the
@@ -162,9 +162,33 @@ speedup.
 
 ## Planned files
 
-- modified \`research/fuzzy_predictive_field.py\`;
-- \`research/exact_perceptual_fast_path_campaign.py\`;
-- \`research/exact_perceptual_fast_path_gate.py\`;
-- \`tests/test_exact_perceptual_fast_path.py\`.
+- modified `research/fuzzy_predictive_field.py`;
+- `research/exact_perceptual_fast_path_campaign.py`;
+- `research/exact_perceptual_fast_path_gate.py`;
+- `tests/test_exact_perceptual_fast_path.py`.
 
 The official campaign should run only after exactness preflight is green.
+
+
+## Official outcome
+
+The official paired campaign passed every frozen gate.
+
+At 288 anchors:
+
+- focused perceptual speedup: **48.26×**;
+- complete fused-step speedup: **1.96×**;
+- optimized perceptual stage share: **2.20%**;
+- structural disagreements: **0**.
+
+Across all official cases, maximum numerical discrepancies remained at
+floating-point scale; the largest measured difference was approximately
+**2.0e-14** in accumulated outcome counts.
+
+The new measured bottleneck is **cache refresh**, at about **45.5%** of the
+288-anchor profiled step.
+
+See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md) and
+[`benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json`](../benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json).
+
+The frozen gates above were not weakened after evaluation.
