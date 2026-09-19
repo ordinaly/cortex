@@ -126,24 +126,28 @@ Required gates:
 - re-run fused-stage attribution;
 - scale at least through 288 anchors.
 
-### 2. Cross-algebra law transfer
+### 2. Cortex Reasoning Map v1 — belief revision under contradiction
 
-The bounded law-form discovery gate is now passed.
+The cross-algebra transfer and first counterfactual-reasoning gates are now passed.
 
-`algebra-form-induction-v1.7` generated 375 canonical equation forms without named algebraic laws and passed the hosted 120-case campaign. Cortex maintained **1.000 resolved accuracy** on every structured family, discovered the rebracketing form on all cyclic and dihedral seeds, rejected swap on every noncommutative dihedral seed, and remained fully unresolved on all random magmas.
+\`algebra-transfer-v1.6\` demonstrated reusable law-form transfer across independently relabeled target algebras with different orders. Mean held-out coverage gain over scratch Cortex was **+0.320 at 20% target evidence**, **+0.486 at 30%**, and **+0.537 at 40%**. The final protocol retained zero wrong resolved compatible predictions and complete abstention on random-magmas. The failed v1.5 negative-transfer campaign is preserved as part of the research history.
 
-The next discriminator is **reuse across worlds**:
+\`counterfactual-reasoning-v1\` then tested a different reasoning primitive. Across 140 untouched causal worlds Cortex achieved **1.000** on all frozen structural metrics: direct intervention-sensitive structure, multi-hop composition, negative reachability, edge-removal counterfactuals, redundant-path preservation, bridge cuts, missing-bridge abstention, proof-path validity, and exact state restoration.
 
-- induce abstract law forms from source algebras;
-- transfer them into independently relabeled target algebras;
-- reduce target evidence compared with rediscovery-from-scratch;
-- require positive sample-efficiency gain on compatible targets;
-- require rejection/deactivation on incompatible targets;
-- preserve proof provenance and unresolved behavior.
+The direct-effect evidence in this first causal benchmark is deterministic by design, so the result establishes structural reasoning rather than noisy causal discovery.
 
-See [ALGEBRA_FORM_INDUCTION_V1.md](ALGEBRA_FORM_INDUCTION_V1.md).
+The next Reasoning Map axis is **belief revision under contradiction**:
 
-The current evidence supports bounded algebraic form discovery and conservative predictive closure on the declared finite fixtures, not unrestricted mathematical discovery or superiority over neural/symbolic methods.
+- establish a strongly supported structural belief;
+- introduce controlled counterevidence;
+- require confidence to move through active → uncertain → retracted;
+- reverse the regime and test recovery;
+- preserve unrelated structure;
+- measure retraction/recovery latency, calibration, edit count and compute.
+
+See [REASONING_MAP_V1.md](REASONING_MAP_V1.md), [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md), and [ALGEBRA_TRANSFER_V1_PROTOCOL.md](ALGEBRA_TRANSFER_V1_PROTOCOL.md).
+
+These are research modules, not stable runtime semantics.
 
 ### 3. Re-profile after exact perception optimization
 
