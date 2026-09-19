@@ -2,9 +2,9 @@
 
 Status: **passed official benchmark / research-only**.
 
-Protocol: \`structural-analogy-v1\`.
+Protocol: `structural-analogy-v1`.
 
-Official run: GitHub Actions run \`35436422688\`.
+Official run: GitHub Actions run `35436422688`.
 
 ## Question
 
@@ -204,18 +204,18 @@ This does not establish unrestricted semantic or human-like analogy.
 
 Implementation:
 
-- \`research/structural_analogy.py\`
-- \`research/structural_analogy_campaign.py\`
-- \`research/structural_analogy_gate.py\`
-- \`tests/test_structural_analogy.py\`
+- `research/structural_analogy.py`
+- `research/structural_analogy_campaign.py`
+- `research/structural_analogy_gate.py`
+- `tests/test_structural_analogy.py`
 
 Frozen protocol:
 
-- [\`STRUCTURAL_ANALOGY_V1_PROTOCOL.md\`](STRUCTURAL_ANALOGY_V1_PROTOCOL.md)
+- [`STRUCTURAL_ANALOGY_V1_PROTOCOL.md`](STRUCTURAL_ANALOGY_V1_PROTOCOL.md)
 
 Aggregate result:
 
-- [\`benchmarks/results/structural_analogy_v1_summary.json\`](../benchmarks/results/structural_analogy_v1_summary.json)
+- [`benchmarks/results/structural_analogy_v1_summary.json`](../benchmarks/results/structural_analogy_v1_summary.json)
 
 ## Next Reasoning Map axis
 
