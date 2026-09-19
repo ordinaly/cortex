@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Belief Revision Under Contradiction
 
-Status: **frozen protocol / official campaign not yet run**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: \`belief-revision-v1\`.
 
@@ -438,3 +438,14 @@ A passing result would support:
 
 It would not establish robust belief revision under stochastic or adversarial
 real-world evidence.
+
+
+## Official outcome
+
+The untouched official campaign on seeds 200–219 passed every frozen gate
+across 60 cases.
+
+See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md) and
+[\`benchmarks/results/belief_revision_v1_summary.json\`](../benchmarks/results/belief_revision_v1_summary.json).
+
+The frozen thresholds above were not weakened after evaluation.
