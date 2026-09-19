@@ -104,7 +104,7 @@ def main() -> None:
     }
 
     payload = {
-        "protocol": "algebra-form-induction-v1.4",
+        "protocol": "algebra-form-induction-v1.7",
         "rows": len(rows),
         "checks": checks,
         "passed": all(checks.values()),
