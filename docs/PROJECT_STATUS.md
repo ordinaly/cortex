@@ -113,9 +113,9 @@ The next research optimization should therefore be exact before approximate: avo
 
 Exploit the normalized-anchor invariant:
 
-$
+$$
 d_i = \max\left(0, 1-a_i^\top\hat{x}\right)
-$
+$$
 
 with only the incoming observation normalized per step.
 
