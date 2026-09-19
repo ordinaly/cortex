@@ -1,0 +1,48 @@
+{
+  "protocol": "exact-perceptual-fast-path-v1.14-R",
+  "status": "passed",
+  "seeds": 3,
+  "anchor_cases": [
+    72,
+    144,
+    288
+  ],
+  "max_errors": {
+    "weights": 2.7755575615628914e-15,
+    "candidate_predictions": 3.3306690738754696e-16,
+    "local_predictions": 2.220446049250313e-16,
+    "outcome_counts": 1.9984014443252818e-14
+  },
+  "structural_disagreements": 0,
+  "cases": {
+    "72": {
+      "perceptual_speedup": 15.586646516650442,
+      "fused_speedup": 1.829387178054238,
+      "stage_perceptual_share": 0.0732526654487071,
+      "stage_cache_refresh_share": 0.3707452233272064,
+      "stage_candidate_readout_share": 0.17580431786453757,
+      "stage_hysteresis_scan_share": 0.18743189827929518,
+      "stage_complexity_share": 0.039778181305305915
+    },
+    "144": {
+      "perceptual_speedup": 27.197164746667323,
+      "fused_speedup": 2.005243845049462,
+      "stage_perceptual_share": 0.047546377520425315,
+      "stage_cache_refresh_share": 0.43328467498279055,
+      "stage_candidate_readout_share": 0.159422610764265,
+      "stage_hysteresis_scan_share": 0.18489789413813643,
+      "stage_complexity_share": 0.06519322607314175
+    },
+    "288": {
+      "perceptual_speedup": 48.262297996802225,
+      "fused_speedup": 1.9590576957891024,
+      "stage_perceptual_share": 0.022004534152182988,
+      "stage_cache_refresh_share": 0.45527443837134607,
+      "stage_candidate_readout_share": 0.20996259473134982,
+      "stage_hysteresis_scan_share": 0.12722639792769488,
+      "stage_complexity_share": 0.12064136858950669
+    }
+  },
+  "next_measured_bottleneck": "cache_refresh",
+  "claim_boundary": "Exact research-path optimization; no semantic change and no universal runtime-speed claim."
+}
