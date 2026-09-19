@@ -126,20 +126,24 @@ Required gates:
 - re-run fused-stage attribution;
 - scale at least through 288 anchors.
 
-### 2. Move from candidate-law induction to law-form discovery
+### 2. Cross-algebra law transfer
 
-The first kinship depth-extrapolation gate and the first held-out algebra-law gate are now passed.
+The bounded law-form discovery gate is now passed.
 
-The next logical-reasoning discriminator should remove another piece of prior structure:
+`algebra-form-induction-v1.7` generated 375 canonical equation forms without named algebraic laws and passed the hosted 120-case campaign. Cortex maintained **1.000 resolved accuracy** on every structured family, discovered the rebracketing form on all cyclic and dihedral seeds, rejected swap on every noncommutative dihedral seed, and remained fully unresolved on all random magmas.
 
-- search over a bounded grammar of equation forms instead of supplying associativity/commutativity/identity explicitly;
-- score candidate laws prequentially or by predictive compression;
-- introduce contradictory/noisy evidence and require calibrated rejection;
-- allow multiple competing proof paths and inspect proof consistency;
-- compare directly against neural, GNN and symbolic baselines on exactly the same partial tables;
-- then connect the induced law system back to relational graphs and natural-language tasks.
+The next discriminator is **reuse across worlds**:
 
-The current result supports **evidence-gated candidate-law induction and exact algebraic closure on the declared fixtures**, not unrestricted mathematical discovery or superiority over neural methods.
+- induce abstract law forms from source algebras;
+- transfer them into independently relabeled target algebras;
+- reduce target evidence compared with rediscovery-from-scratch;
+- require positive sample-efficiency gain on compatible targets;
+- require rejection/deactivation on incompatible targets;
+- preserve proof provenance and unresolved behavior.
+
+See [ALGEBRA_FORM_INDUCTION_V1.md](ALGEBRA_FORM_INDUCTION_V1.md).
+
+The current evidence supports bounded algebraic form discovery and conservative predictive closure on the declared finite fixtures, not unrestricted mathematical discovery or superiority over neural/symbolic methods.
 
 ### 3. Re-profile after exact perception optimization
 
