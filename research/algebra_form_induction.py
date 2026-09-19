@@ -219,9 +219,12 @@ class FuzzyLaw:
     discovery: Evidence
     validation: Evidence
     scope: LawScope
+    structural_membership: float
+    predictive_membership: float
     membership: float
     score: float
     active: bool
+    predictive_active: bool
 
 
 @dataclass(frozen=True)
@@ -562,7 +565,11 @@ class CortexFuzzyLawInducer:
 
         self.forms = equation_forms(max_ops_per_expression)
         self.laws = self._score_forms()
-        eligible = [law for law in self.laws if law.active]
+        eligible = [
+            law
+            for law in self.laws
+            if law.predictive_active
+        ]
         eligible.sort(
             key=lambda law: (
                 -law.score,
@@ -616,26 +623,38 @@ class CortexFuzzyLawInducer:
                 self.elements,
                 self.observed,
             )
-            membership = discovery.membership
+            structural_membership = discovery.membership
+            predictive_membership = validation.membership
+            membership = structural_membership
             if self.use_validation:
                 membership = min(
-                    discovery.membership,
-                    validation.membership,
+                    structural_membership,
+                    predictive_membership,
                 )
             score = (
                 membership
                 - self.complexity_penalty * form.complexity
             )
-            active = membership >= self.membership_threshold
+            active = (
+                structural_membership
+                >= self.membership_threshold
+            )
+            predictive_active = (
+                membership
+                >= self.membership_threshold
+            )
             out.append(
                 FuzzyLaw(
                     form=form,
                     discovery=discovery,
                     validation=validation,
                     scope=scope,
+                    structural_membership=structural_membership,
+                    predictive_membership=predictive_membership,
                     membership=membership,
                     score=score,
                     active=active,
+                    predictive_active=predictive_active,
                 )
             )
         return tuple(out)
@@ -660,6 +679,8 @@ class CortexFuzzyLawInducer:
         return [
             {
                 "key": law.form.key,
+                "structural_membership": law.structural_membership,
+                "predictive_membership": law.predictive_membership,
                 "membership": law.membership,
                 "score": law.score,
                 "complexity": law.form.complexity,
