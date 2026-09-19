@@ -1,0 +1,36 @@
+{
+  "protocol": "kinship-composition-v1",
+  "seeds": 20,
+  "train_max_path_length": 5,
+  "test_min_path_length": 6,
+  "test_max_path_length": 10,
+  "max_train_test_entity_overlap": 0,
+  "methods": {
+    "cortex": {
+      "accuracy": 1,
+      "coverage": 1,
+      "resolved_accuracy": 1
+    },
+    "sequence_memory": {
+      "accuracy": 0,
+      "coverage": 0,
+      "resolved_accuracy": 0
+    },
+    "last_relation": {
+      "accuracy": 0.22222222222222224,
+      "coverage": 1,
+      "resolved_accuracy": 0.22222222222222224
+    },
+    "clipped_count": {
+      "accuracy": 1,
+      "coverage": 1,
+      "resolved_accuracy": 1
+    }
+  },
+  "missing_rule": {
+    "accuracy": 0,
+    "coverage": 0,
+    "resolved_accuracy": 0
+  },
+  "interpretation": "Recursive composition beyond training depth succeeds; completely unobserved composition transitions remain unresolved."
+}
