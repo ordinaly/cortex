@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.13-R**  
+Last consolidated research frontier: **v1.14-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,9 +30,9 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.13-R`.
+The current research frontier is `v1.14-R`.
 
-The most recent measured bottleneck is perceptual responsibility computation in the fused predictive field.
+The most recent exact optimization removed redundant anchor normalization from perceptual responsibility computation. The new measured bottleneck is **cache refresh**, about **45.5%** of the 288-anchor fused research step.
 
 ## Strongest validated engineering results
 
@@ -109,54 +109,36 @@ The next research optimization should therefore be exact before approximate: avo
 
 ## Next milestones
 
-### 1. v1.14-R — exact perceptual fast path
+### 1. v1.14-R — exact perceptual fast path — passed
 
-Exploit the normalized-anchor invariant:
+The exact field-owned perceptual fast path passed all frozen gates.
 
-$$
-d_i = \max\left(0, 1-a_i^\top\hat{x}\right)
-$$
+At 288 anchors:
 
-with only the incoming observation normalized per step.
+- focused perceptual speedup: **48.26×**;
+- complete fused-step speedup: **1.96×**;
+- perceptual stage share: **2.20%**;
+- structural disagreements: **0**.
 
-Required gates:
+The new measured bottleneck is **cache refresh** at about **45.5%**. See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md).
 
-- numerical prediction parity;
-- zero structural disagreement;
-- re-run fused-stage attribution;
-- scale at least through 288 anchors.
+### 2. Cortex Reasoning Map v1 — latent concept induction
 
-### 2. Cortex Reasoning Map v1 — structural analogy / isomorphism
+`structural-analogy-v1` passed every frozen gate. With only 12 of 90 target typed facts, mean held-out coverage was **0.9718** at **1.000 resolved accuracy**; 24 and 36 facts reached full coverage. Genuine graph automorphisms remained mapping-ambiguous, while near-isomorphic and explicitly broken analogies were rejected in every case.
 
-The counterfactual-reasoning and belief-revision gates are now passed.
+The next Reasoning Map axis is **latent concept induction**:
 
-`belief-revision-v1` evaluated 60 untouched cases on seeds 200–219. One contradictory batch never erased the established causal belief; sustained contradiction retracted every case through an explicit unresolved state; weaker ambiguous contradiction remained unresolved in every case; and every case recovered when causal evidence returned.
+- useful categories are not supplied to the learner;
+- a latent grouping must earn its complexity through predictive/compressive gain;
+- random/no-category controls should not produce persistent concepts;
+- later evidence should be able to split, merge or retract a concept;
+- ambiguous evidence should remain unresolved rather than force a partition.
 
-Revision latency scaled exactly with prior support:
+See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md) and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
-- prior strength 1: retraction **7** batches, recovery **3**;
-- prior strength 2: retraction **14**, recovery **5**;
-- prior strength 3: retraction **21**, recovery **7**.
+### 3. v1.15-R — cache-refresh attribution / decomposition
 
-Downstream reasoning tracked the revised belief state with **1.000 alignment**, confidence margins were monotone in both directions, and unrelated structural evidence was preserved exactly. The evidence is deterministic, so this establishes cumulative-evidence revision behavior rather than noisy real-world epistemology.
-
-The next Reasoning Map axis is **structural analogy / isomorphism**:
-
-- independently permute entity labels and relation labels across source and target worlds;
-- infer a structural correspondence rather than reuse names;
-- transfer held-out relational consequences only after the correspondence is evidenced;
-- include near-isomorphic broken-analogy controls;
-- represent symmetric / multiply valid mappings as ambiguous rather than arbitrary certainty;
-- compare target sample efficiency against scratch reasoning;
-- preserve strict no-label-leakage checks.
-
-See [REASONING_MAP_V1.md](REASONING_MAP_V1.md), [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md), and [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
-
-These remain research modules, not stable runtime semantics.
-
-### 3. Re-profile after exact perception optimization
-
-Do not assume the next bottleneck. Re-run attribution and follow the measured dominant stage.
+Decompose the newly dominant cache-refresh stage before optimizing it. Attribute cost to semantic features, outcome probabilities, dirty detection, distance rows, kernel regeneration and bookkeeping. No internal winner is assumed in advance.
 
 ### 4. Freeze the next executable research specification
 
