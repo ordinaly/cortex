@@ -1344,7 +1344,17 @@ $$
 
 With 40% of each operation table hidden, this research path recovered held-out products at 1.000 resolved accuracy on both cyclic and noncommutative dihedral groups, while declining to derive products on a non-associative control.
 
-The law forms are still supplied in advance. The next stronger architecture would search over a bounded equation grammar rather than receiving the candidate laws explicitly.
+The follow-up `algebra-form-induction-v1.7` removes the named-law vocabulary. A bounded grammar generates canonical equation forms directly, and fuzzy evidence is split into:
+
+- **structural membership** — whether the form itself is supported;
+- **predictive activation** — whether it has survived cross-fitted predictive checks;
+- **applicability scope** — which substitutions are justified by witnessed support.
+
+For one- and two-variable laws the scope uses marginal variable support. Three-variable laws additionally preserve pairwise support so independently witnessed marginals cannot be recombined into unsupported tuples.
+
+On the hosted 120-case campaign, every structured-family resolved prediction was correct and every random-magma case remained unresolved. This is still bounded form discovery: the grammar and search depth remain externally supplied.
+
+The next research architecture tests whether a discovered form can become a reusable object and transfer to a new independently relabeled algebra with less target evidence than rediscovery from scratch.
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
 
