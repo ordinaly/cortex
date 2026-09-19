@@ -134,7 +134,11 @@ Cortex already has a research demonstration of prospective multi-hop relational 
 
 This does **not** yet establish symbolic logic in the general sense.
 
-A planned discriminator is a **kinship-composition benchmark**: train or expose the system to primitive family relations, then test relation composition on unseen people, unseen family graphs, unseen chain lengths, and counterfactual graph structures. That benchmark is intended to separate memorized riddle patterns from genuine relational composition.
+The first **kinship-composition-v1** campaign now tests recursive typed relation composition directly. Cortex learned from solved structured paths of length at most 5, then was evaluated on unseen people, unseen noisy graphs and path lengths 6–10. Primitive relation tokens and answer labels were randomly permuted independently for every seed.
+
+Across 20 seeds, Cortex achieved **1.000 accuracy / 1.000 coverage**. Exact sequence memorization had **0.000 coverage**, while a weak last-relation baseline achieved **0.222 accuracy**. A hand-engineered clipped-count symbolic baseline also achieved **1.000**, so this establishes compositional logical generalization in the declared fixture, not a unique Cortex advantage.
+
+When one required composition transition was deliberately withheld from training, Cortex produced **0.000 coverage** on queries requiring that rule rather than fabricating an answer. This exposes the current boundary clearly: Cortex can recursively apply an induced relation algebra, but this experiment does not show that it can derive a completely unobserved law from other laws.
 
 ## Hybrid neural/Cortex path
 
