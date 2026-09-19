@@ -22,10 +22,8 @@ from algebra_form_induction import (
     LawScope,
     Table,
     _close_forms,
-    _crossfit_lawset_evidence,
     _crossfit_predictive_evidence,
     _fold_tables,
-    _positive_scope,
     _structural_evidence,
 )
 
