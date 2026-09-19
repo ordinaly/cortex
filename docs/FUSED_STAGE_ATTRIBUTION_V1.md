@@ -45,9 +45,9 @@ Protocol: `fused-stage-attribution-v1`.
 
 The campaign evaluates
 
-$
+$$
 A\in\{72,144,288\}
-$
+$$
 
 over paired deterministic synthetic streams and three seeds.
 
@@ -114,11 +114,11 @@ At 288 anchors the corresponding median stage costs were approximately:
 
 The dominant stage is therefore unambiguous:
 
-$
+$$
 \boxed{
 \text{perceptual responsibility computation}
 }
-$
+$$
 
 at every tested scale.
 
@@ -127,27 +127,27 @@ at every tested scale.
 The current field constructor already normalizes and stores every perceptual
 anchor:
 
-$
+$$
 a_i\leftarrow \frac{a_i}{\lVert a_i\rVert}.
-$
+$$
 
 However, the generic perceptual-possibility helper is called on every
 observation and normalizes every stored anchor again before evaluating
 
-$
+$$
 1-a_i^\top x.
-$
+$$
 
 For a `FuzzyPredictiveField`, that repeated anchor normalization is redundant.
 
 A semantically exact fast path can instead normalize only the incoming
 observation and compute
 
-$
+$$
 d_i
 =
 \max\left(0,1-a_i^\top\widehat x\right)
-$
+$$
 
 directly against the already-normalized anchor matrix.
 
