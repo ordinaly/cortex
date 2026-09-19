@@ -174,7 +174,7 @@ For a random operation table of order $n$, a fixed deterministic prediction is
 correct with probability $1/n$. If $H(M)$ candidate bundles are inspected from
 a transfer library of size $M$, Cortex uses the conservative search bound
 
-$
+$$
 H(M)
 =
 M
@@ -182,16 +182,16 @@ M
 \binom{M}{2}
 +
 M^2.
-$
+$$
 
 The minimum number $k$ of zero-error target cross-fit predictions is the
 smallest integer satisfying
 
-$
+$$
 H(M)n^{-k}
 \le
 0.01.
-$
+$$
 
 Thus the family-wise chance probability under the uniform-random null is at
 most 1% by a Bonferroni bound.
