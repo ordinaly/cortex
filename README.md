@@ -140,7 +140,11 @@ The first **kinship-composition-v1** campaign now tests recursive typed relation
 
 Across 20 seeds, Cortex achieved **1.000 accuracy / 1.000 coverage**. Exact sequence memorization had **0.000 coverage**, while a weak last-relation baseline achieved **0.222 accuracy**. A hand-engineered clipped-count symbolic baseline also achieved **1.000**, so this establishes compositional logical generalization in the declared fixture, not a unique Cortex advantage.
 
-When one required composition transition was deliberately withheld from training, Cortex produced **0.000 coverage** on queries requiring that rule rather than fabricating an answer. This exposes the current boundary clearly: Cortex can recursively apply an induced relation algebra, but this experiment does not show that it can derive a completely unobserved law from other laws.
+When one required composition transition was deliberately withheld from training, Cortex produced **0.000 coverage** on queries requiring that rule rather than fabricating an answer.
+
+A follow-up **algebra-induction-v1** campaign then tested whether Cortex could recover genuinely unobserved products from global algebraic consistency. With 40% of anonymous operation tables hidden, Cortex selected among evidence-gated associativity, commutativity and identity laws, then closed the table under the supported laws. It achieved **1.000 resolved accuracy** on both a hidden cyclic group and a hidden noncommutative dihedral group, with 0.985 and 1.000 coverage respectively. On a non-associative subtraction control it activated none of the candidate laws and left all held-out products unresolved.
+
+This is stronger than recursive rule application, but it remains **candidate-law induction** rather than unrestricted theorem discovery: the candidate equation forms are supplied in advance. See [docs/ALGEBRA_INDUCTION_V1.md](docs/ALGEBRA_INDUCTION_V1.md).
 
 ## Hybrid neural/Cortex path
 

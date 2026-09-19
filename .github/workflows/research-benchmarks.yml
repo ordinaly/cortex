@@ -12,6 +12,8 @@ on:
       - "benchmarks/*.py"
       - "research/kinship_composition*.py"
       - "tests/test_kinship_composition.py"
+      - "research/algebra_induction*.py"
+      - "tests/test_algebra_induction.py"
       - "crates/cortex-articulation/**"
       - "crates/cortex-runtime/**"
       - "crates/cortex-python/src/lib.rs"
@@ -268,3 +270,35 @@ jobs:
         with:
           name: cortex-kinship-composition-v1
           path: kinship-composition-v1.jsonl
+
+
+  algebra-induction:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
+      - name: Unit tests
+        run: pytest tests/test_algebra_induction.py -q
+      - name: Run algebra induction campaign
+        run: >-
+          python research/algebra_induction_campaign.py
+          --seeds 20
+          --holdout 0.40
+          --output algebra-induction-v1.jsonl
+      - name: Enforce algebra induction gates
+        run: >-
+          python research/algebra_induction_gate.py
+          algebra-induction-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-algebra-induction-v1
+          path: algebra-induction-v1.jsonl

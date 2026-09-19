@@ -1182,23 +1182,37 @@ implicitly contains contributions from paths of many lengths.
 
 Controlled experiments demonstrated unseen-pair prediction at first supporting depths 3, 5, and 7.
 
-### Typed relational composition
+### Typed relational composition and law induction
 
-The newer kinship-composition experiment adds a finite learned relation algebra.
+The kinship-composition experiment adds a finite learned relation algebra.
 
 Conceptually,
 
-$$
+$
 s_{t+1}
 =
 C(s_t,r_t),
-$$
+$
 
-where (C) is learned from solved relation paths.
+where $C$ is learned from solved relation paths.
 
 After training only on paths of length at most 5, the research prototype generalized recursively to unseen entities and path lengths 6–10.
 
-This capability is currently a **research module**, not part of the stable native runtime.
+The follow-up `algebra-induction-v1` experiment goes one step further. Cortex receives a partial anonymous binary-operation table and first decides which candidate structural laws are supported by evidence. The current candidate vocabulary contains associativity, commutativity and a unique two-sided identity.
+
+For example, once associativity is evidence-gated, a missing product can be derived from
+
+$
+(a\star b)\star c
+=
+a\star(b\star c).
+$
+
+With 40% of each operation table hidden, this research path recovered held-out products at 1.000 resolved accuracy on both cyclic and noncommutative dihedral groups, while declining to derive products on a non-associative control.
+
+The law forms are still supplied in advance. The next stronger architecture would search over a bounded equation grammar rather than receiving the candidate laws explicitly.
+
+These capabilities are currently **research modules**, not part of the stable native runtime.
 
 ---
 

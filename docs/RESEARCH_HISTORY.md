@@ -113,7 +113,7 @@ The next research target is an exact perceptual fast path using the invariant th
 Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **systematic relational generalization**, extending the passed kinship depth-extrapolation gate toward held-out rule induction, conflicting evidence, multi-path proofs, and neural/GNN comparison.
+2. **systematic relational generalization**, extending the passed kinship and candidate-law induction gates toward law-form discovery, conflicting evidence, multi-path proofs, and neural/GNN comparison.
 
 
 ## kinship-composition-v1 — structured logical composition
@@ -140,3 +140,36 @@ Mean results:
 A missing-rule diagnostic omitted the transition required to derive the aunt/uncle state. Cortex then remained unresolved on every query requiring that transition instead of guessing.
 
 Interpretation: Cortex can perform recursive compositional generalization once the local relation laws have been evidenced. The test does not show derivation of a completely unseen law, and the hand-engineered symbolic baseline demonstrates that this finite algebra is solvable with an appropriate inductive bias. Neural/GNN comparison remains the next scientific discriminator.
+
+
+## algebra-induction-v1 — evidence-gated algebraic law induction
+
+This campaign tested whether Cortex could derive missing binary-operation results from structural laws that were themselves selected from partial evidence.
+
+The system received anonymous, randomly permuted operation symbols with **40% of the table hidden**. It was not told the generating algebra. The preregistered candidate-law vocabulary contained associativity, commutativity and existence of a unique two-sided identity.
+
+Twenty seeds were run for each of three families:
+
+- cyclic C7;
+- noncommutative dihedral D4;
+- subtraction mod 7 as a non-associative control.
+
+Mean held-out results:
+
+- cyclic C7: **0.985 accuracy / 0.985 coverage / 1.000 resolved accuracy**;
+- dihedral D4: **1.000 / 1.000 / 1.000**;
+- subtraction mod 7: **0.000 / 0.000 / 0.000**.
+
+Direct table memory had zero held-out coverage in every family. A majority-product baseline achieved only about 0.06 accuracy.
+
+Law selection was also structurally correct:
+
+- C7: associativity 1.00, commutativity 1.00, identity 1.00;
+- D4: associativity 1.00, commutativity 0.00, identity 0.95;
+- subtraction control: all three 0.00.
+
+The single D4 identity miss is retained as measured; no threshold was changed after observing it. Associativity alone was sufficient to recover every D4 held-out product.
+
+Interpretation: Cortex can now select among candidate algebraic laws from evidence and derive previously unseen products through exact closure. The law *forms* are still supplied in advance, so this is not yet open-ended theorem or axiom discovery.
+
+See [ALGEBRA_INDUCTION_V1.md](ALGEBRA_INDUCTION_V1.md).
