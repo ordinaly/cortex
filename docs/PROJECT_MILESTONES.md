@@ -16,22 +16,23 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.13-R`;
+- predictive-geometry research frontier: `v1.14-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
   - bounded law-form discovery;
   - cross-world law transfer;
   - structural counterfactual reasoning;
-  - belief revision under contradiction.
+  - belief revision under contradiction;
+  - structural analogy / isomorphism.
 
-The next Reasoning Map axis is **structural analogy / isomorphism**.
+The next Reasoning Map axis is **latent concept induction**.
 
 ---
 
 # Track A — Cortex Reasoning Map
 
-## A1. Structural analogy / isomorphism v1
+## A1. Structural analogy / isomorphism v1 — passed
 
 ### Question
 
@@ -91,7 +92,11 @@ An exact graph-isomorphism algorithm should be included as an **oracle/algorithm
 
 ### Passing claim boundary
 
-A passing result would support structural analogy under declared finite relational fixtures. It would not establish unrestricted analogy or semantic understanding.
+The official campaign passed every frozen gate. With only 12 of 90 target facts observed, mean held-out coverage was **0.9718** at **1.000 resolved accuracy**; at 24 and 36 facts coverage reached **1.000**. Symmetric worlds preserved genuine automorphism ambiguity, while near-isomorphic and explicitly broken analogies were rejected in every case.
+
+See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md).
+
+The result supports structural analogy under declared finite relational fixtures. It does not establish unrestricted analogy or semantic understanding.
 
 ---
 
@@ -214,41 +219,35 @@ The key metric is not merely novelty detection but **novelty attribution**: what
 
 # Track B — Engineering and specification
 
-## B1. v1.14-R exact perceptual fast path
+## B1. v1.14-R exact perceptual fast path — passed
 
-This remains the immediate measured performance target.
+The exact fast path passed every frozen gate.
 
-Exploit the invariant that stored predictive-field anchors are already normalized:
+At 288 anchors:
 
-$$
-d_i=\max(0,1-a_i^\top\hat{x}).
-$$
+- perceptual computation: **48.26× faster**;
+- complete fused step: **1.96× faster**;
+- perceptual stage share: **2.20%**, down from about 48.9%;
+- structural disagreements: **0**.
 
-Required gates:
-
-- numerical parity;
-- zero structural disagreement;
-- scale through at least 288 anchors;
-- re-run fused-stage attribution.
-
-No approximation should be introduced in this milestone.
+Numerical differences remained at floating-point scale. See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md).
 
 ---
 
-## B2. Re-profile and follow the new bottleneck
+## B2. v1.15-R — cache-refresh attribution / decomposition
 
-After B1, do not assume the next optimization target.
+v1.14-R re-profiling identifies **cache refresh** as the new dominant stage at about **45.5%** of the 288-anchor step. Candidate readout is second at about 21%.
 
-Re-run stage attribution and only optimize the empirically dominant remaining stage.
+The next milestone should measure cache-refresh internals before changing them:
 
-Possible outcomes include:
+- semantic-feature recomputation;
+- outcome-probability refresh;
+- dirty-anchor detection;
+- pairwise distance-row updates;
+- kernel-row regeneration;
+- writes/bookkeeping and unattributed remainder.
 
-- cache refresh;
-- candidate readout;
-- hysteresis scan;
-- complexity estimation.
-
-The benchmark decides the target.
+No substage winner is preregistered. The attribution campaign chooses the next exact optimization target.
 
 ---
 
@@ -355,8 +354,6 @@ Two tracks can proceed in parallel without contaminating each other:
 
 $$
 \boxed{
-A1\ \text{analogy}
-\rightarrow
 A2\ \text{latent concepts}
 \rightarrow
 A3\ \text{noise/calibration}
@@ -371,9 +368,7 @@ Planning and open-world novelty follow once those primitives are better characte
 
 $$
 \boxed{
-B1\ \text{exact perceptual fast path}
-\rightarrow
-B2\ \text{re-profile}
+B2\ \text{cache-refresh attribution}
 \rightarrow
 B3\ \text{freeze spec}
 \rightarrow

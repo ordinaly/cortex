@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.13-R** |
+| research frontier | **v1.14-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -108,7 +108,7 @@ See:
 - [docs/NATIVE_STAGE_ATTRIBUTION.md](docs/NATIVE_STAGE_ATTRIBUTION.md)
 - [docs/ARTICULATION_ATTRIBUTION.md](docs/ARTICULATION_ATTRIBUTION.md)
 
-## Research frontier — v1.13-R
+## Research frontier — v1.14-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -126,7 +126,7 @@ The progression has established:
 - retained-mass support tradeoffs;
 - internal fused-stage attribution.
 
-The latest research profiler finds **perceptual responsibility computation** to be the dominant fused-stage cost at 72, 144, and 288 anchors, accounting for about **49–54%** of measured time. The next exact optimization target is therefore a field-specific perceptual fast path that reuses the invariant that stored anchors are already normalized.
+v1.14-R implemented the exact field-specific perceptual fast path identified by the profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and the complete paired fused step **1.96× faster**, with zero structural disagreements. Perceptual share fell to **2.20%**. Re-profiling now identifies **cache refresh** as the dominant stage at about **45.5%**, so the next engineering milestone is cache-refresh decomposition rather than another assumed optimization.
 
 The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md). The latest profiling report is [docs/FUSED_STAGE_ATTRIBUTION_V1.md](docs/FUSED_STAGE_ATTRIBUTION_V1.md).
 
@@ -153,6 +153,8 @@ The follow-up **algebra-transfer-v1.6** campaign then tested whether those equat
 The first **Cortex Reasoning Map v1** campaign, **counterfactual-reasoning-v1**, moved outside algebra. Across 140 untouched causal worlds, Cortex learned intervention-sensitive direct structure, composed unseen multi-hop influence, evaluated temporary edge-removal counterfactuals, preserved redundant paths, returned unresolved on an under-evidenced causal bridge, produced valid causal paths, and restored its base-state fingerprint exactly. The direct evidence was deliberately deterministic, so this establishes the structural reasoning primitive rather than noisy real-world causal discovery. See [docs/COUNTERFACTUAL_REASONING_V1.md](docs/COUNTERFACTUAL_REASONING_V1.md) and [docs/REASONING_MAP_V1.md](docs/REASONING_MAP_V1.md).
 
 The second Reasoning Map campaign, **belief-revision-v1**, tested cumulative contradiction and recovery on a causal belief embedded in the only route through a small graph. All 60 untouched official cases passed. Retraction latency scaled with prior support at **7 / 14 / 21** contradiction batches for 1 / 2 / 3 initial causal batches, while recovery took **3 / 5 / 7** causal batches. Cortex passed through `unresolved`, resisted a single contradictory batch, remained unresolved under ambiguous evidence, propagated belief state downstream, and preserved unrelated structural evidence exactly. See [docs/BELIEF_REVISION_V1.md](docs/BELIEF_REVISION_V1.md).
+
+The third Reasoning Map campaign, **structural-analogy-v1**, independently renamed both entities and relation types across paired worlds. Cortex maintained a version space of consistent correspondences and resolved only invariant consequences shared by every survivor. On untouched seeds, held-out resolved accuracy was **1.000**; with only 12 of 90 target facts, mean coverage was **0.9718**, reaching **1.000** at 24 facts. Symmetric automorphisms remained genuinely ambiguous, while near-isomorphic and explicitly broken analogies were rejected in every case. See [docs/STRUCTURAL_ANALOGY_V1.md](docs/STRUCTURAL_ANALOGY_V1.md).
 
 ## Hybrid neural/Cortex path
 
