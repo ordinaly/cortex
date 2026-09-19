@@ -1,0 +1,79 @@
+{
+  "protocol": "algebra-induction-v1",
+  "seeds_per_family": 20,
+  "holdout_fraction": 0.4,
+  "families": {
+    "cyclic-7": {
+      "cortex": {
+        "accuracy": 0.985,
+        "coverage": 0.985,
+        "resolved_accuracy": 1
+      },
+      "direct-memory": {
+        "accuracy": 0,
+        "coverage": 0,
+        "resolved_accuracy": 0
+      },
+      "majority-product": {
+        "accuracy": 0.06000000000000001,
+        "coverage": 1,
+        "resolved_accuracy": 0.06000000000000001
+      },
+      "law_detection_rate": 1,
+      "mean_conflicts": 0,
+      "detected_law_rates": {
+        "associative": 1,
+        "commutative": 1,
+        "has_identity": 1
+      }
+    },
+    "dihedral-4": {
+      "cortex": {
+        "accuracy": 1,
+        "coverage": 1,
+        "resolved_accuracy": 1
+      },
+      "direct-memory": {
+        "accuracy": 0,
+        "coverage": 0,
+        "resolved_accuracy": 0
+      },
+      "majority-product": {
+        "accuracy": 0.06153846153846154,
+        "coverage": 1,
+        "resolved_accuracy": 0.06153846153846154
+      },
+      "law_detection_rate": 0.95,
+      "mean_conflicts": 0,
+      "detected_law_rates": {
+        "associative": 1,
+        "commutative": 0,
+        "has_identity": 0.95
+      }
+    },
+    "subtraction-7": {
+      "cortex": {
+        "accuracy": 0,
+        "coverage": 0,
+        "resolved_accuracy": 0
+      },
+      "direct-memory": {
+        "accuracy": 0,
+        "coverage": 0,
+        "resolved_accuracy": 0
+      },
+      "majority-product": {
+        "accuracy": 0.0625,
+        "coverage": 1,
+        "resolved_accuracy": 0.0625
+      },
+      "law_detection_rate": 1,
+      "mean_conflicts": 0,
+      "detected_law_rates": {
+        "associative": 0,
+        "commutative": 0,
+        "has_identity": 0
+      }
+    }
+  }
+}
