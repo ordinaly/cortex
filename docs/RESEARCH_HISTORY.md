@@ -113,7 +113,7 @@ The next research target is an exact perceptual fast path using the invariant th
 Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **systematic relational generalization**, extending the passed kinship and candidate-law induction gates toward law-form discovery, conflicting evidence, multi-path proofs, and neural/GNN comparison.
+2. **systematic relational generalization**, extending the passed kinship, candidate-law, and bounded law-form discovery gates toward cross-algebra transfer, proof provenance, conflicting evidence, and neural/GNN/symbolic comparison.
 
 
 ## kinship-composition-v1 — structured logical composition
@@ -173,3 +173,48 @@ The single D4 identity miss is retained as measured; no threshold was changed af
 Interpretation: Cortex can now select among candidate algebraic laws from evidence and derive previously unseen products through exact closure. The law *forms* are still supplied in advance, so this is not yet open-ended theorem or axiom discovery.
 
 See [ALGEBRA_INDUCTION_V1.md](ALGEBRA_INDUCTION_V1.md).
+
+
+## algebra-form-induction-v1.7 — bounded fuzzy algebraic form discovery
+
+This campaign removed the named candidate-law vocabulary used by `algebra-induction-v1`.
+
+Cortex received an anonymous partial operation table plus a bounded grammar over `x`, `y`, `z` and one binary operator. Canonicalization under variable renaming and equation-side exchange produced **375 candidate equation forms**.
+
+The final fuzzy model separates:
+
+- structural law membership;
+- predictive activation;
+- empirical applicability scope.
+
+The distinction emerged from failed intermediate protocols v1 through v1.6, all retained in the source/report rather than hidden by threshold changes.
+
+Official hosted campaign:
+
+- 20 seeds per family;
+- 6 families;
+- 120 cases;
+- 40% table holdout.
+
+Mean Cortex held-out coverage / resolved accuracy:
+
+- cyclic C7: **0.945 / 1.000**;
+- dihedral D4: **0.867 / 1.000**;
+- min semilattice: **0.589 / 1.000**;
+- left-zero semigroup: **0.979 / 1.000**;
+- subtraction mod 7: **0.700 / 1.000**;
+- random magmas: **0.000 / unresolved**.
+
+Target-form behavior:
+
+- rebracketing discovered in 100% of cyclic and dihedral seeds;
+- operand swap discovered in 100% of cyclic seeds and rejected in 100% of dihedral seeds;
+- repetition discovered in 100% of semilattice seeds;
+- left projection discovered in 100% of left-zero seeds;
+- rebracketing rejected in 100% of subtraction and random-magma seeds.
+
+Across all 120 cases there were **zero wrong resolved Cortex predictions** and **zero closure conflicts**. Every random magma remained completely unresolved.
+
+Interpretation: Cortex can discover useful equation forms from a bounded grammar, distinguish law support from applicability, and reuse supported forms for conservative exact closure. This remains bounded form discovery, not unrestricted theorem proving.
+
+See [ALGEBRA_FORM_INDUCTION_V1.md](ALGEBRA_FORM_INDUCTION_V1.md).
