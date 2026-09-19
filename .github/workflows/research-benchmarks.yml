@@ -251,6 +251,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
       - name: Unit tests
         run: pytest tests/test_kinship_composition.py -q
       - name: Run kinship composition campaign
