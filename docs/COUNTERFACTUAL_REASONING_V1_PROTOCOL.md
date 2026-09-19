@@ -97,6 +97,11 @@ semantics are intentionally the same as the current Rust graph contract.
 v1 isolates reasoning from stochastic-estimation variance, so evidence counts
 are deterministic.
 
+Each ordered-pair fixture is a **controlled local direct-effect probe**. Indirect
+effects are intentionally not folded into the pairwise evidence cell; they are
+reserved for the subsequent graph-composition query stage. This keeps direct
+structure induction and multi-hop reasoning experimentally separable.
+
 Every fully observed ordered pair receives 20 intervention and 20 control
 observations.
 
