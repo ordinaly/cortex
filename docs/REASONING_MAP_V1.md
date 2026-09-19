@@ -17,8 +17,8 @@ where its explicit unresolved state provides useful epistemic restraint.
 | bounded law-form discovery | \`algebra-form-induction-v1.7\` | passed | 375-form grammar; zero wrong resolved predictions in 120 cases |
 | cross-world abstract transfer | \`algebra-transfer-v1.6\` | passed | +0.320 coverage over scratch at 20% target evidence; safe negative transfer |
 | structural counterfactual reasoning | \`counterfactual-reasoning-v1\` | passed | all frozen gates passed across 140 worlds |
-| belief revision under contradiction | planned | next | — |
-| structural analogy / isomorphism | planned | queued | — |
+| belief revision under contradiction | `belief-revision-v1` | passed | retraction 7/14/21 batches for prior strengths 1/2/3; exact locality |
+| structural analogy / isomorphism | planned | next | — |
 | latent concept induction | planned | queued | — |
 | explicit proof dependency | planned | later | — |
 | planning / replanning | planned | later | — |
@@ -88,45 +88,27 @@ not robust real-world causal discovery.
 
 See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
 
-## Next axis: belief revision under contradiction
+## Completed axis: belief revision under contradiction
 
-The next experiment should ask whether a strongly supported structural belief
-can be weakened and retracted without catastrophic global relearning.
+\`belief-revision-v1\` tested cumulative revision of one causal belief inside the
+only path $A\rightarrow B\rightarrow C$.
 
-The intended trajectory is:
+Every frozen gate passed across 60 untouched official cases.
 
-$$
-\text{active}
-\rightarrow
-\text{uncertain}
-\rightarrow
-\text{retracted}
-\rightarrow
-\text{possibly recovered}.
-$$
+The central latency result was:
 
-The benchmark should independently vary:
+| initial support | retraction latency | recovery latency |
+|---:|---:|---:|
+| 1 batch | **7** | **3** |
+| 2 batches | **14** | **5** |
+| 3 batches | **21** | **7** |
 
-- contradiction strength;
-- contradiction duration;
-- evidence noise;
-- prior confidence;
-- graph depth;
-- memory pressure.
+Cortex resisted one contradictory batch, passed through unresolved before
+retraction, remained unresolved under weaker ambiguous contradiction, recovered
+when causal evidence returned, propagated each epistemic state downstream, and
+left every unrelated evidence cell unchanged.
 
-Primary metrics should include:
-
-- retraction latency;
-- false-retention rate;
-- premature-retraction rate;
-- recovery latency;
-- unaffected-structure preservation;
-- calibration / abstention;
-- structural edit count;
-- compute cost.
-
-A strong result is not merely fast revision. Cortex should change **only the
-part of the model contradicted by evidence**.
+See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md).
 
 ## Planned axis: structural analogy
 
