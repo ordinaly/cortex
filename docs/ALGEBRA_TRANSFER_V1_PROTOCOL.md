@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1.5`.
+Protocol ID: `algebra-transfer-v1.6`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -102,7 +102,10 @@ $$
 
 The remainder of each target table is held out for evaluation.
 
-Each compatible target condition uses 10 deterministic seeds.
+Each compatible target condition uses 10 deterministic seeds. The v1.6
+official campaign uses the fresh target seed range **100–109**. Seeds 0–9 were
+exposed by the failed v1.5 official campaign and are retained only as
+development evidence.
 
 ## Target re-grounding
 
@@ -160,6 +163,41 @@ and membership at least 0.98. If no safe seed exists, Cortex remains
 unresolved.
 
 The activation threshold remains 0.98.
+
+### Multiplicity-aware predictive evidence
+
+The failed v1.5 official campaign showed that a zero-error streak of only two
+or three predictions is not sufficient after adaptively searching many
+transferred forms.
+
+For a random operation table of order $n$, a fixed deterministic prediction is
+correct with probability $1/n$. If $H(M)$ candidate bundles are inspected from
+a transfer library of size $M$, Cortex uses the conservative search bound
+
+$
+H(M)
+=
+M
++
+\binom{M}{2}
++
+M^2.
+$
+
+The minimum number $k$ of zero-error target cross-fit predictions is the
+smallest integer satisfying
+
+$
+H(M)n^{-k}
+\le
+0.01.
+$
+
+Thus the family-wise chance probability under the uniform-random null is at
+most 1% by a Bonferroni bound.
+
+This criterion is computed from library size and target order. It is not tuned
+per algebra family or seed.
 
 No target threshold may be weakened after official results are observed.
 
@@ -357,5 +395,36 @@ a source applicability set. The hypothesis is still gated by target structural
 evidence and must survive target-only leave-one-out prediction with zero errors
 and zero conflicts.
 
-The official campaign must not be run until the v1.5 implementation and
+### v1.5 official negative result
+
+The v1.5 official campaign was run on target seeds 0–9 and is preserved as a
+failed result.
+
+Compatible transfer was strong:
+
+- at 20% target evidence: transfer coverage **0.5141** versus scratch
+  **0.1686**, a gain of **+0.3455**;
+- at 30%: **0.7900** versus **0.2247**, a gain of **+0.5653**;
+- at 40%: **0.8453** versus **0.3341**, a gain of **+0.5112**;
+- zero wrong resolved predictions and zero closure conflicts on all 120
+  compatible cases.
+
+However, random-magma controls failed:
+
+- 7 of 40 random-control cases produced at least one resolved prediction;
+- 38 random held-out cells were resolved;
+- 22 of those resolved predictions were wrong.
+
+The failed gates were
+`random_controls_zero_wrong` and `random_controls_abstain`.
+
+This exposed a multiple-hypothesis effect: adaptively searching up to 24
+transferred forms makes a short zero-error streak possible by chance.
+
+`algebra-transfer-v1.6` adds the multiplicity-aware evidence bound above and
+moves all official target/control evaluation to the untouched seed range
+100–109. The v1.5 seeds remain development data and are not reused for the
+v1.6 official claim.
+
+The official v1.6 campaign must not be run until its implementation and
 unit-level preflight are green.
