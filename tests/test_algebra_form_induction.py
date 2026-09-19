@@ -16,6 +16,7 @@ from algebra_form_induction import (
 )
 from algebra_form_induction_campaign import (
     left_zero,
+    random_magma,
     semilattice_min,
 )
 from algebra_induction import (
@@ -149,3 +150,23 @@ def test_dihedral_applicability_scope_blocks_sparse_local_overreach():
         metrics = score_heldout(model, table, heldout)
         assert metrics["resolved_accuracy"] == 1.0
         assert metrics["coverage"] >= 0.75
+
+
+
+def test_random_magma_pairwise_scope_prevents_accidental_three_variable_law():
+    # Seed 2 exposed a v1.6 false deduction: marginal support for x/y/z was
+    # recombined into substitutions that were never jointly witnessed.
+    algebra = random_magma(6, 2 * 10007 + 97)
+    elements, table, _identity = anonymize(
+        algebra,
+        seed=2 * 101 + 37,
+    )
+    observed, heldout = partial_observation(
+        table,
+        seed=2 * 1009 + 41,
+        holdout_fraction=0.40,
+    )
+    model = CortexFuzzyLawInducer(elements, observed)
+    metrics = score_heldout(model, table, heldout)
+    assert metrics["coverage"] == 0.0
+    assert metrics["resolved"] == 0
