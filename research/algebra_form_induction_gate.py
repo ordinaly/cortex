@@ -1,9 +1,8 @@
-"""Revised official gates for algebra-form-induction-v1.2.
+"""Revised official gates for algebra-form-induction-v1.3.
 
 The original v1 preflight low-coverage hypothesis for the subtraction control was
 retired after unit characterization showed that a non-associative operation can
-still satisfy other exact short identities. The v1.1 official campaign then
-exposed a second issue: per-partition witness minima suppressed true low-arity laws. Both negative results are preserved in the milestone report.
+still satisfy other exact short identities. The v1.1 official campaign then exposed a second issue: per-partition witness minima suppressed true low-arity laws. v1.2 fixed that failure but admitted sparse-fit forms that did not generalize predictively. v1.3 adds held-aside predictive law validation. All negative results are preserved.
 """
 from __future__ import annotations
 
@@ -101,7 +100,7 @@ def main() -> None:
     }
 
     payload = {
-        "protocol": "algebra-form-induction-v1.2",
+        "protocol": "algebra-form-induction-v1.3",
         "rows": len(rows),
         "checks": checks,
         "passed": all(checks.values()),
