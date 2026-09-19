@@ -98,9 +98,15 @@ def check_file(path: Path) -> list[str]:
         if in_fence:
             continue
 
+        if SINGLE_DOLLAR_RE.match(line):
+            errors.append(
+                f"{name}:{lineno}: standalone single-dollar line; "
+                "use $ for a display-math delimiter"
+            )
+
         if LEGACY_DISPLAY_RE.match(line):
             errors.append(
-                f"{name}:{lineno}: legacy display-math delimiter; use $$ for GitHub Markdown"
+                f"{name}:{lineno}: legacy display-math delimiter; use $ for GitHub Markdown"
             )
 
         if LITERAL_BRACKET_RE.match(line):
