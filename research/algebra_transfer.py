@@ -278,82 +278,161 @@ class CortexTransferredLawInducer:
             minimum_witnesses=2,
         )
         self.joint_validation_conflicts = 0
+        self.selection_mode = "unresolved"
 
-        while candidates:
-            evidence, conflicts = _target_crossfit_lawset_evidence(
-                [
-                    law.prior.form
-                    for law in candidates
-                ],
+        def validate_bundle(
+            laws: Sequence[TransferLaw],
+        ) -> tuple[Evidence, int]:
+            return _target_crossfit_lawset_evidence(
+                [law.prior.form for law in laws],
                 self.elements,
                 self.observed,
             )
+
+        def is_safe(
+            evidence: Evidence,
+            conflicts: int,
+        ) -> bool:
+            return (
+                conflicts == 0
+                and evidence.negative == 0
+                and evidence.membership
+                >= membership_threshold
+            )
+
+        accepted: list[TransferLaw] = []
+
+        # First look for a target-validated single transferred law. This is the
+        # most conservative reusable abstraction.
+        single_seeds = []
+        for law in candidates:
+            evidence, conflicts = validate_bundle([law])
+            if is_safe(evidence, conflicts):
+                single_seeds.append(
+                    (
+                        -evidence.positive,
+                        law.prior.form.complexity,
+                        law.prior.form.key,
+                        law,
+                        evidence,
+                        conflicts,
+                    )
+                )
+
+        if single_seeds:
+            single_seeds.sort(
+                key=lambda item: item[:3]
+            )
+            (
+                _neg_positive,
+                _complexity,
+                _key,
+                seed,
+                evidence,
+                conflicts,
+            ) = single_seeds[0]
+            accepted = [seed]
+            self.joint_validation = evidence
+            self.joint_validation_conflicts = conflicts
+            self.selection_mode = "single-seed"
+        else:
+            # Some laws can become predictive only compositionally. Search
+            # pairs before giving up, bounded by the 24-form transfer library.
+            pair_seeds = []
+            for left_index in range(len(candidates)):
+                for right_index in range(
+                    left_index + 1,
+                    len(candidates),
+                ):
+                    pair = [
+                        candidates[left_index],
+                        candidates[right_index],
+                    ]
+                    evidence, conflicts = validate_bundle(pair)
+                    if not is_safe(evidence, conflicts):
+                        continue
+                    pair_seeds.append(
+                        (
+                            -evidence.positive,
+                            sum(
+                                law.prior.form.complexity
+                                for law in pair
+                            ),
+                            tuple(
+                                law.prior.form.key
+                                for law in pair
+                            ),
+                            pair,
+                            evidence,
+                            conflicts,
+                        )
+                    )
+
+            if pair_seeds:
+                pair_seeds.sort(
+                    key=lambda item: item[:3]
+                )
+                (
+                    _neg_positive,
+                    _complexity,
+                    _keys,
+                    accepted,
+                    evidence,
+                    conflicts,
+                ) = pair_seeds[0]
+                self.joint_validation = evidence
+                self.joint_validation_conflicts = conflicts
+                self.selection_mode = "pair-seed"
+
+        # Grow the accepted bundle only when another law gives strictly more
+        # correct cross-fitted target predictions without errors or conflicts.
+        while accepted and len(accepted) < maximum_active_laws:
+            accepted_keys = {
+                law.prior.form.key
+                for law in accepted
+            }
+            current_positive = self.joint_validation.positive
+            improvements = []
+
+            for law in candidates:
+                if law.prior.form.key in accepted_keys:
+                    continue
+                trial = accepted + [law]
+                evidence, conflicts = validate_bundle(trial)
+                if not is_safe(evidence, conflicts):
+                    continue
+                if evidence.positive <= current_positive:
+                    continue
+                improvements.append(
+                    (
+                        -evidence.positive,
+                        law.prior.form.complexity,
+                        law.prior.form.key,
+                        law,
+                        evidence,
+                        conflicts,
+                    )
+                )
+
+            if not improvements:
+                break
+
+            improvements.sort(
+                key=lambda item: item[:3]
+            )
+            (
+                _neg_positive,
+                _complexity,
+                _key,
+                law,
+                evidence,
+                conflicts,
+            ) = improvements[0]
+            accepted.append(law)
             self.joint_validation = evidence
             self.joint_validation_conflicts = conflicts
 
-            if (
-                conflicts == 0
-                and evidence.negative == 0
-                and evidence.membership >= membership_threshold
-            ):
-                break
-
-            # Conservative target-only pruning: remove the one candidate whose
-            # absence yields the best cross-fitted bundle evidence. This
-            # permits laws that are only useful compositionally while still
-            # requiring the accepted bundle to make correct target predictions.
-            best_index = None
-            best_objective = None
-            for index in range(len(candidates)):
-                trial = (
-                    candidates[:index]
-                    + candidates[index + 1 :]
-                )
-                if not trial:
-                    trial_evidence = Evidence(
-                        positive=0,
-                        negative=0,
-                        minimum_witnesses=2,
-                    )
-                    trial_conflicts = 0
-                else:
-                    trial_evidence, trial_conflicts = (
-                        _target_crossfit_lawset_evidence(
-                            [
-                                law.prior.form
-                                for law in trial
-                            ],
-                            self.elements,
-                            self.observed,
-                        )
-                    )
-                objective = (
-                    trial_conflicts + trial_evidence.negative,
-                    -trial_evidence.positive,
-                    len(trial),
-                    candidates[index].score,
-                )
-                if (
-                    best_objective is None
-                    or objective < best_objective
-                ):
-                    best_objective = objective
-                    best_index = index
-
-            assert best_index is not None
-            candidates.pop(best_index)
-
-        if not candidates:
-            self.active_laws = tuple()
-        elif (
-            self.joint_validation_conflicts == 0
-            and self.joint_validation.negative == 0
-            and self.joint_validation.membership
-            >= membership_threshold
-        ):
-            self.active_laws = tuple(candidates)
-        else:
-            self.active_laws = tuple()
+        self.active_laws = tuple(accepted)
         self.completed = dict(self.observed)
         self.provenance: dict[tuple[str, str], tuple[str, ...]] = {}
         self.conflicts = 0
