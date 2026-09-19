@@ -4,7 +4,7 @@ Last consolidated research frontier: **v1.13-R**
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
-This document is the canonical human-readable status page for the active repository. Historical experiment details remain reproducible from Git history, research code, and committed benchmark summaries.
+This document is the canonical human-readable status page for the active repository. For the detailed system design, data flow, state boundaries, and reasoning mechanics, see [ARCHITECTURE.md](ARCHITECTURE.md). Historical experiment details remain reproducible from Git history, research code, and committed benchmark summaries.
 
 ## What is stable today
 
