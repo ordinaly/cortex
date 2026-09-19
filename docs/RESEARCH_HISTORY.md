@@ -114,3 +114,29 @@ Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
 2. **systematic relational generalization**, beginning with a kinship/family-relation composition benchmark that holds out graph structure rather than merely surface examples.
+
+
+## kinship-composition-v1 — structured logical composition
+
+This parallel reasoning campaign tested whether Cortex can induce and recursively apply a typed relation algebra beyond the depth of its solved training examples.
+
+Protocol:
+
+- solved training paths: lengths 1–5;
+- test paths: lengths 6–10;
+- all test entities and graph instances unseen;
+- distractor branches and disconnected facts present;
+- primitive relation symbols permuted per seed;
+- answer labels permuted per seed;
+- 20 deterministic seeds.
+
+Mean results:
+
+- Cortex relation algebra: **1.000 accuracy / 1.000 coverage**;
+- exact sequence memory: **0.000 accuracy / 0.000 coverage**;
+- last-relation baseline: **0.222 accuracy / 1.000 coverage**;
+- hand-engineered clipped-count baseline: **1.000 accuracy / 1.000 coverage**.
+
+A missing-rule diagnostic omitted the transition required to derive the aunt/uncle state. Cortex then remained unresolved on every query requiring that transition instead of guessing.
+
+Interpretation: Cortex can perform recursive compositional generalization once the local relation laws have been evidenced. The test does not show derivation of a completely unseen law, and the hand-engineered symbolic baseline demonstrates that this finite algebra is solvable with an appropriate inductive bias. Neural/GNN comparison remains the next scientific discriminator.

@@ -10,6 +10,8 @@ on:
       - "Cargo.lock"
       - "pyproject.toml"
       - "benchmarks/*.py"
+      - "research/kinship_composition*.py"
+      - "tests/test_kinship_composition.py"
       - "crates/cortex-articulation/**"
       - "crates/cortex-runtime/**"
       - "crates/cortex-python/src/lib.rs"
@@ -235,3 +237,34 @@ jobs:
         with:
           name: cortex-regime-saturation-v1
           path: regime-saturation-v1.jsonl
+
+
+  kinship-composition:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
+      - name: Unit tests
+        run: pytest tests/test_kinship_composition.py -q
+      - name: Run kinship composition campaign
+        run: >-
+          python research/kinship_composition_campaign.py
+          --seeds 20
+          --output kinship-composition-v1.jsonl
+      - name: Enforce logical-generalization gates
+        run: >-
+          python research/kinship_composition_gate.py
+          kinship-composition-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-kinship-composition-v1
+          path: kinship-composition-v1.jsonl
