@@ -2,7 +2,7 @@
 
 Status: **frozen protocol / official campaign not yet run**.
 
-Protocol ID: `counterfactual-reasoning-v1`.
+Protocol ID: \`counterfactual-reasoning-v1\`.
 
 This is the first experiment in the broader **Cortex Reasoning Map v1**
 campaign. It follows the passing algebraic form-discovery and cross-world
@@ -23,15 +23,15 @@ intervention/control evidence and then reason correctly about:
 The intended reasoning pattern is:
 
 $$
-	ext{intervention evidence}
-ightarrow
-	ext{causal structure}
-ightarrow
-	ext{multi-hop consequence}
-ightarrow
-	ext{temporary world edit}
-ightarrow
-	ext{counterfactual consequence}.
+\text{intervention evidence}
+\rightarrow
+\text{causal structure}
+\rightarrow
+\text{multi-hop consequence}
+\rightarrow
+\text{temporary world edit}
+\rightarrow
+\text{counterfactual consequence}.
 $$
 
 ## Scientific boundary
@@ -54,9 +54,9 @@ For each ordered pair $(i,j)$ Cortex stores interventional and control
 Beta-style sufficient statistics:
 
 $$
-(alpha_{do},eta_{do}),
-qquad
-(alpha_{ctrl},eta_{ctrl}).
+(\alpha_{do},\beta_{do}),
+\qquad
+(\alpha_{ctrl},\beta_{ctrl}).
 $$
 
 With posterior means
@@ -64,19 +64,19 @@ With posterior means
 $$
 p_{do}
 =
-rac{alpha_{do}}
-     {alpha_{do}+eta_{do}},
-qquad
+\frac{\alpha_{do}}
+     {\alpha_{do}+\beta_{do}},
+\qquad
 p_{ctrl}
 =
-rac{alpha_{ctrl}}
-     {alpha_{ctrl}+eta_{ctrl}},
+\frac{\alpha_{ctrl}}
+     {\alpha_{ctrl}+\beta_{ctrl}},
 $$
 
 define
 
 $$
-Delta_{ij}
+\Delta_{ij}
 =
 p_{do}-p_{ctrl}.
 $$
@@ -85,8 +85,8 @@ The frozen native thresholds are retained:
 
 - at least 8 intervention observations;
 - at least 8 control observations;
-- causal when $Delta_{ij}ge 0.24$;
-- resolved-null when $|Delta_{ij}|le 0.10$;
+- causal when $\Delta_{ij}\ge 0.24$;
+- resolved-null when $|\Delta_{ij}|\le 0.10$;
 - otherwise unresolved.
 
 The research prototype is independent Python code, but the evidence-state
@@ -108,21 +108,21 @@ observations.
 ### True direct causal edge
 
 $$
-n_{do}^{+}=18,quad n_{do}^{-}=2,
+n_{do}^{+}=18,\quad n_{do}^{-}=2,
 $$
 
 $$
-n_{ctrl}^{+}=2,quad n_{ctrl}^{-}=18.
+n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
 $$
 
 ### Resolved null edge
 
 $$
-n_{do}^{+}=2,quad n_{do}^{-}=18,
+n_{do}^{+}=2,\quad n_{do}^{-}=18,
 $$
 
 $$
-n_{ctrl}^{+}=2,quad n_{ctrl}^{-}=18.
+n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
 $$
 
 ### Correlation trap
@@ -130,11 +130,11 @@ $$
 For selected non-causal pairs:
 
 $$
-n_{do}^{+}=16,quad n_{do}^{-}=4,
+n_{do}^{+}=16,\quad n_{do}^{-}=4,
 $$
 
 $$
-n_{ctrl}^{+}=16,quad n_{ctrl}^{-}=4.
+n_{ctrl}^{+}=16,\quad n_{ctrl}^{-}=4.
 $$
 
 These pairs have a high outcome rate but no intervention effect. Cortex should
@@ -170,10 +170,9 @@ For a query source $s$ and target $t$:
 This is the key abstention rule:
 
 $$
-	ext{no confirmed path}
-
-otRightarrow
-	ext{no possible path}.
+\text{no confirmed path}
+\not\Rightarrow
+\text{no possible path}.
 $$
 
 A missing bridge should therefore create uncertainty rather than a false
@@ -186,7 +185,7 @@ A query may supply a temporary set of directed edge removals.
 For
 
 $$
-G' = Gsetminus E_{remove},
+G' = G\setminus E_{remove},
 $$
 
 Cortex recomputes confirmed and possible reachability inside $G'$.
@@ -203,7 +202,8 @@ counterfactuals are reserved for later campaigns.
 
 Every world has 8 anonymously relabeled nodes.
 
-The official campaign uses 20 deterministic seeds per family: **100–119**.\nPreflight and unit tests use only development seeds below 100.
+The official campaign uses 20 deterministic seeds per family: **100–119**.
+Preflight and unit tests use only development seeds below 100.
 
 ### Chain
 
@@ -308,8 +308,8 @@ Special tagged subsets:
 
 ### Missing-bridge diagnostic
 
-In bridge worlds, one true bridge is deliberately left below evidence
-threshold.
+A separate bridge-world diagnostic leaves the true bridge below evidence
+threshold while keeping all other pairwise evidence unchanged.
 
 Queries whose only possible route requires that bridge should return
 **unresolved**, not unaffected.
@@ -319,7 +319,7 @@ Queries whose only possible route requires that bridge should return
 Every resolved affected answer must carry one confirmed directed path
 
 $$
-sightarrowcdotsightarrow t.
+s\rightarrow\cdots\rightarrow t.
 $$
 
 The path must:
@@ -439,10 +439,10 @@ claim.
 
 ## Planned files
 
-- `research/counterfactual_reasoning.py`
-- `research/counterfactual_reasoning_campaign.py`
-- `research/counterfactual_reasoning_gate.py`
-- `tests/test_counterfactual_reasoning.py`
+- \`research/counterfactual_reasoning.py\`
+- \`research/counterfactual_reasoning_campaign.py\`
+- \`research/counterfactual_reasoning_gate.py\`
+- \`tests/test_counterfactual_reasoning.py\`
 
 The official campaign must not be run until unit preflight is green.
 
