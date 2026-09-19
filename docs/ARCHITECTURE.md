@@ -1344,7 +1344,7 @@ $$
 
 With 40% of each operation table hidden, this research path recovered held-out products at 1.000 resolved accuracy on both cyclic and noncommutative dihedral groups, while declining to derive products on a non-associative control.
 
-The follow-up \`algebra-form-induction-v1.7\` removes the named-law vocabulary. A bounded grammar generates canonical equation forms directly, and fuzzy evidence is split into:
+The follow-up `algebra-form-induction-v1.7` removes the named-law vocabulary. A bounded grammar generates canonical equation forms directly, and fuzzy evidence is split into:
 
 - **structural membership** — whether the form itself is supported;
 - **predictive activation** — whether it has survived cross-fitted predictive checks;
