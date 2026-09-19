@@ -115,9 +115,9 @@ The conditional tensor/refinement machinery is currently a small fraction of ful
 
 The regime-budget axis remains unresolved because this workload does not populate a large regime library.
 
-## Recommended next optimization
+## Recommended optimization and follow-up status
 
-The next change should be narrow and semantics-preserving:
+The campaign originally recommended a narrow, semantics-preserving change:
 
 1. maintain or expose lightweight graph state counts needed by the articulation summary (`relation_active`, `relation_resolved`, `causal_active`) without constructing/sorting an `EvidenceSnapshot`;
 2. build the articulation summary directly from lightweight articulation state accessors rather than cloning full articulation snapshots;
@@ -127,6 +127,8 @@ The next change should be narrow and semantics-preserving:
 This should remove the measured global graph scan/copy from the hot path without changing any reasoning rule.
 
 Only after that A/B run should binding, assignment, pair processing, SIMD, parallelism, or more sophisticated data structures be considered.
+
+That recommendation was subsequently implemented: the hot path now uses incremental `EvidenceSummary` counts instead of materializing and sorting the full sparse graph merely to build the 12-D articulation summary. The A/B scaling campaign confirmed a median **31.96%** mean-step reduction across its 25 cases, with larger gains in graph-heavy cases. Later stage attribution then identified articulation—and specifically cyclic transform-distance evaluation—as the dominant remaining native cost. See [NATIVE_STAGE_ATTRIBUTION.md](NATIVE_STAGE_ATTRIBUTION.md) and [ARTICULATION_ATTRIBUTION.md](ARTICULATION_ATTRIBUTION.md).
 
 ## Reproducibility
 
@@ -144,4 +146,4 @@ benchmarks/results/native_scaling_sweep_v1_medians.csv
 
 The complete 75-run JSONL remains attached to GitHub Actions run `35094091811` as artifact `cortex-native-scaling-results` (artifact ID `10445611186`). Keeping the full hosted-runner output as the immutable Actions artifact avoids bloating the source tree while preserving the raw measurements.
 
-The temporary one-shot workflow used to obtain the hosted-runner measurements should be removed after the campaign record is complete, so ordinary development pushes do not repeatedly consume benchmark resources.
+The temporary one-shot workflow used for this campaign has been removed from the active repository after the campaign record was consolidated; the committed aggregate results and Git/Actions provenance remain available.
