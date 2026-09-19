@@ -1,0 +1,141 @@
+{
+  "protocol": "algebra-form-induction-v1.1",
+  "status": "failed_preregistered_gates",
+  "rows": 120,
+  "seeds_per_family": 20,
+  "holdout_fraction": 0.4,
+  "grammar_forms": 375,
+  "failed_gates": [
+    "cyclic_swap_discovered",
+    "semilattice_repeat_discovered"
+  ],
+  "interpretation": "Fuzzy evidence used per-partition minimum witness mass. True low-arity laws were suppressed when too few complete witnesses landed in validation. Predictive precision remained 1.0 for Cortex on every structured family whenever a product was resolved.",
+  "families": {
+    "cyclic-7": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0,
+        "swap": 0.75
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 17.4,
+      "mean_supported_laws": 18.2,
+      "cortex": {
+        "accuracy": 0.9825,
+        "coverage": 0.9825,
+        "resolved_accuracy": 1
+      },
+      "fit_only": {
+        "accuracy": 0.9825,
+        "coverage": 0.9825,
+        "resolved_accuracy": 1
+      }
+    },
+    "dihedral-4": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 103.05,
+      "mean_selected_laws": 6.4,
+      "mean_supported_laws": 6.55,
+      "cortex": {
+        "accuracy": 0.95,
+        "coverage": 0.95,
+        "resolved_accuracy": 1
+      },
+      "fit_only": {
+        "accuracy": 0.8596153846153847,
+        "coverage": 0.8653846153846153,
+        "resolved_accuracy": 0.9921052631578947
+      }
+    },
+    "semilattice-min-6": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0.65,
+        "swap": 0.85
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 23.6,
+      "mean_supported_laws": 46.65,
+      "cortex": {
+        "accuracy": 0.7928571428571429,
+        "coverage": 0.7928571428571429,
+        "resolved_accuracy": 1
+      },
+      "fit_only": {
+        "accuracy": 0.6607142857142857,
+        "coverage": 0.6607142857142857,
+        "resolved_accuracy": 1
+      }
+    },
+    "left-zero-6": {
+      "detected_pattern_rates": {
+        "left_projection": 1,
+        "rebracket": 1,
+        "repeat": 0.65,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 24,
+      "mean_supported_laws": 103.95,
+      "cortex": {
+        "accuracy": 1,
+        "coverage": 1,
+        "resolved_accuracy": 1
+      },
+      "fit_only": {
+        "accuracy": 1,
+        "coverage": 1,
+        "resolved_accuracy": 1
+      }
+    },
+    "subtraction-7": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 0.6,
+      "mean_selected_laws": 10.9,
+      "mean_supported_laws": 10.9,
+      "cortex": {
+        "accuracy": 0.985,
+        "coverage": 0.985,
+        "resolved_accuracy": 1
+      },
+      "fit_only": {
+        "accuracy": 0.985,
+        "coverage": 0.985,
+        "resolved_accuracy": 1
+      }
+    },
+    "random-magma-6": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 0.4,
+      "mean_supported_laws": 0.4,
+      "cortex": {
+        "accuracy": 0,
+        "coverage": 0.03214285714285714,
+        "resolved_accuracy": 0
+      },
+      "fit_only": {
+        "accuracy": 0.014285714285714285,
+        "coverage": 0.1392857142857143,
+        "resolved_accuracy": 0.034583333333333334
+      }
+    }
+  }
+}
