@@ -302,6 +302,79 @@ The resulting binding must be **injective within the frame**: two simultaneous d
 
 This avoids a common tracking failure where locally plausible greedy matches become globally inconsistent.
 
+### 7.1 Entity confidence and the attractor interpretation
+
+It is useful to interpret a persistent entity prototype as an **attractor-like
+center** in articulation space. The current native implementation does not,
+however, expose a single scalar such as "entity confidence = 0.87."
+
+For an existing entity $e$, the articulation layer already computes a
+transformation-minimized matching cost of the form
+
+$
+d_e(x)
+=
+\min_{g\in G}
+d_w\!\left(x,g\cdot\mu_e\right).
+$
+
+The selected entity is determined by the **global assignment problem**, with
+new-entity spawn columns competing against existing entities. Therefore the
+effective basin of an entity is defined jointly by:
+
+- its prototype $\mu_e$;
+- its per-feature reliability weights;
+- the currently admissible nuisance transformations;
+- competing entity prototypes;
+- the current spawn gate;
+- simultaneous injectivity constraints from the rest of the frame.
+
+The implementation already retains several uncertainty-related signals:
+
+| signal | current meaning | publicly exposed? |
+|---|---|---|
+| entity matching cost | geometric fit to an entity under its best transform | not in `ArticulationRead` |
+| transform evidence $q(g)$ | uncertainty over nuisance alignment for a chosen entity | internal `BindingResult` |
+| per-feature reliability | stability of each feature dimension for an entity | snapshot |
+| subgroup evidence margin | confidence that one nuisance subgroup is better supported than the runner-up | yes |
+| observation count / history | temporal support accumulated by an entity | internal state |
+
+So Cortex currently has **evidence for confidence**, but no calibrated
+entity-identity confidence scalar.
+
+A natural future quantity is an **attractor-separation margin**. If $e^*$ is
+the chosen entity and $d_{\mathrm{alt}}$ is the best competing explanation
+(other entity or spawn), then
+
+$
+\Delta_e
+=
+d_{\mathrm{alt}}
+-
+d_{e^*}.
+$
+
+Large positive $\Delta_e$ means the selected attractor basin is well separated;
+a value near zero means the observation lies close to a decision boundary.
+
+Because binding is solved jointly with the Hungarian assignment, the most
+rigorous confidence would use **global assignment regret**:
+
+$
+\Delta_{\mathrm{global}}
+=
+C_{\mathrm{best\ alternative\ assignment}}
+-
+C_{\mathrm{optimal\ assignment}}.
+$
+
+That quantity respects simultaneous competition between detections, whereas a
+simple row-wise margin is only an approximation.
+
+Neither margin should automatically be called a probability. To obtain a
+probability such as $P(\text{identity correct}\mid\text{evidence})$, Cortex
+would need calibration against held-out identity outcomes.
+
 ---
 
 ## 8. Learning the active nuisance subgroup
@@ -345,7 +418,7 @@ The public articulation vector does not expose every feature state separately. I
 
 ## 10. Why the graph is sparse
 
-If Cortex tracks (N) entities, a naïve relation system allocates all
+If Cortex tracks $N$ entities, a naïve relation system allocates all
 
 $$
 O(N^2)
@@ -383,7 +456,7 @@ Worst-case storage can still become quadratic if evidence genuinely touches ever
 
 Undirected relation cells maintain Beta-style sufficient statistics.
 
-Conceptually, after binary observations $y ∈ {0,1}$,
+Conceptually, after binary observations $y \in \{0,1\}$,
 
 $$
 a \leftarrow a+y,
@@ -440,8 +513,8 @@ $$
 
 With enough intervention and control samples:
 
-- sufficiently positive $Δ$ supports a causal edge;
-- sufficiently small $|Δ|$ supports a null edge;
+- sufficiently positive $\Delta$ supports a causal edge;
+- sufficiently small $|\Delta|$ supports a null edge;
 - intermediate evidence remains unresolved.
 
 This is not a full causal-discovery framework. It is an explicit online evidence contract for intervention-sensitive directional effects.
@@ -546,7 +619,7 @@ m_i
 }.
 $$
 
-An α-cut determines which memories are considered actively relevant.
+An $\alpha$-cut determines which memories are considered actively relevant.
 
 The reconstruction is the membership-weighted prototype mixture:
 
@@ -617,7 +690,7 @@ $$
 
 If the continual reasoner consumed $\hat z_t$, then a storage optimization could alter active structural decisions.
 
-The current runtime instead sends the original public articulation vector (z_t) to both consumers:
+The current runtime instead sends the original public articulation vector $z_t$ to both consumers:
 
 ```text
                  ┌──> historical memory
@@ -648,7 +721,7 @@ Each regime prototype stores, among other fields:
 - lineage information for splits;
 - refinement depth.
 
-Given the current state (z_t), Cortex computes distances to all prototypes and soft memberships similar to fuzzy memory:
+Given the current state $z_t$, Cortex computes distances to all prototypes and soft memberships similar to fuzzy memory:
 
 $$
 m_i
@@ -786,7 +859,7 @@ The tensor machinery is conditional: it can sleep, wake, refresh, and run in bur
 
 ## 24. Curvature and rank evidence
 
-For an active regime with centroid (mu), define local displacement
+For an active regime with centroid $\mu$, define local displacement
 
 $$
 \delta_t = z_t-\mu.
@@ -822,7 +895,7 @@ That distinction is fundamental:
 
 When a split candidate is launched, Cortex creates temporary **shadow directions** rather than immediately modifying active state.
 
-For candidate direction (u), observations are provisionally separated by the sign of
+For candidate direction $u$, observations are provisionally separated by the sign of
 
 $$
 u^\top(z-\mu).
@@ -893,6 +966,67 @@ This is architecturally different from systems where model complexity only grows
 ---
 
 # Part VII — Boundedness and uncertainty
+
+## 26.1 Does `unresolved` have a confidence score?
+
+Not yet as one universal scalar.
+
+Different Cortex layers already expose the evidence from which an
+**unresolved strength** could be constructed:
+
+- **Historical memory** returns fuzzy `memberships`, `nearest_dist`, and a
+  boolean `unresolved`. Memory becomes unresolved only when capacity is full,
+  safe recompression fails, and reconstruction distortion exceeds the declared
+  budget.
+- **Continual reasoning** returns regime memberships, nearest-regime distance,
+  `unresolved`, and `budget_pressure`. Its snapshot also retains
+  `pending_score`, `pending_count`, the adaptive hazard, and the current
+  pending structural hypothesis.
+- **Relations and causal edges** retain Beta-style sufficient statistics and
+  discrete unresolved states internally, although the public graph read does
+  not currently expose a calibrated posterior confidence.
+- **Entity articulation** has no `unresolved` identity state in the stable
+  runtime. It binds to an existing entity, spawns a new one, or raises an error
+  if a required spawn exceeds `max_entities`.
+
+For fuzzy historical memory, a natural non-probabilistic severity measure would
+be the amount by which reconstruction error exceeds the allowed distortion:
+
+$
+u_{\mathrm{mem}}
+=
+\max\!\left(
+0,
+\frac{d_{\mathrm{RMS}}(z,\hat z)-\varepsilon_D}
+     {\varepsilon_D}
+\right),
+$
+
+where $\varepsilon_D$ is the configured distortion budget.
+
+For a pending continual transition, an evidence margin could similarly compare
+the accumulated score with the current decision threshold:
+
+$
+u_{\mathrm{struct}}
+=
+s_{\mathrm{pending}}
+-
+\theta_t.
+$
+
+These are useful **evidence margins**, but they are not yet part of the frozen
+public runtime contract and should not be described as calibrated
+probabilities.
+
+A future confidence interface should therefore preserve the distinction between:
+
+1. confidence that a particular entity/regime is the best explanation;
+2. confidence in a nuisance transformation;
+3. evidence that the current state is genuinely unresolved;
+4. confidence that a new structural distinction is needed.
+
+Collapsing all four into one number too early would discard useful structure.
 
 ## 27. Bounded state is a design constraint
 
@@ -1086,7 +1220,7 @@ The research answer is increasingly:
 
 Instead of treating every perceptual anchor as a hard ontological entity, the fuzzy predictive-field research maintains responsibilities over anchors and derives semantic distance from their learned future distributions.
 
-At candidate resolution $ρ$,
+At candidate resolution $\rho$,
 
 $$
 K_\rho(i,j)
@@ -1282,14 +1416,14 @@ The exact cost depends strongly on configuration and realized state, but the mai
 
 Let:
 
-- (k) = detections visible in the current frame;
-- (N) = active persistent entities;
-- (d) = articulation feature dimension;
-- (|G|) = active nuisance-transform count;
-- (R) = represented sparse relation cells;
-- (C) = represented causal cells;
-- (B_m) = fuzzy-memory prototype count;
-- (B_r) = continual regime count.
+- $k$ = detections visible in the current frame;
+- $N$ = active persistent entities;
+- $d$ = articulation feature dimension;
+- $\lvert G\rvert$ = active nuisance-transform count;
+- $R$ = represented sparse relation cells;
+- $C$ = represented causal cells;
+- $B_m$ = fuzzy-memory prototype count;
+- $B_r$ = continual regime count.
 
 A rough architecture-level map is:
 
