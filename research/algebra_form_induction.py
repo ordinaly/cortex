@@ -351,6 +351,15 @@ class CortexFuzzyLawInducer:
         return tuple(out)
 
     def active_keys(self) -> set[str]:
+        """All forms whose fuzzy evidence passes the activation gate.
+
+        This is intentionally distinct from `active_laws`, which is the
+        complexity-ranked, resource-bounded subset used for closure.
+        """
+        return {law.form.key for law in self.laws if law.active}
+
+    def selected_keys(self) -> set[str]:
+        """Forms selected into the bounded predictive-closure budget."""
         return {law.form.key for law in self.active_laws}
 
     def top_laws(self, limit: int = 10) -> list[dict[str, float | int | str]]:
