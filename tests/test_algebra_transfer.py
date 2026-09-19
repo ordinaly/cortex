@@ -122,7 +122,18 @@ def test_transfer_regrounds_on_new_cyclic_world_without_false_resolution():
     metrics = score_transfer_heldout(model, table, heldout)
 
     assert metrics["wrong_resolved"] == 0
-    assert metrics["resolved"] > 0
+    assert metrics["resolved"] > 0, {
+        "metrics": metrics,
+        "library": [prior.form.key for prior in library],
+        "structurally_supported": sorted(model.structurally_supported_keys()),
+        "joint_validation": {
+            "positive": model.joint_validation.positive,
+            "negative": model.joint_validation.negative,
+            "membership": model.joint_validation.membership,
+            "conflicts": model.joint_validation_conflicts,
+        },
+        "selected": sorted(model.selected_keys()),
+    }
     assert model.selected_keys()
 
 
