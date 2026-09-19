@@ -15,6 +15,7 @@ MARKDOWN_FILES = sorted(
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 FENCE_RE = re.compile(r"^\s*\x60\x60\x60")
 DISPLAY_MATH_RE = re.compile(r"^\s*\$\$\s*$")
+SINGLE_DOLLAR_RE = re.compile(r"^\s*\$\s*$")
 LEGACY_DISPLAY_RE = re.compile(r"^\s*\\[\[\]]\s*$")
 LITERAL_BRACKET_RE = re.compile(r"^\s*[\[\]]\s*$")
 TABLE_LINE_RE = re.compile(r"^\s*\|.*\|\s*$")
@@ -98,9 +99,15 @@ def check_file(path: Path) -> list[str]:
         if in_fence:
             continue
 
+        if SINGLE_DOLLAR_RE.match(line):
+            errors.append(
+                f"{name}:{lineno}: standalone single-dollar line; "
+                "use $ for a display-math delimiter"
+            )
+
         if LEGACY_DISPLAY_RE.match(line):
             errors.append(
-                f"{name}:{lineno}: legacy display-math delimiter; use $$ for GitHub Markdown"
+                f"{name}:{lineno}: legacy display-math delimiter; use $ for GitHub Markdown"
             )
 
         if LITERAL_BRACKET_RE.match(line):
