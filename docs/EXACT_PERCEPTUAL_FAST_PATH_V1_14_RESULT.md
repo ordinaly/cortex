@@ -2,9 +2,9 @@
 
 Status: **passed research optimization milestone**.
 
-Protocol: \`exact-perceptual-fast-path-v1.14-R\`.
+Protocol: `exact-perceptual-fast-path-v1.14-R`.
 
-Official run: GitHub Actions run \`35436434761\`.
+Official run: GitHub Actions run `35436434761`.
 
 ## Objective
 
@@ -118,18 +118,18 @@ It is not a universal Cortex speedup claim.
 
 Implementation:
 
-- modified \`research/fuzzy_predictive_field.py\`;
-- \`research/exact_perceptual_fast_path_campaign.py\`;
-- \`research/exact_perceptual_fast_path_gate.py\`;
-- \`tests/test_exact_perceptual_fast_path.py\`.
+- modified `research/fuzzy_predictive_field.py`;
+- `research/exact_perceptual_fast_path_campaign.py`;
+- `research/exact_perceptual_fast_path_gate.py`;
+- `tests/test_exact_perceptual_fast_path.py`.
 
 Frozen protocol:
 
-- [\`EXACT_PERCEPTUAL_FAST_PATH_V1_14.md\`](EXACT_PERCEPTUAL_FAST_PATH_V1_14.md)
+- [`EXACT_PERCEPTUAL_FAST_PATH_V1_14.md`](EXACT_PERCEPTUAL_FAST_PATH_V1_14.md)
 
 Aggregate result:
 
-- [\`benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json\`](../benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json)
+- [`benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json`](../benchmarks/results/exact_perceptual_fast_path_v1_14_summary.json)
 
 ## Next engineering milestone
 
