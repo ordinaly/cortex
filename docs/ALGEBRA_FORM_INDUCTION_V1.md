@@ -62,9 +62,9 @@ allowed a locally valid form to be extrapolated to unsupported combinations.
 The result is deliberately fuzzy:
 
 $$
-	ext{law confidence}
+\text{law confidence}
 \neq
-	ext{confidence that the law applies to this substitution}.
+\text{confidence that the law applies to this substitution}.
 $$
 
 ## Campaign
