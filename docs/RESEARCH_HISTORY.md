@@ -309,7 +309,7 @@ This second Reasoning Map campaign tested whether Cortex's existing cumulative
 causal evidence semantics can revise a strongly supported belief without a
 bespoke decay, reset, or hysteresis controller.
 
-The target edge sat inside the only path (Aightarrow Bightarrow C).
+The target edge sat inside the only path $A\rightarrow B\rightarrow C$.
 Twenty untouched seeds (200–219) were evaluated at three initial support
 strengths, producing **60 official cases**.
 
