@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1`.
+Protocol ID: `algebra-transfer-v1.1`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -71,8 +71,13 @@ $$
 r_{\mathrm{source}} \ge 0.75,
 $$
 
-its mean source structural membership is at least 0.98, and its mean source
-predictive membership is at least 0.98.
+and its mean source structural membership is at least 0.98.
+
+Source predictive membership is recorded for diagnostics but is **not** a
+transfer requirement. v1.7 deliberately separated structural discovery from
+predictive applicability; requiring source predictive activation would
+incorrectly discard a structurally stable form merely because a sparse source
+world offered too few opportunities to use it predictively.
 
 Libraries are complexity-ranked and capped at 24 forms.
 
@@ -274,5 +279,17 @@ transfer learning.
 - `research/algebra_transfer_gate.py`
 - `tests/test_algebra_transfer.py`
 
-The official campaign must not be run until the implementation and unit-level
-preflight are reviewed against this frozen protocol.
+### Preflight revision record
+
+The initial `algebra-transfer-v1` preflight required source predictive
+membership as well as structural membership. This excluded structurally stable
+forms, including the canonical rebracketing form in the small cyclic preflight,
+because source predictive opportunities were sparse. No official campaign had
+been run.
+
+`algebra-transfer-v1.1` corrects that conceptual mismatch: **form confidence
+transfers; source applicability does not**. All target predictive evidence and
+all target applicability scopes are still re-grounded locally.
+
+The official campaign must not be run until the v1.1 implementation and
+unit-level preflight are green.
