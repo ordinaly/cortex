@@ -2,9 +2,9 @@
 
 Status: **passed official benchmark / research-only**.
 
-Protocol: \`belief-revision-v1\`.
+Protocol: `belief-revision-v1`.
 
-Official run: GitHub Actions run \`35435047833\`, job \`105876169421\`.
+Official run: GitHub Actions run `35435047833`, job `105876169421`.
 
 ## Question
 
@@ -249,18 +249,18 @@ epistemology.
 
 Implementation:
 
-- \`research/belief_revision.py\`
-- \`research/belief_revision_campaign.py\`
-- \`research/belief_revision_gate.py\`
-- \`tests/test_belief_revision.py\`
+- `research/belief_revision.py`
+- `research/belief_revision_campaign.py`
+- `research/belief_revision_gate.py`
+- `tests/test_belief_revision.py`
 
 Frozen protocol:
 
-- [\`BELIEF_REVISION_V1_PROTOCOL.md\`](BELIEF_REVISION_V1_PROTOCOL.md)
+- [`BELIEF_REVISION_V1_PROTOCOL.md`](BELIEF_REVISION_V1_PROTOCOL.md)
 
 Aggregate result:
 
-- [\`benchmarks/results/belief_revision_v1_summary.json\`](../benchmarks/results/belief_revision_v1_summary.json)
+- [`benchmarks/results/belief_revision_v1_summary.json`](../benchmarks/results/belief_revision_v1_summary.json)
 
 ## Next Reasoning Map axis
 
