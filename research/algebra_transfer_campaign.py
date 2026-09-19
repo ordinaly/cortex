@@ -1,4 +1,4 @@
-"""Prepared campaign for algebra-transfer-v1.4.
+"""Prepared campaign for algebra-transfer-v1.5.
 
 The protocol is frozen in docs/ALGEBRA_TRANSFER_V1_PROTOCOL.md.
 This module is prepared for the official campaign but is not wired into the
@@ -208,7 +208,7 @@ def compatible_row(
     scratch.close()
 
     return {
-        "protocol": "algebra-transfer-v1.4",
+        "protocol": "algebra-transfer-v1.5",
         "kind": "compatible",
         "family": family,
         "seed": seed,
@@ -271,7 +271,7 @@ def control_row(
     rebracket_key = pattern_keys()["rebracket"]
 
     return {
-        "protocol": "algebra-transfer-v1.4",
+        "protocol": "algebra-transfer-v1.5",
         "kind": control,
         "library_name": library_name,
         "seed": seed,
@@ -389,7 +389,7 @@ def campaign(output: Path) -> dict:
         }
 
     summary = {
-        "protocol": "algebra-transfer-v1.4",
+        "protocol": "algebra-transfer-v1.5",
         "status": "official-campaign-output",
         "compatible_rows": len(compatible),
         "control_rows": len(rows) - len(compatible),
@@ -419,7 +419,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("algebra-transfer-v1.4.jsonl"),
+        default=Path("algebra-transfer-v1.5.jsonl"),
     )
     args = parser.parse_args()
     campaign(args.output)
