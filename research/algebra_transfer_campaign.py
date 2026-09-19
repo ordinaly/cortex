@@ -26,6 +26,7 @@ from algebra_induction import (
     cyclic_group,
     dihedral_group,
     partial_observation,
+    subtraction_magma,
 )
 from algebra_transfer import (
     CortexTransferredLawInducer,
@@ -348,9 +349,7 @@ def campaign(output: Path) -> dict:
                 library_name="cyclic",
                 library=libraries["cyclic"],
                 source_labels=source_labels["cyclic"],
-                algebra=__import__(
-                    "algebra_induction"
-                ).subtraction_magma(7),
+                algebra=subtraction_magma(7),
                 seed=seed,
             )
         )
