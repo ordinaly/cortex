@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1.3`.
+Protocol ID: `algebra-transfer-v1.4`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -147,10 +147,17 @@ observed target cells. Each validation cell is predicted from all other
 observed target cells, preserving strict out-of-sample evaluation while
 retaining maximal training evidence in sparse targets.
 
-The bundle is accepted only when it produces at least two cross-fitted
-predictions, zero wrong predictions, zero closure conflicts, and membership at
-least 0.98. If the bundle fails, target-only evidence is used to prune
-candidates until a passing bundle is found or Cortex remains unresolved.
+Target law-set search is conservative and forward:
+
+1. accept the best individually target-validated transferred form when one
+   exists;
+2. otherwise search all transferred **pairs** for a safe compositional seed;
+3. add another form only if the enlarged bundle produces strictly more correct
+   leave-one-out target predictions with zero errors and zero conflicts.
+
+Any accepted seed or bundle must produce at least two cross-fitted predictions
+and membership at least 0.98. If no safe seed exists, Cortex remains
+unresolved.
 
 The activation threshold remains 0.98.
 
@@ -311,5 +318,13 @@ No official campaign had been run.
 Every validation remains strictly out-of-sample, but each fold preserves all
 other target observations.
 
-The official campaign must not be run until the v1.3 implementation and
+A fourth preflight showed that leave-one-out evidence alone was insufficient
+because backward pruning could discard a useful simple transferred law before
+it demonstrated predictive value. No official campaign had been run.
+
+`algebra-transfer-v1.4` therefore replaces backward pruning with conservative
+forward target validation: safe singles first, safe compositional pairs second,
+then only strictly prediction-improving additions.
+
+The official campaign must not be run until the v1.4 implementation and
 unit-level preflight are green.
