@@ -1,51 +1,79 @@
 # Native migration status
 
-Cortex keeps the frozen Python v0.9.5 tree as the executable research specification and migrates stateful reasoning into Rust behind differential tests.
+Cortex keeps the frozen Python `spec-v0.9.5` tree as the executable reference specification and runs the current stateful implementation natively in Rust behind differential tests.
+
+The migration is **functionally complete at the composed runtime level** for the published v1.0.0-rc.2 contract.
 
 ## Native layers
 
-- `cortex-core` — continual regime reasoning, adaptive recurrence, tensor plasticity, split/merge/novelty.
-- `cortex-articulation` — entity identity, cyclic nuisance transforms, soft transform evidence, subgroup synchronization, injective simultaneous binding, residual/noise state.
-- `cortex-memory` — bounded Fuzzy Accordion Memory, alpha-cut activation, certified recompression, explicit unresolved/budget pressure.
-- `cortex-graph` — sparse relation/dependency storage plus lazy relation and intervention-sensitive causal sufficient statistics. Pairs are allocated only after receiving evidence rather than from an entity-capacity Cartesian product.
-- `cortex-runtime` — coarse-grained composition of articulation → sparse graph evidence → 12-D articulation summary → fuzzy memory + continual plasticity.
-- `cortex-python` — thin PyO3 research interface. Experiment orchestration, datasets, plotting, and reports remain Python by design.
+- `cortex-articulation` — entity identity, nuisance transforms, binding, residual/noise state.
+- `cortex-graph` — sparse relation/dependency state and intervention-sensitive causal evidence.
+- `cortex-memory` — bounded historical memory and certified recompression.
+- `cortex-core` — recurrence, adaptation, tensor plasticity, split/merge/novelty.
+- `cortex-runtime` — complete articulation → graph → public summary → memory + continual transition.
+- `cortex-python` — thin PyO3 research interface.
 
-## Migration rule
+## Migration contract
 
-A Rust layer is not considered migrated merely because it compiles. It must reproduce the frozen Python behavioral contract on deterministic differential fixtures before it becomes part of the default native execution path.
+A Rust layer is accepted only after deterministic differential tests reproduce the relevant frozen Python behavior. Compilation alone is not considered semantic equivalence.
 
-The execution boundary is deliberately coarse-grained: one Python call performs a complete state transition inside Rust rather than crossing the FFI boundary for individual numerical operations.
+The FFI boundary is intentionally coarse: one `CortexRuntime.step(...)` call performs the complete state transition inside Rust.
 
-## Verified gates
+## Verified state
 
-1. Continual/plasticity core: frozen v0.9.5 golden replay.
-2. Articulation and fuzzy memory: frozen v0.7/v0.8 differential parity.
-3. Sparse relation/causal evidence: 320-frame frozen v0.7 replay, including posterior counts and state transitions, with no up-front O(N^2) pair allocation.
-4. Full composed runtime: frozen articulation → memory → v0.9.5 path replayed frame-by-frame through one native `CortexRuntime.step(...)` call, including bindings, subgroup state, graph state changes, 12-D articulation vector, memory state, continual predictions, structural decisions, and final snapshots.
+The current CI validates:
 
-The full-runtime gate passes on both Python 3.11 and 3.13 together with canonical rustfmt, strict Clippy, Rust release tests, PyO3 compilation, and locked wheel packaging.
+1. continual/plasticity golden replay;
+2. articulation and memory differential parity;
+3. sparse relation/causal replay;
+4. full composed runtime replay;
+5. Rust formatting and strict Clippy;
+6. release-mode Rust tests;
+7. Python 3.11 and 3.13 differential suites;
+8. PyO3/wheel build;
+9. frozen-reference integrity;
+10. software/specification version consistency.
 
-## First full-stack performance result
+The frozen specification remains immutable under `reference/v0_9_5/`.
 
-A controlled GitHub Actions campaign compared frozen Python, a hybrid native-continual configuration, and the fully native runtime using identical pre-materialized structured frames.
+## Native performance
 
-Median across three independent process runs:
+On the published controlled full-stack workload, the native path measured about **78.66 µs mean step time** versus **10,315.3 µs** for the frozen Python stack, with about **21.99 MiB** versus **87.43 MiB** peak RSS.
 
-| Mode | Mean step | p50 | Peak RSS |
-|---|---:|---:|---:|
-| Frozen Python | 10,315.3 µs | 9,863.6 µs | 87.43 MiB |
-| Hybrid | 10,141.9 µs | 9,719.4 µs | 86.93 MiB |
-| Fully native | **78.66 µs** | **72.63 µs** | **21.99 MiB** |
+This is a workload-specific result. See `FULL_RUNTIME_BENCHMARK.md`.
 
-On that workload the fully native runtime was approximately 131× faster by median mean-step time than the frozen Python stack, while preserving the same final prediction/state fingerprint. This is a workload-specific empirical result, not a universal speedup claim. See `docs/FULL_RUNTIME_BENCHMARK.md` for methodology, raw measurements, caveats, and tail latency.
+## Current native bottleneck
 
-The near-flat Python → hybrid result is itself informative: the dominant full-frame overhead on this benchmark lived in the Python articulation/binding/relation-memory path, not in the already-optimized continual controller. Moving the complete stateful transition behind one native boundary removed that bottleneck.
+The first scaling campaign exposed and removed a global sparse-graph snapshot/materialization cost from the hot path.
 
-## Next gates
+Subsequent stage attribution found articulation to account for roughly **83–95%** of attributed native time in the tested stress cases.
 
-1. Land the full-runtime migration and freeze its end-to-end differential fixture.
-2. Run a controlled scaling campaign over entity count, visibility, graph density, feature dimension, regime budget, and tensor duty cycle.
-3. Measure p50/p95/p99 latency, peak/state memory, and semantic correctness together.
-4. Profile the native runtime before introducing further optimization; do not add low-rank, SIMD, parallel, or alternate graph machinery unless a measured bottleneck justifies it.
-5. After the scaling envelope is declared, move to untouched external structured benchmarks for v1.0 scientific validation.
+Fine-grained articulation attribution localized the dominant work to cyclic transform-distance evaluation. Matching plus subgroup-evidence transform scans consume roughly **85–96%** of attributed articulation work in the measured cases.
+
+The next native optimization should therefore remain narrow and semantics-preserving: allocation-free transform-distance kernels and elimination of redundant evidence construction, followed by the same differential and attribution gates.
+
+See:
+
+- `NATIVE_SCALING_SWEEP_V1.md`
+- `NATIVE_STAGE_ATTRIBUTION.md`
+- `ARTICULATION_ATTRIBUTION.md`
+
+## Relationship to the research frontier
+
+The active predictive-field research line (currently v1.13-R) is **not yet the frozen native specification**.
+
+Promotion should occur only after the research semantics stabilize:
+
+```text
+research mechanism
+      ↓
+new executable specification freeze
+      ↓
+differential contract
+      ↓
+Rust implementation
+      ↓
+native benchmark
+```
+
+The current `spec-v0.9.5` must not be silently rewritten to absorb experimental behavior.
