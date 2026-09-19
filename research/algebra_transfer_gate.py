@@ -1,4 +1,4 @@
-"""Frozen official gates for algebra-transfer-v1.2.
+"""Frozen official gates for algebra-transfer-v1.3.
 
 Do not modify these thresholds after official campaign results are observed.
 The protocol is documented in docs/ALGEBRA_TRANSFER_V1_PROTOCOL.md.
@@ -112,7 +112,7 @@ def main() -> None:
     }
 
     payload = {
-        "protocol": "algebra-transfer-v1.2",
+        "protocol": "algebra-transfer-v1.3",
         "rows": len(rows),
         "checks": checks,
         "passed": all(checks.values()),
