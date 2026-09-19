@@ -112,8 +112,8 @@ The next research target is an exact perceptual fast path using the invariant th
 
 Two immediate scientific directions are now well motivated:
 
-1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **Cortex Reasoning Map v1**, with cross-algebra transfer, structural counterfactual reasoning, and belief revision now passed, and structural analogy/isomorphism next.
+1. **v1.15-R cache-refresh attribution/decomposition**, following the passed v1.14-R exact perceptual fast path;
+2. **Cortex Reasoning Map v1**, with structural analogy/isomorphism now passed and latent concept induction next.
 
 The Reasoning Map then proceeds toward structural analogy/isomorphism, latent-concept induction, explicit proof dependency, planning/replanning, and open-world novelty attribution. See [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
@@ -346,3 +346,45 @@ The result does not yet establish robust belief revision under stochastic or
 adversarial evidence.
 
 See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md).
+
+
+## v1.14-R — exact perceptual fast path
+
+v1.13-R identified perceptual responsibility computation as roughly half of fused research-step time. The field constructor already normalized stored anchors, so v1.14-R removed their redundant per-observation normalization while leaving the generic standalone helper unchanged.
+
+The paired exact campaign passed all frozen gates.
+
+At 288 anchors:
+
+- focused perceptual speedup: **48.26×**;
+- complete fused-step speedup: **1.96×**;
+- perceptual stage share: **2.20%**, down from about 48.9%;
+- structural disagreements: **0**.
+
+Maximum numerical differences remained at floating-point scale. Re-profiling moved the dominant stage to **cache refresh**, about **45.5%** of measured time at 288 anchors.
+
+See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md).
+
+
+## structural-analogy-v1 — typed structural correspondence
+
+This Reasoning Map campaign tested whether Cortex could exploit the same typed relational organization when both entity and relation labels were independently replaced.
+
+Cortex retained every joint correspondence consistent with partial target evidence and resolved a held-out fact only when all surviving correspondences agreed.
+
+Official untouched seeds 300–319 produced 240 compatible cases across four graph families and three evidence budgets.
+
+Results:
+
+- held-out resolved accuracy: **1.000**;
+- coverage at 12 / 90 target facts: **0.9718**;
+- coverage at 24 / 36 facts: **1.000 / 1.000**;
+- asymmetric full unique-mapping rate: **1.000**;
+- symmetric full ambiguity-preservation rate: **1.000**;
+- near-isomorphic rejection: **1.000**;
+- broken-analogy rejection: **1.000**;
+- source/target label overlap: **0**.
+
+The central qualitative result is that **mapping identity may remain uncertain while invariant structural consequences are certain**.
+
+See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md).
