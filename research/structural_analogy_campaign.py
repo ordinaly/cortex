@@ -366,6 +366,8 @@ def full_identifiability(world: AnalogyWorld) -> dict:
         for source in world.source_nodes
     )
     return {
+        "protocol": "structural-analogy-v1",
+        "kind": "full-identifiability",
         "family": world.family,
         "seed": world.seed,
         "candidate_count": model.candidate_count,
@@ -400,6 +402,8 @@ def near_isomorphic_control(world: AnalogyWorld) -> dict:
         ),
     )
     return {
+        "protocol": "structural-analogy-v1",
+        "kind": "near-isomorphic",
         "family": world.family,
         "seed": world.seed,
         "candidate_count": model.candidate_count,
@@ -434,6 +438,8 @@ def broken_analogy_control(world: AnalogyWorld) -> dict:
 
     if contradiction is None:
         return {
+            "protocol": "structural-analogy-v1",
+            "kind": "broken-analogy",
             "family": world.family,
             "seed": world.seed,
             "before_candidates": before,
@@ -444,6 +450,8 @@ def broken_analogy_control(world: AnalogyWorld) -> dict:
 
     model.observe(contradiction)
     return {
+        "protocol": "structural-analogy-v1",
+        "kind": "broken-analogy",
         "family": world.family,
         "seed": world.seed,
         "before_candidates": before,
@@ -481,14 +489,6 @@ def campaign(
         for world in worlds
         for budget in TARGET_BUDGETS
     ]
-    output.write_text(
-        "".join(
-            json.dumps(row, sort_keys=True) + "\n"
-            for row in rows
-        ),
-        encoding="utf-8",
-    )
-
     full = [
         full_identifiability(world)
         for world in worlds
@@ -502,6 +502,15 @@ def campaign(
         broken_analogy_control(world)
         for world in worlds
     ]
+
+    artifact_rows = rows + full + near + broken
+    output.write_text(
+        "".join(
+            json.dumps(row, sort_keys=True) + "\n"
+            for row in artifact_rows
+        ),
+        encoding="utf-8",
+    )
 
     candidate_monotone = []
     for world in worlds:
