@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1.2`.
+Protocol ID: `algebra-transfer-v1.3`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -142,11 +142,15 @@ requiring every form to predict a held-aside target cell in isolation. This is
 necessary because algebraic laws can become predictive only after composition
 with other supported laws.
 
-The bounded candidate bundle is cross-fitted against observed target cells.
-It is accepted only when it produces at least two cross-fitted predictions,
-zero wrong predictions, zero closure conflicts, and membership at least 0.98.
-If the bundle fails, target-only evidence is used to prune candidates until a
-passing bundle is found or Cortex remains unresolved.
+The bounded candidate bundle is **leave-one-cell-out cross-fitted** against
+observed target cells. Each validation cell is predicted from all other
+observed target cells, preserving strict out-of-sample evaluation while
+retaining maximal training evidence in sparse targets.
+
+The bundle is accepted only when it produces at least two cross-fitted
+predictions, zero wrong predictions, zero closure conflicts, and membership at
+least 0.98. If the bundle fails, target-only evidence is used to prune
+candidates until a passing bundle is found or Cortex remains unresolved.
 
 The activation threshold remains 0.98.
 
@@ -298,5 +302,14 @@ moves predictive acceptance to a conservative **joint target law-set
 cross-fit**. The accepted bundle must make target predictions with zero errors
 and zero conflicts. No held-out evaluation cells are used during selection.
 
-The official campaign must not be run until the v1.2 implementation and
+A third preflight showed that four-fold target validation removed too much
+evidence from an already sparse target table: structurally supported cyclic
+forms were present, but the joint validator produced exactly zero predictions.
+No official campaign had been run.
+
+`algebra-transfer-v1.3` therefore uses leave-one-cell-out target validation.
+Every validation remains strictly out-of-sample, but each fold preserves all
+other target observations.
+
+The official campaign must not be run until the v1.3 implementation and
 unit-level preflight are green.
