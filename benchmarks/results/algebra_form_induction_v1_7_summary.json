@@ -1,0 +1,182 @@
+{
+  "families": {
+    "cyclic-7": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0,
+        "swap": 1
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 9.85,
+      "mean_supported_laws": 27.75,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0.945,
+          "coverage": 0.945,
+          "resolved_accuracy": 1
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0.9800000000000001,
+          "coverage": 0.9800000000000001,
+          "resolved_accuracy": 1
+        }
+      }
+    },
+    "dihedral-4": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 2.4,
+      "mean_supported_laws": 11.35,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0.8673076923076923,
+          "coverage": 0.8673076923076923,
+          "resolved_accuracy": 1
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0.9,
+          "coverage": 0.901923076923077,
+          "resolved_accuracy": 0.9974999999999999
+        }
+      }
+    },
+    "left-zero-6": {
+      "detected_pattern_rates": {
+        "left_projection": 1,
+        "rebracket": 1,
+        "repeat": 1,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 12.45,
+      "mean_supported_laws": 121.25,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0.9785714285714286,
+          "coverage": 0.9785714285714286,
+          "resolved_accuracy": 1
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0.9785714285714286,
+          "coverage": 0.9785714285714286,
+          "resolved_accuracy": 1
+        }
+      }
+    },
+    "random-magma-6": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 0,
+      "mean_supported_laws": 1.15,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0,
+          "coverage": 0.03571428571428571,
+          "resolved_accuracy": 0
+        }
+      }
+    },
+    "semilattice-min-6": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 1,
+        "repeat": 1,
+        "swap": 1
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 16.25,
+      "mean_supported_laws": 65.85,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0.5892857142857143,
+          "coverage": 0.5892857142857143,
+          "resolved_accuracy": 1
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0.5785714285714285,
+          "coverage": 0.5785714285714285,
+          "resolved_accuracy": 1
+        }
+      }
+    },
+    "subtraction-7": {
+      "detected_pattern_rates": {
+        "left_projection": 0,
+        "rebracket": 0,
+        "repeat": 0,
+        "swap": 0
+      },
+      "mean_conflicts": 0,
+      "mean_selected_laws": 2.2,
+      "mean_supported_laws": 15.6,
+      "methods": {
+        "cortex-fuzzy": {
+          "accuracy": 0.7,
+          "coverage": 0.7,
+          "resolved_accuracy": 1
+        },
+        "direct-memory": {
+          "accuracy": 0,
+          "coverage": 0,
+          "resolved_accuracy": 0
+        },
+        "fit-only-enumerator": {
+          "accuracy": 0.9375,
+          "coverage": 0.9375,
+          "resolved_accuracy": 1
+        }
+      }
+    }
+  },
+  "global": {
+    "all_cases_zero_conflicts": true,
+    "max_cortex_wrong_resolved_per_case": 0,
+    "max_random_magma_resolved_per_case": 0
+  },
+  "grammar_forms": 375,
+  "holdout_fraction": 0.4,
+  "protocol": "algebra-form-induction-v1.7",
+  "rows": 120,
+  "seeds_per_family": 20
+}
