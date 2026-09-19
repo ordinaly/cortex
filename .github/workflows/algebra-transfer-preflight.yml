@@ -1,0 +1,26 @@
+name: cortex-algebra-transfer-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/algebra_transfer*.py"
+      - "tests/test_algebra_transfer.py"
+      - "docs/ALGEBRA_TRANSFER_V1_PROTOCOL.md"
+      - ".github/workflows/algebra-transfer-preflight.yml"
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
+      - name: Transfer preflight unit tests only
+        run: pytest tests/test_algebra_transfer.py -q
