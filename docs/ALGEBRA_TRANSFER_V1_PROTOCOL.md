@@ -128,14 +128,14 @@ Target evidence minima are frozen as:
 
 Target structural membership for each imported form is
 
-$
+$$
 \mu_{\mathrm{struct}}
 =
 \min(
 \mu_{\mathrm{source}},
 \mu_{\mathrm{target\ structural}}
 ).
-$
+$$
 
 Predictive activation is evaluated at the **joint law-set level** rather than
 requiring every form to predict a held-aside target cell in isolation. This is
