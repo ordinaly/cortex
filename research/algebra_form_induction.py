@@ -227,35 +227,44 @@ class FormInference:
     provenance: tuple[str, ...]
 
 
-def _minimum_witnesses(variable_count: int, split: str) -> int:
-    if split not in {"discovery", "validation"}:
-        raise ValueError(split)
+def _minimum_total_witnesses(variable_count: int) -> int:
+    """Evidence mass required before a perfectly consistent form saturates.
+
+    Low-arity laws have intrinsically few possible substitutions, so evidence
+    sufficiency is assessed across all complete witnesses rather than demanding
+    an arbitrary minimum inside each witness partition.
+    """
     if variable_count <= 1:
-        return 2 if split == "discovery" else 1
+        return 2
     if variable_count == 2:
-        return 6 if split == "discovery" else 2
-    return 12 if split == "discovery" else 4
+        return 6
+    return 12
 
-
-def _assignment_partition(
+def _assignment_code(
     assignment: Sequence[Element],
     index: Mapping[Element, int],
-) -> str:
-    """Deterministic 3:1 witness split independent of Python hash randomization."""
-    code = sum((position + 3) * (index[value] + 1) for position, value in enumerate(assignment))
-    return "validation" if code % 4 == 0 else "discovery"
+) -> int:
+    return sum(
+        (position + 3) * (index[value] + 1)
+        for position, value in enumerate(assignment)
+    )
 
 
 def _evidence_for_form(
     form: CandidateForm,
     elements: Sequence[Element],
     table: Mapping[Pair, Element],
-) -> tuple[Evidence, Evidence]:
+) -> tuple[Evidence, Evidence, float]:
+    """Return disjoint witness evidence and a fuzzy support membership.
+
+    Complete witnesses are first collected without looking at whether they
+    agree. They are then deterministically ordered by assignment identity and
+    split 3:1, guaranteeing a validation witness whenever at least two complete
+    witnesses exist. This avoids suppressing true low-arity laws merely because
+    missing table cells happened to empty one fixed hash bucket.
+    """
     index = {value: i for i, value in enumerate(elements)}
-    counts = {
-        "discovery": [0, 0],
-        "validation": [0, 0],
-    }
+    witnessed: list[tuple[int, bool]] = []
 
     for values in product(elements, repeat=len(form.variables)):
         env = dict(zip(form.variables, values))
@@ -263,23 +272,40 @@ def _evidence_for_form(
         right = evaluate(form.right, env, table)
         if left is None or right is None:
             continue
-        split = _assignment_partition(values, index)
-        if left == right:
-            counts[split][0] += 1
-        else:
-            counts[split][1] += 1
+        witnessed.append(
+            (_assignment_code(values, index), left == right)
+        )
 
-    discovery = Evidence(
-        positive=counts["discovery"][0],
-        negative=counts["discovery"][1],
-        minimum_witnesses=_minimum_witnesses(len(form.variables), "discovery"),
+    witnessed.sort(key=lambda item: item[0])
+    total = len(witnessed)
+    if total < 2:
+        empty = Evidence(0, 0, 1)
+        return empty, empty, 0.0
+
+    validation_n = max(1, total // 4)
+    validation_rows = witnessed[:validation_n]
+    discovery_rows = witnessed[validation_n:]
+
+    def summarize(rows: Sequence[tuple[int, bool]]) -> Evidence:
+        positive = sum(int(ok) for _code, ok in rows)
+        negative = len(rows) - positive
+        return Evidence(
+            positive=positive,
+            negative=negative,
+            minimum_witnesses=1,
+        )
+
+    discovery = summarize(discovery_rows)
+    validation = summarize(validation_rows)
+
+    minimum_total = _minimum_total_witnesses(len(form.variables))
+    mass = min(1.0, total / minimum_total)
+    consistency = min(
+        discovery.consistency,
+        validation.consistency,
     )
-    validation = Evidence(
-        positive=counts["validation"][0],
-        negative=counts["validation"][1],
-        minimum_witnesses=_minimum_witnesses(len(form.variables), "validation"),
-    )
-    return discovery, validation
+    membership = mass * consistency
+    return discovery, validation, membership
 
 
 class CortexFuzzyLawInducer:
@@ -328,14 +354,21 @@ class CortexFuzzyLawInducer:
     def _score_forms(self) -> tuple[FuzzyLaw, ...]:
         out: list[FuzzyLaw] = []
         for form in self.forms:
-            discovery, validation = _evidence_for_form(
+            discovery, validation, joint_membership = _evidence_for_form(
                 form,
                 self.elements,
                 self.observed,
             )
-            membership = discovery.membership
-            if self.use_validation:
-                membership = min(membership, validation.membership)
+            membership = joint_membership
+            if not self.use_validation:
+                total = discovery.total + validation.total
+                minimum_total = _minimum_total_witnesses(
+                    len(form.variables)
+                )
+                mass = min(1.0, total / minimum_total)
+                positive = discovery.positive + validation.positive
+                consistency = positive / max(1, total)
+                membership = mass * consistency
             score = membership - self.complexity_penalty * form.complexity
             active = membership >= self.membership_threshold
             out.append(
