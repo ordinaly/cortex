@@ -235,20 +235,24 @@ def _minimum_discovery_witnesses(variable_count: int) -> int:
     return 12
 
 
-def _minimum_validation_predictions(variable_count: int) -> int:
-    return 1 if variable_count <= 2 else 2
+def _minimum_validation_predictions(_variable_count: int) -> int:
+    return 2
 
 
-def _split_law_tables(
+def _fold_tables(
     elements: Sequence[Element],
     observed: Mapping[Pair, Element],
-) -> tuple[Table, Table]:
-    """Split observed cells without inspecting their output values.
+    *,
+    folds: int = 4,
+) -> tuple[tuple[Table, Table], ...]:
+    """Deterministic cell-wise cross-validation folds.
 
-    Roughly one quarter of the externally observed table is held aside for
-    predictive law validation. The remaining cells are the only cells visible
-    while equation forms are structurally scored.
+    Fold membership depends only on cell identity, never on the observed
+    operation value. Across the folds, every observed cell is predicted once
+    from the remaining cells.
     """
+    if folds < 2:
+        raise ValueError("folds must be >= 2")
     index = {value: i for i, value in enumerate(elements)}
     ranked = sorted(
         observed,
@@ -257,21 +261,25 @@ def _split_law_tables(
             pair,
         ),
     )
-    validation_pairs = {
-        pair
-        for position, pair in enumerate(ranked)
-        if position % 4 == 0
-    }
-    discovery = {
-        pair: value
-        for pair, value in observed.items()
-        if pair not in validation_pairs
-    }
-    validation = {
-        pair: observed[pair]
-        for pair in validation_pairs
-    }
-    return discovery, validation
+
+    out: list[tuple[Table, Table]] = []
+    for fold in range(folds):
+        validation_pairs = {
+            pair
+            for position, pair in enumerate(ranked)
+            if position % folds == fold
+        }
+        train = {
+            pair: value
+            for pair, value in observed.items()
+            if pair not in validation_pairs
+        }
+        validation = {
+            pair: observed[pair]
+            for pair in validation_pairs
+        }
+        out.append((train, validation))
+    return tuple(out)
 
 
 def _structural_evidence(
@@ -322,24 +330,24 @@ def _proposal_map(
     return proposals
 
 
-def _predictive_evidence(
+def _crossfit_predictive_evidence(
     form: CandidateForm,
     elements: Sequence[Element],
-    discovery: Mapping[Pair, Element],
-    validation: Mapping[Pair, Element],
+    observed: Mapping[Pair, Element],
 ) -> Evidence:
-    proposals = _proposal_map(form, elements, discovery)
     positive = 0
     negative = 0
 
-    for pair, truth in validation.items():
-        values = proposals.get(pair)
-        if not values:
-            continue
-        if len(values) == 1 and next(iter(values)) == truth:
-            positive += 1
-        else:
-            negative += 1
+    for train, validation in _fold_tables(elements, observed):
+        proposals = _proposal_map(form, elements, train)
+        for pair, truth in validation.items():
+            values = proposals.get(pair)
+            if not values:
+                continue
+            if len(values) == 1 and next(iter(values)) == truth:
+                positive += 1
+            else:
+                negative += 1
 
     return Evidence(
         positive=positive,
@@ -347,6 +355,106 @@ def _predictive_evidence(
         minimum_witnesses=_minimum_validation_predictions(
             len(form.variables)
         ),
+    )
+
+
+def _close_forms(
+    elements: Sequence[Element],
+    initial: Mapping[Pair, Element],
+    forms: Sequence[CandidateForm],
+) -> tuple[Table, dict[Pair, tuple[str, ...]], int, int]:
+    completed = dict(initial)
+    provenance: dict[Pair, tuple[str, ...]] = {}
+    conflicts = 0
+    rounds = 0
+    max_rounds = len(elements) ** 2 + 2
+
+    while True:
+        rounds += 1
+        proposals: dict[Pair, list[tuple[Element, str]]] = {}
+
+        for form in forms:
+            for values in product(elements, repeat=len(form.variables)):
+                env = dict(zip(form.variables, values))
+                left = evaluate(form.left, env, completed)
+                right = evaluate(form.right, env, completed)
+
+                if left is not None and right is not None:
+                    if left != right:
+                        conflicts += 1
+                    continue
+
+                if left is None and right is not None:
+                    pair = root_missing_pair(form.left, env, completed)
+                    if pair is not None:
+                        proposals.setdefault(pair, []).append(
+                            (right, form.key)
+                        )
+                elif right is None and left is not None:
+                    pair = root_missing_pair(form.right, env, completed)
+                    if pair is not None:
+                        proposals.setdefault(pair, []).append(
+                            (left, form.key)
+                        )
+
+        changed = False
+        for pair, candidates in sorted(proposals.items()):
+            values = {value for value, _key in candidates}
+            if len(values) != 1:
+                conflicts += 1
+                continue
+            if pair in completed:
+                continue
+            value = next(iter(values))
+            keys = tuple(sorted({
+                key
+                for candidate, key in candidates
+                if candidate == value
+            }))
+            completed[pair] = value
+            provenance[pair] = keys
+            changed = True
+
+        if not changed:
+            break
+        if rounds > max_rounds:
+            raise RuntimeError("form closure did not converge")
+
+    return completed, provenance, conflicts, rounds
+
+
+def _crossfit_lawset_evidence(
+    forms: Sequence[CandidateForm],
+    elements: Sequence[Element],
+    observed: Mapping[Pair, Element],
+) -> tuple[Evidence, int]:
+    positive = 0
+    negative = 0
+    conflicts = 0
+
+    for train, validation in _fold_tables(elements, observed):
+        completed, _provenance, fold_conflicts, _rounds = _close_forms(
+            elements,
+            train,
+            forms,
+        )
+        conflicts += fold_conflicts
+        for pair, truth in validation.items():
+            prediction = completed.get(pair)
+            if prediction is None:
+                continue
+            if prediction == truth:
+                positive += 1
+            else:
+                negative += 1
+
+    return (
+        Evidence(
+            positive=positive,
+            negative=negative,
+            minimum_witnesses=2,
+        ),
+        conflicts,
     )
 
 
@@ -381,15 +489,37 @@ class CortexFuzzyLawInducer:
         self.max_active_laws = max_active_laws
         self.use_validation = use_validation
 
-        self.discovery_table, self.law_validation_table = _split_law_tables(
-            self.elements,
-            self.observed,
-        )
         self.forms = equation_forms(max_ops_per_expression)
         self.laws = self._score_forms()
         eligible = [law for law in self.laws if law.active]
-        eligible.sort(key=lambda law: (-law.score, law.form.complexity, law.form.key))
-        self.active_laws = tuple(eligible[:max_active_laws])
+        eligible.sort(
+            key=lambda law: (
+                -law.score,
+                law.form.complexity,
+                law.form.key,
+            )
+        )
+
+        if self.use_validation:
+            accepted: list[FuzzyLaw] = []
+            for law in eligible[: max_active_laws * 2]:
+                if len(accepted) >= max_active_laws:
+                    break
+                trial = [item.form for item in accepted] + [law.form]
+                evidence, conflicts = _crossfit_lawset_evidence(
+                    trial,
+                    self.elements,
+                    self.observed,
+                )
+                if (
+                    conflicts == 0
+                    and evidence.negative == 0
+                    and evidence.membership >= self.membership_threshold
+                ):
+                    accepted.append(law)
+            self.active_laws = tuple(accepted)
+        else:
+            self.active_laws = tuple(eligible[:max_active_laws])
 
         self.completed = dict(self.observed)
         self.provenance: dict[Pair, tuple[str, ...]] = {}
@@ -403,13 +533,12 @@ class CortexFuzzyLawInducer:
             discovery = _structural_evidence(
                 form,
                 self.elements,
-                self.discovery_table,
+                self.observed,
             )
-            validation = _predictive_evidence(
+            validation = _crossfit_predictive_evidence(
                 form,
                 self.elements,
-                self.discovery_table,
-                self.law_validation_table,
+                self.observed,
             )
             membership = discovery.membership
             if self.use_validation:
@@ -468,56 +597,16 @@ class CortexFuzzyLawInducer:
     def close(self) -> None:
         if self._closed:
             return
-
-        max_rounds = len(self.elements) ** 2 + 2
-        while True:
-            self.rounds += 1
-            proposals: dict[Pair, list[tuple[Element, str]]] = {}
-
-            for law in self.active_laws:
-                form = law.form
-                for values in product(self.elements, repeat=len(form.variables)):
-                    env = dict(zip(form.variables, values))
-                    left = evaluate(form.left, env, self.completed)
-                    right = evaluate(form.right, env, self.completed)
-
-                    if left is not None and right is not None:
-                        if left != right:
-                            self.conflicts += 1
-                        continue
-
-                    if left is None and right is not None:
-                        pair = root_missing_pair(form.left, env, self.completed)
-                        if pair is not None:
-                            proposals.setdefault(pair, []).append(
-                                (right, form.key)
-                            )
-                    elif right is None and left is not None:
-                        pair = root_missing_pair(form.right, env, self.completed)
-                        if pair is not None:
-                            proposals.setdefault(pair, []).append(
-                                (left, form.key)
-                            )
-
-            changed = False
-            for pair, candidates in sorted(proposals.items()):
-                values = {value for value, _key in candidates}
-                if len(values) != 1:
-                    self.conflicts += 1
-                    continue
-                if pair in self.completed:
-                    continue
-                value = next(iter(values))
-                keys = tuple(sorted({key for candidate, key in candidates if candidate == value}))
-                self.completed[pair] = value
-                self.provenance[pair] = keys
-                changed = True
-
-            if not changed:
-                break
-            if self.rounds > max_rounds:
-                raise RuntimeError("form closure did not converge")
-
+        (
+            self.completed,
+            self.provenance,
+            self.conflicts,
+            self.rounds,
+        ) = _close_forms(
+            self.elements,
+            self.observed,
+            [law.form for law in self.active_laws],
+        )
         self._closed = True
 
     def infer(self, a: Element, b: Element) -> FormInference:
