@@ -99,13 +99,11 @@ Support truncation was behaviorally safe but much less economically useful. Even
 
 ### Current bottleneck
 
-The v1.13-R stage-attribution campaign reports perceptual responsibility computation as the dominant fused research stage:
+v1.14-R implemented the exact optimization identified by the v1.13-R profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and its profiled share fell from about **48.9%** to **2.2%**, with zero structural disagreements.
 
-- 72 anchors: about **51.0%**;
-- 144 anchors: about **54.0%**;
-- 288 anchors: about **48.9%**.
+The new dominant stage is **cache refresh**, about **45.5%** of the 288-anchor fused research step. Candidate readout is second at about **21%**.
 
-The next research optimization should therefore be exact before approximate: avoid renormalizing stored anchors that the field constructor has already normalized.
+The next research engineering step is therefore **cache-refresh attribution/decomposition** before choosing another optimization.
 
 ## Next milestones
 
