@@ -210,7 +210,13 @@ class Evidence:
         return self.consistency * self.evidence_mass
 
 
-LawScope = tuple[tuple[str, frozenset[Element]], ...]
+@dataclass(frozen=True)
+class LawScope:
+    unary: tuple[tuple[str, frozenset[Element]], ...]
+    pairwise: tuple[
+        tuple[str, str, frozenset[tuple[Element, Element]]],
+        ...
+    ]
 
 
 @dataclass(frozen=True)
@@ -296,26 +302,52 @@ def _positive_scope(
 ) -> LawScope:
     """Empirical applicability basin for a candidate equation.
 
-    A variable value enters the basin only after appearing in at least one
-    complete *positive* witness for that variable role. This keeps a locally
-    valid identity from being extrapolated to element values for which the
-    partial table supplied no supporting witness.
+    Every law keeps marginal support for each variable role. Three-variable
+    laws additionally keep pairwise support, preventing independently supported
+    marginals from being recombined into substitutions that were never jointly
+    witnessed. One- and two-variable laws retain marginal scope so genuinely
+    universal binary forms can still extrapolate to unseen pairs.
     """
-    supported = {
+    unary = {
         name: set()
         for name in form.variables
     }
+    pairwise = {}
+    if len(form.variables) >= 3:
+        pairwise = {
+            (left, right): set()
+            for index, left in enumerate(form.variables)
+            for right in form.variables[index + 1 :]
+        }
+
     for values in product(elements, repeat=len(form.variables)):
         env = dict(zip(form.variables, values))
         left = evaluate(form.left, env, table)
         right = evaluate(form.right, env, table)
         if left is None or right is None or left != right:
             continue
+
         for name, value in env.items():
-            supported[name].add(value)
-    return tuple(
-        (name, frozenset(supported[name]))
-        for name in form.variables
+            unary[name].add(value)
+        for (left_name, right_name), supported in pairwise.items():
+            supported.add(
+                (env[left_name], env[right_name])
+            )
+
+    return LawScope(
+        unary=tuple(
+            (name, frozenset(unary[name]))
+            for name in form.variables
+        ),
+        pairwise=tuple(
+            (
+                left_name,
+                right_name,
+                frozenset(supported),
+            )
+            for (left_name, right_name), supported
+            in pairwise.items()
+        ),
     )
 
 
@@ -323,9 +355,14 @@ def _scope_allows(
     scope: LawScope,
     env: Mapping[str, Element],
 ) -> bool:
-    return all(
+    if not all(
         env[name] in allowed
-        for name, allowed in scope
+        for name, allowed in scope.unary
+    ):
+        return False
+    return all(
+        (env[left_name], env[right_name]) in allowed
+        for left_name, right_name, allowed in scope.pairwise
     )
 
 
@@ -333,12 +370,12 @@ def _scope_fraction(
     scope: LawScope,
     elements: Sequence[Element],
 ) -> float:
-    if not scope:
+    if not scope.unary:
         return 0.0
     return sum(
         len(allowed) / len(elements)
-        for _name, allowed in scope
-    ) / len(scope)
+        for _name, allowed in scope.unary
+    ) / len(scope.unary)
 
 
 def _structural_evidence(
