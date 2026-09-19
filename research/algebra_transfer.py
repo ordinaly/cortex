@@ -41,10 +41,11 @@ class TransferPrior:
 
     @property
     def strength(self) -> float:
+        # Transfer carries confidence in the *form*, not source-world
+        # applicability. Predictive applicability must be re-earned on target.
         return min(
             self.source_support_rate,
             self.mean_structural_membership,
-            self.mean_predictive_membership,
         )
 
 
@@ -95,7 +96,7 @@ def build_transfer_library(
         supported = {
             law.form.key: law
             for law in model.laws
-            if law.active and law.predictive_active
+            if law.active
         }
         for key, law in supported.items():
             forms[key] = law.form
@@ -123,8 +124,6 @@ def build_transfer_library(
         ) / selected_worlds
 
         if structural < minimum_source_membership:
-            continue
-        if predictive < minimum_source_membership:
             continue
 
         priors.append(
