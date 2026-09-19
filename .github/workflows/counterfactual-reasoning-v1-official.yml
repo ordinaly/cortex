@@ -1,0 +1,37 @@
+name: cortex-counterfactual-reasoning-v1-official
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "research/counterfactual_reasoning*.py"
+      - "tests/test_counterfactual_reasoning.py"
+      - "docs/COUNTERFACTUAL_REASONING_V1_PROTOCOL.md"
+      - ".github/workflows/counterfactual-reasoning-v1-official.yml"
+
+jobs:
+  official:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: \${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run frozen counterfactual reasoning v1 campaign
+        run: >-
+          python research/counterfactual_reasoning_campaign.py
+          --output counterfactual-reasoning-v1.jsonl
+      - name: Enforce frozen counterfactual reasoning v1 gates
+        run: >-
+          python research/counterfactual_reasoning_gate.py
+          counterfactual-reasoning-v1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-counterfactual-reasoning-v1
+          path: counterfactual-reasoning-v1.jsonl
