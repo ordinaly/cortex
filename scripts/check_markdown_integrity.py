@@ -15,6 +15,7 @@ MARKDOWN_FILES = sorted(
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 FENCE_RE = re.compile(r"^\s*\x60\x60\x60")
 DISPLAY_MATH_RE = re.compile(r"^\s*\$\$\s*$")
+SINGLE_DOLLAR_RE = re.compile(r"^\s*\$\s*$")
 LEGACY_DISPLAY_RE = re.compile(r"^\s*\\[\[\]]\s*$")
 LITERAL_BRACKET_RE = re.compile(r"^\s*[\[\]]\s*$")
 TABLE_LINE_RE = re.compile(r"^\s*\|.*\|\s*$")
