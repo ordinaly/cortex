@@ -1,8 +1,8 @@
-"""Revised official gates for algebra-form-induction-v1.6.
+"""Revised official gates for algebra-form-induction-v1.7.
 
 The original v1 preflight low-coverage hypothesis for the subtraction control was
 retired after unit characterization showed that a non-associative operation can
-still satisfy other exact short identities. The v1.1 official campaign then exposed a second issue: per-partition witness minima suppressed true low-arity laws. v1.2 fixed that failure but admitted sparse-fit forms that did not generalize predictively. v1.3 added a single held-aside predictive split, which removed random-magma false closure but remained sparse and allowed adverse multi-law interactions. v1.4 used four-fold cross-fitted predictive evidence plus joint law-set validation, but still over-generalized locally supported dihedral identities beyond their witnessed element values. v1.5 added an empirical applicability basin per variable role, which fixed unsafe dihedral extrapolation but conflated structural form discovery with predictive applicability for low-arity laws. v1.6 separates structural membership from predictive activation: a law form may be discovered while remaining inapplicable to unsupported substitutions. All negative results are preserved.
+still satisfy other exact short identities. The v1.1 official campaign then exposed a second issue: per-partition witness minima suppressed true low-arity laws. v1.2 fixed that failure but admitted sparse-fit forms that did not generalize predictively. v1.3 added a single held-aside predictive split, which removed random-magma false closure but remained sparse and allowed adverse multi-law interactions. v1.4 used four-fold cross-fitted predictive evidence plus joint law-set validation, but still over-generalized locally supported dihedral identities beyond their witnessed element values. v1.5 added an empirical applicability basin per variable role, which fixed unsafe dihedral extrapolation but conflated structural form discovery with predictive applicability for low-arity laws. v1.6 separated structural membership from predictive activation, but a dry-run still found one random-magma false deduction from a three-variable identity whose marginal scopes were individually supported but never jointly witnessed. v1.7 keeps marginal scope for one- and two-variable laws and adds pairwise applicability scope for three-variable laws. All negative results are preserved.
 """
 from __future__ import annotations
 
@@ -90,6 +90,10 @@ def main() -> None:
         "random_magma_low_coverage": metric(
             "random-magma-6", "coverage"
         ) <= 0.10,
+        "random_magma_zero_resolved_predictions": max(
+            row["metrics"]["cortex-fuzzy"]["resolved"]
+            for row in by_family["random-magma-6"]
+        ) == 0,
         "random_magma_no_rebracketing": pattern_rate(
             "random-magma-6", "rebracket"
         ) <= 0.05,
