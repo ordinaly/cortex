@@ -2,7 +2,7 @@
 
 Status: **frozen protocol / official campaign passed**.
 
-Protocol ID: \`counterfactual-reasoning-v1\`.
+Protocol ID: `counterfactual-reasoning-v1`.
 
 This is the first experiment in the broader **Cortex Reasoning Map v1**
 campaign. It follows the passing algebraic form-discovery and cross-world
@@ -439,10 +439,10 @@ claim.
 
 ## Planned files
 
-- \`research/counterfactual_reasoning.py\`
-- \`research/counterfactual_reasoning_campaign.py\`
-- \`research/counterfactual_reasoning_gate.py\`
-- \`tests/test_counterfactual_reasoning.py\`
+- `research/counterfactual_reasoning.py`
+- `research/counterfactual_reasoning_campaign.py`
+- `research/counterfactual_reasoning_gate.py`
+- `tests/test_counterfactual_reasoning.py`
 
 The official campaign must not be run until unit preflight is green.
 
@@ -466,6 +466,6 @@ The untouched official campaign on seeds 100–119 passed all frozen gates
 across 140 worlds.
 
 See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md) and
-[\`benchmarks/results/counterfactual_reasoning_v1_summary.json\`](../benchmarks/results/counterfactual_reasoning_v1_summary.json).
+[`benchmarks/results/counterfactual_reasoning_v1_summary.json`](../benchmarks/results/counterfactual_reasoning_v1_summary.json).
 
 The frozen thresholds above were not weakened after evaluation.
