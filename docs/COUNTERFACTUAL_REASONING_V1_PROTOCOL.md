@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Structural Counterfactual Reasoning
 
-Status: **frozen protocol / official campaign not yet run**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: \`counterfactual-reasoning-v1\`.
 
@@ -458,3 +458,14 @@ A passing result would support:
 
 It would not establish full causal discovery, hidden-confounder reasoning, or
 unit-level structural-equation counterfactual inference.
+
+
+## Official outcome
+
+The untouched official campaign on seeds 100–119 passed all frozen gates
+across 140 worlds.
+
+See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md) and
+[\`benchmarks/results/counterfactual_reasoning_v1_summary.json\`](../benchmarks/results/counterfactual_reasoning_v1_summary.json).
+
+The frozen thresholds above were not weakened after evaluation.
