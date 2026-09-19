@@ -57,7 +57,18 @@ This demonstrates multi-hop relational inference in the tested synthetic worlds.
 
 A separate structured logical-composition campaign, `kinship-composition-v1`, then trained Cortex only on solved paths of length 1–5 and tested unseen entities and unseen graph instances at lengths 6–10. Relation and answer symbols were randomly permuted per seed. Across 20 seeds, Cortex achieved **1.000 accuracy and 1.000 coverage**. Exact sequence memorization had zero test coverage and a last-relation baseline achieved **0.222 accuracy**. A hand-engineered clipped-count symbolic baseline also achieved 1.000, so the result demonstrates systematic recursive composition but does not yet establish a Cortex-specific advantage.
 
-When one required composition transition was removed from the training examples, Cortex remained unresolved on all queries requiring it. This is the intended epistemic behavior and also a limitation: the current algebra applies learned rules recursively; it does not yet infer an entirely unobserved rule from analogy.
+When one required composition transition was removed from the training examples, Cortex remained unresolved on all queries requiring it. That limitation motivated `algebra-induction-v1`.
+
+In the follow-up campaign, 40% of finite operation tables were hidden before training. Element symbols were randomly permuted and Cortex was not told the generating algebra. It scored a preregistered candidate-law set—associativity, commutativity and a unique two-sided identity—and used only sufficiently supported laws for closure.
+
+Across 20 seeds per family:
+- cyclic C7: **0.985 coverage / 1.000 resolved accuracy**;
+- dihedral D4: **1.000 coverage / 1.000 resolved accuracy**;
+- non-associative subtraction mod 7: **0.000 coverage**, because no candidate law passed the evidence gate.
+
+Associativity was discovered on every group seed and rejected on every non-associative control seed. Commutativity was correctly rejected on every D4 seed. Identity evidence was sufficient on 95% of D4 seeds; that measured miss is retained without threshold adjustment.
+
+See [ALGEBRA_INDUCTION_V1.md](ALGEBRA_INDUCTION_V1.md).
 
 ### Adaptive predictive resolution
 
@@ -115,18 +126,20 @@ Required gates:
 - re-run fused-stage attribution;
 - scale at least through 288 anchors.
 
-### 2. Extend logical reasoning beyond the first kinship gate
+### 2. Move from candidate-law induction to law-form discovery
 
-The first structured kinship-composition gate is now passed for depth extrapolation. The next discriminator should be harder:
+The first kinship depth-extrapolation gate and the first held-out algebra-law gate are now passed.
 
-- train on fewer/local composition laws and test held-out rule induction;
-- introduce contradictory/noisy evidence and measure calibrated unresolved behavior;
-- allow multiple competing relational paths;
-- test inverse/reversed queries;
-- compare directly against neural and GNN baselines on exactly the same structured input;
-- then move to natural-language CLUTRR-style stories, where parsing and reasoning can be scored separately.
+The next logical-reasoning discriminator should remove another piece of prior structure:
 
-The current result supports **systematic relational composition on the declared finite algebra**, not universal logic and not superiority over neural methods.
+- search over a bounded grammar of equation forms instead of supplying associativity/commutativity/identity explicitly;
+- score candidate laws prequentially or by predictive compression;
+- introduce contradictory/noisy evidence and require calibrated rejection;
+- allow multiple competing proof paths and inspect proof consistency;
+- compare directly against neural, GNN and symbolic baselines on exactly the same partial tables;
+- then connect the induced law system back to relational graphs and natural-language tasks.
+
+The current result supports **evidence-gated candidate-law induction and exact algebraic closure on the declared fixtures**, not unrestricted mathematical discovery or superiority over neural methods.
 
 ### 3. Re-profile after exact perception optimization
 
