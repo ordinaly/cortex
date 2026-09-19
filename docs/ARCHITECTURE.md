@@ -1812,6 +1812,8 @@ It is designed around the idea that **structure should be earned by evidence and
 For current project state and roadmap:
 
 - [PROJECT_STATUS.md](PROJECT_STATUS.md)
+- [PROJECT_MILESTONES.md](PROJECT_MILESTONES.md)
+- [REASONING_MAP_V1.md](REASONING_MAP_V1.md)
 
 For the frozen behavioral contract:
 
