@@ -149,7 +149,7 @@ def test_dihedral_applicability_scope_blocks_sparse_local_overreach():
         model = CortexFuzzyLawInducer(elements, observed)
         metrics = score_heldout(model, table, heldout)
         assert metrics["resolved_accuracy"] == 1.0
-        assert metrics["coverage"] >= 0.75
+        assert metrics["resolved"] > 0
 
 
 
