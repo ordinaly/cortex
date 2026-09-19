@@ -1,4 +1,4 @@
-"""Prepared campaign for algebra-transfer-v1.5.
+"""Prepared campaign for algebra-transfer-v1.6.
 
 The protocol is frozen in docs/ALGEBRA_TRANSFER_V1_PROTOCOL.md.
 This module is prepared for the official campaign but is not wired into the
@@ -36,7 +36,7 @@ from algebra_transfer import (
 
 
 SOURCE_SEEDS_PER_ORDER = 4
-TARGET_SEEDS = 10
+TARGET_SEED_VALUES = tuple(range(100, 110))
 SOURCE_HOLDOUT = 0.40
 TARGET_OBSERVED_FRACTIONS = (0.20, 0.30, 0.40)
 CONTROL_OBSERVED_FRACTION = 0.30
@@ -208,7 +208,7 @@ def compatible_row(
     scratch.close()
 
     return {
-        "protocol": "algebra-transfer-v1.5",
+        "protocol": "algebra-transfer-v1.6",
         "kind": "compatible",
         "family": family,
         "seed": seed,
@@ -224,6 +224,14 @@ def compatible_row(
             transfer.structurally_supported_keys()
         ),
         "transfer_selected": len(transfer.active_laws),
+        "transfer_selected_keys": sorted(transfer.selected_keys()),
+        "transfer_selection_mode": transfer.selection_mode,
+        "transfer_hypothesis_budget": transfer.hypothesis_budget,
+        "transfer_required_predictions": transfer.required_predictions,
+        "transfer_validation_positive": transfer.joint_validation.positive,
+        "transfer_validation_negative": transfer.joint_validation.negative,
+        "transfer_validation_membership": transfer.joint_validation.membership,
+        "transfer_validation_conflicts": transfer.joint_validation_conflicts,
         "scratch_supported": len(scratch.active_keys()),
         "scratch_selected": len(scratch.active_laws),
         "transfer_conflicts": transfer.conflicts,
@@ -271,7 +279,7 @@ def control_row(
     rebracket_key = pattern_keys()["rebracket"]
 
     return {
-        "protocol": "algebra-transfer-v1.5",
+        "protocol": "algebra-transfer-v1.6",
         "kind": control,
         "library_name": library_name,
         "seed": seed,
@@ -285,6 +293,14 @@ def control_row(
             transfer.structurally_supported_keys()
         ),
         "transfer_selected": len(transfer.active_laws),
+        "transfer_selected_keys": sorted(transfer.selected_keys()),
+        "transfer_selection_mode": transfer.selection_mode,
+        "transfer_hypothesis_budget": transfer.hypothesis_budget,
+        "transfer_required_predictions": transfer.required_predictions,
+        "transfer_validation_positive": transfer.joint_validation.positive,
+        "transfer_validation_negative": transfer.joint_validation.negative,
+        "transfer_validation_membership": transfer.joint_validation.membership,
+        "transfer_validation_conflicts": transfer.joint_validation_conflicts,
         "rebracket_selected": (
             rebracket_key in transfer.selected_keys()
         ),
@@ -313,7 +329,7 @@ def campaign(output: Path) -> dict:
 
     for family, algebra in target_specs().items():
         for fraction in TARGET_OBSERVED_FRACTIONS:
-            for seed in range(TARGET_SEEDS):
+            for seed in TARGET_SEED_VALUES:
                 rows.append(
                     compatible_row(
                         family=family,
@@ -327,7 +343,7 @@ def campaign(output: Path) -> dict:
                 )
 
     for library_name, library in libraries.items():
-        for seed in range(TARGET_SEEDS):
+        for seed in TARGET_SEED_VALUES:
             rows.append(
                 control_row(
                     control="random-control",
@@ -342,7 +358,7 @@ def campaign(output: Path) -> dict:
                 )
             )
 
-    for seed in range(TARGET_SEEDS):
+    for seed in TARGET_SEED_VALUES:
         rows.append(
             control_row(
                 control="subtraction-control",
@@ -389,11 +405,11 @@ def campaign(output: Path) -> dict:
         }
 
     summary = {
-        "protocol": "algebra-transfer-v1.5",
+        "protocol": "algebra-transfer-v1.6",
         "status": "official-campaign-output",
         "compatible_rows": len(compatible),
         "control_rows": len(rows) - len(compatible),
-        "target_seeds": TARGET_SEEDS,
+        "target_seeds": list(TARGET_SEED_VALUES),
         "target_observed_fractions": list(
             TARGET_OBSERVED_FRACTIONS
         ),
@@ -419,7 +435,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("algebra-transfer-v1.5.jsonl"),
+        default=Path("algebra-transfer-v1.6.jsonl"),
     )
     args = parser.parse_args()
     campaign(args.output)
