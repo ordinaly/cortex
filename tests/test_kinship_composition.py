@@ -14,7 +14,7 @@ from kinship_composition import (
     canonical_relation,
     extract_relation_path,
     score,
-    test_examples,
+    test_examples as make_test_examples,
     train_examples,
 )
 
@@ -50,7 +50,7 @@ def test_cortex_composes_beyond_training_depth():
         model.observe_solved(example)
         memory.observe_solved(example)
 
-    test = test_examples(
+    test = make_test_examples(
         seed=9,
         primitive_alias=primitive_alias,
         answer_alias=answer_alias,
@@ -68,7 +68,7 @@ def test_cortex_composes_beyond_training_depth():
 
 def test_unseen_entities_are_disjoint_by_construction():
     train, primitive_alias, answer_alias = train_examples(seed=11)
-    test = test_examples(
+    test = make_test_examples(
         seed=11,
         primitive_alias=primitive_alias,
         answer_alias=answer_alias,
@@ -98,7 +98,7 @@ def test_missing_rule_becomes_unresolved_not_hallucinated():
     for example in train:
         model.observe_solved(example)
 
-    test = test_examples(
+    test = make_test_examples(
         seed=13,
         primitive_alias=primitive_alias,
         answer_alias=answer_alias,
@@ -118,7 +118,7 @@ def test_alias_permutation_does_not_change_logic():
         model = CortexRelationAlgebra()
         for example in train:
             model.observe_solved(example)
-        test = test_examples(
+        test = make_test_examples(
             seed=100 + seed,
             primitive_alias=primitive_alias,
             answer_alias=answer_alias,
