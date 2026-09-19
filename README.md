@@ -20,7 +20,7 @@ Cortex currently has three independent provenance coordinates:
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
-For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary and roadmap, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
 ## Architecture
 
@@ -151,6 +151,8 @@ The next **algebra-form-induction-v1.7** campaign removed that named-law vocabul
 The follow-up **algebra-transfer-v1.6** campaign then tested whether those equation forms survive replacement of the underlying world. On independently relabeled target algebras with different orders, transferred forms improved mean held-out coverage over scratch Cortex by **+0.320 at 20% target evidence**, **+0.486 at 30%**, and **+0.537 at 40%**, while preserving zero wrong resolved compatible predictions and complete abstention on random-magma controls. A failed v1.5 negative-transfer campaign is retained in the research record.
 
 The first **Cortex Reasoning Map v1** campaign, **counterfactual-reasoning-v1**, moved outside algebra. Across 140 untouched causal worlds, Cortex learned intervention-sensitive direct structure, composed unseen multi-hop influence, evaluated temporary edge-removal counterfactuals, preserved redundant paths, returned unresolved on an under-evidenced causal bridge, produced valid causal paths, and restored its base-state fingerprint exactly. The direct evidence was deliberately deterministic, so this establishes the structural reasoning primitive rather than noisy real-world causal discovery. See [docs/COUNTERFACTUAL_REASONING_V1.md](docs/COUNTERFACTUAL_REASONING_V1.md) and [docs/REASONING_MAP_V1.md](docs/REASONING_MAP_V1.md).
+
+The second Reasoning Map campaign, **belief-revision-v1**, tested cumulative contradiction and recovery on a causal belief embedded in the only route through a small graph. All 60 untouched official cases passed. Retraction latency scaled with prior support at **7 / 14 / 21** contradiction batches for 1 / 2 / 3 initial causal batches, while recovery took **3 / 5 / 7** causal batches. Cortex passed through `unresolved`, resisted a single contradictory batch, remained unresolved under ambiguous evidence, propagated belief state downstream, and preserved unrelated structural evidence exactly. See [docs/BELIEF_REVISION_V1.md](docs/BELIEF_REVISION_V1.md).
 
 ## Hybrid neural/Cortex path
 

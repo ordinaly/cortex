@@ -1356,7 +1356,7 @@ On the hosted 120-case campaign, every structured-family resolved prediction was
 
 ### Cross-world law transfer
 
-\`algebra-transfer-v1.6\` tests whether a discovered canonical equation form can survive replacement of the underlying algebra.
+`algebra-transfer-v1.6` tests whether a discovered canonical equation form can survive replacement of the underlying algebra.
 
 Only the form and aggregate source evidence transfer. Source entity labels, source table cells, and source applicability basins do not.
 
@@ -1366,7 +1366,7 @@ The failed v1.5 negative-transfer campaign is retained because it exposed a mult
 
 ### Structural counterfactual reasoning
 
-\`counterfactual-reasoning-v1\` starts the broader **Cortex Reasoning Map v1** program.
+`counterfactual-reasoning-v1` starts the broader **Cortex Reasoning Map v1** program.
 
 The research prototype mirrors the native intervention/control causal-state thresholds, then constructs:
 
@@ -1406,6 +1406,38 @@ Across 140 untouched worlds, all frozen v1 gates passed: multi-hop composition, 
 The direct-effect evidence in this first campaign is deterministic, so the result establishes the reasoning operation rather than noisy causal discovery.
 
 See [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
+
+### Belief revision under contradiction
+
+`belief-revision-v1` characterizes what the existing cumulative causal sufficient statistics imply when evidence reverses over time.
+
+No decay, sliding window, reset, or dedicated belief-revision controller is added. As contradictory null-effect evidence accumulates, the target causal margin moves through the existing thresholds:
+
+$$
+\text{causal}
+\rightarrow
+\text{unresolved}
+\rightarrow
+\text{null}.
+$$
+
+When causal evidence returns, the same cumulative state reverses through
+
+$$
+\text{null}
+\rightarrow
+\text{unresolved}
+\rightarrow
+\text{causal}.
+$$
+
+Across 60 untouched official cases, initial support strengths 1, 2, and 3 produced retraction latencies of **7, 14, and 21** contradiction batches and recovery latencies of **3, 5, and 7** causal batches respectively. Every case preserved unrelated causal evidence exactly, and the downstream query state followed the local belief as affected → unresolved → unaffected → affected.
+
+This is a research characterization of the cumulative evidence semantics, not a claim that the stable runtime contains a general-purpose epistemic revision controller. The evidence in v1 is deterministic.
+
+The next Reasoning Map axis is structural analogy / isomorphism.
+
+See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md) and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
 
@@ -1780,6 +1812,8 @@ It is designed around the idea that **structure should be earned by evidence and
 For current project state and roadmap:
 
 - [PROJECT_STATUS.md](PROJECT_STATUS.md)
+- [PROJECT_MILESTONES.md](PROJECT_MILESTONES.md)
+- [REASONING_MAP_V1.md](REASONING_MAP_V1.md)
 
 For the frozen behavioral contract:
 

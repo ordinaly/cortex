@@ -113,7 +113,7 @@ The next research target is an exact perceptual fast path using the invariant th
 Two immediate scientific directions are now well motivated:
 
 1. **v1.14-R exact perceptual optimization**, followed by re-profiling;
-2. **Cortex Reasoning Map v1**, with cross-algebra transfer and structural counterfactual reasoning now passed, and belief revision under contradiction next.
+2. **Cortex Reasoning Map v1**, with cross-algebra transfer, structural counterfactual reasoning, and belief revision now passed, and structural analogy/isomorphism next.
 
 The Reasoning Map then proceeds toward structural analogy/isomorphism, latent-concept induction, explicit proof dependency, planning/replanning, and open-world novelty attribution. See [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
@@ -301,3 +301,48 @@ inside the altered structure, preserve epistemic uncertainty when a required
 bridge is unresolved, and return to the exact original state afterward.
 
 See [COUNTERFACTUAL_REASONING_V1.md](COUNTERFACTUAL_REASONING_V1.md).
+
+
+## belief-revision-v1 — cumulative contradiction and recovery
+
+This second Reasoning Map campaign tested whether Cortex's existing cumulative
+causal evidence semantics can revise a strongly supported belief without a
+bespoke decay, reset, or hysteresis controller.
+
+The target edge sat inside the only path $A\rightarrow B\rightarrow C$.
+Twenty untouched seeds (200–219) were evaluated at three initial support
+strengths, producing **60 official cases**.
+
+Every frozen gate passed.
+
+Key results:
+
+- initial active rate: **1.000**;
+- one-contradiction-batch retention: **1.000**;
+- retraction success: **1.000**;
+- ambiguous-evidence unresolved rate: **1.000**;
+- ambiguous false-retraction rate: **0.000**;
+- recovery success: **1.000**;
+- downstream state alignment: **1.000**;
+- contradiction/recovery margin monotonicity: **1.000 / 1.000**;
+- unrelated-structure preservation: **1.000**.
+
+Revision latency scaled exactly with accumulated support:
+
+- prior 1: retraction **7**, recovery **3** batches;
+- prior 2: retraction **14**, recovery **5**;
+- prior 3: retraction **21**, recovery **7**.
+
+The sticky baseline never revised, while the latest-batch baseline retracted
+immediately after one contradictory batch.
+
+Interpretation: in these deterministic fixtures, Cortex exhibits
+evidence-proportional inertia: stronger evidence resists contradiction longer,
+but remains reversible. Revision passes through the explicit unresolved state,
+changes downstream reasoning appropriately, and remains local to the
+contradicted evidence cell.
+
+The result does not yet establish robust belief revision under stochastic or
+adversarial evidence.
+
+See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md).
