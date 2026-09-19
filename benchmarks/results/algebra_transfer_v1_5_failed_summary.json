@@ -1,0 +1,66 @@
+{
+  "protocol": "algebra-transfer-v1.5",
+  "status": "failed-official-campaign",
+  "workflow_run": 35432557177,
+  "rows": 170,
+  "compatible_rows": 120,
+  "random_control_rows": 40,
+  "subtraction_control_rows": 10,
+  "coverage_by_fraction": {
+    "0.2": {
+      "mean_transfer_coverage": 0.5140648567119155,
+      "mean_scratch_coverage": 0.16858974358974357,
+      "mean_coverage_gain": 0.34547511312217194
+    },
+    "0.3": {
+      "mean_transfer_coverage": 0.789983660130719,
+      "mean_scratch_coverage": 0.2246732026143791,
+      "mean_coverage_gain": 0.5653104575163399
+    },
+    "0.4": {
+      "mean_transfer_coverage": 0.8453266787658802,
+      "mean_scratch_coverage": 0.33414246823956445,
+      "mean_coverage_gain": 0.5111842105263158
+    }
+  },
+  "compatible": {
+    "wrong_resolved_total": 0,
+    "closure_conflicts_total": 0
+  },
+  "random_controls": {
+    "resolved_total": 38,
+    "wrong_resolved_total": 22,
+    "resolved_cases": 7,
+    "by_library": {
+      "cyclic": {
+        "resolved_total": 10,
+        "wrong_resolved_total": 4,
+        "resolved_cases": 2
+      },
+      "dihedral": {
+        "resolved_total": 0,
+        "wrong_resolved_total": 0,
+        "resolved_cases": 0
+      },
+      "left-zero": {
+        "resolved_total": 7,
+        "wrong_resolved_total": 6,
+        "resolved_cases": 2
+      },
+      "semilattice": {
+        "resolved_total": 21,
+        "wrong_resolved_total": 12,
+        "resolved_cases": 3
+      }
+    }
+  },
+  "subtraction_controls": {
+    "resolved_total": 264,
+    "wrong_resolved_total": 0,
+    "rebracket_selected_rate": 0
+  },
+  "failed_gates": [
+    "random_controls_zero_wrong",
+    "random_controls_abstain"
+  ]
+}
