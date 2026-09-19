@@ -210,11 +210,15 @@ class Evidence:
         return self.consistency * self.evidence_mass
 
 
+LawScope = tuple[tuple[str, frozenset[Element]], ...]
+
+
 @dataclass(frozen=True)
 class FuzzyLaw:
     form: CandidateForm
     discovery: Evidence
     validation: Evidence
+    scope: LawScope
     membership: float
     score: float
     active: bool
@@ -282,6 +286,58 @@ def _fold_tables(
     return tuple(out)
 
 
+def _positive_scope(
+    form: CandidateForm,
+    elements: Sequence[Element],
+    table: Mapping[Pair, Element],
+) -> LawScope:
+    """Empirical applicability basin for a candidate equation.
+
+    A variable value enters the basin only after appearing in at least one
+    complete *positive* witness for that variable role. This keeps a locally
+    valid identity from being extrapolated to element values for which the
+    partial table supplied no supporting witness.
+    """
+    supported = {
+        name: set()
+        for name in form.variables
+    }
+    for values in product(elements, repeat=len(form.variables)):
+        env = dict(zip(form.variables, values))
+        left = evaluate(form.left, env, table)
+        right = evaluate(form.right, env, table)
+        if left is None or right is None or left != right:
+            continue
+        for name, value in env.items():
+            supported[name].add(value)
+    return tuple(
+        (name, frozenset(supported[name]))
+        for name in form.variables
+    )
+
+
+def _scope_allows(
+    scope: LawScope,
+    env: Mapping[str, Element],
+) -> bool:
+    return all(
+        env[name] in allowed
+        for name, allowed in scope
+    )
+
+
+def _scope_fraction(
+    scope: LawScope,
+    elements: Sequence[Element],
+) -> float:
+    if not scope:
+        return 0.0
+    return sum(
+        len(allowed) / len(elements)
+        for _name, allowed in scope
+    ) / len(scope)
+
+
 def _structural_evidence(
     form: CandidateForm,
     elements: Sequence[Element],
@@ -312,10 +368,15 @@ def _proposal_map(
     form: CandidateForm,
     elements: Sequence[Element],
     table: Mapping[Pair, Element],
+    scope: LawScope | None = None,
 ) -> dict[Pair, set[Element]]:
+    if scope is None:
+        scope = _positive_scope(form, elements, table)
     proposals: dict[Pair, set[Element]] = {}
     for values in product(elements, repeat=len(form.variables)):
         env = dict(zip(form.variables, values))
+        if not _scope_allows(scope, env):
+            continue
         left = evaluate(form.left, env, table)
         right = evaluate(form.right, env, table)
 
@@ -339,7 +400,8 @@ def _crossfit_predictive_evidence(
     negative = 0
 
     for train, validation in _fold_tables(elements, observed):
-        proposals = _proposal_map(form, elements, train)
+        scope = _positive_scope(form, elements, train)
+        proposals = _proposal_map(form, elements, train, scope)
         for pair, truth in validation.items():
             values = proposals.get(pair)
             if not values:
@@ -361,7 +423,7 @@ def _crossfit_predictive_evidence(
 def _close_forms(
     elements: Sequence[Element],
     initial: Mapping[Pair, Element],
-    forms: Sequence[CandidateForm],
+    forms: Sequence[tuple[CandidateForm, LawScope]],
 ) -> tuple[Table, dict[Pair, tuple[str, ...]], int, int]:
     completed = dict(initial)
     provenance: dict[Pair, tuple[str, ...]] = {}
@@ -373,9 +435,11 @@ def _close_forms(
         rounds += 1
         proposals: dict[Pair, list[tuple[Element, str]]] = {}
 
-        for form in forms:
+        for form, scope in forms:
             for values in product(elements, repeat=len(form.variables)):
                 env = dict(zip(form.variables, values))
+                if not _scope_allows(scope, env):
+                    continue
                 left = evaluate(form.left, env, completed)
                 right = evaluate(form.right, env, completed)
 
@@ -433,10 +497,17 @@ def _crossfit_lawset_evidence(
     conflicts = 0
 
     for train, validation in _fold_tables(elements, observed):
+        scoped_forms = [
+            (
+                form,
+                _positive_scope(form, elements, train),
+            )
+            for form in forms
+        ]
         completed, _provenance, fold_conflicts, _rounds = _close_forms(
             elements,
             train,
-            forms,
+            scoped_forms,
         )
         conflicts += fold_conflicts
         for pair, truth in validation.items():
@@ -535,6 +606,11 @@ class CortexFuzzyLawInducer:
                 self.elements,
                 self.observed,
             )
+            scope = _positive_scope(
+                form,
+                self.elements,
+                self.observed,
+            )
             validation = _crossfit_predictive_evidence(
                 form,
                 self.elements,
@@ -556,6 +632,7 @@ class CortexFuzzyLawInducer:
                     form=form,
                     discovery=discovery,
                     validation=validation,
+                    scope=scope,
                     membership=membership,
                     score=score,
                     active=active,
@@ -590,6 +667,10 @@ class CortexFuzzyLawInducer:
                 "discovery_negative": law.discovery.negative,
                 "validation_positive": law.validation.positive,
                 "validation_negative": law.validation.negative,
+                "scope_fraction": _scope_fraction(
+                    law.scope,
+                    self.elements,
+                ),
             }
             for law in ranked[:limit]
         ]
@@ -605,7 +686,10 @@ class CortexFuzzyLawInducer:
         ) = _close_forms(
             self.elements,
             self.observed,
-            [law.form for law in self.active_laws],
+            [
+                (law.form, law.scope)
+                for law in self.active_laws
+            ],
         )
         self._closed = True
 
