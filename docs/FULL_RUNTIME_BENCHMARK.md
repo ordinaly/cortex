@@ -116,4 +116,4 @@ This campaign does not establish that Cortex is always ~131× faster in Rust. Th
 - hardware and allocator behavior;
 - whether the caller is Python, native Rust, or another FFI client.
 
-The next performance work should therefore be a controlled scaling campaign across declared resource axes, with p50/p95/p99 latency, memory, and semantic correctness measured together. Optimization should target only bottlenecks that appear in those profiles.
+At the time of this benchmark, the next planned performance step was a controlled scaling campaign across declared resource axes. That follow-up has now been completed; see [NATIVE_SCALING_SWEEP_V1.md](NATIVE_SCALING_SWEEP_V1.md), [NATIVE_STAGE_ATTRIBUTION.md](NATIVE_STAGE_ATTRIBUTION.md), and [ARTICULATION_ATTRIBUTION.md](ARTICULATION_ATTRIBUTION.md). Those later measurements, rather than this initial benchmark, define the current native optimization target.
