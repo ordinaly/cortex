@@ -105,6 +105,9 @@ def integer_edges(family: str, seed: int) -> set[tuple[int, int]]:
             for right in range(left + 1, 8):
                 if (left, right) in edges:
                     continue
+                if (left, right) == (0, 2):
+                    # Preserve at least one genuinely multi-hop query.
+                    continue
                 if rng.random() < 0.22:
                     edges.add((left, right))
         return edges
