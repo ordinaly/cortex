@@ -205,7 +205,7 @@ class CortexTransferredLawInducer:
         eligible = [
             law
             for law in self.laws
-            if law.predictive_active
+            if law.active
         ]
         eligible.sort(
             key=lambda law: (
@@ -215,27 +215,91 @@ class CortexTransferredLawInducer:
             )
         )
 
-        accepted: list[TransferLaw] = []
-        for law in eligible[: maximum_active_laws * 2]:
-            if len(accepted) >= maximum_active_laws:
-                break
-            trial_forms = [
-                item.prior.form
-                for item in accepted
-            ] + [law.prior.form]
+        candidates = list(
+            eligible[:maximum_active_laws]
+        )
+        self.joint_validation = Evidence(
+            positive=0,
+            negative=0,
+            minimum_witnesses=2,
+        )
+        self.joint_validation_conflicts = 0
+
+        while candidates:
             evidence, conflicts = _crossfit_lawset_evidence(
-                trial_forms,
+                [
+                    law.prior.form
+                    for law in candidates
+                ],
                 self.elements,
                 self.observed,
             )
+            self.joint_validation = evidence
+            self.joint_validation_conflicts = conflicts
+
             if (
                 conflicts == 0
                 and evidence.negative == 0
                 and evidence.membership >= membership_threshold
             ):
-                accepted.append(law)
+                break
 
-        self.active_laws = tuple(accepted)
+            # Conservative target-only pruning: remove the one candidate whose
+            # absence yields the best cross-fitted bundle evidence. This
+            # permits laws that are only useful compositionally while still
+            # requiring the accepted bundle to make correct target predictions.
+            best_index = None
+            best_objective = None
+            for index in range(len(candidates)):
+                trial = (
+                    candidates[:index]
+                    + candidates[index + 1 :]
+                )
+                if not trial:
+                    trial_evidence = Evidence(
+                        positive=0,
+                        negative=0,
+                        minimum_witnesses=2,
+                    )
+                    trial_conflicts = 0
+                else:
+                    trial_evidence, trial_conflicts = (
+                        _crossfit_lawset_evidence(
+                            [
+                                law.prior.form
+                                for law in trial
+                            ],
+                            self.elements,
+                            self.observed,
+                        )
+                    )
+                objective = (
+                    trial_conflicts + trial_evidence.negative,
+                    -trial_evidence.positive,
+                    len(trial),
+                    candidates[index].score,
+                )
+                if (
+                    best_objective is None
+                    or objective < best_objective
+                ):
+                    best_objective = objective
+                    best_index = index
+
+            assert best_index is not None
+            candidates.pop(best_index)
+
+        if not candidates:
+            self.active_laws = tuple()
+        elif (
+            self.joint_validation_conflicts == 0
+            and self.joint_validation.negative == 0
+            and self.joint_validation.membership
+            >= membership_threshold
+        ):
+            self.active_laws = tuple(candidates)
+        else:
+            self.active_laws = tuple()
         self.completed = dict(self.observed)
         self.provenance: dict[tuple[str, str], tuple[str, ...]] = {}
         self.conflicts = 0
