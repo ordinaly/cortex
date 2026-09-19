@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1.4`.
+Protocol ID: `algebra-transfer-v1.5`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -165,12 +165,33 @@ No target threshold may be weakened after official results are observed.
 
 ## Applicability
 
-The v1.7 applicability rule is retained:
+Source applicability sets are always discarded.
 
-- one- and two-variable laws use target-derived marginal variable support;
-- three-variable laws additionally require target-derived pairwise support.
+Transfer introduces a **cross-world universality prior**. A canonical form that
+is structurally stable across several independent source worlds and also passes
+the target structural gate may be *hypothesized* to quantify over all target
+elements.
 
-Source applicability sets are discarded during transfer.
+This does not make the law automatically true on the target. Universal
+applicability is operational only if the target-only leave-one-out predictive
+validator accepts the law or law bundle with zero errors and zero closure
+conflicts.
+
+Thus transfer carries:
+
+$
+\text{confidence in a universal form}
+$
+
+but never:
+
+$
+\text{source entity-specific applicability}.
+$
+
+This is deliberately stronger than rebuilding the v1.7 empirical basin from
+sparse target witnesses and is the mechanism by which cross-world abstraction
+can improve sample efficiency.
 
 ## Baselines
 
@@ -326,5 +347,15 @@ it demonstrated predictive value. No official campaign had been run.
 forward target validation: safe singles first, safe compositional pairs second,
 then only strictly prediction-improving additions.
 
-The official campaign must not be run until the v1.4 implementation and
+A fifth preflight showed that safe forward search still abstained because
+v1.7-style empirical target scopes required local witness coverage for each
+element role. That is appropriate for one-world discovery but prevents a
+cross-world universal form from acting as a transferable abstraction.
+
+`algebra-transfer-v1.5` therefore transfers a **universality hypothesis**, not
+a source applicability set. The hypothesis is still gated by target structural
+evidence and must survive target-only leave-one-out prediction with zero errors
+and zero conflicts.
+
+The official campaign must not be run until the v1.5 implementation and
 unit-level preflight are green.
