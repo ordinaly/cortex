@@ -163,9 +163,9 @@ return all reads
 
 The system therefore has one explicit public structural bottleneck:
 
-[
-z_t in mathbb{R}^{12}.
-]
+$$
+z_t in \mathbb{R}^{12}.
+$$
 
 Everything below articulation and graph evidence is conditioned on this compact state.
 
@@ -179,9 +179,9 @@ Articulation is the process of turning raw feature vectors into persistent, stru
 
 Suppose a frame contains detections
 
-[
-x_1,ldots,x_k in mathbb{R}^d.
-]
+$$
+x_1,\ldots,x_k in \mathbb{R}^d.
+$$
 
 Cortex must decide whether each detection corresponds to:
 
@@ -207,29 +207,29 @@ Every persistent entity stores running evidence including:
 - a per-feature reliability vector;
 - a per-feature discrete noise state.
 
-For entity (e), the prototype is the running aligned mean:
+For entity $e$, the prototype is the running aligned mean:
 
-[
-mu_e(f)
+$$
+\mu_e(f)
 =
-rac{1}{n_e}
-sum_{t in e}
-x_t^{	ext{aligned}}(f).
-]
+\frac{1}{n_e}
+\sum_{t in e}
+x_t^{\text{aligned}}(f).
+$$
 
 Feature reliability is derived from anomaly evidence. A feature repeatedly behaving like unexplained noise is downweighted during matching.
 
 The matching distance is a weighted mean squared error:
 
-[
+$$
 d_w(x,y)
 =
-rac{
-sum_f w_f(x_f-y_f)^2
+\frac{
+\sum_f w_f(x_f-y_f)^2
 }{
-sum_f w_f
+\sum_f w_f
 }.
-]
+$$
 
 This matters because identity should not depend equally on dimensions that the system has learned are unstable.
 
@@ -237,33 +237,33 @@ This matters because identity should not depend equally on dimensions that the s
 
 ## 6. Nuisance transformations
 
-For an existing entity (e), Cortex evaluates the observation against transformed versions of the prototype:
+For an existing entity $e$, Cortex evaluates the observation against transformed versions of the prototype:
 
-[
-gcdotmu_e,
-qquad
-gin G.
-]
+$$
+gcdot\mu_e,
+\qquad
+g\in G.
+$$
 
 For each candidate transformation,
 
-[
+$$
 c_g
 =
-d_w(x,gcdotmu_e).
-]
+d_w(x,gcdot\mu_e).
+$$
 
 The best transform determines the hard alignment used for the state update, but Cortex also computes a soft transform-evidence distribution:
 
-[
+$$
 q(g)
 =
-rac{
-exp(-eta c_g)
+\frac{
+\exp(-\beta c_g)
 }{
-sum_h exp(-eta c_h)
+\sum_h \exp(-\beta c_h)
 }.
-]
+$$
 
 So the architecture distinguishes:
 
@@ -347,9 +347,9 @@ The public articulation vector does not expose every feature state separately. I
 
 If Cortex tracks (N) entities, a naïve relation system allocates all
 
-[
+$$
 O(N^2)
-]
+$$
 
 possible pairs.
 
@@ -383,21 +383,21 @@ Worst-case storage can still become quadratic if evidence genuinely touches ever
 
 Undirected relation cells maintain Beta-style sufficient statistics.
 
-Conceptually, after binary observations (yin{0,1}),
+Conceptually, after binary observations $y ∈ {0,1}$,
 
-[
+$$
 a leftarrow a+y,
-qquad
+\qquad
 b leftarrow b+(1-y).
-]
+$$
 
 The posterior mean is
 
-[
-hat p
+$$
+\hat p
 =
-rac{a}{a+b}.
-]
+\frac{a}{a+b}.
+$$
 
 After a minimum number of exposures, configured thresholds classify the pair as:
 
@@ -420,28 +420,28 @@ Each directed pair stores separate Beta-style sufficient statistics for interven
 
 If
 
-[
-p_{	ext{do}}
+$$
+p_{\text{do}}
 =
-rac{a_{	ext{do}}}{a_{	ext{do}}+b_{	ext{do}}},
-qquad
-p_{	ext{ctrl}}
+\frac{a_{\text{do}}}{a_{\text{do}}+b_{\text{do}}},
+\qquad
+p_{\text{ctrl}}
 =
-rac{a_{	ext{ctrl}}}{a_{	ext{ctrl}}+b_{	ext{ctrl}}},
-]
+\frac{a_{\text{ctrl}}}{a_{\text{ctrl}}+b_{\text{ctrl}}},
+$$
 
 then evidence is based on
 
-[
-Delta
+$$
+\Delta
 =
-p_{	ext{do}}-p_{	ext{ctrl}}.
-]
+p_{\text{do}}-p_{\text{ctrl}}.
+$$
 
 With enough intervention and control samples:
 
-- sufficiently positive (Delta) supports a causal edge;
-- sufficiently small (|Delta|) supports a null edge;
+- sufficiently positive $Δ$ supports a causal edge;
+- sufficiently small $|Δ|$ supports a null edge;
 - intermediate evidence remains unresolved.
 
 This is not a full causal-discovery framework. It is an explicit online evidence contract for intervention-sensitive directional effects.
@@ -454,13 +454,13 @@ The graph crate also provides a directed dependency graph.
 
 When a node becomes dirty, Cortex can compute the transitive closure of only its dependents:
 
-[
-operatorname{closure}(S)
+$$
+\operatorname{closure}(S)
 =
 S
-cup
-{v : exists uin S,; uleadsto v}.
-]
+\cup
+{v : \exists u\in S,; u\leadsto v}.
+$$
 
 This supports a broader architectural principle:
 
@@ -483,9 +483,9 @@ The continual reasoner does not consume this complete internal state directly.
 
 Instead, `cortex-runtime` constructs a fixed 12-dimensional public summary:
 
-[
-z_t in mathbb{R}^{12}.
-]
+$$
+z_t in \mathbb{R}^{12}.
+$$
 
 This creates a stable contract between "perceptual/relational articulation" and "continual structural reasoning."
 
@@ -507,12 +507,12 @@ The last three denominators are based on the complete active entity population, 
 
 This is a good example of an implementation optimization that preserves semantics:
 
-[
-	ext{sparse storage}
+$$
+\text{sparse storage}
 
-eq
-	ext{different meaning}.
-]
+\neq
+\text{different meaning}.
+$$
 
 ---
 
@@ -526,39 +526,39 @@ Its purpose is not to choose the active regime. Instead it answers a different q
 
 > Which previously stored structural states resemble the current one, and can history be compressed without exceeding a declared distortion budget?
 
-For prototypes (c_i), Cortex computes RMS distances
+For prototypes $c_i$, Cortex computes RMS distances
 
-[
+$$
 d_i
 =
-operatorname{RMS}(z,c_i)
-]
+\operatorname{RMS}(z,c_i)
+$$
 
 and fuzzy membership scores
 
-[
+$$
 m_i
 =
-rac{
-exp(-d_i/	au)
+\frac{
+\exp(-d_i/\tau)
 }{
-sum_jexp(-d_j/	au)
+\\sum_j \exp(-d_j/\tau)
 }.
-]
+$$
 
-An (alpha)-cut determines which memories are considered actively relevant.
+An α-cut determines which memories are considered actively relevant.
 
 The reconstruction is the membership-weighted prototype mixture:
 
-[
-hat z
+$$
+\hat z
 =
-rac{
-sum_i m_i c_i
+\frac{
+\sum_i m_i c_i
 }{
-sum_i m_i
+\sum_i m_i
 }.
-]
+$$
 
 ---
 
@@ -609,13 +609,13 @@ This boundary is intentional.
 
 A fuzzy memory reconstruction is an approximation:
 
-[
+$$
 z_t
 mapsto
-hat z_t.
-]
+\hat z_t.
+$$
 
-If the continual reasoner consumed (hat z_t), then a storage optimization could alter active structural decisions.
+If the continual reasoner consumed $\hat z_t$, then a storage optimization could alter active structural decisions.
 
 The current runtime instead sends the original public articulation vector (z_t) to both consumers:
 
@@ -650,11 +650,11 @@ Each regime prototype stores, among other fields:
 
 Given the current state (z_t), Cortex computes distances to all prototypes and soft memberships similar to fuzzy memory:
 
-[
+$$
 m_i
-propto
-exp(-d_i/	au).
-]
+\propto
+\exp(-d_i/\tau).
+$$
 
 These memberships contribute to prediction and to decisions about whether the current state belongs to:
 
@@ -705,11 +705,11 @@ Small local drift updates the existing regime rather than creating a new one.
 
 This is the default bias:
 
-[
-	ext{adapt existing structure}
+$$
+\text{adapt existing structure}
 <
-	ext{create new structure}
-]
+\text{create new structure}
+$$
 
 unless evidence justifies the latter.
 
@@ -748,15 +748,15 @@ If capacity exists, or if a safe recompression can free capacity, the regime is 
 
 Otherwise:
 
-[
-oxed{
-	ext{novel evidence}
+$$
+\boxed{
+\text{novel evidence}
 +
-	ext{no safe capacity}
-Rightarrow
-	ext{unresolved + budget pressure}
+\text{no safe capacity}
+\Rightarrow
+\text{unresolved + budget pressure}
 }
-]
+$$
 
 not "pretend the closest existing regime is correct."
 
@@ -788,21 +788,21 @@ The tensor machinery is conditional: it can sleep, wake, refresh, and run in bur
 
 For an active regime with centroid (mu), define local displacement
 
-[
-delta_t = z_t-mu.
-]
+$$
+\delta_t = z_t-mu.
+$$
 
 With predictive residual
 
-[
-e_t = y_t-hat y_t,
-]
+$$
+e_t = y_t-\hat y_t,
+$$
 
 the core maintains a curvature-like matrix using terms of the form
 
-[
-e_t,delta_tdelta_t^	op.
-]
+$$
+e_t,\\delta_t\\delta_t^\top.
+$$
 
 The implementation periodically examines the eigenspectrum of this matrix.
 
@@ -824,9 +824,9 @@ When a split candidate is launched, Cortex creates temporary **shadow directions
 
 For candidate direction (u), observations are provisionally separated by the sign of
 
-[
-u^	op(z-mu).
-]
+$$
+u^\top(z-mu).
+$$
 
 Cortex then compares:
 
@@ -880,13 +880,13 @@ Only after persistent merge evidence are descendants recombined.
 
 Therefore the structure is **reversible**:
 
-[
-	ext{coarse}
-ightarrow
-	ext{split}
-ightarrow
-	ext{coarse again}.
-]
+$$
+\text{coarse}
+\rightarrow
+\text{split}
+\rightarrow
+\text{coarse again}.
+$$
 
 This is architecturally different from systems where model complexity only grows.
 
@@ -932,11 +932,11 @@ flowchart LR
 
 The governing principle is:
 
-[
-oxed{
-	ext{resource exhaustion must reduce certainty, not fabricate certainty.}
+$$
+\boxed{
+\text{resource exhaustion must reduce certainty, not fabricate certainty.}
 }
-]
+$$
 
 ---
 
@@ -1021,22 +1021,22 @@ flowchart LR
     X --> N --> Z --> A --> C --> O
 ```
 
-For a (d)-dimensional embedding (z), the adapter uses
+For a $d$-dimensional embedding $z$, the adapter uses
 
-[
+$$
 x
 =
-sqrt{rac d2}
-rac{z}{|z|_2}.
-]
+\sqrt{\frac d2}
+\frac{z}{\|z\|_2}.
+$$
 
-For two adapted embeddings (x_a,x_b), ordinary unweighted MSE becomes exactly cosine distance between the original embeddings:
+For two adapted embeddings $x_a,x_b$, ordinary unweighted MSE becomes exactly cosine distance between the original embeddings:
 
-[
-operatorname{MSE}(x_a,x_b)
+$$
+\operatorname{MSE}(x_a,x_b)
 =
-1-cos(a,b).
-]
+1-\cos(a,b).
+$$
 
 This gives Cortex's existing metric thresholds a defined interpretation instead of allowing arbitrary neural embedding magnitudes to control identity decisions.
 
@@ -1048,11 +1048,11 @@ Generic embeddings use a fixed identity nuisance group because cyclic shifts of 
 
 The one-way boundary is deliberate:
 
-[
-	ext{encoder}
-ightarrow
-	ext{Cortex}.
-]
+$$
+\text{encoder}
+\rightarrow
+\text{Cortex}.
+$$
 
 If both systems learned simultaneously, it would be difficult to determine whether a performance gain came from:
 
@@ -1066,11 +1066,11 @@ Stage I isolates the question:
 
 Only after that is established should a Stage II experiment consider
 
-[
-	ext{encoder}
+$$
+\text{encoder}
 leftrightarrow
-	ext{Cortex}.
-]
+\text{Cortex}.
+$$
 
 ---
 
@@ -1086,24 +1086,24 @@ The research answer is increasingly:
 
 Instead of treating every perceptual anchor as a hard ontological entity, the fuzzy predictive-field research maintains responsibilities over anchors and derives semantic distance from their learned future distributions.
 
-At candidate resolution (ho),
+At candidate resolution $ρ$,
 
-[
-K_ho(i,j)
+$$
+K_\rho(i,j)
 =
 exp
-left[
--rac{d_P(i,j)^2}{2ho^2}
-ight].
-]
+\left[
+-\frac{d_P(i,j)^2}{2\rho^2}
+\right].
+$$
 
 This supports a continuum:
 
-[
-	ext{fine distinction}
-longleftrightarrow
-	ext{predictive equivalence}.
-]
+$$
+\text{fine distinction}
+\longleftrightarrow
+\text{predictive equivalence}.
+$$
 
 ---
 
@@ -1111,17 +1111,17 @@ longleftrightarrow
 
 Research v1.7-R formalized adaptive resolution as:
 
-[
-ho_t^*
+$$
+\rho_t^*
 =
-argmin_ho C_t(ho)
-quad
-	ext{subject to}
-quad
-D_t(ho)
-le
-D_t^{min}+arepsilon.
-]
+\arg\min_\rho C_t(\rho)
+\quad
+\text{subject to}
+\quad
+D_t(\rho)
+\le
+D_t^{\min}+\varepsilon.
+$$
 
 In plain language:
 
@@ -1172,11 +1172,11 @@ A learned graph diffusion operator can assign high potential to previously unsee
 
 The heat kernel
 
-[
-K_ho
+$$
+K_\rho
 =
-e^{-ho L}
-]
+e^{-\rho L}
+$$
 
 implicitly contains contributions from paths of many lengths.
 
@@ -1188,11 +1188,11 @@ The newer kinship-composition experiment adds a finite learned relation algebra.
 
 Conceptually,
 
-[
+$$
 s_{t+1}
 =
 C(s_t,r_t),
-]
+$$
 
 where (C) is learned from solved relation paths.
 
@@ -1220,15 +1220,15 @@ On the declared 1,400-frame benchmark:
 
 On that workload this corresponds to roughly:
 
-[
-131	imes
-]
+$$
+131\times
+$$
 
 lower mean step time and about
 
-[
-4	imes
-]
+$$
+4\times
+$$
 
 lower peak process memory.
 
@@ -1286,8 +1286,8 @@ A rough architecture-level map is:
 | Current-frame relation updates | approximately quadratic in visible entities, not total entity capacity |
 | Stored graph memory | (O(R+C)), allocated from observed evidence |
 | Public 12-D summary | constant-dimensional output; graph counts maintained incrementally |
-| Fuzzy memory matching | (O(B_m cdot 12)) |
-| Continual regime matching | (O(B_r cdot 12)) |
+| Fuzzy memory matching | approximately O(B_m · 12) |
+| Continual regime matching | approximately O(B_r · 12) |
 | Exact curvature rank checks | dense in the fixed continual dimension and conditional/sampled rather than every frame |
 
 These expressions are architectural guides, not formal asymptotic theorems for every code path.
@@ -1544,11 +1544,11 @@ flowchart TB
 
 All of these mechanisms point to one common design rule:
 
-[
-oxed{
-	ext{Use the smallest revisable structure that available evidence can justify.}
+$$
+\boxed{
+\text{Use the smallest revisable structure that available evidence can justify.}
 }
-]
+$$
 
 Cortex therefore treats representation as something that may:
 
