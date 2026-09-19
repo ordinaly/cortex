@@ -146,6 +146,8 @@ A follow-up **algebra-induction-v1** campaign then tested whether Cortex could r
 
 This is stronger than recursive rule application, but it remains **candidate-law induction** rather than unrestricted theorem discovery: the candidate equation forms are supplied in advance. See [docs/ALGEBRA_INDUCTION_V1.md](docs/ALGEBRA_INDUCTION_V1.md).
 
+The next **algebra-form-induction-v1.7** campaign removed that named-law vocabulary. Cortex generated **375 canonical equation forms** from a bounded anonymous grammar, assigned fuzzy structural membership, separated predictive activation from discovery, and restricted each law to an empirically supported applicability basin. Across 120 hosted cases it achieved **1.000 resolved accuracy on every structured family**, discovered the rebracketing form on every cyclic and dihedral seed, rejected operand swap on every noncommutative dihedral seed, and made **zero resolved predictions on all 20 random magmas**. See [docs/ALGEBRA_FORM_INDUCTION_V1.md](docs/ALGEBRA_FORM_INDUCTION_V1.md).
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
