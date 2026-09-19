@@ -144,7 +144,7 @@ def run_case(
     }
 
     return {
-        "protocol": "algebra-form-induction-v1",
+        "protocol": "algebra-form-induction-v1.1",
         "family": algebra.name,
         "seed": seed,
         "order": len(elements),
@@ -152,7 +152,8 @@ def run_case(
         "observed_cells": len(observed),
         "heldout_cells": len(heldout),
         "grammar_forms": len(cortex.forms),
-        "active_laws": len(cortex.active_laws),
+        "supported_laws": len(cortex.active_keys()),
+        "selected_laws": len(cortex.active_laws),
         "detected_patterns": detected,
         "top_laws": cortex.top_laws(10),
         "conflicts": cortex.conflicts,
@@ -205,7 +206,7 @@ def campaign(
 
     families = sorted({row["family"] for row in rows})
     summary = {
-        "protocol": "algebra-form-induction-v1",
+        "protocol": "algebra-form-induction-v1.1",
         "seeds_per_family": seeds,
         "holdout_fraction": holdout_fraction,
         "grammar_forms": rows[0]["grammar_forms"],
@@ -215,8 +216,11 @@ def campaign(
     for family in families:
         family_rows = [row for row in rows if row["family"] == family]
         family_summary = {
-            "mean_active_laws": sum(
-                row["active_laws"] for row in family_rows
+            "mean_supported_laws": sum(
+                row["supported_laws"] for row in family_rows
+            ) / len(family_rows),
+            "mean_selected_laws": sum(
+                row["selected_laws"] for row in family_rows
             ) / len(family_rows),
             "mean_conflicts": sum(
                 row["conflicts"] for row in family_rows
