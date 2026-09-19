@@ -203,7 +203,7 @@ counterfactuals are reserved for later campaigns.
 
 Every world has 8 anonymously relabeled nodes.
 
-The official campaign uses 20 deterministic seeds per family.
+The official campaign uses 20 deterministic seeds per family: **100–119**.\nPreflight and unit tests use only development seeds below 100.
 
 ### Chain
 
