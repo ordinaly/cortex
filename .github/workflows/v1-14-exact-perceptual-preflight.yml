@@ -1,0 +1,30 @@
+name: cortex-v1-14-exact-perceptual-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/fuzzy_predictive_field.py"
+      - "research/exact_perceptual_fast_path*.py"
+      - "tests/test_exact_perceptual_fast_path.py"
+      - "docs/EXACT_PERCEPTUAL_FAST_PATH_V1_14.md"
+      - ".github/workflows/v1-14-exact-perceptual-preflight.yml"
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest numpy scipy
+      - name: Exact perceptual fast-path preflight
+        run: pytest tests/test_exact_perceptual_fast_path.py -q
