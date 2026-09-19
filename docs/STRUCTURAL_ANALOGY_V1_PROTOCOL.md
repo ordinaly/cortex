@@ -1,8 +1,8 @@
 # Cortex Reasoning Map v1 — Structural Analogy / Isomorphism
 
-Status: **frozen protocol / official campaign not yet run**.
+Status: **frozen protocol / official campaign passed**.
 
-Protocol ID: \`structural-analogy-v1\`.
+Protocol ID: `structural-analogy-v1`.
 
 This is the third dedicated experiment in **Cortex Reasoning Map v1** after
 structural counterfactual reasoning and belief revision.
@@ -391,10 +391,10 @@ seeds for any revised official claim.
 
 ## Planned files
 
-- \`research/structural_analogy.py\`
-- \`research/structural_analogy_campaign.py\`
-- \`research/structural_analogy_gate.py\`
-- \`tests/test_structural_analogy.py\`
+- `research/structural_analogy.py`
+- `research/structural_analogy_campaign.py`
+- `research/structural_analogy_gate.py`
+- `tests/test_structural_analogy.py`
 
 The official campaign must not run until preflight is green.
 
@@ -409,3 +409,24 @@ A passing result would support:
 > contradictory structure invalidates all correspondences.
 
 It would not establish unrestricted human-like analogy or semantic transfer.
+
+
+## Official outcome
+
+The untouched official campaign on seeds 300–319 passed every frozen gate.
+
+Key results:
+
+- held-out resolved accuracy: **1.000**;
+- mean held-out coverage at 12 facts: **0.9718**;
+- coverage at 24 / 36 facts: **1.000 / 1.000**;
+- asymmetric full unique-mapping rate: **1.000**;
+- symmetric full ambiguity-preservation rate: **1.000**;
+- near-isomorphic rejection: **1.000**;
+- broken-analogy rejection: **1.000**;
+- source/target entity and relation label overlap: **0**.
+
+See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md) and
+[`benchmarks/results/structural_analogy_v1_summary.json`](../benchmarks/results/structural_analogy_v1_summary.json).
+
+The frozen thresholds above were not weakened after evaluation.
