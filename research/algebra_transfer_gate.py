@@ -1,4 +1,4 @@
-"""Frozen official gates for algebra-transfer-v1.5.
+"""Frozen official gates for algebra-transfer-v1.6.
 
 Do not modify these thresholds after official campaign results are observed.
 The protocol is documented in docs/ALGEBRA_TRANSFER_V1_PROTOCOL.md.
@@ -50,6 +50,9 @@ def main() -> None:
     mid = by_fraction(0.30)
 
     checks = {
+        "fresh_target_seed_range": min(
+            row["seed"] for row in rows
+        ) >= 100,
         "source_target_labels_disjoint": max(
             row["source_target_label_overlap"]
             for row in rows
@@ -89,6 +92,16 @@ def main() -> None:
             row["scratch_grammar_forms"]
             for row in compatible
         ),
+        "multiplicity_evidence_respected": all(
+            row["transfer_selected"] == 0
+            or (
+                row["transfer_validation_positive"]
+                >= row["transfer_required_predictions"]
+                and row["transfer_validation_negative"] == 0
+                and row["transfer_validation_conflicts"] == 0
+            )
+            for row in rows
+        ),
         "random_controls_zero_wrong": max(
             row["metrics"]["transfer"]["wrong_resolved"]
             for row in random_controls
@@ -112,7 +125,7 @@ def main() -> None:
     }
 
     payload = {
-        "protocol": "algebra-transfer-v1.5",
+        "protocol": "algebra-transfer-v1.6",
         "rows": len(rows),
         "checks": checks,
         "passed": all(checks.values()),
