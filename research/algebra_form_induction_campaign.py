@@ -144,7 +144,7 @@ def run_case(
     }
 
     return {
-        "protocol": "algebra-form-induction-v1.1",
+        "protocol": "algebra-form-induction-v1.2",
         "family": algebra.name,
         "seed": seed,
         "order": len(elements),
@@ -206,7 +206,7 @@ def campaign(
 
     families = sorted({row["family"] for row in rows})
     summary = {
-        "protocol": "algebra-form-induction-v1.1",
+        "protocol": "algebra-form-induction-v1.2",
         "seeds_per_family": seeds,
         "holdout_fraction": holdout_fraction,
         "grammar_forms": rows[0]["grammar_forms"],
