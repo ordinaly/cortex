@@ -18,6 +18,8 @@ from algebra_induction import (
 from algebra_transfer import (
     CortexTransferredLawInducer,
     TransferPrior,
+    _required_zero_error_predictions,
+    _transfer_hypothesis_budget,
     build_transfer_library,
     score_transfer_heldout,
 )
@@ -176,3 +178,41 @@ def test_random_magma_does_not_receive_forced_transfer_structure():
 def test_transfer_module_does_not_enumerate_target_grammar():
     source = (ROOT / "research" / "algebra_transfer.py").read_text()
     assert "equation_forms(" not in source
+
+
+
+def test_multiplicity_gate_scales_with_search_and_target_order():
+    large_budget = _transfer_hypothesis_budget(24)
+    assert large_budget >= 800
+    assert _required_zero_error_predictions(
+        element_count=6,
+        hypothesis_budget=large_budget,
+    ) >= 7
+    assert _required_zero_error_predictions(
+        element_count=8,
+        hypothesis_budget=_transfer_hypothesis_budget(22),
+    ) >= 6
+
+
+def test_selected_transfer_bundle_meets_multiplicity_evidence():
+    library = cyclic_library()
+    elements, table, observed, heldout = target_case(
+        cyclic_group(8),
+        seed=3,
+        observed_fraction=0.30,
+    )
+    model = CortexTransferredLawInducer(
+        elements,
+        observed,
+        library,
+    )
+    metrics = score_transfer_heldout(model, table, heldout)
+
+    assert metrics["wrong_resolved"] == 0
+    if model.selected_keys():
+        assert (
+            model.joint_validation.positive
+            >= model.required_predictions
+        )
+        assert model.joint_validation.negative == 0
+        assert model.joint_validation_conflicts == 0
