@@ -1,0 +1,59 @@
+{
+  "protocol": "structural-analogy-v1",
+  "status": "passed",
+  "official_seeds": [
+    300,
+    301,
+    302,
+    303,
+    304,
+    305,
+    306,
+    307,
+    308,
+    309,
+    310,
+    311,
+    312,
+    313,
+    314,
+    315,
+    316,
+    317,
+    318,
+    319
+  ],
+  "compatible_cases": 240,
+  "total_artifact_rows": 440,
+  "families": [
+    "asymmetric-chain",
+    "asymmetric-branch",
+    "symmetric-twins",
+    "symmetric-diamond"
+  ],
+  "budgets": [
+    12,
+    24,
+    36
+  ],
+  "metrics": {
+    "entity_label_overlap_max": 0,
+    "relation_label_overlap_max": 0,
+    "heldout_resolved_accuracy": 1,
+    "positive_resolved_accuracy": 1,
+    "negative_resolved_accuracy": 1,
+    "coverage_by_budget": {
+      "12": 0.9717948717948717,
+      "24": 1,
+      "36": 1
+    },
+    "direct_memory_coverage": 0,
+    "candidate_monotonicity_rate": 1,
+    "asymmetric_full_unique_rate": 1,
+    "asymmetric_resolved_mapping_precision": 1,
+    "symmetric_full_ambiguity_rate": 1,
+    "near_isomorphic_rejection_rate": 1,
+    "broken_analogy_rejection_rate": 1
+  },
+  "claim_boundary": "Finite typed-graph structural analogy under explicit partial evidence; not unrestricted semantic analogy."
+}
