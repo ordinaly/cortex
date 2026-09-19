@@ -254,6 +254,46 @@ def _target_crossfit_lawset_evidence(
     ), conflicts
 
 
+def _transfer_hypothesis_budget(library_size: int) -> int:
+    """Conservative bound on target bundles inspected by forward selection."""
+    if library_size <= 0:
+        return 1
+    singles = library_size
+    pairs = library_size * (library_size - 1) // 2
+    growth = library_size * library_size
+    return max(1, singles + pairs + growth)
+
+
+def _required_zero_error_predictions(
+    *,
+    element_count: int,
+    hypothesis_budget: int,
+    familywise_alpha: float = 0.01,
+) -> int:
+    """Multiplicity-aware zero-error evidence requirement.
+
+    Under an independent uniform random operation table of order n, a fixed
+    deterministic prediction is correct with probability 1/n. Bonferroni then
+    gives P(any searched hypothesis gets k zero-error hits by chance)
+    <= H * n**(-k).
+    """
+    if element_count < 2:
+        raise ValueError("element_count must be >= 2")
+    if hypothesis_budget < 1:
+        raise ValueError("hypothesis_budget must be >= 1")
+    if not 0.0 < familywise_alpha < 1.0:
+        raise ValueError("familywise_alpha must lie in (0,1)")
+
+    required = 1
+    while (
+        hypothesis_budget
+        * (element_count ** (-required))
+        > familywise_alpha
+    ):
+        required += 1
+    return max(2, required)
+
+
 class CortexTransferredLawInducer:
     """Re-ground transferred forms in a new target algebra.
 
@@ -287,6 +327,13 @@ class CortexTransferredLawInducer:
         self.membership_threshold = membership_threshold
         self.complexity_penalty = complexity_penalty
         self.maximum_active_laws = maximum_active_laws
+        self.hypothesis_budget = _transfer_hypothesis_budget(
+            min(len(self.library), maximum_active_laws)
+        )
+        self.required_predictions = _required_zero_error_predictions(
+            element_count=len(self.elements),
+            hypothesis_budget=self.hypothesis_budget,
+        )
 
         self.laws = self._score_library()
         eligible = [
@@ -329,6 +376,8 @@ class CortexTransferredLawInducer:
             return (
                 conflicts == 0
                 and evidence.negative == 0
+                and evidence.positive
+                >= self.required_predictions
                 and evidence.membership
                 >= membership_threshold
             )
