@@ -1344,7 +1344,7 @@ $$
 
 With 40% of each operation table hidden, this research path recovered held-out products at 1.000 resolved accuracy on both cyclic and noncommutative dihedral groups, while declining to derive products on a non-associative control.
 
-The follow-up `algebra-form-induction-v1.7` removes the named-law vocabulary. A bounded grammar generates canonical equation forms directly, and fuzzy evidence is split into:
+The follow-up \`algebra-form-induction-v1.7\` removes the named-law vocabulary. A bounded grammar generates canonical equation forms directly, and fuzzy evidence is split into:
 
 - **structural membership** — whether the form itself is supported;
 - **predictive activation** — whether it has survived cross-fitted predictive checks;
@@ -1354,7 +1354,58 @@ For one- and two-variable laws the scope uses marginal variable support. Three-v
 
 On the hosted 120-case campaign, every structured-family resolved prediction was correct and every random-magma case remained unresolved. This is still bounded form discovery: the grammar and search depth remain externally supplied.
 
-The next research architecture tests whether a discovered form can become a reusable object and transfer to a new independently relabeled algebra with less target evidence than rediscovery from scratch.
+### Cross-world law transfer
+
+\`algebra-transfer-v1.6\` tests whether a discovered canonical equation form can survive replacement of the underlying algebra.
+
+Only the form and aggregate source evidence transfer. Source entity labels, source table cells, and source applicability basins do not.
+
+On the final untouched campaign, transferred forms improved mean held-out coverage over scratch discovery by **+0.320 at 20% target evidence**, **+0.486 at 30%**, and **+0.537 at 40%**, while preserving zero wrong resolved compatible predictions and abstaining on random-magmas.
+
+The failed v1.5 negative-transfer campaign is retained because it exposed a multiple-hypothesis problem that motivated v1.6's multiplicity-aware evidence requirement.
+
+### Structural counterfactual reasoning
+
+\`counterfactual-reasoning-v1\` starts the broader **Cortex Reasoning Map v1** program.
+
+The research prototype mirrors the native intervention/control causal-state thresholds, then constructs:
+
+- a **confirmed graph** from resolved causal edges;
+- a **possible graph** from causal plus unresolved edges.
+
+A query returns:
+
+$$
+\text{affected}
+$$
+
+when the target is reachable in the confirmed graph,
+
+$$
+\text{unresolved}
+$$
+
+when it is reachable only in the possible graph, and
+
+$$
+\text{unaffected}
+$$
+
+otherwise.
+
+A structural counterfactual temporarily evaluates
+
+$$
+G' = G\setminus E_{remove}
+$$
+
+without mutating the learned base graph.
+
+Across 140 untouched worlds, all frozen v1 gates passed: multi-hop composition, negative reachability, redundant-path preservation, bridge cuts, missing-bridge abstention, proof-path validity, and exact state restoration all measured **1.000**.
+
+The direct-effect evidence in this first campaign is deterministic, so the result establishes the reasoning operation rather than noisy causal discovery.
+
+See [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
 
