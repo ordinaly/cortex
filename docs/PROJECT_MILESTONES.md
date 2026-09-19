@@ -14,9 +14,9 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 ## Current coordinates
 
-- software/runtime: \`v1.0.0-rc.2\`;
-- frozen executable specification: \`spec-v0.9.5\`;
-- predictive-geometry research frontier: \`v1.13-R\`;
+- software/runtime: `v1.0.0-rc.2`;
+- frozen executable specification: `spec-v0.9.5`;
+- predictive-geometry research frontier: `v1.13-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -152,7 +152,7 @@ The next robustness campaign should add:
 - revision/recovery latency distributions;
 - unaffected-structure preservation.
 
-The goal is to determine whether \`unresolved\` activates **before** errors dominate.
+The goal is to determine whether `unresolved` activates **before** errors dominate.
 
 ---
 
@@ -254,7 +254,7 @@ The benchmark decides the target.
 
 ## B3. Freeze the next executable research specification
 
-Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying \`spec-v0.9.5\`.
+Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying `spec-v0.9.5`.
 
 The freeze should include:
 
