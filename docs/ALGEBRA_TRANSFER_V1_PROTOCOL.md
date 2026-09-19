@@ -2,7 +2,7 @@
 
 Status: **prepared / official campaign not yet run**.
 
-Protocol ID: `algebra-transfer-v1.1`.
+Protocol ID: `algebra-transfer-v1.2`.
 
 This experiment follows the passing
 [`algebra-form-induction-v1.7`](ALGEBRA_FORM_INDUCTION_V1.md) milestone.
@@ -126,27 +126,27 @@ Target evidence minima are frozen as:
 | 2 variables | 2 |
 | 3 variables | 4 |
 
-At least one cross-fitted target prediction is required.
+Target structural membership for each imported form is
 
-The fuzzy combination is conservative:
-
-$$
+$
 \mu_{\mathrm{struct}}
 =
 \min(
 \mu_{\mathrm{source}},
 \mu_{\mathrm{target\ structural}}
-),
-$$
-
-$$
-\mu_{\mathrm{transfer}}
-=
-\min(
-\mu_{\mathrm{struct}},
-\mu_{\mathrm{target\ predictive}}
 ).
-$$
+$
+
+Predictive activation is evaluated at the **joint law-set level** rather than
+requiring every form to predict a held-aside target cell in isolation. This is
+necessary because algebraic laws can become predictive only after composition
+with other supported laws.
+
+The bounded candidate bundle is cross-fitted against observed target cells.
+It is accepted only when it produces at least two cross-fitted predictions,
+zero wrong predictions, zero closure conflicts, and membership at least 0.98.
+If the bundle fails, target-only evidence is used to prune candidates until a
+passing bundle is found or Cortex remains unresolved.
 
 The activation threshold remains 0.98.
 
@@ -287,9 +287,16 @@ forms, including the canonical rebracketing form in the small cyclic preflight,
 because source predictive opportunities were sparse. No official campaign had
 been run.
 
-`algebra-transfer-v1.1` corrects that conceptual mismatch: **form confidence
-transfers; source applicability does not**. All target predictive evidence and
-all target applicability scopes are still re-grounded locally.
+`algebra-transfer-v1.1` corrected that mismatch: **form confidence transfers;
+source applicability does not**. A second preflight then showed that requiring
+every imported form to make a cross-fitted prediction *individually* was still
+too strict at sparse target evidence. Useful laws can be predictive only after
+they compose with other supported laws.
 
-The official campaign must not be run until the v1.1 implementation and
+`algebra-transfer-v1.2` therefore keeps per-form structural re-grounding but
+moves predictive acceptance to a conservative **joint target law-set
+cross-fit**. The accepted bundle must make target predictions with zero errors
+and zero conflicts. No held-out evaluation cells are used during selection.
+
+The official campaign must not be run until the v1.2 implementation and
 unit-level preflight are green.
