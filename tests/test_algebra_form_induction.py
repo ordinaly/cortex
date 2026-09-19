@@ -134,3 +134,18 @@ def test_subtraction_does_not_invent_rebracketing():
     # Non-associative does not mean unstructured: the grammar can discover
     # other exact identities and may legitimately recover held-out products.
     assert model.active_keys()
+
+
+
+def test_dihedral_applicability_scope_blocks_sparse_local_overreach():
+    # These seeds exposed v1.4's failure mode: identities that were valid on
+    # well-observed involutions were extrapolated to unsupported rotations.
+    for seed in (6, 13):
+        elements, table, observed, heldout = make_case(
+            dihedral_group(4),
+            seed,
+        )
+        model = CortexFuzzyLawInducer(elements, observed)
+        metrics = score_heldout(model, table, heldout)
+        assert metrics["resolved_accuracy"] == 1.0
+        assert metrics["coverage"] >= 0.75
