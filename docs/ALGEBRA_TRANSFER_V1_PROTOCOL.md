@@ -179,15 +179,15 @@ conflicts.
 
 Thus transfer carries:
 
-$
+$$
 \text{confidence in a universal form}
-$
+$$
 
 but never:
 
-$
+$$
 \text{source entity-specific applicability}.
-$
+$$
 
 This is deliberately stronger than rebuilding the v1.7 empirical basin from
 sparse target witnesses and is the mechanism by which cross-world abstraction
