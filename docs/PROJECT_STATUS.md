@@ -53,7 +53,11 @@ In the original 50-seed synthetic campaign, all scored pairs had zero direct tra
 
 A variable-depth follow-up tested first supporting path depths 3, 5, and 7. The heat operator achieved Hit@1 **1.0** at all three depths without being given the required dependency depth in advance.
 
-This demonstrates multi-hop relational inference in the tested synthetic worlds. It is not yet a claim of general symbolic reasoning.
+This demonstrates multi-hop relational inference in the tested synthetic worlds.
+
+A separate structured logical-composition campaign, `kinship-composition-v1`, then trained Cortex only on solved paths of length 1–5 and tested unseen entities and unseen graph instances at lengths 6–10. Relation and answer symbols were randomly permuted per seed. Across 20 seeds, Cortex achieved **1.000 accuracy and 1.000 coverage**. Exact sequence memorization had zero test coverage and a last-relation baseline achieved **0.222 accuracy**. A hand-engineered clipped-count symbolic baseline also achieved 1.000, so the result demonstrates systematic recursive composition but does not yet establish a Cortex-specific advantage.
+
+When one required composition transition was removed from the training examples, Cortex remained unresolved on all queries requiring it. This is the intended epistemic behavior and also a limitation: the current algebra applies learned rules recursively; it does not yet infer an entirely unobserved rule from analogy.
 
 ### Adaptive predictive resolution
 
@@ -111,40 +115,18 @@ Required gates:
 - re-run fused-stage attribution;
 - scale at least through 288 anchors.
 
-### 2. Kinship relational-composition benchmark
+### 2. Extend logical reasoning beyond the first kinship gate
 
-Build a benchmark explicitly designed to separate memorization from relational inference.
+The first structured kinship-composition gate is now passed for depth extrapolation. The next discriminator should be harder:
 
-The system should receive primitive facts such as:
+- train on fewer/local composition laws and test held-out rule induction;
+- introduce contradictory/noisy evidence and measure calibrated unresolved behavior;
+- allow multiple competing relational paths;
+- test inverse/reversed queries;
+- compare directly against neural and GNN baselines on exactly the same structured input;
+- then move to natural-language CLUTRR-style stories, where parsing and reasoning can be scored separately.
 
-```text
-parent(A, B)
-parent(B, C)
-sibling(B, D)
-```
-
-and infer queries such as:
-
-```text
-grandparent(A, C)
-aunt_or_uncle(D, C)
-```
-
-The important splits are not random examples. They must hold out **structure**:
-
-- unseen person names;
-- unseen family graphs;
-- unseen permutations of roles and names;
-- unseen chain lengths;
-- compositions absent as complete templates during training;
-- distractor facts;
-- disconnected components;
-- inconsistent/noisy facts;
-- counterfactual graph edits.
-
-The benchmark should compare Cortex against neural baselines supplied with the same primitive information and no test leakage.
-
-A successful Cortex result would be evidence for **systematic relational generalization**, not a claim that neural networks cannot reason.
+The current result supports **systematic relational composition on the declared finite algebra**, not universal logic and not superiority over neural methods.
 
 ### 3. Re-profile after exact perception optimization
 
