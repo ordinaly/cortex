@@ -1,0 +1,26 @@
+name: cortex-structural-analogy-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/structural_analogy*.py"
+      - "tests/test_structural_analogy.py"
+      - "docs/STRUCTURAL_ANALOGY_V1_PROTOCOL.md"
+      - ".github/workflows/structural-analogy-preflight.yml"
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
+      - name: Structural analogy preflight
+        run: pytest tests/test_structural_analogy.py -q
