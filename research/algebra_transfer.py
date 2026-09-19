@@ -89,15 +89,21 @@ def build_transfer_library(
 
     per_key: dict[str, list] = {}
     forms: dict[str, CandidateForm] = {}
+    predictive_witnesses: dict[str, int] = {}
 
     for model in source_models:
-        selected = {
+        supported = {
             law.form.key: law
-            for law in model.active_laws
+            for law in model.laws
+            if law.active and law.predictive_active
         }
-        for key, law in selected.items():
+        for key, law in supported.items():
             forms[key] = law.form
             per_key.setdefault(key, []).append(law)
+            predictive_witnesses[key] = (
+                predictive_witnesses.get(key, 0)
+                + law.validation.positive
+            )
 
     priors: list[TransferPrior] = []
     total_worlds = len(source_models)
@@ -136,6 +142,7 @@ def build_transfer_library(
         key=lambda prior: (
             -prior.strength,
             prior.form.complexity,
+            -predictive_witnesses.get(prior.form.key, 0),
             prior.form.key,
         )
     )
