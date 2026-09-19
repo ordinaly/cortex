@@ -2,9 +2,9 @@
 
 Status: **passed official benchmark / research-only**.
 
-Protocol: \`counterfactual-reasoning-v1\`.
+Protocol: `counterfactual-reasoning-v1`.
 
-Official run: GitHub Actions run \`35434536047\`, job \`105874861338\`.
+Official run: GitHub Actions run `35434536047`, job `105874861338`.
 
 ## Question
 
@@ -215,18 +215,18 @@ Do not claim from this benchmark alone:
 
 Implementation:
 
-- \`research/counterfactual_reasoning.py\`
-- \`research/counterfactual_reasoning_campaign.py\`
-- \`research/counterfactual_reasoning_gate.py\`
-- \`tests/test_counterfactual_reasoning.py\`
+- `research/counterfactual_reasoning.py`
+- `research/counterfactual_reasoning_campaign.py`
+- `research/counterfactual_reasoning_gate.py`
+- `tests/test_counterfactual_reasoning.py`
 
 Frozen protocol:
 
-- [\`COUNTERFACTUAL_REASONING_V1_PROTOCOL.md\`](COUNTERFACTUAL_REASONING_V1_PROTOCOL.md)
+- [`COUNTERFACTUAL_REASONING_V1_PROTOCOL.md`](COUNTERFACTUAL_REASONING_V1_PROTOCOL.md)
 
 Aggregate result:
 
-- [\`benchmarks/results/counterfactual_reasoning_v1_summary.json\`](../benchmarks/results/counterfactual_reasoning_v1_summary.json)
+- [`benchmarks/results/counterfactual_reasoning_v1_summary.json`](../benchmarks/results/counterfactual_reasoning_v1_summary.json)
 
 ## Next Reasoning Map experiment
 
