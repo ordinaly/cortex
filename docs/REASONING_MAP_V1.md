@@ -18,8 +18,8 @@ where its explicit unresolved state provides useful epistemic restraint.
 | cross-world abstract transfer | `algebra-transfer-v1.6` | passed | +0.320 coverage over scratch at 20% target evidence; safe negative transfer |
 | structural counterfactual reasoning | `counterfactual-reasoning-v1` | passed | all frozen gates passed across 140 worlds |
 | belief revision under contradiction | `belief-revision-v1` | passed | retraction 7/14/21 batches for prior strengths 1/2/3; exact locality |
-| structural analogy / isomorphism | planned | next | — |
-| latent concept induction | planned | queued | — |
+| structural analogy / isomorphism | `structural-analogy-v1` | passed | 0.9718 coverage with 12/90 facts; exact ambiguity preservation |
+| latent concept induction | planned | next | — |
 | explicit proof dependency | planned | later | — |
 | planning / replanning | planned | later | — |
 | open-world novelty attribution | planned | later | — |
@@ -110,23 +110,23 @@ left every unrelated evidence cell unchanged.
 
 See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md).
 
-## Planned axis: structural analogy
+## Completed axis: structural analogy / isomorphism
 
-The analogy benchmark should test whether Cortex recognizes structural
-equivalence across worlds with different:
+`structural-analogy-v1` maintained a version space of joint entity/relation correspondences across independently renamed typed graphs.
 
-- entity labels;
-- relation labels;
-- superficial graph layouts.
+Across untouched seeds 300–319:
 
-The central object is an isomorphism or partial structural correspondence:
+- held-out resolved accuracy: **1.000**;
+- coverage with 12 / 90 target facts: **0.9718**;
+- coverage with 24 / 36 facts: **1.000 / 1.000**;
+- asymmetric full unique-mapping rate: **1.000**;
+- symmetric full ambiguity-preservation rate: **1.000**;
+- near-isomorphic rejection: **1.000**;
+- broken-analogy rejection: **1.000**.
 
-$$
-\phi:G_1\rightarrow G_2.
-$$
+The key qualitative result was that correspondence identity could remain ambiguous while all surviving mappings still agreed on a structural consequence.
 
-The test should measure whether a structure learned in $G_1$ reduces evidence
-requirements in $G_2$ without forcing transfer when the analogy breaks.
+See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md).
 
 ## Planned axis: latent concept induction
 
