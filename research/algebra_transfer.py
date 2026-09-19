@@ -10,6 +10,7 @@ can participate in closure.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import product
 from math import isfinite
 from typing import Iterable, Sequence
 
@@ -168,6 +169,40 @@ def _evidence_membership(
     return evidence.consistency * mass
 
 
+def _universal_target_scope(
+    form: CandidateForm,
+    elements: Sequence[str],
+) -> LawScope:
+    """Universal target-scope hypothesis for a transferred equation form.
+
+    No source entity scope is reused. Instead, cross-world structural support
+    permits the *hypothesis* that the canonical equation is universally
+    quantified over the new target's elements. Target-only structural and
+    predictive evidence must still accept that hypothesis before closure.
+    """
+    all_elements = frozenset(elements)
+    unary = tuple(
+        (name, all_elements)
+        for name in form.variables
+    )
+    pairwise = tuple()
+    if len(form.variables) >= 3:
+        all_pairs = frozenset(product(elements, repeat=2))
+        pairwise = tuple(
+            (
+                left_name,
+                right_name,
+                all_pairs,
+            )
+            for index, left_name in enumerate(form.variables)
+            for right_name in form.variables[index + 1 :]
+        )
+    return LawScope(
+        unary=unary,
+        pairwise=pairwise,
+    )
+
+
 def _target_crossfit_lawset_evidence(
     forms: Sequence[CandidateForm],
     elements: Sequence[str],
@@ -195,7 +230,7 @@ def _target_crossfit_lawset_evidence(
         scoped_forms = [
             (
                 form,
-                _positive_scope(form, elements, train),
+                _universal_target_scope(form, elements),
             )
             for form in forms
         ]
@@ -453,10 +488,9 @@ class CortexTransferredLawInducer:
                 self.elements,
                 self.observed,
             )
-            scope = _positive_scope(
+            scope = _universal_target_scope(
                 form,
                 self.elements,
-                self.observed,
             )
 
             target_structural = _evidence_membership(
@@ -479,7 +513,7 @@ class CortexTransferredLawInducer:
                 target_predictive,
             )
             score = (
-                membership
+                structural
                 - self.complexity_penalty * form.complexity
             )
 
