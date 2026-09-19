@@ -23,6 +23,7 @@ from algebra_form_induction import (
     _close_forms,
     _crossfit_lawset_evidence,
     _crossfit_predictive_evidence,
+    _fold_tables,
     _positive_scope,
     _structural_evidence,
 )
@@ -167,6 +168,59 @@ def _evidence_membership(
     return evidence.consistency * mass
 
 
+def _target_crossfit_lawset_evidence(
+    forms: Sequence[CandidateForm],
+    elements: Sequence[str],
+    observed: Table,
+) -> tuple[Evidence, int]:
+    """Leave-one-cell-out target validation for sparse transfer.
+
+    Every observed target cell is predicted from all other observed cells.
+    This remains strictly out-of-sample while avoiding the evidence collapse
+    caused by removing a quarter of an already sparse target table.
+    """
+    if len(observed) < 2:
+        return Evidence(0, 0, 2), 0
+
+    positive = 0
+    negative = 0
+    conflicts = 0
+    folds = len(observed)
+
+    for train, validation in _fold_tables(
+        elements,
+        observed,
+        folds=folds,
+    ):
+        scoped_forms = [
+            (
+                form,
+                _positive_scope(form, elements, train),
+            )
+            for form in forms
+        ]
+        completed, _provenance, fold_conflicts, _rounds = _close_forms(
+            elements,
+            train,
+            scoped_forms,
+        )
+        conflicts += fold_conflicts
+        for pair, truth in validation.items():
+            prediction = completed.get(pair)
+            if prediction is None:
+                continue
+            if prediction == truth:
+                positive += 1
+            else:
+                negative += 1
+
+    return Evidence(
+        positive=positive,
+        negative=negative,
+        minimum_witnesses=2,
+    ), conflicts
+
+
 class CortexTransferredLawInducer:
     """Re-ground transferred forms in a new target algebra.
 
@@ -226,7 +280,7 @@ class CortexTransferredLawInducer:
         self.joint_validation_conflicts = 0
 
         while candidates:
-            evidence, conflicts = _crossfit_lawset_evidence(
+            evidence, conflicts = _target_crossfit_lawset_evidence(
                 [
                     law.prior.form
                     for law in candidates
@@ -264,7 +318,7 @@ class CortexTransferredLawInducer:
                     trial_conflicts = 0
                 else:
                     trial_evidence, trial_conflicts = (
-                        _crossfit_lawset_evidence(
+                        _target_crossfit_lawset_evidence(
                             [
                                 law.prior.form
                                 for law in trial
