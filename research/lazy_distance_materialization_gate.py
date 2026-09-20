@@ -80,6 +80,44 @@ def main() -> None:
         ),
     }
 
+    by_anchors = {
+        anchors: [
+            row
+            for row in rows
+            if int(row["anchors"]) == anchors
+        ]
+        for anchors in ANCHOR_CASES
+    }
+    performance = {
+        anchors: {
+            "refresh_speedup": float(
+                np.median(
+                    [
+                        float(row["refresh_speedup"])
+                        for row in selected
+                    ]
+                )
+            ),
+            "fused_speedup": float(
+                np.median(
+                    [
+                        float(row["fused_speedup"])
+                        for row in selected
+                    ]
+                )
+            ),
+            "distance_access_us": float(
+                np.median(
+                    [
+                        float(row["distance_access_us"])
+                        for row in selected
+                    ]
+                )
+            ),
+        }
+        for anchors, selected in by_anchors.items()
+    }
+
     checks = {
         "protocol_exact": all(
             row["protocol"] == PROTOCOL
@@ -156,6 +194,20 @@ def main() -> None:
             ) == 1
             for row in rows
         ),
+        "small_scale_refresh_gain": (
+            performance[72]["refresh_speedup"] >= 1.02
+            and performance[144]["refresh_speedup"] >= 1.02
+        ),
+        "small_scale_no_fused_regression": (
+            performance[72]["fused_speedup"] >= 0.99
+            and performance[144]["fused_speedup"] >= 0.99
+        ),
+        "large_scale_refresh_gain": (
+            performance[288]["refresh_speedup"] >= 1.05
+        ),
+        "large_scale_fused_gain": (
+            performance[288]["fused_speedup"] >= 1.01
+        ),
     }
 
     payload = {
@@ -167,6 +219,7 @@ def main() -> None:
         ),
         "rows": len(rows),
         "metrics": metrics,
+        "performance": performance,
         "checks": checks,
         "passed": all(checks.values()),
     }
