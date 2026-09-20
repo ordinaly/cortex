@@ -78,7 +78,7 @@ Cortex maintains two interpretations of the direct graph:
 For source $s$ and target $t$:
 
 $$
-t\in\operatorname{Reach}_{confirmed}(s)
+t\in\mathrm{Reach}_{confirmed}(s)
 \Rightarrow
 \text{affected},
 $$
@@ -86,7 +86,7 @@ $$
 otherwise
 
 $$
-t\in\operatorname{Reach}_{possible}(s)
+t\in\mathrm{Reach}_{possible}(s)
 \Rightarrow
 \text{unresolved},
 $$

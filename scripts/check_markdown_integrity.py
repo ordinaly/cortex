@@ -28,6 +28,7 @@ HEADING_LATEX_RE = re.compile(
 LEGACY_INLINE_MATH_RE = re.compile(r"\\[()\[\]]")
 INLINE_MATH_SPAN_RE = re.compile(r"(?<!\\)\$[^$\n]+?(?<!\\)\$")
 TEX_COMMAND_RE = re.compile(r"\\[A-Za-z]+")
+FORBIDDEN_KATEX_MACRO_RE = re.compile(r"\\operatorname\\b")
 
 
 def rel(path: Path) -> str:
@@ -113,6 +114,12 @@ def check_file(path: Path) -> list[str]:
         table_rows = []
 
     for lineno, line in enumerate(lines, 1):
+        if FORBIDDEN_KATEX_MACRO_RE.search(line):
+            errors.append(
+                f"{name}:{lineno}: disallowed GitHub math macro \\operatorname; "
+                "use a GitHub-supported form such as \\mathrm{...}"
+            )
+
         if FENCE_RE.match(line):
             flush_table()
             in_fence = not in_fence

@@ -543,7 +543,7 @@ The graph crate also provides a directed dependency graph.
 When a node becomes dirty, Cortex can compute the transitive closure of only its dependents:
 
 ```math
-\operatorname{closure}(S)
+\mathrm{closure}(S)
 =
 S
 \cup
@@ -619,7 +619,7 @@ For prototypes $c_i$, Cortex computes RMS distances
 ```math
 d_i
 =
-\operatorname{RMS}(z,c_i)
+\mathrm{RMS}(z,c_i)
 ```
 
 and fuzzy membership scores
@@ -1182,7 +1182,7 @@ x
 For two adapted embeddings $x_a,x_b$, ordinary unweighted MSE becomes exactly cosine distance between the original embeddings:
 
 ```math
-\operatorname{MSE}(x_a,x_b)
+\mathrm{MSE}(x_a,x_b)
 =
 1-\cos(a,b).
 ```
@@ -1532,7 +1532,7 @@ candidate vocabulary may contain unused labels. This enables the explicit state
 ```math
 Z_{\mathrm{new}}\text{ exists},
 \qquad
-\operatorname{label}(Z_{\mathrm{new}})=\texttt{unresolved}.
+\mathrm{label}(Z_{\mathrm{new}})=\texttt{unresolved}.
 ```
 
 Across 80 untouched official cases, latent concept recovery, semantic
