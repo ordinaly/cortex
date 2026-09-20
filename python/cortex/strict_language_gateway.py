@@ -2421,7 +2421,12 @@ class StrictCortexChatSession:
                 timings,
             )
         )
-        if self.config.explain_responses:
+        if not content.strip():
+            content = (
+                reasoning_report.text()
+                .strip()
+            )
+        elif self.config.explain_responses:
             content = (
                 content.rstrip()
                 + reasoning_report.text()
