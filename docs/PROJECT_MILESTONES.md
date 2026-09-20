@@ -351,9 +351,15 @@ proposals jointly with relational structure and may return `reinforce`,
 `reinspect`, `broaden`, or `hold` feedback. Cortex can therefore demote a
 high-confidence neural label without deleting the underlying concept.
 
-Development preflight passed while the official seed range remains untouched.
-The official campaign should run only after the protocol is reviewed/frozen in
-the repository.
+The frozen official campaign has now passed. With one adversarial swapped
+pair, neural top-label accuracy of **0.600** became **0.9933 resolved accuracy**
+at **0.9933 coverage** after 8 structural facts. With two swapped pairs, neural
+accuracy of **0.200** became **0.960 resolved accuracy / 1.000 coverage** after
+12 facts, with **0.950 correction rate** and zero false reinspection on
+neural-correct concepts. Exact structural twins remained unresolved at 0.500
+support.
+
+See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md).
 
 The first protocol intentionally receives concept identities as input so it can
 isolate semantic adjudication. The intended integration order is therefore:
