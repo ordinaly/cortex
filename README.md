@@ -40,7 +40,7 @@ compact public articulation state
         └──────────────→ continual structural reasoning
 ```
 
-The implementation is split between a stable runtime and an experimental research layer. Implementation details are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/NATIVE_MIGRATION.md](docs/NATIVE_MIGRATION.md); they are secondary to the research questions summarized here.
+The implementation is split between a stable runtime and an experimental research layer. Implementation details are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); they are secondary to the research questions summarized here.
 
 ## Behavioral contract
 
@@ -63,10 +63,9 @@ The stable runtime is differentially checked against the frozen executable
 specification where their contracts overlap. CI also protects the frozen
 reference, version consistency, packaging, and the active research fixtures.
 
-For implementation history and runtime benchmarks, see
-[docs/NATIVE_MIGRATION.md](docs/NATIVE_MIGRATION.md),
-[docs/FULL_RUNTIME_BENCHMARK.md](docs/FULL_RUNTIME_BENCHMARK.md), and
-[docs/VERSIONING.md](docs/VERSIONING.md).
+Versioning and validation conventions are documented in
+[docs/VERSIONING.md](docs/VERSIONING.md). Historical implementation and
+performance reports remain available under `docs/`.
 
 ## Research frontier — v1.20-R
 
