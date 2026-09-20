@@ -40,6 +40,50 @@ def _bool_value(value: Any) -> bool | None:
     raise ValueError(f"invalid boolean value: {value!r}")
 
 
+def _message_text_content(content: Any) -> str | None:
+    """Extract textual content from OpenAI chat message content.
+
+    OpenAI-compatible clients may send either a plain string or an ordered
+    list of content parts such as:
+        [{"type": "text", "text": "hello"}, {"type": "image_url", ...}]
+    Only textual parts are forwarded into the Cortex language parser.
+    """
+
+    if isinstance(content, str):
+        text = content.strip()
+        return text or None
+
+    if isinstance(content, dict):
+        part_type = content.get("type")
+        text = content.get("text")
+        if (
+            part_type in ("text", "input_text")
+            and isinstance(text, str)
+        ):
+            normalized = text.strip()
+            return normalized or None
+        return None
+
+    if isinstance(content, list):
+        parts: list[str] = []
+        for part in content:
+            if not isinstance(part, dict):
+                continue
+            part_type = part.get("type")
+            text = part.get("text")
+            if (
+                part_type in ("text", "input_text")
+                and isinstance(text, str)
+                and text.strip()
+            ):
+                parts.append(text.strip())
+        if parts:
+            return "\n".join(parts)
+        return None
+
+    return None
+
+
 def _last_user_text(messages: Any) -> str:
     if not isinstance(messages, list):
         raise ValueError("messages must be an array")
@@ -48,10 +92,14 @@ def _last_user_text(messages: Any) -> str:
             continue
         if message.get("role") != "user":
             continue
-        content = message.get("content")
-        if isinstance(content, str):
-            return content
-    raise ValueError("a string user message is required")
+        text = _message_text_content(
+            message.get("content")
+        )
+        if text is not None:
+            return text
+    raise ValueError(
+        "a textual user message is required"
+    )
 
 
 def _openai_stream_events(result: Any):
