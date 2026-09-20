@@ -23,6 +23,7 @@ where its explicit unresolved state provides useful epistemic restraint.
 | explicit proof dependency | `explicit-proof-dependency-v1` | passed | all frozen gates passed across 120 cases; exact alternate-support handling |
 | planning / replanning | `planning-replanning-v1` | passed | optimal local repair with 0.0875 mean expansion ratio vs full replanning |
 | open-world novelty attribution | `open-world-novelty-attribution-v1` | passed | 1.000 attribution; 0 false persistent edits; exact ambiguity abstention |
+| novelty-aware replanning | `novelty-aware-replanning-v1` | passed integration | 1.000 decisions; 0.03846 mean local/full expansion ratio |
 
 All passed entries are research fixtures, not stable runtime semantics unless
 separately promoted through the executable-specification process.
@@ -259,9 +260,33 @@ unresolved when the structural edit itself is ambiguous.
 
 See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
 
-The next integration milestone is **Novelty-Aware Replanning v1**: use the
-attributed kind of world change to determine the scope of dependency
-invalidation and plan repair.
+## Completed integration: novelty-aware replanning
+
+`novelty-aware-replanning-v1` composes novelty attribution with planning
+dependency localization and repair.
+
+Across **160 untouched official cases**:
+
+- attribution accuracy: **1.000**;
+- novelty-to-plan decision accuracy: **1.000**;
+- model-component locality: **1.000**;
+- repair optimality: **1.000**;
+- exact plan preservation on noise/irrelevant novelty: **1.000**;
+- zero planning search on preserve cases: **1.000**;
+- local impact localization: **1.000**;
+- prefix/suffix preservation: **1.000 / 1.000**;
+- regime-global replanning correctness: **1.000**;
+- unresolved deferral safety: **1.000**.
+
+On local-repair fixtures, the mean local/full expansion ratio was **0.03846**,
+while preserving the exact full-search minimum cost.
+
+See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
+
+The next scientific milestone is **Open-World Robustness v1**, stressing the
+integrated adaptive loop under stochastic corruption, missing evidence,
+persistence variation, gradual shifts, compound novelty, and confidence
+calibration.
 
 ## Common evaluation axes
 
