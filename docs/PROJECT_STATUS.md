@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.16-R**  
+Last consolidated research frontier: **v1.17-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,9 +30,11 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.16-R`.
+The current research frontier is `v1.17-R`.
 
-v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling. The threshold was not weakened after evaluation.
+v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
+
+v1.17-R then re-attributed the optimized cache. At 288 anchors, **kernel regeneration is now 48.63%** of optimized refresh, writes/bookkeeping **24.94%**, and streamed geometry **13.69%**. The profiler reproduced the optimized cache exactly with zero prediction/cache/structural disagreements. The next measured engineering target is therefore kernel regeneration rather than geometry.
 
 ## Strongest validated engineering results
 
@@ -288,27 +290,50 @@ hypothesis is retained.
 
 See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
 
-### 5. v1.17-R — optimized cache re-attribution
+### 5. v1.17-R — optimized cache re-attribution — passed
 
-Re-decompose the **optimized** cache-refresh path before choosing another
-optimization. The development run suggested candidate readout might become
-dominant, but the untouched official run still measured cache refresh as the
-largest stage. A fresh internal attribution is therefore the correct next
-engineering experiment.
+The untouched official campaign reproduced the development ordering.
 
-### 6. Freeze the next executable research specification
+At 288 anchors:
+
+- kernel regeneration: **48.63%**;
+- writes/bookkeeping: **24.94%**;
+- streamed semantic geometry: **13.69%**;
+- semantic features: **4.31%**;
+- dirty detection: **2.82%**;
+- outcome probabilities: **2.32%**;
+- mean dirty-row fraction: **13.28%**.
+
+Inside streamed geometry, squared-distance accumulation is only **11.40%** and
+the final square root **2.21%**. Further geometry micro-optimization is
+therefore not the measured priority.
+
+See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
+
+### 6. v1.18-R — exact kernel-ladder fast path
+
+Test whether the canonical resolution ladder can reduce expensive exponential
+evaluation without changing cached kernels or predictions. For resolutions
+0.03, 0.06 and 0.12, the squared inverse-scale ratios are 16:4:1, so finer
+kernels may be derived by integer powers from the 0.12 kernel while the 0.25
+kernel remains independently exponentiated.
+
+Strict paired kernel/prediction parity and underflow behavior must be validated
+before accepting any performance claim.
+
+### 7. Freeze the next executable research specification
 
 Once adaptive predictive geometry and relational composition stabilize, define a new frozen research specification rather than mutating `spec-v0.9.5`.
 
-### 7. Promote validated mechanisms to Rust
+### 8. Promote validated mechanisms to Rust
 
 Port only mechanisms accepted into that new specification, with differential contracts.
 
-### 8. Untouched external validation
+### 9. Untouched external validation
 
 Freeze configuration before evaluation and compare against fair online/continual/graph/neural baselines on external chronological structured data.
 
-### 9. Hybrid Cortex Stage II
+### 10. Hybrid Cortex Stage II
 
 Only after Stage I demonstrates value beyond the frozen encoder should Cortex feedback be allowed to influence representation learning.
 
