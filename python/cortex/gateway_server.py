@@ -4,8 +4,9 @@ Install the optional gateway dependencies and run:
 
     cortex-gateway --chat-model qwen3:8b --embedding-model embeddinggemma
 
-The v0.1 server exposes a deliberately small OpenAI-compatible surface plus
-Cortex session controls. Streaming is deferred to a later milestone.
+The server exposes a deliberately small OpenAI-compatible surface plus
+Cortex session controls. OpenAI SSE transport streaming is supported; Cortex
+currently computes the complete answer before chunks are emitted.
 """
 from __future__ import annotations
 
