@@ -67,6 +67,7 @@ For implementation history and runtime benchmarks, see
 [docs/NATIVE_MIGRATION.md](docs/NATIVE_MIGRATION.md),
 [docs/FULL_RUNTIME_BENCHMARK.md](docs/FULL_RUNTIME_BENCHMARK.md), and
 [docs/VERSIONING.md](docs/VERSIONING.md).
+
 ## Research frontier — v1.20-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
