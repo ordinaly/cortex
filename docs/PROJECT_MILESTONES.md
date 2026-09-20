@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.21-R`;
+- predictive-geometry research frontier: `v1.22-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -423,24 +423,30 @@ See [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESU
 
 ---
 
-## B9. v1.22-R — single-buffer kernel refresh / allocation elision
+## B9. v1.22-R — single-buffer kernel refresh / allocation elision — development rejected
 
-The current lazy refresh computes a temporary kernel-row tensor with dimensions
-`resolutions × dirty_rows × anchors` before copying each resolution into the
-persistent kernel cache.
+The candidate replaced the temporary
+`resolutions × dirty_rows × anchors` kernel block with a reusable
+two-dimensional scratch buffer and evaluated one resolution at a time.
 
-Test whether the same exact kernels can be produced one resolution at a time
-into a reusable two-dimensional scratch buffer. This targets temporary
-allocation and memory traffic without changing the kernel formula.
+Behavioral parity was exact across the frozen development campaign:
 
-Require:
+- all prediction/state/kernel/distance errors: **0**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**;
+- lazy distance behavior preserved.
 
-- exact paired kernel/prediction/state parity;
-- zero structural disagreements;
-- preserved lazy distance behavior;
-- focused refresh and full fused-step timing;
-- explicit temporary-memory accounting;
-- no promotion without a clear paired full-step gain.
+Performance did not justify promotion:
+
+- 72 anchors: refresh **0.963×**, fused step **0.989×**;
+- 144 anchors: refresh **0.969×**, fused step **0.991×**;
+- 288 anchors: refresh **0.990×**, fused step **0.988×**;
+- 288-anchor fused wins: **0 / 6**.
+
+The development gates therefore failed and the official seeds were deliberately
+not run. The validated v1.20 lazy cache remains the default.
+
+See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
 
 ---
 
