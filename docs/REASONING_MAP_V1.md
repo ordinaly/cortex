@@ -19,7 +19,7 @@ where its explicit unresolved state provides useful epistemic restraint.
 | structural counterfactual reasoning | `counterfactual-reasoning-v1` | passed | all frozen gates passed across 140 worlds |
 | belief revision under contradiction | `belief-revision-v1` | passed | retraction 7/14/21 batches for prior strengths 1/2/3; exact locality |
 | structural analogy / isomorphism | `structural-analogy-v1` | passed | 0.9718 coverage with 12/90 facts; exact ambiguity preservation |
-| latent concept induction | planned | next | — |
+| latent concept induction | `latent-concept-induction-v1` | passed | exact recovery, ambiguity preservation, predictive gain, reversible lifecycle |
 | explicit proof dependency | planned | later | — |
 | planning / replanning | planned | later | — |
 | open-world novelty attribution | planned | later | — |
@@ -128,29 +128,38 @@ The key qualitative result was that correspondence identity could remain ambiguo
 
 See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md).
 
-## Planned axis: latent concept induction
+## Completed axis: latent concept induction
 
-The latent-concept benchmark removes one more piece of supplied structure.
+`latent-concept-induction-v1` removes one more piece of supplied structure:
+the useful category itself is not given to Cortex.
 
-Instead of providing every useful category, Cortex should be rewarded for
-introducing a latent grouping only when it reduces unresolved predictive
-complexity.
+The finite research prototype evaluates all **203** partitions of six opaque
+entities under a predictive-description objective. Hidden concept labels are
+used only after inference for scoring.
 
-Conceptually:
+Across untouched official seeds 700–719:
 
-$$
-\{e_1,e_3,e_7\}
-\rightarrow
-Z
-$$
+- two-concept minimum partition F1: **1.000**;
+- three-concept minimum partition F1: **1.000**;
+- no-shared-concept control correctness: **1.000**;
+- mean held-out gain over a flat per-entity predictor:
+  **0.0556 / 0.0288 nats per outcome** for the two- and three-concept worlds;
+- minimum grouped-case gain over one global concept: **0.2426 nats/outcome**;
+- ambiguous-member unresolved rate: **1.000**;
+- create/split/merge/retract lifecycle coverage: **1.000**.
 
-should be introduced only when the new articulation earns its complexity cost.
+A deliberately wrong geometry-decoy grouping reached at most **0.3333** F1,
+while Cortex recovered the predictive partition at **1.000** F1.
 
-This is likely one of the strongest future tests of Cortex's core design
-principle:
+The qualitative result is that Cortex can introduce a finite latent category
+because pooling improves predictive-description economy, and can later split,
+merge, or retract that category when current predictive structure changes.
 
-> Explain new evidence with the smallest structural change that future evidence
-> can justify.
+See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
+
+The next reasoning-map axis is **explicit proof dependency**. A separate
+integration milestone should also connect internally discovered concept IDs to
+the already validated semantic-grounding/revision stack.
 
 ## Common evaluation axes
 
