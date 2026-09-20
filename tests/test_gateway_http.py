@@ -68,7 +68,31 @@ class DummyGateway:
                         "cortex_prompt": 0.05,
                         "candidate": 0.10,
                     },
-                }
+                },
+                "orchestration": {
+                    "route": "mixed_structural",
+                    "cortex_prepass": True,
+                    "cortex_context_used": True,
+                    "candidate_checked": True,
+                    "revision_cycles": 1,
+                    "selected_model": "reasoning-adapter:latest",
+                    "adapter_active": True,
+                },
+                "adaptive_neural": {
+                    "activation": {
+                        "route": "mixed_structural",
+                        "model": "reasoning-adapter:latest",
+                        "adapter_active": True,
+                    },
+                    "learning": {
+                        "action": "context_only",
+                        "reason": "Evidence remains in Cortex memory.",
+                        "evidence_confirmations": 1,
+                        "requires_approval": False,
+                        "base_weights_mutated": False,
+                    },
+                    "weight_updates_enabled": False,
+                },
             },
             diagnostics=None,
         )
@@ -576,6 +600,16 @@ def test_ollama_chat_stream_matches_alpaca_ollama_0_6_1(client):
         "Reasoning mode: pretrained_knowledge"
         in thinking
     )
+    assert "Orchestration" in thinking
+    assert "Route: mixed_structural" in thinking
+    assert (
+        "Neural model: reasoning-adapter:latest"
+        in thinking
+    )
+    assert "Revision cycles: 1" in thinking
+    assert "Adapter active: True" in thinking
+    assert "Learning action: context_only" in thinking
+    assert "Base weights mutated: False" in thinking
     assert (
         chunks[-1].total_duration
         == 400_000_000
