@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.15-R`;
+- predictive-geometry research frontier: `v1.16-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -291,30 +291,56 @@ See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_
 
 ---
 
-## B3. v1.16-R — exact semantic-geometry fast path
+## B3. v1.16-R — exact semantic-geometry fast path — mixed official result
 
-The semantic feature rows are square roots of categorical probability vectors and therefore have unit Euclidean norm up to floating-point precision.
+The first development variant used the unit-norm dot-product identity directly.
+It was fast but failed the strict cached-distance parity gate near zero because
+of cancellation after the square root.
 
-Instead of materializing a dirty-rows × anchors × outcomes difference tensor, test the exact identity:
+The accepted implementation instead accumulates squared feature differences
+into a 2-D dirty-row matrix and reuses that squared geometry for all candidate
+resolution kernels.
 
-```math
-d_{ij}
-=
-\sqrt{\max(0,1-f_i^\top f_j)}.
-```
+On untouched official seeds at 288 anchors:
 
-The candidate optimization should:
+- cache-refresh speedup: **1.523×**;
+- complete fused-step speedup: **1.174×**;
+- maximum distance error: **5.55e-17**;
+- maximum kernel error: **3.33e-16**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**.
 
-- compute dirty-row dot products against all cached feature rows;
-- recover the same predictive distances;
-- regenerate every candidate-resolution kernel from the same squared-distance quantity;
-- preserve the existing sparse dirty-row selection;
-- preserve cached distance/kernel semantics;
-- pass paired numerical/structural parity before any performance claim.
+The preregistered bottleneck-shift gate nevertheless failed: cache refresh
+remained **36.79%** of the profiled step, above the frozen **35%** ceiling.
+
+The exact optimization is retained, but the full milestone is not recorded as a
+clean pass.
+
+See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
 
 ---
 
-## B4. Freeze the next executable research specification
+## B4. v1.17-R — optimized cache re-attribution
+
+Re-profile the internals of the **optimized** cache path before selecting another
+micro-optimization.
+
+Required groups:
+
+- semantic-feature recomputation;
+- outcome-probability refresh;
+- dirty-anchor detection;
+- streamed squared-distance accumulation;
+- multi-resolution kernel regeneration;
+- writes/bookkeeping and unattributed remainder.
+
+The official v1.16 stage profile still places cache refresh first, while its
+development profile temporarily placed candidate readout first. That
+disagreement makes fresh attribution preferable to assuming the next target.
+
+---
+
+## B5. Freeze the next executable research specification
 
 Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying `spec-v0.9.5`.
 
@@ -330,7 +356,8 @@ The freeze should include:
 This is the boundary between successful research and promotable architecture.
 
 ---
-## B5. Promote accepted mechanisms to Rust
+
+## B6. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
