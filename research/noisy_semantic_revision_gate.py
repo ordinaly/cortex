@@ -95,12 +95,34 @@ def summarize(rows: list[dict], *, official: bool) -> dict:
         ),
     }
 
+    diagnostics = {
+        "locality_failures": [
+            {
+                "seed": r["seed"],
+                "family": r["family"],
+                "events": r["unaffected_revision_events"],
+            }
+            for r in rows
+            if r["unaffected_revision_events"] != 0
+        ],
+        "false_revision_cases": [
+            {
+                "seed": r["seed"],
+                "family": r["family"],
+                "events": r["false_revision_events"],
+            }
+            for r in rows
+            if r["false_revision_events"] != 0
+        ],
+    }
+
     return {
         "protocol": PROTOCOL,
         "mode": "official" if official else "development",
         "rows": len(rows),
         "metrics": metrics,
         "checks": checks,
+        "diagnostics": diagnostics,
         "passed": all(checks.values()),
     }
 
