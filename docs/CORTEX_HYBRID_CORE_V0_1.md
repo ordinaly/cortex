@@ -92,6 +92,14 @@ A neural prior is not automatically written into Cortex.
 A neural bootstrap claim is also not treated as verified truth. It is a
 provisional seed that Cortex may later corroborate, revise, or reject.
 
+Hybrid Core also prevents **circular corroboration**. If a neural answer agrees
+with a relation that originally came only from neural bootstrap, the diagnosis
+is `bootstrap_aligned`, not `supported`. If it disagrees, the diagnosis is
+`bootstrap_divergence`, not a hard Cortex conflict.
+
+Only independent evidence such as an explicit user observation can promote the
+stored relation's provenance so that later agreement counts as corroboration.
+
 ## Neural bootstrap memory
 
 An existing pretrained neural model can seed small parts of Cortex memory.
