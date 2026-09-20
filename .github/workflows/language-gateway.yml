@@ -57,10 +57,18 @@ jobs:
               parser_model="test-parser",
               persistence_dir="",
           )
+          orchestrator = build_gateway_from_env(
+              chat_model="test",
+              cognitive_orchestrator=True,
+              parser_model="test-parser",
+              persistence_dir="",
+          )
 
           assert create_app(legacy).title == "Cortex Language Gateway"
           assert create_app(strict).title == "Cortex Language Gateway"
           assert create_app(hybrid).title == "Cortex Language Gateway"
+          assert create_app(orchestrator).title == "Cortex Language Gateway"
           assert strict.config.embedding_model == "sha256-symbolic-v1"
           assert hybrid.config.embedding_model == "sha256-symbolic-v1"
+          assert orchestrator.config.allow_weight_updates is False
           PY
