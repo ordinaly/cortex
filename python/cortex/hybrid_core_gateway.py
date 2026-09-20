@@ -19,7 +19,9 @@ from .hybrid_exchange import (
 )
 from .language_gateway import ChatResult
 from .neural_runtime import (
+    DefaultNeuralSessionFactory,
     NeuralRuntime,
+    NeuralSessionFactory,
     OllamaNeuralRuntime,
 )
 
@@ -355,6 +357,10 @@ class HybridCoreGateway:
             HybridOrchestrationPolicy
             | None
         ) = None,
+        neural_session_factory: (
+            NeuralSessionFactory
+            | None
+        ) = None,
     ) -> None:
         self.config = config
         self.runtime = (
@@ -365,6 +371,10 @@ class HybridCoreGateway:
         )
         self.orchestration_policy = (
             orchestration_policy
+        )
+        self.neural_session_factory = (
+            neural_session_factory
+            or DefaultNeuralSessionFactory()
         )
         self.sessions: dict[
             str,
@@ -382,12 +392,21 @@ class HybridCoreGateway:
         self,
         session_id: str,
     ) -> HybridCoreSession:
+        neural_session = (
+            self.neural_session_factory.create(
+                session_id=session_id,
+                runtime=self.runtime,
+            )
+        )
         return HybridCoreSession(
             session_id,
             self.config,
             self.runtime,
             orchestration_policy=(
                 self.orchestration_policy
+            ),
+            neural_session=(
+                neural_session
             ),
         )
 
