@@ -1,0 +1,33 @@
+name: concept-semantic-integration-official
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/concept-semantic-integration-official.yml"
+
+jobs:
+  concept-semantic-integration-official:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip numpy
+      - name: Run untouched official campaign
+        run: >-
+          python research/concept_semantic_integration_campaign.py
+          --official
+          --output concept-semantic-official.jsonl
+      - name: Check frozen official gates
+        run: >-
+          python research/concept_semantic_integration_gate.py
+          --input concept-semantic-official.jsonl
+          --official
+          | tee concept-semantic-official-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: concept-semantic-integration-official
+          path: |
+            concept-semantic-official.jsonl
+            concept-semantic-official-summary.json
