@@ -1,4 +1,4 @@
-"""Development validity checks for v1.16-R semantic geometry."""
+"""Frozen gates for v1.16-R exact semantic-geometry fast path."""
 from __future__ import annotations
 
 import argparse
@@ -78,6 +78,33 @@ def main() -> None:
             float(row["stage_accounted_fraction"])
             for row in rows
         ),
+        "refresh_speedup_288": float(
+            np.median(
+                [
+                    row["refresh_speedup"]
+                    for row in rows
+                    if int(row["anchors"]) == 288
+                ]
+            )
+        ),
+        "fused_speedup_288": float(
+            np.median(
+                [
+                    row["fused_speedup"]
+                    for row in rows
+                    if int(row["anchors"]) == 288
+                ]
+            )
+        ),
+        "cache_refresh_share_288": float(
+            np.median(
+                [
+                    row["stage_cache_refresh_share"]
+                    for row in rows
+                    if int(row["anchors"]) == 288
+                ]
+            )
+        ),
     }
 
     checks = {
@@ -133,6 +160,15 @@ def main() -> None:
         ),
         "stage_accounting": (
             metrics["stage_accounting_min"] >= 0.90
+        ),
+        "refresh_speedup_288": (
+            metrics["refresh_speedup_288"] >= 1.30
+        ),
+        "fused_speedup_288": (
+            metrics["fused_speedup_288"] >= 1.08
+        ),
+        "cache_bottleneck_reduced_288": (
+            metrics["cache_refresh_share_288"] <= 0.35
         ),
     }
 
