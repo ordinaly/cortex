@@ -215,6 +215,7 @@ def run_case(family: str, seed: int) -> dict:
         RELATIONS,
         semantic_edges,
         challenge_patience=NOISY_CHALLENGE_PATIENCE,
+        require_resolved_challenger=True,
     )
 
     neural_briers: list[float] = []
