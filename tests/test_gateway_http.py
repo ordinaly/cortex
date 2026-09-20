@@ -568,10 +568,17 @@ def test_ollama_chat_stream_matches_alpaca_ollama_0_6_1(client):
         for line in raw_lines
     ]
 
-    text = "".join(
+    content_chunks = [
         chunk.message.content
-        or ""
         for chunk in chunks
+        if chunk.message.content
+    ]
+    assert len(
+        content_chunks
+    ) == 1
+
+    text = "".join(
+        content_chunks
     )
 
     assert text == "Hello from Cortex."
