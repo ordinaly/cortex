@@ -1,4 +1,4 @@
-name: cortex-language-gateway-v0.1
+name: cortex-language-gateway
 
 on:
   pull_request:
@@ -26,11 +26,25 @@ jobs:
       - run: python -m pip install --upgrade pip pytest fastapi uvicorn
       - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/gateway_server.py
       - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py -q
-      - name: Import HTTP app surface
+      - name: Import HTTP app surfaces
         run: |
           python - <<'PY'
           from cortex.gateway_server import build_gateway_from_env, create_app
-          gateway = build_gateway_from_env(chat_model="test", embedding_model="test")
-          app = create_app(gateway)
-          assert app.title == "Cortex Language Gateway"
+
+          legacy = build_gateway_from_env(
+              chat_model="test",
+              embedding_model="test",
+              persistence_dir="",
+          )
+          strict = build_gateway_from_env(
+              chat_model="test",
+              strict_neural_boundary=True,
+              parser_model="test-parser",
+              renderer_model="test-renderer",
+              persistence_dir="",
+          )
+
+          assert create_app(legacy).title == "Cortex Language Gateway"
+          assert create_app(strict).title == "Cortex Language Gateway"
+          assert strict.config.embedding_model == "sha256-symbolic-v1"
           PY
