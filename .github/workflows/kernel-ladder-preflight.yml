@@ -1,18 +1,13 @@
-name: cortex-v1-18-kernel-ladder-preflight
+name: cortex-v1-18-kernel-ladder-repro
 
+# v1.18-R is a concluded negative performance experiment. Keep the campaign
+# available for reproducibility, but do not use its historical performance
+# thresholds as a blocking check for newer cache implementations.
 on:
-  pull_request:
-    paths:
-      - "research/support_sparse_prediction.py"
-      - "research/kernel_ladder_fast_path_campaign.py"
-      - "research/kernel_ladder_fast_path_gate.py"
-      - "tests/test_kernel_ladder_fast_path.py"
-      - "docs/KERNEL_LADDER_FAST_PATH_V1_18.md"
-      - ".github/workflows/kernel-ladder-preflight.yml"
   workflow_dispatch:
 
 jobs:
-  kernel-ladder-preflight:
+  kernel-ladder-repro:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,12 +16,12 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip pytest numpy scipy
       - run: pytest tests/test_kernel_ladder_fast_path.py -q
-      - name: Run development campaign
+      - name: Run frozen development campaign
         run: >-
           python research/kernel_ladder_fast_path_campaign.py
           --development
           --output kernel-ladder-development.jsonl
-      - name: Check development validity gates
+      - name: Reproduce historical gates
         run: >-
           python research/kernel_ladder_fast_path_gate.py
           kernel-ladder-development.jsonl

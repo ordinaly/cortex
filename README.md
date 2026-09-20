@@ -16,9 +16,9 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.19-R** |
+| research frontier | **v1.20-R** |
 
-The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
+The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.20-R research frontier**.
 
 For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
@@ -26,33 +26,21 @@ For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/
 
 The canonical detailed architecture guide is [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-The composed native path is:
+The core information flow is:
 
 ```text
 structured observations
         ↓
-entity identity + nuisance-transform handling + binding
+entity identity + nuisance handling + binding
         ↓
-sparse relation and intervention-sensitive causal evidence
+sparse relational / causal structure
         ↓
-12-dimensional public articulation summary
-        ├──────────────→ bounded fuzzy historical memory
-        └──────────────→ continual regime reasoning and plasticity
+compact public articulation state
+        ├──────────────→ bounded historical memory
+        └──────────────→ continual structural reasoning
 ```
 
-Rust owns the stateful hot path:
-
-```text
-crates/
-  cortex-articulation/   entity identity, invariance, binding, residual/noise state
-  cortex-graph/          sparse relation, causal and dependency state
-  cortex-memory/         bounded fuzzy historical memory
-  cortex-core/           recurrence, adaptation, split/merge/novelty
-  cortex-runtime/        complete composed frame transition
-  cortex-python/         thin PyO3 research interface
-```
-
-Python remains the experiment layer for datasets, benchmark orchestration, analysis, plotting, and research prototypes.
+The implementation is split between a stable runtime and an experimental research layer. Implementation details are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md); they are secondary to the research questions summarized here.
 
 ## Behavioral contract
 
@@ -69,46 +57,17 @@ Cortex is explicitly bounded and structurally conservative:
 
 The release-candidate contract is recorded in [docs/V1_CONTRACT.md](docs/V1_CONTRACT.md).
 
-## Native implementation and validation
+## Implementation and validation
 
-The frozen Python tree under `reference/v0_9_5/` is protected by SHA-256 hashes and is intentionally historical and immutable.
+The stable runtime is differentially checked against the frozen executable
+specification where their contracts overlap. CI also protects the frozen
+reference, version consistency, packaging, and the active research fixtures.
 
-Native layers are accepted through differential replay rather than by compilation alone. CI checks include Rust formatting and Clippy, release-mode Rust tests, PyO3 build, Python differential suites, frozen-reference integrity, wheel packaging, and version consistency.
+Versioning and validation conventions are documented in
+[docs/VERSIONING.md](docs/VERSIONING.md). Historical implementation and
+performance reports remain available under `docs/`.
 
-See:
-
-- [docs/NATIVE_MIGRATION.md](docs/NATIVE_MIGRATION.md)
-- [docs/VERSIONING.md](docs/VERSIONING.md)
-
-## Performance results
-
-### Full-stack native migration
-
-On the controlled 1,400-frame full-stack workload:
-
-| execution mode | mean step | p50 latency | peak RSS |
-|---|---:|---:|---:|
-| Frozen Python | 10,315.3 µs | 9,863.6 µs | 87.43 MiB |
-| Hybrid | 10,141.9 µs | 9,719.4 µs | 86.93 MiB |
-| Fully native | **78.66 µs** | **72.63 µs** | **21.99 MiB** |
-
-On that specific workload, the fully native path was about **131× faster by mean step time** and used about **4× less peak process memory** than the frozen Python stack. These are workload-specific measurements, not universal speedup claims.
-
-See [docs/FULL_RUNTIME_BENCHMARK.md](docs/FULL_RUNTIME_BENCHMARK.md).
-
-### Native scaling and attribution
-
-A first native scaling sweep exposed an accidental global graph-snapshot cost. Replacing that hot-path materialization with incremental evidence counts reduced median mean-step time by **31.96% across the 25-case campaign**, with substantially larger gains in graph-heavy cases.
-
-Top-level stage attribution then showed that native **articulation** accounts for roughly **83–95%** of attributed runtime in the tested stress cases. Fine-grained attribution localized that cost further: cyclic transform-distance evaluation accounts for roughly **85–96%** of attributed articulation work.
-
-See:
-
-- [docs/NATIVE_SCALING_SWEEP_V1.md](docs/NATIVE_SCALING_SWEEP_V1.md)
-- [docs/NATIVE_STAGE_ATTRIBUTION.md](docs/NATIVE_STAGE_ATTRIBUTION.md)
-- [docs/ARTICULATION_ATTRIBUTION.md](docs/ARTICULATION_ATTRIBUTION.md)
-
-## Research frontier — v1.19-R
+## Research frontier — v1.20-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -126,21 +85,15 @@ The progression has established:
 - retained-mass support tradeoffs;
 - internal fused-stage attribution.
 
-v1.14-R implemented the exact field-specific perceptual fast path identified by the profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and the complete paired fused step **1.96× faster**, with zero structural disagreements. Perceptual share fell to **2.20%**.
+Recent engineering work has focused on making the adaptive predictive-geometry path cheaper without changing its behavior. The important current results are:
 
-v1.15-R then decomposed the new cache-refresh bottleneck. At 288 anchors, **distance-row recomputation accounts for 41.10%** of attributed refresh time, **kernel regeneration 35.50%**, and writes/bookkeeping 15.48%. Together, semantic geometry and kernel regeneration account for about **76.6%** of refresh cost, with exact paired cache parity and zero structural disagreements.
+- v1.19-R used low-overhead independent replay profiling and confirmed that cache refresh was the largest coarse Python/NumPy stage at **37.22%** of the 288-anchor fused step, ahead of candidate readout (**21.80%**), hysteresis/state scan (**17.60%**), and complexity refresh (**13.41%**);
+- v1.20-R introduced **lazy distance materialization**: the hot path keeps squared semantic geometry and predictive kernels current, while the ordinary distance matrix is reconstructed only when explicitly requested;
+- on untouched official v1.20-R cases at 288 anchors, refresh became **1.132× faster** and the complete fused step **1.025× faster**, with **zero numerical or structural discrepancy** and exact distance reconstruction on demand.
 
-v1.16-R implements the resulting exact semantic-geometry fast path. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the full fused step **1.17× faster**, while distance/kernel discrepancies remained at **5.55e-17 / 3.33e-16** and structural disagreements stayed at zero. One preregistered gate nevertheless failed: cache refresh still occupied **36.79%** of the profiled step, above the frozen **35%** bottleneck-shift ceiling. The threshold was not weakened.
+The lazy cache is now the default research fused-cache path. The next engineering milestone is **v1.21-R post-lazy low-overhead stage profiling**, which will re-measure the new top-level cost structure before another optimization is selected.
 
-v1.17-R re-attributed that optimized cache. At 288 anchors, **kernel regeneration is 48.63%** of refresh, writes/bookkeeping **24.94%**, and streamed semantic geometry **13.69%**. Squared-distance accumulation itself is only **11.40%**, confirming that v1.16 successfully moved the dominant internal cost away from geometry.
-
-v1.18-R tested that exact kernel ladder. The transformation was numerically safe (maximum kernel error **1.89e-15**, zero underflow/dirty/structural mismatches), but the untouched official performance campaign rejected promotion: at 288 anchors the kernel path was only **1.115×** faster, refresh **1.017×**, and the full fused step **0.998×**, below all frozen performance gates.
-
-v1.19-R then measured each fused stage in a separate fresh replay to reduce observer interference. The untouched official profile reproduced development: at 288 anchors, **cache refresh is 37.22%**, candidate readout **21.80%**, hysteresis/state scan **17.60%**, and complexity refresh **13.41%**, with zero prediction-checksum discrepancy.
-
-The next engineering experiment is **v1.20-R lazy distance materialization / write elision**: keep the kernel cache hot, stop eagerly synchronizing the full distance matrix on every dirty refresh, and materialize the diagnostic distance view only when explicitly requested. See [docs/LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](docs/LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
-
-The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
+See [docs/LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](docs/LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md) and [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md) for the detailed engineering history, including retained negative results.
 
 ## Relational reasoning
 
@@ -223,13 +176,13 @@ See [docs/HYBRID_STAGE_I.md](docs/HYBRID_STAGE_I.md),
 ## Repository layout
 
 ```text
-crates/                 native Rust runtime
-python/                 Python package/research boundary
 research/               active and reproducible research implementations
 benchmarks/             benchmark drivers and committed aggregate results
-tests/                  native/Python/differential/research tests
+tests/                  validation and research tests
 reference/v0_9_5/       immutable frozen executable specification
-docs/                   current project and benchmark documentation
+docs/                   architecture, project status and experiment reports
+crates/                 stable runtime implementation
+python/                 Python package / runtime boundary
 configs/                canonical runtime configuration
 ```
 

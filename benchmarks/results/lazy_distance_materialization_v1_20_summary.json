@@ -1,0 +1,41 @@
+{
+  "protocol": "lazy-distance-materialization-v1.20-R",
+  "mode": "official",
+  "workflow_run_id": 35505783301,
+  "seeds": [900, 901, 902, 903, 904],
+  "anchor_cases": [72, 144, 288],
+  "max_candidate_error": 0.0,
+  "max_local_error": 0.0,
+  "max_outcome_count_error": 0.0,
+  "max_feature_error": 0.0,
+  "max_probability_error": 0.0,
+  "max_kernel_error": 0.0,
+  "max_distance_error_after_access": 0.0,
+  "dirty_disagreements": 0,
+  "structural_disagreements": 0,
+  "hot_distance_materializations": 0,
+  "cases": {
+    "72": {
+      "refresh_speedup": 1.0728944816998953,
+      "fused_speedup": 1.0237384351141021,
+      "lazy_refresh_us_per_step": 133.19879259259258,
+      "distance_access_us": 76.773,
+      "distance_access_break_even_refreshes": 7.907033359595274
+    },
+    "144": {
+      "refresh_speedup": 1.0905512771793773,
+      "fused_speedup": 1.0254689828798211,
+      "lazy_refresh_us_per_step": 310.0107814814815,
+      "distance_access_us": 204.051,
+      "distance_access_break_even_refreshes": 7.268877491599794
+    },
+    "288": {
+      "refresh_speedup": 1.1316614041041384,
+      "fused_speedup": 1.0248707492557043,
+      "lazy_refresh_us_per_step": 665.8376407407407,
+      "distance_access_us": 780.18,
+      "distance_access_break_even_refreshes": 8.899548779493177
+    }
+  },
+  "passed": true
+}

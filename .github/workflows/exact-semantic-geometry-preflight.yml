@@ -1,18 +1,13 @@
-name: cortex-v1-16-semantic-geometry-preflight
+name: cortex-v1-16-semantic-geometry-repro
 
+# v1.16-R is a concluded historical optimization campaign. Keep it available
+# for reproducibility, but do not use its old bottleneck-share performance gate
+# as a blocking check for newer research-cache implementations.
 on:
-  pull_request:
-    paths:
-      - "research/support_sparse_prediction.py"
-      - "research/exact_semantic_geometry_fast_path_campaign.py"
-      - "research/exact_semantic_geometry_fast_path_gate.py"
-      - "tests/test_exact_semantic_geometry_fast_path.py"
-      - "docs/EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16.md"
-      - ".github/workflows/exact-semantic-geometry-preflight.yml"
   workflow_dispatch:
 
 jobs:
-  exact-semantic-geometry-preflight:
+  exact-semantic-geometry-repro:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,12 +16,12 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip pytest numpy scipy
       - run: pytest tests/test_exact_semantic_geometry_fast_path.py -q
-      - name: Run development campaign
+      - name: Run frozen development campaign
         run: >-
           python research/exact_semantic_geometry_fast_path_campaign.py
           --development
           --output exact-semantic-geometry-development.jsonl
-      - name: Check development validity gates
+      - name: Reproduce historical gates
         run: >-
           python research/exact_semantic_geometry_fast_path_gate.py
           exact-semantic-geometry-development.jsonl

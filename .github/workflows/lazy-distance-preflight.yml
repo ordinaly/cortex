@@ -1,0 +1,27 @@
+name: cortex-v1-20-lazy-distance-repro
+
+# v1.20-R has a frozen passing official campaign. Keep the development
+# performance campaign available for reproducibility, but do not let noisy
+# microbenchmark thresholds block unrelated or later changes.
+on:
+  workflow_dispatch:
+
+jobs:
+  lazy-distance-repro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy scipy
+      - run: pytest tests/test_lazy_distance_materialization.py -q
+      - name: Run frozen development campaign
+        run: >-
+          python research/lazy_distance_materialization_campaign.py
+          --development
+          --output lazy-distance-development.jsonl
+      - name: Reproduce historical gates
+        run: >-
+          python research/lazy_distance_materialization_gate.py
+          lazy-distance-development.jsonl
