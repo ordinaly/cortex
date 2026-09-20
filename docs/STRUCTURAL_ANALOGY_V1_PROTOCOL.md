@@ -14,11 +14,11 @@ both entity labels and relation labels are independently replaced?
 
 The intended abstraction is:
 
-$$
+```math
 G_s
 \xrightarrow{\text{structural correspondence}}
 G_t
-$$
+```
 
 without relying on shared surface symbols.
 
@@ -49,15 +49,15 @@ For every seed, source and target use disjoint opaque namespaces.
 
 Entity labels are independently permuted:
 
-$$
+```math
 S_i \notin \{T_j\},
-$$
+```
 
 and relation labels are independently permuted:
 
-$$
+```math
 R_i^{(s)} \notin \{R_j^{(t)}\}.
-$$
+```
 
 The hidden source-to-target entity bijection and relation bijection are never
 exposed to the inducer.
@@ -113,30 +113,30 @@ The target graph is only partially observed.
 
 Evidence is ternary structural data:
 
-$$
+```math
 (u,r,v,\text{present})
-$$
+```
 
 or
 
-$$
+```math
 (u,r,v,\text{absent}).
-$$
+```
 
 The target contains 90 possible directed non-self triples:
 
-$$
+```math
 6\times 5\times 3=90.
-$$
+```
 
 Evidence is revealed in a deterministic nested order with positive and negative
 facts interleaved.
 
 Official budgets are:
 
-$$
+```math
 12,\quad 24,\quad 36
-$$
+```
 
 observed target triples.
 
@@ -147,9 +147,9 @@ space must never increase as budget grows.
 
 Cortex maintains every joint bijection
 
-$$
+```math
 (\phi_V,\phi_R)
-$$
+```
 
 that is consistent with all observed target facts.
 
@@ -158,9 +158,9 @@ candidate node and relation mappings reproduces every observed target fact.
 
 This produces a version space:
 
-$$
+```math
 \mathcal V_t.
-$$
+```
 
 No arbitrary tie-break is allowed.
 
@@ -178,9 +178,9 @@ Cortex returns:
 
 Thus:
 
-$$
+```math
 |\mathcal V_t|>1
-$$
+```
 
 does not necessarily imply predictive uncertainty.
 
@@ -191,7 +191,7 @@ prediction.
 
 For each source entity $s$, Cortex records the empirical candidate distribution
 
-$$
+```math
 P_t(v\mid s)
 =
 \frac{
@@ -199,7 +199,7 @@ P_t(v\mid s)
 }{
 |\mathcal V_t|
 }.
-$$
+```
 
 The correspondence is resolved only when this distribution is a point mass.
 
@@ -257,9 +257,9 @@ Complete diagnostic evidence is then supplied.
 
 Cortex must reject the analogy:
 
-$$
+```math
 \mathcal V=\varnothing.
-$$
+```
 
 This is a safety control, not a sample-efficiency comparison.
 
@@ -289,11 +289,11 @@ Required behavior:
 
 This directly tests:
 
-$$
+```math
 \text{uncertain identity}
 \neq
 \text{uncertain structure}.
-$$
+```
 
 ## Provenance
 
@@ -312,15 +312,15 @@ Development and preflight use seeds below 100.
 
 The untouched official campaign uses:
 
-$$
+```math
 300,\ldots,319.
-$$
+```
 
 With 4 families and 3 evidence budgets, the compatible campaign contains:
 
-$$
+```math
 20\times4\times3=240
-$$
+```
 
 cases.
 
