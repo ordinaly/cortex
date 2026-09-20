@@ -1,6 +1,6 @@
 # Semantic revision v1 — temporal label revision
 
-Status: **frozen protocol / development preflight pending**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: `semantic-revision-v1`.
 
@@ -168,8 +168,7 @@ Official untouched seeds: `400..419`.
 There are 3 structural families, producing 60 development and 60 official
 cases.
 
-Official seeds may not be evaluated until development gates pass and this
-protocol is frozen.
+Development gates passed before the untouched official seed range was evaluated.
 
 ## Frozen gates
 
@@ -198,3 +197,26 @@ persistent regime change, and recover when the regime reverses.
 
 It would not establish optimal Bayesian forgetting, real-world concept drift,
 open-vocabulary revision, or trainable neural feedback.
+
+
+## Official outcome
+
+The untouched official campaign on seeds 400–419 passed every frozen gate
+across 60 cases.
+
+Key results:
+
+- initial mapping correctness: **1.000**;
+- one-shock preservation: **1.000**;
+- sustained revision success: **1.000**;
+- recovery success: **1.000**;
+- explicit challenged → withdrawn → revised path validity: **1.000**;
+- unaffected-concept preservation: **1.000**;
+- maximum shift latency: **4 epochs**;
+- maximum recovery latency: **4 epochs**;
+- bounded neural and structural history compliance: **1.000**.
+
+See [SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md) and
+[the committed aggregate summary](../benchmarks/results/semantic_revision_v1_summary.json).
+
+The frozen thresholds were not weakened after official evaluation.
