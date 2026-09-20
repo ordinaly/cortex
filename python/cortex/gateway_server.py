@@ -385,6 +385,8 @@ def _ollama_chat_payload(
     model: str,
     content: str,
     done: bool,
+    thinking: str = "",
+    metrics: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     return {
         "model": model,
@@ -392,7 +394,7 @@ def _ollama_chat_payload(
         "message": {
             "role": "assistant",
             "content": content,
-            "thinking": "",
+            "thinking": thinking,
             "tool_calls": [],
         },
         "done": done,
@@ -401,12 +403,17 @@ def _ollama_chat_payload(
             if done
             else None
         ),
-        "total_duration": 0,
-        "load_duration": 0,
-        "prompt_eval_count": 0,
-        "prompt_eval_duration": 0,
-        "eval_count": 0,
-        "eval_duration": 0,
+        **(
+            metrics
+            or {
+                "total_duration": 0,
+                "load_duration": 0,
+                "prompt_eval_count": 0,
+                "prompt_eval_duration": 0,
+                "eval_count": 0,
+                "eval_duration": 0,
+            }
+        ),
     }
 
 
