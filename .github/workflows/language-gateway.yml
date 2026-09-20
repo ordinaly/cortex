@@ -46,8 +46,16 @@ jobs:
               renderer_model="test-renderer",
               persistence_dir="",
           )
+          hybrid = build_gateway_from_env(
+              chat_model="test",
+              hybrid_cognition=True,
+              parser_model="test-parser",
+              persistence_dir="",
+          )
 
           assert create_app(legacy).title == "Cortex Language Gateway"
           assert create_app(strict).title == "Cortex Language Gateway"
+          assert create_app(hybrid).title == "Cortex Language Gateway"
           assert strict.config.embedding_model == "sha256-symbolic-v1"
+          assert hybrid.config.embedding_model == "sha256-symbolic-v1"
           PY
