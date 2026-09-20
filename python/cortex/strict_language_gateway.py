@@ -721,6 +721,51 @@ def prompt_ir_packet(
     }
 
 
+def _resolve_prompt_entity_ref(
+    reference: str,
+    entities: Sequence[PromptEntity],
+) -> str:
+    """Resolve a PromptIR entity reference to a declared local entity ID.
+
+    The strict schema asks the parser to use local IDs such as e0/e1. Real
+    language models occasionally emit the declared surface string instead.
+    Accept that representation only when it maps unambiguously to one declared
+    entity. Unknown or ambiguous references remain validation errors.
+    """
+
+    raw = reference.strip()
+    if not raw:
+        return ""
+
+    by_id = {
+        entity.local_id: entity.local_id
+        for entity in entities
+    }
+    if raw in by_id:
+        return by_id[raw]
+
+    normalized = _normalized_text(
+        raw
+    )
+    surface_matches = [
+        entity.local_id
+        for entity in entities
+        if _normalized_text(
+            entity.surface
+        ) == normalized
+    ]
+    if len(surface_matches) == 1:
+        return surface_matches[0]
+    if len(surface_matches) > 1:
+        raise ValueError(
+            f"PromptIR entity reference is ambiguous: {reference!r}"
+        )
+
+    raise ValueError(
+        f"PromptIR entity reference is unknown: {reference!r}"
+    )
+
+
 def parse_prompt_ir_payload(
     payload: Mapping[str, Any],
     *,
@@ -818,27 +863,40 @@ def parse_prompt_ir_payload(
             raise ValueError(
                 "PromptIR observation must be an object"
             )
+        raw_subject = str(
+            item.get(
+                "subject",
+                "",
+            )
+        ).strip()
+        raw_object = str(
+            item.get(
+                "object",
+                "",
+            )
+        ).strip()
+        predicate = _normalized_predicate(
+            str(
+                item.get(
+                    "predicate",
+                    "",
+                )
+            )
+        )
+        if not predicate:
+            raise ValueError(
+                "PromptIR observation predicate must not be empty"
+            )
         observation = PromptObservation(
-            subject=str(
-                item.get(
-                    "subject",
-                    "",
-                )
-            ).strip(),
-            predicate=_normalized_predicate(
-                str(
-                    item.get(
-                        "predicate",
-                        "",
-                    )
-                )
+            subject=_resolve_prompt_entity_ref(
+                raw_subject,
+                entities,
             ),
-            object=str(
-                item.get(
-                    "object",
-                    "",
-                )
-            ).strip(),
+            predicate=predicate,
+            object=_resolve_prompt_entity_ref(
+                raw_object,
+                entities,
+            ),
             asserted=bool(
                 item.get(
                     "asserted",
@@ -852,16 +910,6 @@ def parse_prompt_ir_payload(
                 )
             ).strip(),
         )
-        if (
-            observation.subject
-            not in ids
-            or observation.object
-            not in ids
-            or not observation.predicate
-        ):
-            raise ValueError(
-                "PromptIR observation references an unknown entity or empty predicate"
-            )
         if (
             source_text is not None
             and not _evidence_is_anchored(
@@ -893,18 +941,34 @@ def parse_prompt_ir_payload(
             "unsupported PromptIR query operation"
         )
 
-    query_subject = str(
+    raw_query_subject = str(
         payload.get(
             "query_subject",
             "",
         )
     ).strip()
-    query_object = str(
+    raw_query_object = str(
         payload.get(
             "query_object",
             "",
         )
     ).strip()
+    query_subject = (
+        _resolve_prompt_entity_ref(
+            raw_query_subject,
+            entities,
+        )
+        if raw_query_subject
+        else ""
+    )
+    query_object = (
+        _resolve_prompt_entity_ref(
+            raw_query_object,
+            entities,
+        )
+        if raw_query_object
+        else ""
+    )
     query_predicate = (
         _normalized_predicate(
             str(
@@ -915,23 +979,6 @@ def parse_prompt_ir_payload(
             )
         )
     )
-
-    if (
-        query_subject
-        and query_subject
-        not in ids
-    ):
-        raise ValueError(
-            "PromptIR query subject references unknown entity"
-        )
-    if (
-        query_object
-        and query_object
-        not in ids
-    ):
-        raise ValueError(
-            "PromptIR query object references unknown entity"
-        )
     if (
         operation
         == "relation_lookup"
