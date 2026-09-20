@@ -17,9 +17,9 @@ scale:
 The current `FuzzyPredictiveField` constructor already stores every anchor as
 a unit vector:
 
-$$
+```math
 a_i\leftarrow\frac{a_i}{\lVert a_i\rVert}.
-$$
+```
 
 The generic perceptual helper nevertheless normalizes every anchor again for
 every observation.
@@ -34,15 +34,15 @@ inputs.
 Inside `FuzzyPredictiveField.possibility`, normalize only the incoming
 observation:
 
-$$
+```math
 \hat{x}=\frac{x}{\lVert x\rVert},
-$$
+```
 
 then evaluate
 
-$$
+```math
 d_i=\max(0,1-a_i^\top\hat{x})
-$$
+```
 
 directly against the constructor-normalized anchor matrix.
 
@@ -92,27 +92,27 @@ Measure in the same process:
 
 Report paired speedups:
 
-$$
+```math
 S_{perceptual}
 =
 \frac{T_{legacy,perceptual}}
      {T_{fast,perceptual}},
-$$
+```
 
 and
 
-$$
+```math
 S_{step}
 =
 \frac{T_{legacy,step}}
      {T_{fast,step}}.
-$$
+```
 
 Anchor counts:
 
-$$
+```math
 72,\quad144,\quad288.
-$$
+```
 
 Three deterministic seeds are used.
 

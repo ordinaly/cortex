@@ -34,9 +34,9 @@ Only afterward was semantic evidence introduced.
 Perception intentionally swapped the names of two concepts, producing raw
 neural semantic accuracy of:
 
-$$
+```math
 0.3333.
-$$
+```
 
 Persistent relational structure then adjudicated the label mapping.
 
@@ -67,19 +67,19 @@ Label-causal-isolation rate: **1.000**.
 
 This supports the intended direction:
 
-$$
+```math
 \text{concept}
 \rightarrow
 \text{label evidence}
-$$
+```
 
 and rejects the reverse dependency inside this integration:
 
-$$
+```math
 \text{label vocabulary}
 \nrightarrow
 \text{concept identity}.
-$$
+```
 
 ## A concept can exist without a name
 
@@ -99,17 +99,17 @@ Official result:
 
 Thus the system can represent:
 
-$$
+```math
 Z_{\mathrm{new}}\text{ exists}
-$$
+```
 
 while simultaneously representing:
 
-$$
+```math
 \operatorname{label}(Z_{\mathrm{new}})
 =
 \texttt{unresolved}.
-$$
+```
 
 This is a stronger separation between ontology and language than the earlier
 semantic-grounding experiment, which received concept identities externally.
@@ -119,7 +119,7 @@ semantic-grounding experiment, which received concept identities externally.
 The final fixture integrated semantic grounding with the latent concept
 lifecycle:
 
-$$
+```math
 \text{coarse}
 \rightarrow
 \text{split}
@@ -127,11 +127,11 @@ $$
 \text{merge}
 \rightarrow
 \text{retract}.
-$$
+```
 
 The semantic trajectory was:
 
-$$
+```math
 \text{broad}
 \rightarrow
 \{\text{left},\text{right}\}
@@ -139,7 +139,7 @@ $$
 \text{broad}
 \rightarrow
 \varnothing.
-$$
+```
 
 Across every official seed:
 
@@ -160,11 +160,11 @@ The semantic grounder now supports more labels than active concepts.
 For $m$ concepts and $n\ge m$ labels, exact inference evaluates injective
 assignments:
 
-$$
+```math
 P(n,m)
 =
 \frac{n!}{(n-m)!}.
-$$
+```
 
 This preserves the original equal-cardinality behavior while allowing unused
 vocabulary and semantically unnamed concepts.
@@ -176,7 +176,7 @@ generalization.
 
 The composed research path is now:
 
-$$
+```math
 \boxed{
 \text{entities}
 \rightarrow
@@ -184,7 +184,7 @@ $$
 \rightarrow
 \text{semantic grounding}
 }
-$$
+```
 
 with concept identity and semantic identity explicitly separate.
 

@@ -36,11 +36,11 @@ its empirical consistency exceeds the frozen confidence threshold.
 
 For observed products, Cortex looks for complete witnesses to
 
-$$
+```math
 (a\star b)\star c
 =
 a\star(b\star c).
-$$
+```
 
 If enough complete witnesses agree, associativity becomes an admissible
 constraint.
@@ -49,21 +49,21 @@ constraint.
 
 For pairs where both directions are observed, Cortex tests
 
-$$
+```math
 a\star b
 =
 b\star a.
-$$
+```
 
 ### Identity evidence
 
 For each candidate element $e$, Cortex checks directly observed instances of
 
-$$
+```math
 e\star a=a,
 \qquad
 a\star e=a.
-$$
+```
 
 A two-sided identity is activated only if exactly one candidate has sufficient
 consistent evidence.
@@ -75,19 +75,19 @@ observed directly.
 
 If
 
-$$
+```math
 a\star b=u,
 \qquad
 b\star c=v,
-$$
+```
 
 and one side of
 
-$$
+```math
 u\star c
 =
 a\star v
-$$
+```
 
 is known while the other is missing, associativity supplies the missing
 product.
@@ -112,9 +112,9 @@ The campaign uses three structurally different operations.
 
 The subtraction operation
 
-$$
+```math
 a\star b = a-b \pmod 7
-$$
+```
 
 is a structured non-associative control. It is included to detect a reasoner
 that imposes elegant group-like laws even when the data contradict them.
@@ -148,9 +148,9 @@ The distinction between **accuracy** and **resolved accuracy** matters.
 For cyclic C7, Cortex left a small fraction of held-out products unresolved on
 one sparse seed. Every product it did derive was correct:
 
-$$
+```math
 P(\text{correct}\mid\text{resolved})=1.000.
-$$
+```
 
 For the noncommutative dihedral group, Cortex derived every held-out product
 correctly.
@@ -181,7 +181,7 @@ No threshold was changed after observing this result.
 Within these finite controlled algebras, Cortex can now demonstrate a stronger
 capability than the earlier kinship experiment:
 
-$$
+```math
 \text{partial observations}
 \rightarrow
 \text{law evidence}
@@ -189,7 +189,7 @@ $$
 \text{accepted structural laws}
 \rightarrow
 \text{previously unseen products}.
-$$
+```
 
 The answer is not recovered by exact table lookup: direct memory has zero
 held-out coverage.

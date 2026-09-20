@@ -19,7 +19,7 @@ high-confidence perceptual label when persistent structure contradicts it?
 
 The architectural rule is:
 
-$$
+```math
 \boxed{
 \text{perception proposes}
 \rightarrow
@@ -27,15 +27,15 @@ $$
 \rightarrow
 \text{perception may be queried again}
 }
-$$
+```
 
 with the additional epistemic constraint:
 
-$$
+```math
 \boxed{
 \text{later evidence may overturn both layers.}
 }
-$$
+```
 
 Cortex therefore has the final word only over its **current accepted semantic
 state**, not over objective truth.
@@ -44,23 +44,23 @@ state**, not over objective truth.
 
 The most important invariant is:
 
-$$
+```math
 \boxed{
 \text{concept identity must not depend on its current label.}
 }
-$$
+```
 
 The grounding layer receives persistent concept identifiers
 
-$$
+```math
 Z_1,\ldots,Z_n
-$$
+```
 
 and candidate semantic labels
 
-$$
+```math
 \ell_1,\ldots,\ell_n.
-$$
+```
 
 Changing the accepted label for $Z_i$ never changes the identity of $Z_i$.
 
@@ -75,9 +75,9 @@ isolates semantic grounding by assuming concept identities already exist.
 
 v1 deliberately uses a finite flat one-to-one vocabulary:
 
-$$
+```math
 \phi:\mathcal Z\rightarrow\mathcal L
-$$
+```
 
 where $|\mathcal Z|=|\mathcal L|$ and $\phi$ is bijective.
 
@@ -91,53 +91,53 @@ into the neural encoder, or latent-concept discovery itself.
 
 For each concept $Z_i$, perception emits a complete candidate distribution
 
-$$
+```math
 P_N(\ell\mid Z_i).
-$$
+```
 
 The neural distribution is evidence, not accepted Cortex state.
 
 Repeated perceptual observations may accumulate with an explicit reliability
 weight $r_N>0$. For a proposed mapping $\phi$, neural log-evidence is
 
-$$
+```math
 S_N(\phi)
 =
 \sum_i\sum_t
 r_{it}
 \log
 P_{N,t}\bigl(\phi(Z_i)\mid Z_i\bigr).
-$$
+```
 
 ## Structural semantic evidence
 
 Cortex also observes typed structural facts between its internal concepts:
 
-$$
+```math
 (Z_i,r,Z_j,\text{present})
-$$
+```
 
 or
 
-$$
+```math
 (Z_i,r,Z_j,\text{absent}).
-$$
+```
 
 The external semantic vocabulary supplies a typed semantic relation graph over
 candidate labels.
 
 Under mapping $\phi$, a structural observation agrees when
 
-$$
+```math
 (\phi(Z_i),r,\phi(Z_j))
-$$
+```
 
 has the same present/absent value in the semantic graph.
 
 Let $q\in(0.5,1)$ be the declared reliability of a structural match. The
 structural score is
 
-$$
+```math
 S_R(\phi)
 =
 \sum_k r_k
@@ -145,7 +145,7 @@ S_R(\phi)
 \log q, & \text{if observation }k\text{ agrees},\\
 \log(1-q), & \text{otherwise}.
 \end{cases}
-$$
+```
 
 The current implementation uses $q=0.95$.
 
@@ -153,24 +153,24 @@ The current implementation uses $q=0.95$.
 
 The total mapping score is
 
-$$
+```math
 S(\phi)=w_N S_N(\phi)+w_R S_R(\phi),
-$$
+```
 
 with frozen v1 defaults
 
-$$
+```math
 w_N=w_R=1.
-$$
+```
 
 Normalized finite mapping support is
 
-$$
+```math
 P_C(\phi)
 =
 \frac{\exp S(\phi)}
 {\sum_{\psi}\exp S(\psi)}.
-$$
+```
 
 This is exact normalized support over the declared finite hypothesis space. It
 must not be described as a universally calibrated probability that a label is
@@ -178,12 +178,12 @@ metaphysically correct.
 
 The Cortex label marginal is
 
-$$
+```math
 P_C(\ell\mid Z_i)
 =
 \sum_{\phi:\phi(Z_i)=\ell}
 P_C(\phi).
-$$
+```
 
 ## Resolution rule
 
@@ -192,15 +192,15 @@ and $p_2$.
 
 v1 resolves a semantic label only if
 
-$$
+```math
 p_1\ge 0.70
-$$
+```
 
 and
 
-$$
+```math
 p_1-p_2\ge 0.15.
-$$
+```
 
 Otherwise the accepted semantic state is `unresolved`. No arbitrary tie-break
 is allowed.
@@ -231,11 +231,11 @@ adding a trainable feedback path.
 
 A later Stage II-B may test
 
-$$
+```math
 \text{encoder}
 \leftrightarrow
 \text{Cortex}
-$$
+```
 
 with representation learning, but that requires separate stability and causal
 attribution controls.
@@ -267,17 +267,17 @@ swap; structural evidence is required.
 
 The resulting neural top-label accuracies are exactly:
 
-$$
+```math
 1.0,\quad 0.6,\quad 0.2.
-$$
+```
 
 ## Structural evidence budgets
 
 Normal cases use nested structural budgets:
 
-$$
+```math
 0,\quad 8,\quad 12.
-$$
+```
 
 Budget 0 is the neural-only/global-assignment control. Positive and negative
 structural facts are interleaved in a deterministic seeded order.
@@ -290,9 +290,9 @@ corresponding labels.
 
 Even with complete structural evidence, Cortex must preserve
 
-$$
+```math
 P_C(\ell_a\mid Z)=P_C(\ell_b\mid Z)=0.5
-$$
+```
 
 for the twin concepts and return `unresolved`. Other non-symmetric concepts
 must still resolve correctly.

@@ -22,7 +22,7 @@ intervention/control evidence and then reason correctly about:
 
 The intended reasoning pattern is:
 
-$$
+```math
 \text{intervention evidence}
 \rightarrow
 \text{causal structure}
@@ -32,7 +32,7 @@ $$
 \text{temporary world edit}
 \rightarrow
 \text{counterfactual consequence}.
-$$
+```
 
 ## Scientific boundary
 
@@ -53,15 +53,15 @@ The evidence model mirrors the stable native Cortex causal-evidence contract.
 For each ordered pair $(i,j)$ Cortex stores interventional and control
 Beta-style sufficient statistics:
 
-$$
+```math
 (\alpha_{do},\beta_{do}),
 \qquad
 (\alpha_{ctrl},\beta_{ctrl}).
-$$
+```
 
 With posterior means
 
-$$
+```math
 p_{do}
 =
 \frac{\alpha_{do}}
@@ -71,15 +71,15 @@ p_{ctrl}
 =
 \frac{\alpha_{ctrl}}
      {\alpha_{ctrl}+\beta_{ctrl}},
-$$
+```
 
 define
 
-$$
+```math
 \Delta_{ij}
 =
 p_{do}-p_{ctrl}.
-$$
+```
 
 The frozen native thresholds are retained:
 
@@ -107,35 +107,35 @@ observations.
 
 ### True direct causal edge
 
-$$
+```math
 n_{do}^{+}=18,\quad n_{do}^{-}=2,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
-$$
+```
 
 ### Resolved null edge
 
-$$
+```math
 n_{do}^{+}=2,\quad n_{do}^{-}=18,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
-$$
+```
 
 ### Correlation trap
 
 For selected non-causal pairs:
 
-$$
+```math
 n_{do}^{+}=16,\quad n_{do}^{-}=4,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=16,\quad n_{ctrl}^{-}=4.
-$$
+```
 
 These pairs have a high outcome rate but no intervention effect. Cortex should
 resolve them as null rather than causal.
@@ -169,11 +169,11 @@ For a query source $s$ and target $t$:
 
 This is the key abstention rule:
 
-$$
+```math
 \text{no confirmed path}
 \not\Rightarrow
 \text{no possible path}.
-$$
+```
 
 A missing bridge should therefore create uncertainty rather than a false
 negative.
@@ -184,9 +184,9 @@ A query may supply a temporary set of directed edge removals.
 
 For
 
-$$
+```math
 G' = G\setminus E_{remove},
-$$
+```
 
 Cortex recomputes confirmed and possible reachability inside $G'$.
 
@@ -318,9 +318,9 @@ Queries whose only possible route requires that bridge should return
 
 Every resolved affected answer must carry one confirmed directed path
 
-$$
+```math
 s\rightarrow\cdots\rightarrow t.
-$$
+```
 
 The path must:
 

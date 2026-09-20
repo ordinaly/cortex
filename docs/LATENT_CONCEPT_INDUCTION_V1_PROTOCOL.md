@@ -33,9 +33,9 @@ entities.
 
 There are exactly
 
-$$
+```math
 B_6 = 203
-$$
+```
 
 candidate partitions.
 
@@ -46,29 +46,29 @@ smoothed predictive outcome distribution.
 
 With smoothing parameter
 
-$$
+```math
 \alpha = 0.5,
-$$
+```
 
 the pooled distribution for block $g$ is
 
-$$
+```math
 P(k\mid g)
 =
 \frac{n_{gk}+\alpha}
 {N_g+\alpha K}.
-$$
+```
 
 Each candidate partition is scored by
 
-$$
+```math
 L(\pi)
 =
 -\sum_{e,k}
 n_{ek}\log P(k\mid \pi(e))
 +
 \frac{|\pi|(K-1)}{2}\log N.
-$$
+```
 
 The first term rewards predictive fit. The second is a BIC-style complexity
 penalty on the number of represented blocks.

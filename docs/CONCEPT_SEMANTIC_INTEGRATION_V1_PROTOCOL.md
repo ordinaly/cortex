@@ -12,7 +12,7 @@ itself?
 
 The required direction is:
 
-$$
+```math
 \text{predictive evidence}
 \rightarrow
 \text{latent concept } Z
@@ -20,15 +20,15 @@ $$
 \text{semantic evidence}
 \rightarrow
 \text{label belief}.
-$$
+```
 
 The reverse direction is forbidden in this protocol:
 
-$$
+```math
 \text{label}
 \nrightarrow
 \text{concept identity}.
-$$
+```
 
 ## Architectural invariant
 
@@ -38,13 +38,13 @@ A latent concept must not depend on its semantic label.
 
 This gives three distinct layers:
 
-$$
+```math
 \text{entity}
 \rightarrow
 \text{latent concept}
 \rightarrow
 \text{semantic label}.
-$$
+```
 
 Concept split, merge, or retraction may invalidate semantic beliefs even when
 the old label token remains available.
@@ -60,11 +60,11 @@ active concepts.
 For $m$ active concepts and $n\ge m$ candidate labels, the exact mapping space
 contains:
 
-$$
+```math
 P(n,m)
 =
 \frac{n!}{(n-m)!}
-$$
+```
 
 assignments.
 
@@ -141,23 +141,23 @@ Required behavior:
 
 Thus:
 
-$$
+```math
 Z_{\mathrm{new}}\text{ exists}
-$$
+```
 
 can coexist with
 
-$$
+```math
 \operatorname{label}(Z_{\mathrm{new}})
 =
 \texttt{unresolved}.
-$$
+```
 
 ## Experiment D — semantic lineage under ontology change
 
 A deterministic concept lifecycle runs through:
 
-$$
+```math
 \text{coarse}
 \rightarrow
 \text{split}
@@ -165,7 +165,7 @@ $$
 \text{merge}
 \rightarrow
 \text{retract}.
-$$
+```
 
 Semantic evidence changes consistently with the ontology:
 
