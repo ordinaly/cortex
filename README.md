@@ -273,10 +273,37 @@ Bootstrap claims are tagged `provenance=neural_bootstrap`, remain provisional,
 and may later be corroborated, revised, or rejected. Normal neural answers are
 still not silently written into Cortex memory.
 
-The current backend is Ollama, but Cortex now depends on the `NeuralRuntime`
-capability contract rather than Ollama/Qwen directly. This leaves explicit
-extension points for future in-process backends, hidden states, KV-cache reuse,
-logits, adapters, and adapter training.
+The current backend is Ollama, but Cortex now depends on a layered interface:
+
+```text
+OrchestrationPolicy
+       ↓
+HybridExchange
+       ↕
+Cortex    NeuralSession
+             ↓
+         NeuralRuntime
+```
+
+`HybridExchange` is the typed cognitive contract for one turn.
+`NeuralSession` owns per-exchange model execution state and capability checks,
+while `NeuralRuntime` is the provider/backend boundary.
+
+This leaves explicit extension points for future in-process backends, hidden
+states, KV-cache reuse, logits, adapters, and adapter training without making
+Cortex depend on a particular model implementation.
+
+Controlled orchestration ablations are available with:
+
+```text
+--hybrid-policy full
+--hybrid-policy neural-direct
+--hybrid-policy no-revision
+--hybrid-policy no-cortex-context
+```
+
+These let the same core measure the contribution of semantic parsing, Cortex
+pre-generation guidance, and bounded revision.
 
 See
 [docs/CORTEX_HYBRID_CORE_V0_1.md](docs/CORTEX_HYBRID_CORE_V0_1.md).
