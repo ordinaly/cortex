@@ -1,6 +1,6 @@
 # Cortex v1.17-R — Optimized Cache Re-Attribution
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen attribution protocol / development passed / official campaign untouched**.
 
 Protocol ID: **optimized-cache-reattribution-v1.17-R**.
 
@@ -119,3 +119,28 @@ ordering are the primary quantities; absolute microseconds are secondary.
 This campaign attributes the current Python/NumPy optimized cache path on the
 declared synthetic traces. It does not establish a universal bottleneck for
 the Rust runtime or external workloads.
+
+## Development outcome before freeze
+
+The 9-case development campaign passed every validity gate with exact paired
+cache/prediction parity and **0 structural disagreements**.
+
+At 288 anchors, median optimized-refresh attribution was:
+
+- kernel regeneration: **48.84%**;
+- writes/bookkeeping: **24.77%**;
+- streamed semantic geometry: **13.79%**;
+- semantic features: **4.34%**;
+- dirty detection: **2.73%**;
+- outcome probabilities: **2.30%**.
+
+Inside streamed geometry:
+
+- squared-distance accumulation: **11.52%**;
+- distance square root: **2.25%**.
+
+The median accounting fraction was **96.79%**, and the mean dirty-row fraction
+was **13.30%**.
+
+No gate or mechanism may now change before the untouched official campaign.
+Any later mechanism change requires a new protocol version and fresh seeds.
