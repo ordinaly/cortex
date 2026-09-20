@@ -415,3 +415,39 @@ result argues against further layout-only optimization of the current cache
 without a new coarse performance hypothesis.
 
 See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
+
+
+## explicit-proof-dependency-v1 — explicit derivation support and invalidation
+
+This Reasoning Map campaign moved from attaching one valid path to a conclusion
+to maintaining a finite proof/dependency DAG with multiple simultaneous
+derivations.
+
+Untouched official seeds 1300–1319 across six structural families produced
+**120 cases**.
+
+Every frozen gate passed:
+
+- proof-DAG validity: **1.000**;
+- provenance validity: **1.000**;
+- shortest-proof selection: **1.000**;
+- redundant-proof survival: **1.000**;
+- deeper-proof takeover: **1.000**;
+- shared-root invalidation: **1.000**;
+- contradictory-proof conflict handling: **1.000**;
+- nested partial invalidation: **1.000**;
+- irrelevant-premise locality: **1.000**;
+- exact restoration: **1.000**.
+
+A baseline that retained only the initially selected proof failed every
+designated alternate-support case.
+
+Interpretation: within finite supplied acyclic rule fixtures, Cortex can now
+distinguish a conclusion from any one justification for it. Local premise
+changes invalidate exactly the dependent proof alternatives, while independent
+support remains active.
+
+This is proof dependency management, not unrestricted theorem proving or
+inference-rule discovery.
+
+See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
