@@ -1,6 +1,6 @@
 # Cortex v1.19-R — Low-Overhead Fused-Stage Crossover Profile
 
-Status: **frozen profiling protocol / development passed / official campaign untouched**.
+Status: **frozen profiling protocol / official campaign passed**.
 
 Protocol ID: **low-overhead-fused-stage-profile-v1.19-R**.
 
@@ -56,7 +56,7 @@ Anchor counts: **72, 144, 288**.
 
 Development seeds: **0..5**.
 
-Reserved untouched official seeds: **600..604**.
+Official seeds: **600..604**.
 
 ## Metrics
 
@@ -122,3 +122,21 @@ same-run accounting identity.
 
 No stage winner is frozen in advance; the untouched official campaign chooses
 the next target.
+
+## Official outcome
+
+The untouched official campaign passed every frozen validity gate and
+reproduced the development ordering.
+
+At 288 anchors:
+
+- cache refresh: **37.22%**;
+- candidate readout: **21.80%**;
+- hysteresis/state scan: **17.60%**;
+- complexity refresh: **13.41%**;
+- independent-replay accounting ratio: **99.29%**;
+- prediction-checksum discrepancy: **0**.
+
+Cache refresh is therefore confirmed as the largest coarse Python/NumPy stage.
+
+See [LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
