@@ -1,6 +1,6 @@
 # Cortex v1.19-R — Low-Overhead Fused-Stage Crossover Profile
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen profiling protocol / development passed / official campaign untouched**.
 
 Protocol ID: **low-overhead-fused-stage-profile-v1.19-R**.
 
@@ -99,3 +99,26 @@ freeze the optimization line rather than chase timer noise.
 
 This is a Python/NumPy research attribution campaign on declared synthetic
 traces. It does not characterize the native Rust runtime.
+
+## Development outcome before freeze
+
+The 18-case development campaign passed every validity gate with **0**
+prediction-checksum discrepancy.
+
+At 288 anchors, median low-overhead stage shares were:
+
+- cache refresh: **37.23%**;
+- candidate readout: **21.14%**;
+- hysteresis/state scan: **18.30%**;
+- complexity refresh: **13.51%**;
+- local readout: **3.63%**;
+- tracker update: **2.90%**;
+- perceptual computation: **2.69%**;
+- field update: **0.29%**.
+
+The independent-replay stage/total ratio summed to about **99.80%**, supporting
+the consistency of the coarse measurement method without treating the sum as a
+same-run accounting identity.
+
+No stage winner is frozen in advance; the untouched official campaign chooses
+the next target.
