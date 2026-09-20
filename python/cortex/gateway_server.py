@@ -437,6 +437,17 @@ def _cortex_thinking_text(
                         )
                     ),
                     (
+                        "Post-assessment: "
+                        + (
+                            "enabled"
+                            if plan.get(
+                                "assess_candidate",
+                                True,
+                            )
+                            else "disabled"
+                        )
+                    ),
+                    (
                         "Revision budget: "
                         + str(
                             plan.get(
