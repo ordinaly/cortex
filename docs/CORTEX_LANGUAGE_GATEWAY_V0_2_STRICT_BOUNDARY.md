@@ -247,7 +247,7 @@ It does not yet provide:
 - source-confidence weighting;
 - alias/coreference resolution beyond deterministic lexical identity;
 - tool orchestration;
-- streaming;
+- token-level incremental generation (the HTTP layer supports OpenAI-compatible SSE transport after the Cortex answer is complete);
 - semantic rendering verification beyond support IDs;
 - natural-language access to all research-only Cortex modules.
 

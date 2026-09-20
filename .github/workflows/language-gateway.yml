@@ -8,6 +8,7 @@ on:
       - "python/cortex/strict_language_gateway.py"
       - "tests/test_language_gateway.py"
       - "tests/test_strict_language_gateway.py"
+      - "tests/test_gateway_http.py"
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md"
       - "pyproject.toml"
       - ".github/workflows/language-gateway.yml"
@@ -23,9 +24,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - run: python -m pip install --upgrade pip pytest fastapi uvicorn
+      - run: python -m pip install --upgrade pip pytest fastapi uvicorn httpx
       - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/gateway_server.py
-      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py -q
+      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py tests/test_gateway_http.py -q
       - name: Import HTTP app surfaces
         run: |
           python - <<'PY'
