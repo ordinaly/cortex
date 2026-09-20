@@ -290,6 +290,96 @@ def _ollama_created_at() -> str:
     )
 
 
+def _cortex_thinking_text(
+    result: Any,
+) -> str:
+    context = getattr(result, "cortex_context", None)
+    if not isinstance(context, dict):
+        return ""
+    diagnosis = context.get("diagnosis")
+    if not isinstance(diagnosis, dict):
+        return ""
+
+    lines = [
+        "Cortex diagnosis",
+        "Status: " + str(diagnosis.get("status", "unknown")),
+        "Reasoning mode: " + str(diagnosis.get("reasoning_mode", "unknown")),
+    ]
+    summary = diagnosis.get("summary")
+    if isinstance(summary, str) and summary.strip():
+        lines.append("Assessment: " + summary.strip())
+    lines.append(
+        "Memory: structural state changed on this turn."
+        if diagnosis.get("memory_changed")
+        else "Memory: no structural state change."
+    )
+
+    neural_claims = diagnosis.get("neural_claims")
+    if isinstance(neural_claims, list) and neural_claims:
+        statuses: dict[str, int] = {}
+        for item in neural_claims:
+            if isinstance(item, dict):
+                status = str(item.get("status", "unknown"))
+                statuses[status] = statuses.get(status, 0) + 1
+        if statuses:
+            lines.append(
+                "Neural claims: "
+                + ", ".join(
+                    name + "=" + str(count)
+                    for name, count in sorted(statuses.items())
+                )
+            )
+
+    cortex_claims = diagnosis.get("cortex_claims")
+    if isinstance(cortex_claims, list) and cortex_claims:
+        lines.append("Cortex-supported claims: " + str(len(cortex_claims)))
+
+    runtime = diagnosis.get("runtime")
+    if isinstance(runtime, dict):
+        flags = [
+            key
+            for key in (
+                "unresolved",
+                "revision",
+                "reactivated",
+                "discovered",
+                "budget_pressure",
+            )
+            if runtime.get(key)
+        ]
+        lines.append(
+            "Runtime: " + (", ".join(flags) if flags else "stable/no flagged condition")
+        )
+
+    errors = diagnosis.get("analysis_errors")
+    if isinstance(errors, list) and errors:
+        lines.append(
+            "Analysis warnings: " + "; ".join(str(item) for item in errors)
+        )
+
+    return "\n".join(lines)
+
+
+def _ollama_timing_metadata(
+    result: Any,
+) -> dict[str, int]:
+    context = getattr(result, "cortex_context", None)
+    diagnosis = context.get("diagnosis") if isinstance(context, dict) else None
+    timings = diagnosis.get("timings") if isinstance(diagnosis, dict) else None
+    total_seconds = 0.0
+    if isinstance(timings, dict):
+        for value in timings.values():
+            if isinstance(value, (int, float)):
+                total_seconds += max(0.0, float(value))
+    return {
+        "total_duration": int(total_seconds * 1_000_000_000),
+        "load_duration": 0,
+        "prompt_eval_count": 0,
+        "prompt_eval_duration": 0,
+        "eval_count": 0,
+        "eval_duration": 0,
+    }
+
 def _ollama_chat_payload(
     *,
     model: str,
