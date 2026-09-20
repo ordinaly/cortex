@@ -2,7 +2,7 @@
 
 Status: **development protocol / official campaign not opened**.
 
-Protocol ID: `latent-concept-induction-v1`.
+Protocol ID: **latent-concept-induction-v1**.
 
 ## Research question
 
@@ -39,7 +39,7 @@ $$
 
 candidate partitions.
 
-For a candidate partition (pi), entities in the same block share one
+For a candidate partition $\pi$, entities in the same block share one
 smoothed predictive outcome distribution.
 
 ## Predictive-description objective
@@ -47,27 +47,27 @@ smoothed predictive outcome distribution.
 With smoothing parameter
 
 $$
-alpha = 0.5,
+\alpha = 0.5,
 $$
 
-the pooled distribution for block (g) is
+the pooled distribution for block $g$ is
 
 $$
-P(kmid g)
+P(k\mid g)
 =
-rac{n_{gk}+alpha}
-{N_g+alpha K}.
+\frac{n_{gk}+\alpha}
+{N_g+\alpha K}.
 $$
 
 Each candidate partition is scored by
 
 $$
-L(pi)
+L(\pi)
 =
--sum_{e,k}
-n_{ek}log P(kmid pi(e))
+-\sum_{e,k}
+n_{ek}\log P(k\mid \pi(e))
 +
-rac{|pi|(K-1)}{2}log N.
+\frac{|\pi|(K-1)}{2}\log N.
 $$
 
 The first term rewards predictive fit. The second is a BIC-style complexity
@@ -77,7 +77,7 @@ There is no tuned concept-count target.
 
 ## Epistemic semantics
 
-Cortex retains every partition within (10^{-9}) of the minimum description
+Cortex retains every partition within $10^{-9}$ of the minimum description
 length.
 
 If several partitions tie, it does not choose one arbitrarily.
@@ -99,7 +99,7 @@ Three entities share one predictive law and three share another.
 Training evidence uses 20 observations per entity. Held-out evaluation uses
 300 observations per entity.
 
-Expected hidden structure: (3+3).
+Expected hidden structure: $3+3$.
 
 ### Three-concept world
 
@@ -107,7 +107,7 @@ Three pairs share three distinct predictive laws.
 
 Training evidence uses 25 observations per entity.
 
-Expected hidden structure: (2+2+2).
+Expected hidden structure: $2+2+2$.
 
 ### No-shared-concept control
 
@@ -136,11 +136,8 @@ Required behavior:
 
 ## Geometry-decoy baseline
 
-A fixed grouping pattern
-
-`(0,1,0,1,0,1)`
-
-is treated as a hypothetical geometry-derived clustering baseline.
+A fixed grouping pattern (0, 1, 0, 1, 0, 1) is treated as a hypothetical
+geometry-derived clustering baseline.
 
 It is intentionally misaligned with the planted predictive concepts.
 
@@ -203,9 +200,9 @@ concept IDs and explicit lineage events.
 
 ## Development and official separation
 
-Development seeds: `0..39`.
+Development seeds: **0..39**.
 
-Reserved untouched official seeds: `700..719`.
+Reserved untouched official seeds: **700..719**.
 
 The official range must not be evaluated until development is green and the
 protocol/gates are frozen.
@@ -241,8 +238,7 @@ The current development gates require:
 ### Lifecycle
 
 10. coarse, split, merge, and retract partitions all achieve F1 = **1.0**;
-11. `created`, `split`, `merge`, and `retracted` lifecycle events are
-    all observed;
+11. created, split, merge, and retracted lifecycle events are all observed;
 12. the final active non-singleton concept set is empty and remains empty on
     the repeated snapshot.
 
