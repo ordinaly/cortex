@@ -1,6 +1,6 @@
 # Cortex v1.20-R — Lazy Distance Materialization
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: **lazy-distance-materialization-v1.20-R**.
 
@@ -110,3 +110,35 @@ reads are genuinely colder than reasoning steps.
 A passing result would establish an implementation optimization for the current
 Python/NumPy research cache. It would not change the stable runtime semantics
 or imply the same benefit in Rust.
+
+## Development outcome before freeze
+
+Across 24 development cases:
+
+- candidate/local prediction error: **0**;
+- outcome/feature/probability/kernel error: **0**;
+- explicit distance-view error after materialization: **0**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**;
+- hot-path distance materializations: **0**.
+
+Median performance:
+
+| anchors | refresh speedup | fused speedup | distance access |
+|---:|---:|---:|---:|
+| 72 | **1.059×** | **1.019×** | 62 µs |
+| 144 | **1.057×** | **1.019×** | 188 µs |
+| 288 | **1.082×** | **1.013×** | 701 µs |
+
+Frozen official performance gates:
+
+- 72/144 refresh speedup >= **1.02×**;
+- 72/144 fused speedup >= **0.99×**;
+- 288 refresh speedup >= **1.05×**;
+- 288 fused speedup >= **1.01×**.
+
+The 288 fused-step gate is intentionally retained despite the narrow
+development margin. An isolated refresh improvement is not sufficient for
+promotion.
+
+No mechanism or threshold may change before official evaluation.
