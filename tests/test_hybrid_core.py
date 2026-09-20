@@ -24,6 +24,7 @@ from cortex.gateway_server import (
 from cortex.neural_runtime import (
     NeuralCapabilities,
     NeuralResponse,
+    NeuralSession,
 )
 
 
@@ -961,3 +962,98 @@ def test_server_factory_exposes_named_hybrid_policy(
     assert not plan.parse_user
     assert not plan.inject_cortex
     assert not plan.assess_candidate
+
+
+
+def test_hybrid_core_passes_live_exchange_to_neural_session():
+    session, _runtime = make_session()
+
+    result = session.chat(
+        "Does Alice work with Bob?"
+    )
+
+    answer_calls = [
+        call
+        for call
+        in session.neural_session.calls
+        if call.request.stage
+        == "answer_with_sidecar"
+    ]
+    assert len(
+        answer_calls
+    ) == 1
+    live_exchange = (
+        answer_calls[0].request.control[
+            "hybrid_exchange"
+        ]
+    )
+    assert (
+        live_exchange.exchange_id
+        == result.cortex_context[
+            "hybrid_exchange"
+        ][
+            "exchange_id"
+        ]
+    )
+    assert (
+        live_exchange.plan.route
+        == "full_hybrid"
+    )
+
+
+def test_gateway_accepts_custom_neural_session_factory():
+    runtime = FakeNeuralRuntime()
+
+    class TrackingSession(
+        NeuralSession
+    ):
+        pass
+
+    class Factory:
+        def __init__(self):
+            self.created = []
+
+        def create(
+            self,
+            *,
+            session_id,
+            runtime,
+        ):
+            session = TrackingSession(
+                session_id=session_id,
+                runtime=runtime,
+            )
+            self.created.append(
+                session
+            )
+            return session
+
+    factory = Factory()
+    gateway = HybridCoreGateway(
+        HybridCoreConfig(
+            chat_model="knowledge",
+            parser_model="parser",
+            feature_dim=64,
+            include_diagnosis=False,
+        ),
+        runtime=runtime,
+        neural_session_factory=(
+            factory
+        ),
+    )
+
+    session = gateway.session(
+        "custom"
+    )
+
+    assert len(
+        factory.created
+    ) == 1
+    assert (
+        session.neural_session
+        is factory.created[0]
+    )
+    assert isinstance(
+        session.neural_session,
+        TrackingSession,
+    )
