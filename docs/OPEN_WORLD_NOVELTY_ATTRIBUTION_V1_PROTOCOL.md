@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Open-World Novelty Attribution v1
 
-Status: **frozen protocol / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: `open-world-novelty-attribution-v1`.
 
@@ -341,3 +341,30 @@ Those belong to later robustness and integration campaigns.
 
 The official campaign must remain untouched until development preflight is
 green.
+
+
+## Official outcome
+
+The untouched official campaign on seeds **1500–1519** passed every frozen
+gate across **160** cases.
+
+Official metrics:
+
+- exact attribution accuracy: **1.000**;
+- resolved/unresolved correctness: **1.000**;
+- evaluation purity: **1.000**;
+- exact edit locality: **1.000**;
+- required persistent edit rate: **1.000**;
+- false persistent edit rate: **0.000**;
+- post-edit stability: **1.000**;
+- ambiguous unresolved rate: **1.000**;
+- transient recovery/no-edit correctness: **1.000**;
+- nearest-known-type baseline accuracy: **0.375**;
+- global-reset baseline accuracy: **0.125**.
+
+See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md)
+and
+[`benchmarks/results/open_world_novelty_attribution_v1_summary.json`](../benchmarks/results/open_world_novelty_attribution_v1_summary.json).
+
+The frozen gates and scoring constants above were not changed after official
+evaluation.
