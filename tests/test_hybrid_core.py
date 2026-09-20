@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Mapping, Sequence
 
 import pytest
@@ -13,6 +14,9 @@ from cortex.hybrid_core import (
 )
 from cortex.hybrid_core_gateway import (
     HybridCoreGateway,
+)
+from cortex.hybrid_exchange import (
+    named_orchestration_policy,
 )
 from cortex.gateway_server import (
     build_gateway_from_env,
@@ -740,3 +744,211 @@ def test_server_factory_builds_hybrid_runtime_mode(
         gateway.runtime.backend_name
         == "ollama"
     )
+
+
+
+def test_neural_direct_policy_uses_one_neural_call():
+    runtime = FakeNeuralRuntime()
+    session = HybridCoreSession(
+        "direct",
+        HybridCoreConfig(
+            chat_model="knowledge",
+            parser_model="parser",
+            feature_dim=64,
+            include_diagnosis=False,
+        ),
+        runtime,
+        orchestration_policy=(
+            named_orchestration_policy(
+                "neural-direct"
+            )
+        ),
+    )
+
+    result = session.chat(
+        "Does Alice work with Bob?"
+    )
+
+    assert len(
+        runtime.calls
+    ) == 1
+    assert (
+        result.cortex_context[
+            "prompt_ir"
+        ]
+        is None
+    )
+    assert (
+        result.cortex_context[
+            "hybrid_runtime"
+        ][
+            "neural_call_count"
+        ]
+        == 1
+    )
+    exchange = result.cortex_context[
+        "hybrid_exchange"
+    ]
+    assert (
+        exchange["plan"][
+            "route"
+        ]
+        == "neural_direct"
+    )
+    assert (
+        "parse_skipped"
+        in [
+            event["phase"]
+            for event
+            in exchange["events"]
+        ]
+    )
+
+
+def test_no_revision_policy_preserves_conflict_without_third_call():
+    runtime = FakeNeuralRuntime()
+    session = HybridCoreSession(
+        "no-revision",
+        HybridCoreConfig(
+            chat_model="knowledge",
+            parser_model="parser",
+            feature_dim=64,
+            include_diagnosis=False,
+        ),
+        runtime,
+        orchestration_policy=(
+            named_orchestration_policy(
+                "no-revision"
+            )
+        ),
+    )
+
+    session.chat(
+        "Alice does not work with Bob."
+    )
+    result = session.chat(
+        "Does Alice work with Bob?"
+    )
+
+    assert (
+        result.cortex_context[
+            "diagnosis"
+        ][
+            "status"
+        ]
+        == "conflict"
+    )
+    assert (
+        result.cortex_context[
+            "hybrid_runtime"
+        ][
+            "neural_call_count"
+        ]
+        == 2
+    )
+    assert (
+        result.cortex_context[
+            "hybrid_exchange"
+        ][
+            "revision_count"
+        ]
+        == 0
+    )
+
+
+def test_no_cortex_context_policy_observes_but_withholds_pre_generation_state():
+    runtime = FakeNeuralRuntime()
+    session = HybridCoreSession(
+        "withheld",
+        HybridCoreConfig(
+            chat_model="knowledge",
+            parser_model="parser",
+            feature_dim=64,
+            include_diagnosis=False,
+        ),
+        runtime,
+        orchestration_policy=(
+            named_orchestration_policy(
+                "no-cortex-context"
+            )
+        ),
+    )
+
+    session.chat(
+        "Alice works with Bob."
+    )
+    result = session.chat(
+        "Does Alice work with Bob?"
+    )
+
+    answer_call = runtime.calls[-1]
+    system = answer_call[
+        "messages"
+    ][0][
+        "content"
+    ]
+    payload = json.loads(
+        system.split(
+            "HYBRID_EXCHANGE=",
+            1,
+        )[1]
+    )
+
+    assert "cortex" not in payload
+    assert (
+        result.cortex_context[
+            "cortex_answer_ir"
+        ][
+            "status"
+        ]
+        == "resolved"
+    )
+    assert (
+        result.cortex_context[
+            "diagnosis"
+        ][
+            "status"
+        ]
+        == "supported"
+    )
+    assert (
+        result.cortex_context[
+            "hybrid_exchange"
+        ][
+            "plan"
+        ][
+            "inject_cortex"
+        ]
+        is False
+    )
+
+
+def test_server_factory_exposes_named_hybrid_policy(
+    tmp_path,
+):
+    gateway = build_gateway_from_env(
+        chat_model="knowledge",
+        parser_model="parser",
+        hybrid_runtime=True,
+        hybrid_policy=(
+            "neural-direct"
+        ),
+        persistence_dir=str(
+            tmp_path
+        ),
+        feature_dim=64,
+    )
+
+    plan = (
+        gateway.orchestration_policy.plan(
+            user_text="hello",
+            has_relations=False,
+            has_bootstrap=False,
+        )
+    )
+    assert (
+        plan.route
+        == "neural_direct"
+    )
+    assert not plan.parse_user
+    assert not plan.inject_cortex
