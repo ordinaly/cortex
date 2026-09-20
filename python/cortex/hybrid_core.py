@@ -358,12 +358,26 @@ class HybridCoreSession(
             HybridOrchestrationPolicy
             | None
         ) = None,
+        neural_session: (
+            NeuralSession
+            | None
+        ) = None,
     ) -> None:
         self.neural_runtime = runtime
-        self.neural_session = NeuralSession(
-            session_id=session_id,
-            runtime=runtime,
+        self.neural_session = (
+            neural_session
+            or NeuralSession(
+                session_id=session_id,
+                runtime=runtime,
+            )
         )
+        if (
+            self.neural_session.session_id
+            != session_id
+        ):
+            raise ValueError(
+                "neural session ID must match Hybrid Core session ID"
+            )
         self.exchange_adapter = (
             TextHybridExchangeAdapter()
         )
@@ -720,6 +734,14 @@ class HybridCoreSession(
                     cache_policy=(
                         "isolated_structured_parse"
                     ),
+                    control={
+                        "hybrid_exchange": (
+                            exchange
+                        ),
+                        "operation": (
+                            "prompt_parse"
+                        ),
+                    },
                 )
             )
         )
@@ -884,6 +906,14 @@ class HybridCoreSession(
                     cache_policy=(
                         "reuse_conversation_if_supported"
                     ),
+                    control={
+                        "hybrid_exchange": (
+                            exchange
+                        ),
+                        "operation": (
+                            "answer"
+                        ),
+                    },
                 )
             )
         )
@@ -964,6 +994,14 @@ class HybridCoreSession(
                     cache_policy=(
                         "reuse_conversation_if_supported"
                     ),
+                    control={
+                        "hybrid_exchange": (
+                            exchange
+                        ),
+                        "operation": (
+                            "revision"
+                        ),
+                    },
                 )
             )
         )
@@ -1056,6 +1094,14 @@ class HybridCoreSession(
                         cache_policy=(
                             "isolated_bootstrap"
                         ),
+                        control={
+                            "operation": (
+                                "bootstrap"
+                            ),
+                            "topic": (
+                                normalized_topic
+                            ),
+                        },
                     )
                 )
             )
