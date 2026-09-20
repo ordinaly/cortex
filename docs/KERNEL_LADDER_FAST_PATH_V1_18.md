@@ -1,6 +1,6 @@
 # Cortex v1.18-R — Exact Kernel-Ladder Fast Path
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: **kernel-ladder-fast-path-v1.18-R**.
 
@@ -124,3 +124,32 @@ result and move to the writes/bookkeeping target identified by v1.17-R.
 A passing result would establish only an exact-or-machine-parity optimization
 for the canonical Python/NumPy resolution ladder. It would not imply equal
 benefit for arbitrary resolutions, Rust, or external workloads.
+
+## Development outcome before freeze
+
+Across 24 development cases (seeds 0..7), exactness remained green with:
+
+- maximum kernel error: **1.67e-15**;
+- underflow-pattern mismatches: **0**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**.
+
+Median performance:
+
+| anchors | kernel speedup | refresh speedup | fused speedup |
+|---:|---:|---:|---:|
+| 72 | 0.98× | 1.00× | 1.00× |
+| 144 | 1.00× | 1.00× | 1.00× |
+| 288 | **1.70×** | **1.25×** | **1.05×** |
+
+The scale gate therefore keeps small anchor banks on the unchanged direct
+path and activates the ladder only from 192 anchors upward.
+
+Frozen official performance gates:
+
+- 72/144 refresh and fused speedups >= **0.95×**;
+- 288 kernel speedup >= **1.40×**;
+- 288 refresh speedup >= **1.10×**;
+- 288 fused speedup >= **1.02×**.
+
+No mechanism or threshold may change before official evaluation.
