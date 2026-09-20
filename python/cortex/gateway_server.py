@@ -424,22 +424,36 @@ def _ollama_stream_events(
     trace: bool = False,
 ):
     content = result.content
+    thinking = _cortex_thinking_text(result)
+    metrics = _ollama_timing_metadata(result)
     chunk_size = 64
-    emitted = 0
-    for offset in range(
-        0,
-        len(content),
-        chunk_size,
-    ):
-        emitted += 1
+    emitted_content = 0
+    emitted_thinking = 0
+
+    if thinking:
+        for offset in range(0, len(thinking), chunk_size):
+            emitted_thinking += 1
+            yield (
+                json.dumps(
+                    _ollama_chat_payload(
+                        model=model,
+                        content="",
+                        thinking=thinking[offset : offset + chunk_size],
+                        done=False,
+                    ),
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                )
+                + "\n"
+            )
+
+    for offset in range(0, len(content), chunk_size):
+        emitted_content += 1
         yield (
             json.dumps(
                 _ollama_chat_payload(
                     model=model,
-                    content=content[
-                        offset : offset
-                        + chunk_size
-                    ],
+                    content=content[offset : offset + chunk_size],
                     done=False,
                 ),
                 ensure_ascii=False,
@@ -454,6 +468,7 @@ def _ollama_stream_events(
                 model=model,
                 content="",
                 done=True,
+                metrics=metrics,
             ),
             ensure_ascii=False,
             separators=(",", ":"),
@@ -464,10 +479,12 @@ def _ollama_stream_events(
     if trace:
         print(
             f"[cortex-gateway:{result.session_id}] "
-            f"ollama:done ({len(content)} chars, {emitted} content chunks)",
+            f"ollama:done ({len(content)} answer chars, "
+            f"{len(thinking)} diagnosis chars, "
+            f"{emitted_content} answer chunks, "
+            f"{emitted_thinking} diagnosis chunks)",
             flush=True,
         )
-
 
 def create_app(
     gateway: Any,
@@ -776,7 +793,9 @@ def create_app(
             _ollama_chat_payload(
                 model=model_name,
                 content=result.content,
+                thinking=_cortex_thinking_text(result),
                 done=True,
+                metrics=_ollama_timing_metadata(result),
             )
         )
 
