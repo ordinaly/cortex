@@ -14,6 +14,7 @@ from cortex.gateway_server import _bool_value, _last_user_text
 from cortex.language_gateway import (
     CortexLanguageGateway,
     GatewayConfig,
+    OllamaClient,
     diagnose_runtime,
     openai_chat_completion,
     parse_semantic_observation,
@@ -534,6 +535,58 @@ def test_parser_rejects_unanchored_extractor_hallucination():
         (None, None),
     ],
 )
+def test_ollama_client_normalizes_host_without_scheme():
+    client = OllamaClient(
+        "127.0.0.1:11434"
+    )
+    assert (
+        client.base_url
+        == "http://127.0.0.1:11434"
+    )
+
+
+def test_failed_answer_still_persists_accepted_observation(tmp_path):
+    class FailingAnswerClient(FakeClient):
+        def chat(
+            self,
+            *,
+            model: str,
+            messages: Sequence[Mapping[str, str]],
+            format_schema=None,
+        ) -> str:
+            if format_schema is not None:
+                return super().chat(
+                    model=model,
+                    messages=messages,
+                    format_schema=format_schema,
+                )
+            raise RuntimeError(
+                "answer generation failed"
+            )
+
+    client = FailingAnswerClient()
+    gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+
+    with pytest.raises(RuntimeError):
+        gateway.chat(
+            "failed-answer",
+            "Alice is here.",
+        )
+
+    restored_gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+    restored = restored_gateway.session(
+        "failed-answer"
+    )
+    assert len(restored.frames) == 1
+    assert len(restored.entities) == 1
+
+
 def test_gateway_boolean_parser(raw, expected):
     assert _bool_value(raw) is expected
 
