@@ -1,6 +1,6 @@
 # Noisy semantic revision v1 — confidence and revision under stochastic evidence
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: `noisy-semantic-revision-v1`.
 
@@ -178,14 +178,11 @@ changes to the already published clean semantic-revision-v1 protocol.
 
 Development seeds are `0..23`.
 
-Reserved official seeds are `500..519`.
+Official seeds are `500..519`.
 
-No official seed may be evaluated until the development campaign is reviewed
-and the final gates are frozen. Development is explicitly allowed to expose
-weaknesses and motivate changes to the mechanism or thresholds.
-
-Any post-official change requires a new protocol version and fresh untouched
-seeds.
+The protocol and gates were frozen before those seeds were evaluated. Any
+post-official mechanism or threshold change requires a new protocol version
+and fresh untouched seeds.
 
 ## Frozen official gates
 
@@ -239,3 +236,31 @@ It would not establish:
 - open-vocabulary semantics;
 - correctness of a neural encoder;
 - trainable Cortex-to-neural feedback.
+
+
+## Official outcome
+
+The untouched 60-case official campaign on seeds 500–519 passed every frozen
+gate.
+
+Official aggregate metrics:
+
+- neural top-label accuracy: **0.8061**;
+- Cortex top-label accuracy: **0.9639**;
+- neural Brier score: **0.3563**;
+- Cortex Brier score: **0.0689**;
+- mean Cortex top-support ECE: **0.0357**;
+- trusted accepted-label accuracy: **0.9980** at **0.7807** coverage;
+- trusted-support ECE: **0.00191**;
+- false-certainty rate: **0.00195**;
+- uncertainty-interception rate: **0.9750**;
+- false pre-shift revision cases: **0**;
+- shift success: **1.000**, p95 latency **7 epochs**;
+- recovery success: **1.000**, p95 latency **7 epochs**;
+- unaffected-concept preservation: **1.000**;
+- bounded-history compliance: **1.000**.
+
+See [NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md) and
+[the committed aggregate summary](../benchmarks/results/noisy_semantic_revision_v1_summary.json).
+
+The frozen gates were not weakened after official evaluation.
