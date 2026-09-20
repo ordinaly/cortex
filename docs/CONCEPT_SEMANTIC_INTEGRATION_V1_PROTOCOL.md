@@ -1,6 +1,6 @@
 # Concept-to-Semantics Integration v1
 
-Status: **development protocol / official campaign not opened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: **concept-semantic-integration-v1**.
 
@@ -207,7 +207,9 @@ Reserved untouched official seeds: **800..819**.
 The official seed range must not be evaluated until development passes and all
 gates are frozen.
 
-## Development gates
+## Frozen official gates
+
+The development campaign passed the following gates. They are now frozen unchanged for the untouched official campaign.
 
 ### Ontology recovery
 
@@ -241,8 +243,24 @@ gates are frozen.
 14. concept retraction invalidates semantic state in every case;
 15. split/merge concept identities obey lineage and are never silently reused.
 
-These gates may be revised only from development evidence. Once frozen, any
-change after official evaluation requires a new protocol version and fresh
+The passing 120-case development campaign measured:
+
+- minimum concept partition F1: **1.000**;
+- raw neural semantic accuracy: **0.3333**;
+- Cortex semantic accuracy / coverage: **1.000 / 1.000**;
+- effective Cortex semantic accuracy: **1.000**;
+- distractor-label resolution rate: **0.000**;
+- label-causal-isolation rate: **1.000**;
+- nameable-concept semantic accuracy: **1.000**;
+- unnamed-concept unresolved rate: **1.000**;
+- maximum unnamed semantic confidence: **0.3333**;
+- split semantic-lineage correctness: **1.000**;
+- merge semantic-lineage correctness: **1.000**;
+- retraction invalidation correctness: **1.000**;
+- concept identity-lineage correctness: **1.000**.
+
+No gate or mechanism may now be changed before official evaluation. Any change
+after opening the official seed range requires a new protocol version and fresh
 untouched seeds.
 
 ## Claim boundary
