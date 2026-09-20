@@ -104,6 +104,27 @@ Writes/bookkeeping remain **24.94%** of optimized refresh, with kernel writes
 alone about **16.39%**. If the kernel-ladder experiment succeeds, cache-memory
 layout or write fusion is the next likely target.
 
+## Independent replication caveat
+
+A parallel historical v1.17 attribution branch (PR #54) replayed the same
+v1.16 optimized-cache semantics with exact behavioral parity but produced a
+different fine-grained timing split on its untouched official run.
+
+At 288 anchors that independent run measured:
+
+- writes/bookkeeping: **44.29%**;
+- streamed semantic geometry: **20.74%**;
+- kernel regeneration: **15.48%**.
+
+This contrasts with the consolidated v1.17 run, where kernel regeneration
+appeared dominant. The disagreement is retained as evidence that fine-grained
+within-refresh timing is sensitive to instrumentation and runner conditions.
+
+That instability is consistent with the later v1.18 result, where optimizing
+kernel regeneration failed to reproduce the large end-to-end gain suggested by
+the original internal attribution. PR #54 is therefore preserved as historical
+evidence but should not be merged over the consolidated research line.
+
 ## Claim boundary
 
 This result characterizes the current Python/NumPy optimized cache on the
