@@ -1,0 +1,39 @@
+{
+  "protocol": "latent-concept-induction-v1",
+  "mode": "official",
+  "rows": 100,
+  "metrics": {
+    "ambiguity_unresolved_rate": 1.0,
+    "candidate_count_max": 203,
+    "candidate_count_min": 203,
+    "lifecycle_empty_rate": 1.0,
+    "lifecycle_event_rate": 1.0,
+    "lifecycle_exact_rate": 1.0,
+    "max_decoy_f1": 0.3333333333333333,
+    "min_global_gain": 0.24256835375869978,
+    "singleton_correct_rate": 1.0,
+    "three_mean_flat_gain": 0.028788184998795173,
+    "three_min_f1": 1.0,
+    "two_mean_flat_gain": 0.05560439970804314,
+    "two_min_f1": 1.0
+  },
+  "checks": {
+    "ambiguity_preserved": true,
+    "beats_global": true,
+    "decoy_rejected": true,
+    "grammar_exact": true,
+    "lifecycle_events": true,
+    "lifecycle_partitions": true,
+    "lifecycle_retraction": true,
+    "protocol_exact": true,
+    "row_count": true,
+    "seeds_exact": true,
+    "singleton_control": true,
+    "three_concept_recovery": true,
+    "three_predictive_gain": true,
+    "two_concept_recovery": true,
+    "two_predictive_gain": true
+  },
+  "passed": true,
+  "workflow_run_id": 35498002525
+}
