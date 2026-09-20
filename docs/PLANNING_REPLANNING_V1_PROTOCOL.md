@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Planning / Replanning v1
 
-Status: **frozen protocol / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: planning-replanning-v1.
 
@@ -393,3 +393,26 @@ It would not establish:
 
 The official campaign must remain untouched until development preflight is
 green.
+
+
+## Official outcome
+
+The untouched official campaign on seeds **1400–1419** passed every frozen
+gate across **140** cases.
+
+On the **80** local-repair cases:
+
+- mean local search expansions: **2.425**;
+- mean full-replan expansions: **27.5**;
+- mean local/full expansion ratio: **0.08745**;
+- optimal-cost agreement: **1.000**;
+- exact prefix and suffix preservation gates: **1.000**.
+
+All specialized controls also passed, including cost adaptation, reversible
+state restoration, irrelevant-change stability, global fallback, and
+infeasibility detection.
+
+See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md) and
+[benchmarks/results/planning_replanning_v1_summary.json](../benchmarks/results/planning_replanning_v1_summary.json).
+
+The frozen gates above were not changed after official evaluation.
