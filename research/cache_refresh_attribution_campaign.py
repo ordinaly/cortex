@@ -239,6 +239,21 @@ class ProfiledSupportSparsePredictiveCache(
         explicit = sum(self.substage_ns.values())
         dirty_total = max(1, self.dirty_refresh_total_ns)
         anchors = len(self.field.anchors)
+        group_ns = {
+            group: sum(
+                self.substage_ns[name]
+                for name in members
+            )
+            for group, members in ATTRIBUTION_GROUPS.items()
+        }
+        dirty_group_ns = {
+            group: sum(
+                self.dirty_event_substage_ns[name]
+                for name in members
+            )
+            for group, members in ATTRIBUTION_GROUPS.items()
+        }
+
         return {
             "refresh_events": self.profiled_events,
             "dirty_events": self.dirty_events,
@@ -272,6 +287,22 @@ class ProfiledSupportSparsePredictiveCache(
                     / dirty_total
                 )
                 for name in SUBSTAGES
+            },
+            **{
+                f"group_{group}_ns": value
+                for group, value in group_ns.items()
+            },
+            **{
+                f"group_{group}_share": (
+                    value / total
+                )
+                for group, value in group_ns.items()
+            },
+            **{
+                f"dirty_group_{group}_share": (
+                    dirty_group_ns[group] / dirty_total
+                )
+                for group in ATTRIBUTION_GROUPS
             },
         }
 
@@ -489,6 +520,26 @@ def run_case(seed: int, anchors_count: int) -> dict:
         "mean_dirty_row_fraction": profile[
             "mean_dirty_row_fraction"
         ],
+        **{
+            f"group_{group}_us_per_step": (
+                profile[f"group_{group}_ns"]
+                / steps
+                / 1.0e3
+            )
+            for group in ATTRIBUTION_GROUPS
+        },
+        **{
+            f"group_{group}_share": profile[
+                f"group_{group}_share"
+            ]
+            for group in ATTRIBUTION_GROUPS
+        },
+        **{
+            f"dirty_group_{group}_share": profile[
+                f"dirty_group_{group}_share"
+            ]
+            for group in ATTRIBUTION_GROUPS
+        },
     }
 
 
@@ -528,9 +579,16 @@ def campaign(seeds: int, output: Path) -> dict:
             )
             for name in SUBSTAGES
         }
+        group_shares = {
+            group: _median(
+                selected,
+                f"group_{group}_share",
+            )
+            for group in ATTRIBUTION_GROUPS
+        }
         dominant = max(
-            SUBSTAGES,
-            key=shares.get,
+            ATTRIBUTION_GROUPS,
+            key=group_shares.get,
         )
         cases[str(anchors)] = {
             "refresh_us_per_step": _median(
@@ -549,7 +607,21 @@ def campaign(seeds: int, output: Path) -> dict:
                 selected,
                 "mean_dirty_row_fraction",
             ),
-            "dominant_substage": dominant,
+            "dominant_group": dominant,
+            "groups": {
+                group: {
+                    "share": group_shares[group],
+                    "us_per_step": _median(
+                        selected,
+                        f"group_{group}_us_per_step",
+                    ),
+                    "dirty_share": _median(
+                        selected,
+                        f"dirty_group_{group}_share",
+                    ),
+                }
+                for group in ATTRIBUTION_GROUPS
+            },
             "substages": {
                 name: {
                     "share": shares[name],
