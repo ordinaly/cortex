@@ -1,9 +1,7 @@
 name: semantic-grounding-official
 
 on:
-  push:
-    branches:
-      - "research/hybrid-semantic-grounding-v1"
+  pull_request:
     paths:
       - ".github/workflows/semantic-grounding-official.yml"
 
