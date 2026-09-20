@@ -80,6 +80,43 @@ def main() -> None:
         ),
     }
 
+    by_anchors = {
+        anchors: [
+            row for row in rows
+            if int(row["anchors"]) == anchors
+        ]
+        for anchors in ANCHOR_CASES
+    }
+    performance = {
+        anchors: {
+            "kernel_speedup": float(
+                np.median(
+                    [
+                        float(row["kernel_speedup"])
+                        for row in selected
+                    ]
+                )
+            ),
+            "refresh_speedup": float(
+                np.median(
+                    [
+                        float(row["refresh_speedup"])
+                        for row in selected
+                    ]
+                )
+            ),
+            "fused_speedup": float(
+                np.median(
+                    [
+                        float(row["fused_speedup"])
+                        for row in selected
+                    ]
+                )
+            ),
+        }
+        for anchors, selected in by_anchors.items()
+    }
+
     checks = {
         "protocol_exact": all(
             row["protocol"] == PROTOCOL
@@ -134,6 +171,21 @@ def main() -> None:
         "structural_parity": (
             metrics["structural_disagreements"] == 0
         ),
+        "small_scale_no_regression": (
+            performance[72]["refresh_speedup"] >= 0.95
+            and performance[72]["fused_speedup"] >= 0.95
+            and performance[144]["refresh_speedup"] >= 0.95
+            and performance[144]["fused_speedup"] >= 0.95
+        ),
+        "large_scale_kernel_speedup": (
+            performance[288]["kernel_speedup"] >= 1.40
+        ),
+        "large_scale_refresh_speedup": (
+            performance[288]["refresh_speedup"] >= 1.10
+        ),
+        "large_scale_fused_speedup": (
+            performance[288]["fused_speedup"] >= 1.02
+        ),
     }
 
     payload = {
@@ -141,6 +193,7 @@ def main() -> None:
         "mode": "official" if args.official else "development",
         "rows": len(rows),
         "metrics": metrics,
+        "performance": performance,
         "checks": checks,
         "passed": all(checks.values()),
     }
