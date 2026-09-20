@@ -145,9 +145,18 @@ force. Neural and structural history sizes are checked directly.
 
 The clean semantic-revision controller uses two consecutive resolved conflicts
 before withdrawing an incumbent. The noisy v1 profile intentionally raises
-this to **four consecutive resolved conflicts**. This is a robustness
-parameter for the noisy experiment, not a retroactive change to the already
-published clean semantic-revision-v1 protocol.
+this to **four accumulated resolved conflicts**. In addition, each increment
+must be backed by direct current-epoch neural support for the same challenger
+with top-label confidence at least **0.62**. Missing or ambiguous direct
+evidence pauses the counter; sufficiently confident direct support for the
+incumbent resets it.
+
+This creates a locality gate: global relational consistency may propose a
+semantic change, but an individual concept is not withdrawn solely because
+other concepts make a different global permutation attractive.
+
+These are robustness parameters for the noisy experiment, not retroactive
+changes to the already published clean semantic-revision-v1 protocol.
 
 ## Development and official separation
 
