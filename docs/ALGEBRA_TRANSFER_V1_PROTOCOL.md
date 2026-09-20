@@ -15,15 +15,15 @@ algebra with less target evidence than rediscovery from scratch?
 
 The experiment separates:
 
-$$
+```math
 \text{law discovery}
-$$
+```
 
 from
 
-$$
+```math
 \text{law transfer + target re-grounding}.
-$$
+```
 
 A successful transfer must improve target sample efficiency without importing
 source element identities, source applicability scopes, or source table cells.
@@ -67,9 +67,9 @@ Each family therefore contributes 8 source worlds.
 
 A form enters a transfer library only when:
 
-$$
+```math
 r_{\mathrm{source}} \ge 0.75,
-$$
+```
 
 and its mean source structural membership is at least 0.98.
 
@@ -96,9 +96,9 @@ Target labels are independently randomized and use a target-only namespace.
 
 The official campaign will evaluate target observation fractions:
 
-$$
+```math
 0.20,\quad 0.30,\quad 0.40.
-$$
+```
 
 The remainder of each target table is held out for evaluation.
 
@@ -131,14 +131,14 @@ Target evidence minima are frozen as:
 
 Target structural membership for each imported form is
 
-$$
+```math
 \mu_{\mathrm{struct}}
 =
 \min(
 \mu_{\mathrm{source}},
 \mu_{\mathrm{target\ structural}}
 ).
-$$
+```
 
 Predictive activation is evaluated at the **joint law-set level** rather than
 requiring every form to predict a held-aside target cell in isolation. This is
@@ -174,7 +174,7 @@ For a random operation table of order $n$, a fixed deterministic prediction is
 correct with probability $1/n$. If $H(M)$ candidate bundles are inspected from
 a transfer library of size $M$, Cortex uses the conservative search bound
 
-$$
+```math
 H(M)
 =
 M
@@ -182,16 +182,16 @@ M
 \binom{M}{2}
 +
 M^2.
-$$
+```
 
 The minimum number $k$ of zero-error target cross-fit predictions is the
 smallest integer satisfying
 
-$$
+```math
 H(M)n^{-k}
 \le
 0.01.
-$$
+```
 
 Thus the family-wise chance probability under the uniform-random null is at
 most 1% by a Bonferroni bound.
@@ -217,15 +217,15 @@ conflicts.
 
 Thus transfer carries:
 
-$$
+```math
 \text{confidence in a universal form}
-$$
+```
 
 but never:
 
-$$
+```math
 \text{source entity-specific applicability}.
-$$
+```
 
 This is deliberately stronger than rebuilding the v1.7 empirical basin from
 sparse target witnesses and is the mechanism by which cross-world abstraction
