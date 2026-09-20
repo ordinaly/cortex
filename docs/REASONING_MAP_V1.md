@@ -157,9 +157,25 @@ merge, or retract that category when current predictive structure changes.
 
 See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
 
-The next reasoning-map axis is **explicit proof dependency**. A separate
-integration milestone should also connect internally discovered concept IDs to
-the already validated semantic-grounding/revision stack.
+## Completed integration: concept to semantics
+
+`concept-semantic-integration-v1` composes latent concept induction with the
+existing semantic-grounding layer while preserving causal direction from
+ontology to naming.
+
+Across 80 untouched official cases:
+
+- latent concept partition F1 remained **1.000**;
+- raw adversarial neural naming was **0.3333**;
+- Cortex semantic accuracy and coverage were **1.000 / 1.000**;
+- replacing the complete label vocabulary changed no concept identities;
+- a real latent concept with symmetric vocabulary evidence remained unnamed at
+  **0.3333** maximum support;
+- split/merge/retraction semantic lineage was exact.
+
+See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md).
+
+The next independent reasoning-map axis is **explicit proof dependency**.
 
 ## Common evaluation axes
 
