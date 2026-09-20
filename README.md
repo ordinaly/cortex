@@ -154,7 +154,18 @@ and unrelated premise removal left the target explanation unchanged. A
 single-proof baseline failed every alternate-support case. See
 [docs/PROOF_DEPENDENCY_V1.md](docs/PROOF_DEPENDENCY_V1.md).
 
-The next independent Reasoning Map axis is **planning / replanning v1**.
+The sixth Reasoning Map campaign, **planning-replanning-v1**, adds a
+finite deterministic action model with costs, add/delete effects, temporal
+support provenance, local repair, global fallback, and explicit infeasibility.
+Across **140 untouched official cases**, every frozen gate passed. On the **80
+local-repair cases**, Cortex matched full uniform-cost replanning in solution
+cost while expanding **2.425 states on average versus 27.5**, a mean expansion
+ratio of **0.08745**. Irrelevant action-model changes left plan/support
+fingerprints unchanged, and cases requiring earlier rerouting correctly fell
+back to full replanning. See
+[docs/PLANNING_REPLANNING_V1.md](docs/PLANNING_REPLANNING_V1.md).
+
+The next independent Reasoning Map axis is **open-world novelty attribution v1**.
 
 ## Hybrid neural/Cortex path
 

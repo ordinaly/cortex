@@ -26,9 +26,10 @@ The tracks should remain distinct. A successful research prototype is not automa
   - belief revision under contradiction;
   - structural analogy / isomorphism;
   - latent concept induction;
-  - explicit proof dependency.
+  - explicit proof dependency;
+  - planning / replanning.
 
-The next independent Reasoning Map axis is **planning / replanning**.
+The next independent Reasoning Map axis is **open-world novelty attribution**.
 Concept-to-semantics integration is already complete; hierarchy/inheritance and
 temporal semantic lineage remain separate semantic follow-ups.
 
@@ -222,26 +223,36 @@ See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
 
 ---
 
-## A5. Planning and replanning v1
+## A5. Planning and replanning v1 — passed
 
-Give Cortex an explicit action model:
+The official campaign passed every frozen gate across **140** untouched cases.
 
-$$
-s_t\xrightarrow{a_t}s_{t+1}
-$$
+Cortex now has a finite deterministic planning primitive with:
 
-and a goal state.
+- positive preconditions;
+- add/delete effects;
+- integer action costs;
+- exact uniform-cost base planning;
+- temporal support provenance;
+- local repair by earliest valid trajectory rejoin;
+- full-replan fallback;
+- explicit infeasibility.
 
-Test:
+On the **80** local-change cases:
 
-- multi-step plans;
-- dead ends;
-- reversible actions;
-- action costs;
-- changing transition rules;
-- partial replanning after local model revision.
+- optimal-cost agreement with full replanning: **1.000**;
+- exact prefix preservation: **1.000**;
+- suffix preservation: **1.000**;
+- local search-saving rate: **1.000**;
+- mean local expansions: **2.425**;
+- mean full-replan expansions: **27.5**;
+- mean expansion ratio: **0.08745**.
 
-The Cortex-specific question is whether a local rule change causes a local plan repair rather than global relearning.
+Cost shifts, transition-rule changes, reversible detours, irrelevant changes,
+global reroutes, and truly infeasible worlds all passed their specialized
+controls.
+
+See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
 
 ---
 

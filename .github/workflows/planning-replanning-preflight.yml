@@ -1,0 +1,73 @@
+name: cortex-planning-replanning-v1
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "research/planning_replanning*.py"
+      - "tests/test_planning_replanning.py"
+      - "docs/PLANNING_REPLANNING_V1_PROTOCOL.md"
+      - ".github/workflows/planning-replanning-preflight.yml"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  development:
+    if: github.event.action != 'ready_for_review'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_planning_replanning.py -q
+      - name: Run frozen development campaign
+        run: >-
+          python research/planning_replanning_campaign.py
+          --development
+          --output planning-replanning-development.jsonl
+      - name: Apply frozen development gates
+        run: >-
+          python research/planning_replanning_gate.py
+          planning-replanning-development.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: planning-replanning-development
+          path: planning-replanning-development.jsonl
+          if-no-files-found: ignore
+
+  official:
+    if: github.event.action == 'ready_for_review'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_planning_replanning.py -q
+      - name: Run untouched official campaign
+        run: >-
+          python research/planning_replanning_campaign.py
+          --official
+          --output planning-replanning-official.jsonl
+      - name: Apply frozen official gates
+        run: >-
+          python research/planning_replanning_gate.py
+          planning-replanning-official.jsonl
+          --official
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: planning-replanning-official
+          path: planning-replanning-official.jsonl
+          if-no-files-found: ignore
