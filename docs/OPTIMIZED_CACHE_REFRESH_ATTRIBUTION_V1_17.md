@@ -1,6 +1,6 @@
 # Cortex v1.17-R — Optimized Cache-Refresh Re-Attribution
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen attribution protocol / development passed / official campaign untouched**.
 
 Protocol ID: **optimized-cache-refresh-attribution-v1.17-R**.
 
@@ -105,3 +105,23 @@ scale trends are primary; absolute microsecond values are contextual.
 This campaign characterizes only the current Python/NumPy optimized cache path
 on the declared synthetic traces. It does not establish a universal Cortex
 bottleneck ordering.
+
+## Development outcome before freeze
+
+The 9-case development campaign passed every validity gate with **zero** paired
+numerical discrepancies, **zero** dirty-mask disagreements, and **zero**
+structural disagreements.
+
+At 288 anchors, median optimized-cache attribution was:
+
+- kernel regeneration: **47.52%**;
+- writes/bookkeeping: **25.76%**;
+- streamed semantic geometry: **13.47%**;
+- semantic features: **4.53%**;
+- dirty detection: **2.79%**;
+- outcome probabilities: **2.30%**.
+
+The median accounting fraction was **96.25%** and the mean dirty-row fraction
+was **13.30%**.
+
+No gate or attribution group is changed before the official evaluation.
