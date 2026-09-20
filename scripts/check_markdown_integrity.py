@@ -15,6 +15,7 @@ MARKDOWN_FILES = sorted(
 LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 FENCE_RE = re.compile(r"^\s*\x60\x60\x60")
 DISPLAY_MATH_RE = re.compile(r"^\s*\$\$\s*$")
+MATH_SETEXT_COLLISION_RE = re.compile(r"^\s*(?:=+|-+)\s*$")
 SINGLE_DOLLAR_RE = re.compile(r"^\s*\$\s*$")
 LEGACY_DISPLAY_RE = re.compile(r"^\s*\\[\[\]]\s*$")
 LITERAL_BRACKET_RE = re.compile(r"^\s*[\[\]]\s*$")
@@ -159,7 +160,13 @@ def check_file(path: Path) -> list[str]:
             math_open = not math_open
             if math_open:
                 math_start = lineno
-        elif not math_open:
+        elif math_open:
+            if MATH_SETEXT_COLLISION_RE.match(line):
+                errors.append(
+                    f"{name}:{lineno}: Setext/heading collision inside $ "
+                    "display math; use a fenced ```math block"
+                )
+        else:
             if unescaped_dollar_count(line) % 2 != 0:
                 errors.append(
                     f"{name}:{lineno}: unbalanced inline $ delimiter"
