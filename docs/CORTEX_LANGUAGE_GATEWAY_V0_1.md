@@ -298,11 +298,20 @@ The session file also stores:
 
 - recent conversational history;
 - the diagnostics switch;
-- the configured chat-model identifier;
-- the configured embedding-model identifier.
+- the chat-model identifier used when the session was written;
+- the embedding-model identifier;
+- Cortex software/specification identifiers;
+- a native runtime snapshot witness when the native binding exposes one.
 
-A persisted session refuses to load if its saved model identifiers do not match
-the active gateway configuration.
+The **chat model may change** across restarts: it is an articulation component,
+not part of Cortex's stored metric space.
+
+The **embedding model must match** before a persisted session is loaded. New
+observations must remain in the same embedding coordinate system as the vectors
+already stored in that Cortex session.
+
+When a native snapshot witness is present, the gateway also compares the
+replayed native state against that saved witness and rejects a divergent replay.
 
 ### Atomic files and schema version
 
@@ -343,6 +352,13 @@ removes both the active in-memory session and its persisted file by default.
 The persistence design is intentionally backend-neutral. A future SQLite,
 object-store, or graph-database implementation can replace the file store
 without changing the chat/session API.
+
+### Local data note
+
+Gateway v0.1 session files are ordinary local JSON files. They contain recent
+conversation history, extracted semantic evidence, entity/relation metadata,
+and embedding vectors. They are **not encrypted by Cortex**. Use an
+appropriately protected state directory if the conversation is sensitive.
 
 ## Deliberate v0.1 limitations
 
