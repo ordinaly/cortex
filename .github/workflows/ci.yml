@@ -73,6 +73,7 @@ jobs:
           tests/test_native_graph.py
           tests/test_native_runtime.py
           tests/test_hybrid.py
+          tests/test_semantic_grounding.py
           tests/test_versioning.py
           -q
 

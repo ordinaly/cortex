@@ -105,6 +105,27 @@ The new dominant stage is **cache refresh**, about **45.5%** of the 288-anchor f
 
 The next research engineering step is therefore **cache-refresh attribution/decomposition** before choosing another optimization.
 
+### Hybrid semantic grounding
+
+The isolated `hybrid-semantic-grounding-v1` Stage II-A campaign has passed its
+frozen official gates. This research module keeps concept identity separate
+from semantic labels and combines neural candidate-label distributions with
+persistent typed relational structure.
+
+With one adversarial swapped label pair, neural accuracy was **0.600** and
+Cortex reached **0.9933 resolved accuracy at 0.9933 coverage** after 8
+structural facts. With two swapped pairs, neural accuracy was **0.200** and
+Cortex reached **0.960 resolved accuracy at 1.000 coverage**, with **0.950**
+correction rate. False reinspection of neural-correct concepts remained zero.
+Exact structural twins remained unresolved at **0.500** support rather than
+being tie-broken.
+
+This is an isolated semantic-grounding result with supplied concept IDs. The
+next integration step is to feed it concepts discovered by latent concept
+induction; it is not yet part of the stable native runtime.
+
+See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed

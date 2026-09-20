@@ -335,9 +335,47 @@ This remains one of the strongest gates before broad scientific claims.
 
 ## C3. Hybrid Cortex Stage II
 
-Only after frozen-encoder Stage I demonstrates value beyond simpler matching should Cortex feedback influence representation learning.
+### Stage II-A — semantic grounding / inference-time feedback
 
-Questions for Stage II:
+A research prototype is now prepared under
+[hybrid-semantic-grounding-v1](HYBRID_SEMANTIC_GROUNDING_V1_PROTOCOL.md).
+
+Its invariant is:
+
+$$
+\text{concept identity}\neq\text{current label}.
+$$
+
+Neural perception supplies candidate-label distributions. Cortex scores those
+proposals jointly with relational structure and may return `reinforce`,
+`reinspect`, `broaden`, or `hold` feedback. Cortex can therefore demote a
+high-confidence neural label without deleting the underlying concept.
+
+The frozen official campaign has now passed. With one adversarial swapped
+pair, neural top-label accuracy of **0.600** became **0.9933 resolved accuracy**
+at **0.9933 coverage** after 8 structural facts. With two swapped pairs, neural
+accuracy of **0.200** became **0.960 resolved accuracy / 1.000 coverage** after
+12 facts, with **0.950 correction rate** and zero false reinspection on
+neural-correct concepts. Exact structural twins remained unresolved at 0.500
+support.
+
+See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md).
+
+The first protocol intentionally receives concept identities as input so it can
+isolate semantic adjudication. The intended integration order is therefore:
+
+$$
+\text{latent concept induction}
+\rightarrow
+\text{semantic grounding}.
+$$
+
+### Stage II-B — trainable representation feedback
+
+Only after inference-time grounding and frozen-encoder Stage I are characterized
+should Cortex feedback influence neural parameters.
+
+Questions for Stage II-B:
 
 - can structural uncertainty guide representation refinement?
 - can persistent entity/relation evidence improve the encoder?
@@ -356,13 +394,18 @@ $$
 \boxed{
 A2\ \text{latent concepts}
 \rightarrow
+C3\text{-A}\ \text{semantic grounding}
+\rightarrow
 A3\ \text{noise/calibration}
 \rightarrow
 A4\ \text{proof dependency}
 }
 $$
 
-Planning and open-world novelty follow once those primitives are better characterized.
+Semantic grounding is implemented as a separable research prototype now, but
+its full Cortex interpretation should consume concepts produced by A2 rather
+than externally supplied concept IDs. Planning and open-world novelty follow
+once those primitives are better characterized.
 
 ### Engineering track
 

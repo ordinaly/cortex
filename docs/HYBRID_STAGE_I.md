@@ -151,13 +151,22 @@ Stage I is useful if, with Cortex unchanged:
 The final point is essential. Better neural features alone are not evidence for
 Cortex's added value.
 
-## Deferred Stage II
+## Stage II boundary
 
-Only after Stage I is characterized should the boundary become bidirectional.
-Candidate Stage-II signals include persistent entity identity, reactivation,
-structural conflict, feature reliability, and novelty confidence. Those signals
-could train the neural representation toward temporal/structural consistency.
+Stage I itself remains one-way and frozen.
 
-Stage II requires a new protocol because it changes the causal architecture:
-Cortex would no longer merely consume a frozen representation; it would
-participate in learning it.
+The first bidirectional research prototype is now specified separately as
+[Hybrid semantic grounding v1](HYBRID_SEMANTIC_GROUNDING_V1_PROTOCOL.md).
+That Stage-II-A experiment is deliberately **inference-time only**: neural
+perception proposes label distributions, Cortex combines them with persistent
+structural evidence, and Cortex may return `reinforce`, `reinspect`,
+`broaden`, or `hold` feedback.
+
+The semantic-grounding protocol preserves the invariant that concept identity
+does not depend on its current label. It does not change encoder weights or the
+stable native runtime.
+
+Trainable Cortex-to-network feedback remains deferred to a later Stage II-B.
+That later step must separately test stability, representation collapse, and
+whether gains truly come from Cortex feedback rather than simply from extra
+training.
