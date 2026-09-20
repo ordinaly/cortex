@@ -34,6 +34,11 @@ from .hybrid_language_gateway import (
     HybridCortexLanguageGateway,
     HybridGatewayConfig,
 )
+from .cognitive_orchestrator import (
+    ORCHESTRATOR_VERSION,
+    CognitiveOrchestratorConfig,
+    CognitiveOrchestratorGateway,
+)
 
 
 def _bool_value(value: Any) -> bool | None:
@@ -367,6 +372,96 @@ def _cortex_thinking_text(
             "Analysis warnings: " + "; ".join(str(item) for item in errors)
         )
 
+    orchestration = context.get("orchestration")
+    if isinstance(orchestration, dict):
+        lines.extend(
+            [
+                "",
+                "Orchestration",
+                "Route: "
+                + str(
+                    orchestration.get(
+                        "route",
+                        "unknown",
+                    )
+                ),
+                "Neural model: "
+                + str(
+                    orchestration.get(
+                        "selected_model",
+                        "unknown",
+                    )
+                ),
+                "Revision cycles: "
+                + str(
+                    orchestration.get(
+                        "revision_cycles",
+                        0,
+                    )
+                ),
+            ]
+        )
+
+    adaptive = context.get("adaptive_neural")
+    if isinstance(adaptive, dict):
+        activation = adaptive.get("activation")
+        learning = adaptive.get("learning")
+        if isinstance(activation, dict):
+            lines.append(
+                "Adapter active: "
+                + str(
+                    bool(
+                        activation.get(
+                            "adapter_active"
+                        )
+                    )
+                )
+            )
+        if isinstance(learning, dict):
+            lines.append(
+                "Learning action: "
+                + str(
+                    learning.get(
+                        "action",
+                        "none",
+                    )
+                )
+            )
+            lines.append(
+                "Learning evidence confirmations: "
+                + str(
+                    learning.get(
+                        "evidence_confirmations",
+                        0,
+                    )
+                )
+            )
+            if learning.get(
+                "requires_approval"
+            ):
+                lines.append(
+                    "Learning approval: required"
+                )
+        lines.append(
+            "Base weights mutated: "
+            + str(
+                bool(
+                    adaptive.get(
+                        "weight_updates_enabled",
+                        False,
+                    )
+                    and isinstance(
+                        learning,
+                        dict,
+                    )
+                    and learning.get(
+                        "base_weights_mutated",
+                        False,
+                    )
+                )
+            )
+        )
+
     return "\n".join(lines)
 
 
@@ -523,18 +618,25 @@ def create_app(
         return {
             "status": "ok",
             "gateway": (
-                STRICT_GATEWAY_VERSION
+                ORCHESTRATOR_VERSION
                 if isinstance(
                     gateway,
-                    StrictCortexLanguageGateway,
+                    CognitiveOrchestratorGateway,
                 )
                 else (
-                    HYBRID_GATEWAY_VERSION
+                    STRICT_GATEWAY_VERSION
                     if isinstance(
                         gateway,
-                        HybridCortexLanguageGateway,
+                        StrictCortexLanguageGateway,
                     )
-                    else "cortex-language-gateway-v0.1"
+                    else (
+                        HYBRID_GATEWAY_VERSION
+                        if isinstance(
+                            gateway,
+                            HybridCortexLanguageGateway,
+                        )
+                        else "cortex-language-gateway-v0.1"
+                    )
                 )
             ),
             "ollama_url": gateway.config.ollama_url,
@@ -547,6 +649,10 @@ def create_app(
             "hybrid_cognition": isinstance(
                 gateway,
                 HybridCortexLanguageGateway,
+            ),
+            "cognitive_orchestrator": isinstance(
+                gateway,
+                CognitiveOrchestratorGateway,
             ),
             "parser_model": getattr(
                 gateway.config,
@@ -646,15 +752,27 @@ def create_app(
             },
             "model_info": {
                 "general.architecture": (
-                    "cortex-hybrid"
-                ),
-                "cortex.gateway": (
-                    HYBRID_GATEWAY_VERSION
+                    "cortex-cognitive-orchestrator"
                     if isinstance(
                         gateway,
-                        HybridCortexLanguageGateway,
+                        CognitiveOrchestratorGateway,
                     )
-                    else "cortex"
+                    else "cortex-hybrid"
+                ),
+                "cortex.gateway": (
+                    ORCHESTRATOR_VERSION
+                    if isinstance(
+                        gateway,
+                        CognitiveOrchestratorGateway,
+                    )
+                    else (
+                        HYBRID_GATEWAY_VERSION
+                        if isinstance(
+                            gateway,
+                            HybridCortexLanguageGateway,
+                        )
+                        else "cortex"
+                    )
                 ),
             },
             "parameters": "",
@@ -1082,11 +1200,15 @@ def build_gateway_from_env(
     persistence_dir: str | None = None,
     strict_neural_boundary: bool = False,
     hybrid_cognition: bool = False,
+    cognitive_orchestrator: bool = False,
     parser_model: str | None = None,
     renderer_model: str | None = None,
     feature_dim: int = 128,
     trace_stages: bool = False,
     explain_responses: bool = False,
+    adapter_models: dict[str, str] | None = None,
+    adaptation_min_confirmations: int = 3,
+    max_revision_cycles: int = 1,
 ) -> Any:
     model = (
         chat_model
@@ -1168,6 +1290,52 @@ def build_gateway_from_env(
         )
         return StrictCortexLanguageGateway(
             strict_config
+        )
+
+    if cognitive_orchestrator:
+        orchestrator_config = CognitiveOrchestratorConfig(
+            chat_model=model,
+            parser_model=(
+                parser_model
+                or os.environ.get(
+                    "CORTEX_PARSER_MODEL"
+                )
+                or model
+            ),
+            ollama_url=url,
+            feature_dim=int(
+                feature_dim
+            ),
+            diagnostics_default=bool(
+                default_diag
+            ),
+            persistence_dir=(
+                state_dir or None
+            ),
+            trace_stages=bool(
+                trace_stages
+            ),
+            include_diagnosis=False,
+            adapter_models=dict(
+                adapter_models
+                or {}
+            ),
+            adaptation_min_confirmations=max(
+                1,
+                int(
+                    adaptation_min_confirmations
+                ),
+            ),
+            max_revision_cycles=max(
+                0,
+                int(
+                    max_revision_cycles
+                ),
+            ),
+            allow_weight_updates=False,
+        )
+        return CognitiveOrchestratorGateway(
+            orchestrator_config
         )
 
     if hybrid_cognition:
@@ -1252,6 +1420,15 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--cognitive-orchestrator",
+        action="store_true",
+        help=(
+            "Use Cognitive Orchestrator v0.1: Cortex pre-pass, "
+            "neural answer, Cortex candidate check, bounded revision, "
+            "and reversible adaptive-neural control."
+        ),
+    )
+    parser.add_argument(
         "--parser-model",
         default=None,
         help="Ollama model used only for text -> PromptIR.",
@@ -1283,6 +1460,33 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--adapter-model",
+        action="append",
+        default=[],
+        metavar="ROUTE=MODEL",
+        help=(
+            "Pre-existing Ollama adapter/model variant for an orchestrator "
+            "route, e.g. mixed_structural=my-adapter:latest. Repeatable."
+        ),
+    )
+    parser.add_argument(
+        "--adaptation-confirmations",
+        type=int,
+        default=3,
+        help=(
+            "Repeated explicit-evidence threshold for an adapter-candidate "
+            "proposal. No training is performed in v0.1."
+        ),
+    )
+    parser.add_argument(
+        "--max-revision-cycles",
+        type=int,
+        default=1,
+        help=(
+            "Maximum NN/Cortex conflict-revision cycles per turn."
+        ),
+    )
+    parser.add_argument(
         "--ollama-url",
         default=None,
     )
@@ -1305,13 +1509,45 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if (
-        args.strict_neural_boundary
-        and args.hybrid_cognition
-    ):
-        parser.error(
-            "--strict-neural-boundary and --hybrid-cognition are mutually exclusive"
+    selected_modes = sum(
+        (
+            bool(
+                args.strict_neural_boundary
+            ),
+            bool(
+                args.hybrid_cognition
+            ),
+            bool(
+                args.cognitive_orchestrator
+            ),
         )
+    )
+    if selected_modes > 1:
+        parser.error(
+            "--strict-neural-boundary, --hybrid-cognition, and "
+            "--cognitive-orchestrator are mutually exclusive"
+        )
+
+    adapter_models: dict[str, str] = {}
+    for item in args.adapter_model:
+        route, separator, model_name = (
+            str(
+                item
+            ).partition(
+                "="
+            )
+        )
+        if (
+            not separator
+            or not route.strip()
+            or not model_name.strip()
+        ):
+            parser.error(
+                "--adapter-model must use ROUTE=MODEL"
+            )
+        adapter_models[
+            route.strip()
+        ] = model_name.strip()
 
     try:
         import uvicorn
@@ -1336,6 +1572,9 @@ def main() -> None:
         hybrid_cognition=(
             args.hybrid_cognition
         ),
+        cognitive_orchestrator=(
+            args.cognitive_orchestrator
+        ),
         parser_model=args.parser_model,
         renderer_model=(
             args.renderer_model
@@ -1346,6 +1585,13 @@ def main() -> None:
         ),
         explain_responses=(
             args.explain_responses
+        ),
+        adapter_models=adapter_models,
+        adaptation_min_confirmations=(
+            args.adaptation_confirmations
+        ),
+        max_revision_cycles=(
+            args.max_revision_cycles
         ),
     )
     app = create_app(gateway)
