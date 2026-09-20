@@ -388,3 +388,84 @@ def test_alpaca_plain_title_fallback_bypasses_cortex_state(client):
         "choices"
     ][0]["message"]["content"]
     assert "Alice" in content
+
+
+def test_alpaca_openai_1_84_structured_title_parse(client):
+    http, gateway = client
+    openai = pytest.importorskip("openai")
+    from pydantic import BaseModel
+
+    class ChatTitle(BaseModel):
+        title: str
+        emoji: str = ""
+
+    sdk = openai.OpenAI(
+        api_key="cortex",
+        base_url="http://testserver/v1",
+        http_client=http,
+    )
+
+    completion = sdk.chat.completions.parse(
+        model="cortex",
+        messages=[
+            {
+                "role": "system",
+                "content": "Generate a short title.",
+            },
+            {
+                "role": "user",
+                "content": "Generate a title for this prompt:\nHello Cortex",
+            },
+        ],
+        max_tokens=30,
+        temperature=0.2,
+        response_format=ChatTitle,
+    )
+
+    assert gateway.calls == []
+    parsed = completion.choices[0].message.parsed
+    assert parsed is not None
+    assert isinstance(parsed.title, str)
+    assert parsed.title
+    assert parsed.emoji == ""
+
+
+def test_alpaca_openai_1_84_stream_consumption_exact_loop(client):
+    http, _gateway = client
+    openai = pytest.importorskip("openai")
+
+    sdk = openai.OpenAI(
+        api_key="cortex",
+        base_url="http://testserver/v1",
+        http_client=http,
+    )
+
+    response = sdk.chat.completions.create(
+        model="cortex",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Hello Cortex",
+                    }
+                ],
+            }
+        ],
+        stream=True,
+    )
+
+    collected = []
+    for chunk in response:
+        if (
+            chunk.choices
+            and chunk.choices[0].delta
+        ):
+            delta = chunk.choices[0].delta
+            if delta.content:
+                collected.append(
+                    delta.content
+                )
+
+    assert "".join(collected) == "Hello from Cortex."
