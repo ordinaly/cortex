@@ -1,6 +1,6 @@
 # Concept-to-Semantics Integration v1
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: **concept-semantic-integration-v1**.
 
@@ -202,10 +202,9 @@ exists.
 
 Development seeds: **0..29**.
 
-Reserved untouched official seeds: **800..819**.
+Official seeds: **800..819**.
 
-The official seed range must not be evaluated until development passes and all
-gates are frozen.
+The protocol and gates were frozen before this range was evaluated.
 
 ## Frozen official gates
 
@@ -277,3 +276,31 @@ declared finite fixtures, Cortex can:
 
 It would not establish open-ended language learning, unrestricted semantic
 grounding, scalable ontology induction, or real-world multimodal understanding.
+
+
+## Official outcome
+
+The untouched 80-case official campaign on seeds 800–819 passed every frozen
+gate.
+
+Official aggregate metrics:
+
+- minimum latent concept partition F1: **1.000**;
+- raw neural semantic accuracy: **0.3333**;
+- Cortex semantic accuracy / coverage: **1.000 / 1.000**;
+- effective Cortex semantic accuracy: **1.000**;
+- distractor-label resolution rate: **0.000**;
+- label-causal-isolation rate: **1.000**;
+- nameable-concept semantic accuracy: **1.000**;
+- unnamed-concept unresolved rate: **1.000**;
+- maximum unnamed semantic confidence: **0.3333**;
+- split semantic-lineage correctness: **1.000**;
+- merge semantic-lineage correctness: **1.000**;
+- retraction invalidation correctness: **1.000**;
+- concept identity-lineage correctness: **1.000**.
+
+See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md)
+and
+[the committed aggregate summary](../benchmarks/results/concept_semantic_integration_v1_summary.json).
+
+The frozen gates were not weakened after official evaluation.
