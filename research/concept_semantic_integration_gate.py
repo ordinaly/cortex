@@ -98,6 +98,8 @@ def summarize(rows: list[dict], *, official: bool) -> dict:
         ),
     }
 
+    # Frozen gates shared by development verification and the untouched
+    # official campaign. Do not weaken after official evaluation begins.
     checks = {
         "protocol_exact": all(
             row["protocol"] == PROTOCOL
