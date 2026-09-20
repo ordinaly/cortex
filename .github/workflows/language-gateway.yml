@@ -7,12 +7,14 @@ on:
       - "python/cortex/gateway_server.py"
       - "python/cortex/strict_language_gateway.py"
       - "python/cortex/hybrid_language_gateway.py"
+      - "python/cortex/hybrid_exchange.py"
       - "python/cortex/neural_runtime.py"
       - "python/cortex/hybrid_core.py"
       - "python/cortex/hybrid_core_gateway.py"
       - "tests/test_language_gateway.py"
       - "tests/test_strict_language_gateway.py"
       - "tests/test_hybrid_language_gateway.py"
+      - "tests/test_hybrid_exchange.py"
       - "tests/test_neural_runtime.py"
       - "tests/test_hybrid_core.py"
       - "tests/test_gateway_http.py"
@@ -36,8 +38,8 @@ jobs:
         with:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip pytest fastapi uvicorn httpx "openai==1.84.0" "ollama==0.6.1"
-      - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/hybrid_language_gateway.py python/cortex/neural_runtime.py python/cortex/hybrid_core.py python/cortex/hybrid_core_gateway.py python/cortex/gateway_server.py
-      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py tests/test_hybrid_language_gateway.py tests/test_neural_runtime.py tests/test_hybrid_core.py tests/test_gateway_http.py -q
+      - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/hybrid_language_gateway.py python/cortex/hybrid_exchange.py python/cortex/neural_runtime.py python/cortex/hybrid_core.py python/cortex/hybrid_core_gateway.py python/cortex/gateway_server.py
+      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py tests/test_hybrid_language_gateway.py tests/test_hybrid_exchange.py tests/test_neural_runtime.py tests/test_hybrid_core.py tests/test_gateway_http.py -q
       - name: Import HTTP app surfaces
         run: |
           python - <<'PY'
