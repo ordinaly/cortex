@@ -1,6 +1,6 @@
 # Cortex v1.21-R — Post-Lazy Low-Overhead Stage Profile
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen profiling protocol / development passed / official campaign untouched**.
 
 Protocol ID: **post-lazy-low-overhead-stage-profile-v1.21-R**.
 
@@ -88,3 +88,29 @@ The untouched official campaign selects the next engineering action.
 This campaign profiles the current Python/NumPy research path on deterministic
 synthetic traces. It is an engineering attribution experiment, not a claim
 about the stable runtime or external workloads.
+
+## Development outcome before freeze
+
+The 18-case development campaign passed every validity gate with **0**
+prediction-checksum discrepancy and confirmed that the promoted lazy cache was
+used throughout.
+
+At 288 anchors, median low-overhead stage shares were:
+
+- cache refresh: **35.92%**;
+- candidate readout: **21.76%**;
+- hysteresis/state scan: **18.85%**;
+- complexity refresh: **13.85%**;
+- local readout: **3.58%**;
+- tracker update: **2.97%**;
+- perceptual computation: **2.73%**;
+- field update: **0.29%**.
+
+Median total fused-step time was **2105.61 µs/step**.
+
+Relative to the v1.19 official 288-anchor profile, cache share decreased by
+about **1.30 percentage points**, while candidate readout remained effectively
+unchanged.
+
+No stage winner or optimization target is frozen before the untouched official
+campaign.
