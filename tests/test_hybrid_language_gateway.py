@@ -6,6 +6,7 @@ import pytest
 
 import cortex.strict_language_gateway as strict_module
 from cortex.gateway_server import build_gateway_from_env
+from cortex.language_gateway import openai_chat_completion
 from cortex.hybrid_language_gateway import (
     HybridCortexLanguageGateway,
     HybridGatewayConfig,
@@ -581,4 +582,31 @@ def test_server_factory_builds_hybrid_mode(tmp_path):
     assert (
         gateway.config.embedding_model
         == "sha256-symbolic-v1"
+    )
+
+
+def test_openai_response_exposes_structured_hybrid_diagnosis():
+    gateway, _client = make_gateway()
+
+    result = gateway.chat(
+        "hybrid",
+        "What is the capital of Mongolia?",
+    )
+    payload = openai_chat_completion(
+        result
+    )
+
+    diagnosis = payload[
+        "cortex"
+    ][
+        "diagnosis"
+    ]
+    assert diagnosis is not None
+    assert (
+        diagnosis["status"]
+        == "neural_prior"
+    )
+    assert (
+        diagnosis["reasoning_mode"]
+        == "pretrained_knowledge"
     )
