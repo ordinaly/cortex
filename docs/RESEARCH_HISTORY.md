@@ -489,3 +489,39 @@ The expansion reduction is specific to these fixtures and is not a general
 planning-complexity theorem.
 
 See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
+
+
+## open-world-novelty-attribution-v1 — structural attribution of surprise
+
+This Reasoning Map campaign tested whether Cortex could distinguish the kind of
+model revision justified by surprising evidence instead of returning one
+generic novelty flag.
+
+Untouched official seeds 1500–1519 across eight structural families produced
+**160 cases**.
+
+Every frozen gate passed:
+
+- exact attribution accuracy: **1.000**;
+- resolved/unresolved correctness: **1.000**;
+- evaluation purity: **1.000**;
+- exact edit locality: **1.000**;
+- required persistent edit rate: **1.000**;
+- false persistent edit rate: **0.000**;
+- post-edit stability: **1.000**;
+- ambiguous instance-vs-type unresolved rate: **1.000**;
+- transient recovery/no-edit correctness: **1.000**.
+
+The nearest-known-type baseline achieved **0.375** exact attribution accuracy;
+the global-reset baseline achieved **0.125**.
+
+Interpretation: within finite structured fixtures, Cortex can discriminate
+noise, new-instance assimilation, new type formation, new relation formation,
+and coherent regime change while preserving unresolved when the structural edit
+itself is not identifiable.
+
+The transient control tests conservative non-persistence under a weak
+excursion; it does not yet establish full discovery and lifecycle tracking of a
+strong temporary regime.
+
+See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
