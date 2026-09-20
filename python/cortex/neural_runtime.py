@@ -61,6 +61,215 @@ class NeuralResponse:
         }
 
 
+@dataclass(frozen=True)
+class NeuralRequest:
+    """One orchestrator-controlled neural execution."""
+
+    stage: str
+    model: str
+    messages: Sequence[
+        Mapping[str, str]
+    ]
+    schema: Mapping[
+        str,
+        Any,
+    ] | None = None
+    temperature: float | None = None
+    exchange_id: str | None = None
+    cache_policy: str = "reuse_if_supported"
+    adapter: str | None = None
+
+    def packet(self) -> dict[str, Any]:
+        return {
+            "stage": self.stage,
+            "model": self.model,
+            "structured": (
+                self.schema
+                is not None
+            ),
+            "exchange_id": (
+                self.exchange_id
+            ),
+            "cache_policy": (
+                self.cache_policy
+            ),
+            "adapter": self.adapter,
+            "message_count": len(
+                self.messages
+            ),
+        }
+
+
+@dataclass(frozen=True)
+class NeuralCall:
+    request: NeuralRequest
+    response: NeuralResponse
+
+    def packet(self) -> dict[str, Any]:
+        packet = (
+            self.response.packet()
+        )
+        packet[
+            "stage"
+        ] = (
+            self.request.stage
+        )
+        packet[
+            "exchange_id"
+        ] = (
+            self.request.exchange_id
+        )
+        packet[
+            "cache_policy"
+        ] = (
+            self.request.cache_policy
+        )
+        packet[
+            "adapter"
+        ] = (
+            self.request.adapter
+        )
+        return packet
+
+
+class NeuralSession:
+    """Stateful execution boundary owned by the hybrid orchestrator.
+
+    v0.1 delegates execution to NeuralRuntime while recording explicit
+    per-exchange requests. Future backends can override this boundary to keep
+    KV state, active adapters, or other model-local state alive across calls.
+    """
+
+    def __init__(
+        self,
+        *,
+        session_id: str,
+        runtime: "NeuralRuntime",
+    ) -> None:
+        self.session_id = session_id
+        self.runtime = runtime
+        self.active_exchange_id: (
+            str
+            | None
+        ) = None
+        self.calls: list[
+            NeuralCall
+        ] = []
+
+    @property
+    def capabilities(
+        self,
+    ) -> NeuralCapabilities:
+        return (
+            self.runtime.capabilities
+        )
+
+    @property
+    def backend_name(
+        self,
+    ) -> str:
+        return (
+            self.runtime.backend_name
+        )
+
+    def begin_exchange(
+        self,
+        exchange_id: str,
+    ) -> None:
+        self.active_exchange_id = (
+            exchange_id
+        )
+        self.calls = []
+
+    def execute(
+        self,
+        request: NeuralRequest,
+    ) -> NeuralResponse:
+        if (
+            request.schema
+            is not None
+            and not self.capabilities.structured_generate
+        ):
+            raise RuntimeError(
+                "neural backend does not support structured generation"
+            )
+        if (
+            request.adapter
+            is not None
+            and not self.capabilities.adapters
+        ):
+            raise RuntimeError(
+                "neural backend does not support adapter activation"
+            )
+        exchange_id = (
+            request.exchange_id
+            or self.active_exchange_id
+        )
+        normalized = NeuralRequest(
+            stage=request.stage,
+            model=request.model,
+            messages=request.messages,
+            schema=request.schema,
+            temperature=(
+                request.temperature
+            ),
+            exchange_id=(
+                exchange_id
+            ),
+            cache_policy=(
+                request.cache_policy
+            ),
+            adapter=request.adapter,
+        )
+        response = (
+            self.runtime.generate(
+                model=(
+                    normalized.model
+                ),
+                messages=(
+                    normalized.messages
+                ),
+                schema=(
+                    normalized.schema
+                ),
+                temperature=(
+                    normalized.temperature
+                ),
+            )
+        )
+        self.calls.append(
+            NeuralCall(
+                request=normalized,
+                response=response,
+            )
+        )
+        return response
+
+    def packet(self) -> dict[str, Any]:
+        return {
+            "session_id": (
+                self.session_id
+            ),
+            "backend": (
+                self.backend_name
+            ),
+            "capabilities": (
+                self.capabilities.packet()
+            ),
+            "active_exchange_id": (
+                self.active_exchange_id
+            ),
+            "neural_call_count": len(
+                self.calls
+            ),
+            "neural_calls": [
+                call.packet()
+                for call
+                in self.calls
+            ],
+        }
+
+
 class NeuralRuntime(Protocol):
     @property
     def capabilities(
