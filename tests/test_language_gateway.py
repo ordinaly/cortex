@@ -106,16 +106,16 @@ class FakeClient:
             if "Alice knows Bob" in user:
                 return (
                     '{"entities":['
-                    '{"id":"e0","name":"Alice","kind":"person","description":""},'
-                    '{"id":"e1","name":"Bob","kind":"person","description":""}'
+                    '{"id":"e0","name":"Alice","kind":"person","description":"","evidence":"Alice"},'
+                    '{"id":"e1","name":"Bob","kind":"person","description":"","evidence":"Bob"}'
                     '],"relations":['
-                    '{"source":"e0","target":"e1","label":"knows","asserted":true}'
+                    '{"source":"e0","target":"e1","label":"knows","asserted":true,"evidence":"Alice knows Bob"}'
                     ']}'
                 )
             if "Alice" in user:
                 return (
                     '{"entities":['
-                    '{"id":"e0","name":"Alice","kind":"person","description":""}'
+                    '{"id":"e0","name":"Alice","kind":"person","description":"","evidence":"Alice"}'
                     '],"relations":[]}'
                 )
             return '{"entities":[],"relations":[]}'
@@ -289,13 +289,26 @@ def test_openai_chat_completion_contains_cortex_extension():
 def test_parser_rejects_relation_to_unknown_local_entity():
     raw = (
         '{"entities":['
-        '{"id":"e0","name":"Alice","kind":"person","description":""}'
+        '{"id":"e0","name":"Alice","kind":"person","description":"","evidence":"Alice"}'
         '],"relations":['
-        '{"source":"e0","target":"missing","label":"knows","asserted":true}'
+        '{"source":"e0","target":"missing","label":"knows","asserted":true,"evidence":"Alice"}'
         ']}'
     )
     with pytest.raises(ValueError):
         parse_semantic_observation(raw)
+
+
+def test_parser_rejects_unanchored_extractor_hallucination():
+    raw = (
+        '{"entities":['
+        '{"id":"e0","name":"Paris","kind":"city","description":"","evidence":"Paris"}'
+        '],"relations":[]}'
+    )
+    with pytest.raises(ValueError):
+        parse_semantic_observation(
+            raw,
+            source_text="Alice is here.",
+        )
 
 
 @pytest.mark.parametrize(
