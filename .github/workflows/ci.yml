@@ -81,6 +81,7 @@ jobs:
           tests/test_proof_dependency.py
           tests/test_planning_replanning.py
           tests/test_open_world_novelty.py
+          tests/test_novelty_aware_replanning.py
           tests/test_cache_refresh_attribution.py
           tests/test_exact_semantic_geometry_fast_path.py
           tests/test_optimized_cache_reattribution.py
