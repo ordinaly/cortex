@@ -1417,5 +1417,15 @@ def openai_chat_completion(result: ChatResult) -> dict[str, Any]:
                 if result.diagnostics is not None
                 else None
             ),
+            "diagnosis": (
+                result.cortex_context.get(
+                    "diagnosis"
+                )
+                if isinstance(
+                    result.cortex_context,
+                    Mapping,
+                )
+                else None
+            ),
         },
     }
