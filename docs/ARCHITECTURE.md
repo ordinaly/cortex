@@ -1488,12 +1488,31 @@ Across 60 untouched official cases, initial support strengths 1, 2, and 3 produc
 This is a research characterization of the cumulative evidence semantics, not a claim that the stable runtime contains a general-purpose epistemic revision controller. The evidence in v1 is deterministic.
 
 Structural analogy / isomorphism subsequently passed its own frozen campaign.
-The next Reasoning Map axis is **latent concept induction**, where useful
-categories are not supplied in advance but must earn their complexity through
-predictive compression.
+
+The next completed step, `latent-concept-induction-v1`, removes the assumption
+that useful categories are supplied in advance. The research prototype
+evaluates the complete **203-partition** grammar for six opaque entities under a
+predictive-description objective. A non-singleton block is exposed as resolved
+only when it is shared by every exact optimum.
+
+Across the untouched official campaign, two- and three-concept recovery reached
+**1.000 minimum partition F1**, the no-shared-concept control remained fully
+singleton, ambiguous membership stayed unresolved, and the reversible
+**create → split → merge → retract** lifecycle passed every case.
+
+This creates an explicit architectural distinction between:
+
+- an entity, which may persist independently;
+- a latent concept, whose membership must earn predictive compression;
+- a semantic label, which is attached later and remains revisable.
+
+The next integration target is therefore to feed internally discovered concept
+IDs into the semantic-grounding/revision stack. The next independent Reasoning
+Map axis is explicit proof dependency.
 
 See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md),
-[STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md), and
+[STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md),
+[LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md), and
 [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
