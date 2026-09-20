@@ -1,0 +1,32 @@
+name: semantic-revision-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/semantic_revision.py"
+      - "research/semantic_revision_campaign.py"
+      - "research/semantic_revision_gate.py"
+      - "tests/test_semantic_revision.py"
+      - "docs/SEMANTIC_REVISION_V1_PROTOCOL.md"
+      - ".github/workflows/semantic-revision-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  semantic-revision-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_semantic_revision.py -q
+      - name: Run development campaign
+        run: >-
+          python research/semantic_revision_campaign.py
+          --development
+          --output semantic-revision-development.jsonl
+      - name: Check frozen development gates
+        run: >-
+          python research/semantic_revision_gate.py
+          --input semantic-revision-development.jsonl
