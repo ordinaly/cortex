@@ -227,6 +227,30 @@ cortex-gateway \
 
 No embedding model or strict renderer model is required.
 
+### Alpaca transport
+
+For Alpaca, use the native **Ollama (External)** instance type:
+
+```text
+URL: http://127.0.0.1:11435
+Model: cortex:latest
+```
+
+The gateway exposes:
+
+- `GET /api/tags`;
+- `POST /api/show`;
+- `GET /api/ps`;
+- `POST /api/chat`.
+
+Streaming chat uses Ollama-compatible newline-delimited JSON rather than
+OpenAI SSE. Alpaca's structured title-generation request is detected and
+answered as a utility operation without entering Cortex state.
+
+The OpenAI-compatible `/v1/chat/completions` surface remains available, but
+the native Ollama path is the recommended Alpaca integration because it matches
+Alpaca's first-class Ollama client directly.
+
 The terminal reports stages as:
 
 ```text

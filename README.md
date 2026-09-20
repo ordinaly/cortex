@@ -281,6 +281,20 @@ cortex-gateway \
 
 No embedding model or strict renderer model is required.
 
+For **Alpaca**, prefer its native **Ollama (External)** instance type rather
+than the generic OpenAI-compatible path:
+
+```text
+Instance type: Ollama (External)
+URL: http://127.0.0.1:11435
+Model: cortex:latest
+```
+
+The Cortex gateway exposes the small Ollama surface Alpaca needs:
+`/api/tags`, `/api/show`, `/api/ps`, and `/api/chat` with NDJSON
+streaming. Alpaca title generation is handled as a utility request and does
+not enter Cortex memory.
+
 See
 [docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md).
 

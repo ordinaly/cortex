@@ -388,3 +388,192 @@ def test_alpaca_plain_title_fallback_bypasses_cortex_state(client):
         "choices"
     ][0]["message"]["content"]
     assert "Alice" in content
+
+
+def test_alpaca_openai_1_84_stream_consumption_exact_loop(client):
+    http, _gateway = client
+    openai = pytest.importorskip("openai")
+
+    sdk = openai.OpenAI(
+        api_key="cortex",
+        base_url="http://testserver/v1",
+        http_client=http,
+    )
+
+    response = sdk.chat.completions.create(
+        model="cortex",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Hello Cortex",
+                    }
+                ],
+            }
+        ],
+        stream=True,
+    )
+
+    collected = []
+    for chunk in response:
+        if (
+            chunk.choices
+            and chunk.choices[0].delta
+        ):
+            delta = chunk.choices[0].delta
+            if delta.content:
+                collected.append(
+                    delta.content
+                )
+
+    assert "".join(collected) == "Hello from Cortex."
+
+
+def test_ollama_tags_match_alpaca_ollama_0_6_1_models(client):
+    http, _gateway = client
+    ollama = pytest.importorskip("ollama")
+
+    response = http.get(
+        "/api/tags"
+    )
+
+    assert response.status_code == 200
+    parsed = ollama.ListResponse.model_validate(
+        response.json()
+    )
+    assert parsed.models
+    assert (
+        parsed.models[0].model
+        == "cortex:latest"
+    )
+
+
+def test_ollama_show_matches_alpaca_ollama_0_6_1_model(client):
+    http, _gateway = client
+    ollama = pytest.importorskip("ollama")
+
+    response = http.post(
+        "/api/show",
+        json={
+            "model": "cortex",
+        },
+    )
+
+    assert response.status_code == 200
+    parsed = ollama.ShowResponse.model_validate(
+        response.json()
+    )
+    assert (
+        "completion"
+        in (
+            parsed.capabilities
+            or []
+        )
+    )
+
+
+def test_ollama_chat_stream_matches_alpaca_ollama_0_6_1(client):
+    http, gateway = client
+    ollama = pytest.importorskip("ollama")
+
+    with http.stream(
+        "POST",
+        "/api/chat",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Hello Cortex",
+                }
+            ],
+            "stream": True,
+            "think": False,
+        },
+    ) as response:
+        assert response.status_code == 200
+        assert response.headers[
+            "content-type"
+        ].startswith(
+            "application/x-ndjson"
+        )
+        raw_lines = [
+            line
+            for line
+            in response.iter_lines()
+            if line.strip()
+        ]
+
+    chunks = [
+        ollama.ChatResponse.model_validate_json(
+            line
+        )
+        for line in raw_lines
+    ]
+
+    text = "".join(
+        chunk.message.content
+        or ""
+        for chunk in chunks
+    )
+
+    assert text == "Hello from Cortex."
+    assert chunks[-1].done is True
+    assert (
+        chunks[-1].done_reason
+        == "stop"
+    )
+    assert gateway.calls[-1][
+        "user_text"
+    ] == "Hello Cortex"
+
+
+def test_ollama_alpaca_title_request_bypasses_cortex(client):
+    http, gateway = client
+    ollama = pytest.importorskip("ollama")
+
+    response = http.post(
+        "/api/chat",
+        json={
+            "model": "cortex",
+            "stream": False,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": (
+                        "You are an assistant that generates short chat titles "
+                        "based on the prompt. If you want to, you can add a single "
+                        "emoji. Format the response as a single JSON object."
+                        "\n\nHello Cortex"
+                    ),
+                }
+            ],
+            "format": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "title"
+                ],
+            },
+            "think": False,
+        },
+    )
+
+    assert response.status_code == 200
+    assert gateway.calls == []
+    parsed = ollama.ChatResponse.model_validate(
+        response.json()
+    )
+    payload = json.loads(
+        parsed.message.content
+        or "{}"
+    )
+    assert payload[
+        "title"
+    ] == "Hello Cortex"
