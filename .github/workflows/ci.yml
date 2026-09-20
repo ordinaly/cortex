@@ -85,6 +85,7 @@ jobs:
           tests/test_language_gateway.py
           tests/test_strict_language_gateway.py
           tests/test_hybrid_language_gateway.py
+          tests/test_cognitive_orchestrator.py
           tests/test_cache_refresh_attribution.py
           tests/test_exact_semantic_geometry_fast_path.py
           tests/test_optimized_cache_reattribution.py
