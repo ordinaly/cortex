@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.14-R** |
+| research frontier | **v1.15-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -126,9 +126,13 @@ The progression has established:
 - retained-mass support tradeoffs;
 - internal fused-stage attribution.
 
-v1.14-R implemented the exact field-specific perceptual fast path identified by the profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and the complete paired fused step **1.96× faster**, with zero structural disagreements. Perceptual share fell to **2.20%**. Re-profiling now identifies **cache refresh** as the dominant stage at about **45.5%**, so the next engineering milestone is cache-refresh decomposition rather than another assumed optimization.
+v1.14-R implemented the exact field-specific perceptual fast path identified by the profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and the complete paired fused step **1.96× faster**, with zero structural disagreements. Perceptual share fell to **2.20%**.
 
-The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md). The latest profiling report is [docs/FUSED_STAGE_ATTRIBUTION_V1.md](docs/FUSED_STAGE_ATTRIBUTION_V1.md).
+v1.15-R then decomposed the new cache-refresh bottleneck. At 288 anchors, **distance-row recomputation accounts for 41.10%** of attributed refresh time, **kernel regeneration 35.50%**, and writes/bookkeeping 15.48%. Together, semantic geometry and kernel regeneration account for about **76.6%** of refresh cost, with exact paired cache parity and zero structural disagreements.
+
+The next engineering target is therefore an exact semantic-geometry fast path rather than feature/probability micro-optimization. See [docs/CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](docs/CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
+
+The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
 
 ## Relational reasoning
 
