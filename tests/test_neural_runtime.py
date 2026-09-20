@@ -249,6 +249,10 @@ def test_neural_session_owns_per_exchange_call_trace():
         call["cache_policy"]
         == "reuse_if_supported"
     )
+    assert (
+        call["control_keys"]
+        == []
+    )
 
 
 def test_neural_session_resets_trace_for_new_exchange():
@@ -323,3 +327,43 @@ def test_neural_session_rejects_unsupported_structured_generation():
         raise AssertionError(
             "unsupported structured generation must fail"
         )
+
+
+
+def test_neural_session_preserves_out_of_band_control_objects():
+    runtime = FakeRuntime()
+    session = NeuralSession(
+        session_id="s1",
+        runtime=runtime,
+    )
+    sentinel = object()
+
+    session.execute(
+        NeuralRequest(
+            stage="answer",
+            model="test",
+            messages=[],
+            control={
+                "hybrid_exchange": (
+                    sentinel
+                ),
+            },
+        )
+    )
+
+    assert (
+        session.calls[0].request.control[
+            "hybrid_exchange"
+        ]
+        is sentinel
+    )
+    assert (
+        session.packet()[
+            "neural_calls"
+        ][0][
+            "control_keys"
+        ]
+        == [
+            "hybrid_exchange"
+        ]
+    )
