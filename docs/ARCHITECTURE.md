@@ -1242,16 +1242,20 @@ $
 \text{revised stable}.
 $
 
-The current noisy-confidence research extends this boundary with missing
+The subsequent noisy-confidence campaign extends this boundary with missing
 observations, stochastic neural errors, corrupted relational evidence, changing
 reliability, and explicit trust suspension before an accepted label is
-withdrawn.
+withdrawn. The frozen official campaign passed all gates: raw neural top-label
+accuracy was **0.8061**, Cortex top-label accuracy **0.9639**, trusted
+accepted-label accuracy **0.9980** at **0.7807 coverage**, false certainty
+**0.00195**, and unaffected-concept preservation **1.000**.
 
 These mechanisms remain **research-only**. They do not modify the frozen native
 runtime or train neural encoder parameters.
 
 See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md),
-[SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md), and
+[SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md),
+[NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md), and
 [NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md](NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md).
 
 ---
