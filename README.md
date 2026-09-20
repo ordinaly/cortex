@@ -165,7 +165,17 @@ fingerprints unchanged, and cases requiring earlier rerouting correctly fell
 back to full replanning. See
 [docs/PLANNING_REPLANNING_V1.md](docs/PLANNING_REPLANNING_V1.md).
 
-The next independent Reasoning Map axis is **open-world novelty attribution v1**.
+The seventh Reasoning Map campaign,
+**open-world-novelty-attribution-v1**, turns novelty detection into competing
+structural explanations. Across **160 untouched official cases**, exact
+attribution and edit locality were **1.000**, the false persistent edit rate was
+**0.000**, ambiguous instance-vs-type evidence stayed unresolved in every case,
+and transient excursion/recovery produced no structural rewrite. The
+nearest-known-type and global-reset baselines reached **0.375** and **0.125**
+exact attribution accuracy. See
+[docs/OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](docs/OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
+
+The next integration milestone is **Novelty-Aware Replanning v1**.
 
 ## Hybrid neural/Cortex path
 
