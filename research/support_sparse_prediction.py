@@ -210,16 +210,15 @@ class SupportSparsePredictiveCache(PredictiveKernelCache):
 class ExactSemanticGeometryPredictiveCache(
     SupportSparsePredictiveCache
 ):
-    """Sparse cache using exact unit-norm semantic geometry.
+    """Sparse cache using exact streamed semantic geometry.
 
-    semantic_features returns square-root categorical probabilities. Each
-    feature row therefore has unit Euclidean norm up to floating-point
-    roundoff, so squared RMS predictive distance equals one minus the row
-    dot product.
-
-    Refresh uses dirty-row dot products instead of materializing a
+    Refresh accumulates squared feature differences directly into a 2-D
+    dirty-row distance matrix rather than materializing a
     dirty-rows × anchors × outcomes difference tensor. The same squared
-    distance is reused to regenerate every resolution kernel row.
+    distance is then reused to regenerate every resolution kernel row.
+
+    This preserves the legacy Euclidean distance arithmetic more closely than
+    the mathematically equivalent unit-norm dot-product identity near zero.
     """
 
     def __init__(self, *args, **kwargs):
@@ -238,11 +237,21 @@ class ExactSemanticGeometryPredictiveCache(
         *,
         source_indices: np.ndarray | None = None,
     ) -> tuple[np.ndarray, np.ndarray]:
-        similarities = features @ self.features.T
-        distance_squared = np.maximum(
-            0.0,
-            1.0 - similarities,
+        # Accumulate exact squared differences into a 2-D dirty-row matrix
+        # instead of materializing dirty_rows × anchors × outcomes. This is
+        # algebraically identical to the legacy Euclidean path while avoiding
+        # the near-zero cancellation of sqrt(1 - dot).
+        distance_squared = np.zeros(
+            (len(features), len(self.features)),
+            dtype=float,
         )
+        for dimension in range(features.shape[1]):
+            delta = (
+                features[:, dimension, None]
+                - self.features[None, :, dimension]
+            )
+            distance_squared += delta * delta
+        distance_squared *= 0.5
         if source_indices is not None:
             distance_squared[
                 np.arange(len(source_indices)),
