@@ -72,6 +72,12 @@ A future in-process backend can consume the same exchange through a different
 adapter such as soft conditioning, adapter gates, cache state, or activation
 interfaces.
 
+In addition, every `NeuralRequest` can carry an out-of-band `control` payload.
+Hybrid Core places the live `HybridExchange` object there for answer and
+revision stages. The default Ollama session ignores this control channel and
+uses the text adapter; a specialized in-process `NeuralSession` can consume
+the typed exchange directly without parsing its own prompt serialization.
+
 ### NeuralSession
 
 `NeuralSession` sits between Hybrid Core and `NeuralRuntime`.
@@ -88,6 +94,10 @@ It owns:
 The current implementation delegates execution to `NeuralRuntime`. A future
 backend can keep KV caches, adapters, or other model-local state behind the
 same session boundary.
+
+`HybridCoreGateway` accepts an injectable neural-session factory, so a backend
+can create a specialized session per Cortex conversation while retaining the
+same Hybrid Core orchestration and persistence boundary.
 
 ### OrchestrationPolicy
 
