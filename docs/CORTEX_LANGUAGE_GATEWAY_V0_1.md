@@ -124,7 +124,10 @@ The prototype exposes:
 - `GET /health`
 - `GET /v1/models`
 - `POST /v1/chat/completions`
+- `GET /cortex/sessions`
 - `GET /cortex/sessions/{session_id}`
+- `POST /cortex/sessions/{session_id}/save`
+- `POST /cortex/sessions/{session_id}/load`
 - `POST /cortex/sessions/{session_id}/diagnostics`
 - `DELETE /cortex/sessions/{session_id}`
 
@@ -173,6 +176,7 @@ Start the gateway:
 cortex-gateway \
   --chat-model qwen3:8b \
   --embedding-model embeddinggemma \
+  --state-dir ~/.cortex/gateway \
   --port 11435
 ```
 
@@ -242,20 +246,103 @@ first-class bridge rather than a gateway-side ledger.
 
 ## Persistence
 
-Session state is currently in memory for the lifetime of the gateway process.
-
-The native runtime already supports snapshot serialization, but full restore and
-gateway-session persistence are not yet exposed.
-
-The next persistence step should add:
+Gateway sessions are persisted by default under:
 
 ```text
-save(session)
-load(session)
-list sessions
+~/.cortex/gateway
 ```
 
-without requiring a graph database initially.
+The location can be changed with:
+
+```shell
+cortex-gateway --state-dir /path/to/cortex-state
+```
+
+or:
+
+```shell
+export CORTEX_STATE_DIR=/path/to/cortex-state
+```
+
+Persistence can be disabled explicitly with:
+
+```shell
+cortex-gateway --no-persistence
+```
+
+### Event-sourced reconstruction
+
+The native runtime currently exposes snapshot serialization but not a native
+snapshot-restore constructor. Gateway v0.1 therefore uses a versioned
+event-sourced session format.
+
+Each persisted frame stores:
+
+- the validated semantic entities and relations;
+- their source-evidence snippets;
+- the **exact embedding vectors** originally submitted to Cortex.
+
+On restore, the gateway creates a fresh native runtime and replays those saved
+vectors in their original order.
+
+It does **not**:
+
+- call the semantic extractor again;
+- call the embedding model again;
+- reinterpret historical text.
+
+This matters because changing or upgrading the Ollama embedding model cannot
+silently rewrite old Cortex memory.
+
+The session file also stores:
+
+- recent conversational history;
+- the diagnostics switch;
+- the configured chat-model identifier;
+- the configured embedding-model identifier.
+
+A persisted session refuses to load if its saved model identifiers do not match
+the active gateway configuration.
+
+### Atomic files and schema version
+
+Session files use the schema identifier:
+
+```text
+cortex-language-session-v1
+```
+
+Writes go through a temporary file followed by an atomic filesystem replace.
+
+File names contain a sanitized session label plus a hash of the complete
+session ID, avoiding direct use of arbitrary user-provided paths.
+
+### Automatic and explicit lifecycle
+
+A successful chat turn automatically saves its session.
+
+The first access to a session ID automatically restores it when a matching
+persisted session exists.
+
+Explicit operations are also available:
+
+```http
+GET  /cortex/sessions
+POST /cortex/sessions/research/save
+POST /cortex/sessions/research/load
+```
+
+Deleting a session through:
+
+```http
+DELETE /cortex/sessions/research
+```
+
+removes both the active in-memory session and its persisted file by default.
+
+The persistence design is intentionally backend-neutral. A future SQLite,
+object-store, or graph-database implementation can replace the file store
+without changing the chat/session API.
 
 ## Deliberate v0.1 limitations
 
@@ -263,7 +350,7 @@ The prototype currently does **not** provide:
 
 - streaming chat completions;
 - tool-call orchestration;
-- persistent session restore across gateway restarts;
+- native O(1) snapshot restore (v0.1 rebuilds the runtime by deterministic event replay);
 - full typed natural-language relation semantics inside the native graph;
 - source-confidence weighting;
 - semantic retrieval over large Cortex histories;
@@ -309,9 +396,9 @@ The unit suite explicitly checks this invariant.
 Recommended follow-ups:
 
 1. source-confidence and trust-policy envelopes;
-2. persistent save/restore;
-3. semantic retrieval for context selection;
-4. typed language relations;
+2. semantic retrieval for context selection;
+3. typed language relations;
+4. native snapshot restoration to replace event replay when promoted safely;
 5. tool calling;
 6. streaming;
 7. metacognitive self-diagnosis over historical trends;
