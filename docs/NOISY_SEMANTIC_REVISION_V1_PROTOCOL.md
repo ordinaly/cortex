@@ -161,15 +161,15 @@ Separately, a sufficiently strong current-epoch neural disagreement can suspend
 the `trusted` flag immediately while the accepted label remains in memory.
 This separates:
 
-$
+$$
 \text{stop trusting}
-$
+$$
 
 from
 
-$
+$$
 \text{change the accepted label}.
-$
+$$
 
 These are robustness parameters for the noisy experiment, not retroactive
 changes to the already published clean semantic-revision-v1 protocol.
