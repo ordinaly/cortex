@@ -1,6 +1,6 @@
 # Hybrid Cortex semantic grounding v1 — mutual perception/reasoning
 
-Status: **frozen protocol / development preflight passed / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: `hybrid-semantic-grounding-v1`.
 
@@ -303,7 +303,7 @@ Development/preflight seeds are $0,\ldots,19$.
 
 Official untouched seeds are reserved as $300,\ldots,319$.
 
-Official seeds must not be inspected before the protocol is frozen.
+The protocol was frozen before the official seed range was evaluated.
 
 ## Development preflight result
 
@@ -411,3 +411,22 @@ genuinely ambiguous.
 
 It would not establish open-vocabulary semantic understanding, natural-language
 grounding, or superiority over trained multimodal foundation models.
+
+
+## Official outcome
+
+The untouched official campaign on seeds 300–319 passed every frozen gate.
+
+Key results:
+
+- clean perception: **1.000 resolved accuracy / 1.000 coverage / 0 false reinspection**;
+- one swapped pair: neural **0.600** → Cortex **0.9933 resolved accuracy**, **0.9933 coverage**, **0.9667 correction rate** at 8 structural facts;
+- two swapped pairs: neural **0.200** → Cortex **0.960 resolved accuracy**, **1.000 coverage**, **0.960 effective correct fraction**, **0.950 correction rate** at 12 facts;
+- false reinspection on neural-correct concepts: **0.000** in both corrupted conditions;
+- exact symmetric twins: **1.000 unresolved fraction** with mean support **0.500**;
+- non-symmetric labels in the symmetry control: **1.000 resolved accuracy**.
+
+See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md)
+and [the committed aggregate summary](../benchmarks/results/hybrid_semantic_grounding_v1_summary.json).
+
+The frozen thresholds above were not weakened after evaluation.
