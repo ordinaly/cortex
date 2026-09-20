@@ -1514,11 +1514,11 @@ the latent member blocks and concept IDs unchanged.
 The semantic mapping is injective rather than necessarily bijective, so the
 candidate vocabulary may contain unused labels. This enables the explicit state
 
-$
-Z_{mathrm{new}}	ext{ exists},
-qquad
-operatorname{label}(Z_{mathrm{new}})=	exttt{unresolved}.
-$
+$$
+Z_{\mathrm{new}}\text{ exists},
+\qquad
+\operatorname{label}(Z_{\mathrm{new}})=\texttt{unresolved}.
+$$
 
 Across 80 untouched official cases, latent concept recovery, semantic
 correction, label-causal isolation, split/merge semantic lineage, and
@@ -1527,15 +1527,15 @@ was **0.3333**, while Cortex semantic accuracy and coverage were **1.000**.
 
 The resulting research hierarchy is now:
 
-$
-oxed{
-	ext{entity}
-ightarrow
-	ext{latent concept}
-ightarrow
-	ext{semantic label}
+$$
+\boxed{
+\text{entity}
+\rightarrow
+\text{latent concept}
+\rightarrow
+\text{semantic label}
 }
-$
+$$
 
 where each layer has its own identity and revision semantics. A concept split
 or merge creates new concept identity with explicit lineage; a retracted
