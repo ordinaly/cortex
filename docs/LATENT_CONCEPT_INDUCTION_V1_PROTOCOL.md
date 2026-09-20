@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Latent Concept Induction
 
-Status: **development protocol / official campaign not opened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: **latent-concept-induction-v1**.
 
@@ -207,9 +207,9 @@ Reserved untouched official seeds: **700..719**.
 The official range must not be evaluated until development is green and the
 protocol/gates are frozen.
 
-## Development gates
+## Frozen official gates
 
-The current development gates require:
+The development campaign passed the following gates. They are now frozen unchanged for the untouched official campaign:
 
 ### Recovery
 
@@ -246,9 +246,24 @@ The current development gates require:
 
 13. every case evaluates exactly **203** candidate partitions.
 
-These are development gates. They may be revised only before official
-evaluation and only in response to development evidence. Once frozen, any
-post-official change requires a new protocol version and fresh untouched seeds.
+The passing 200-case development campaign measured:
+
+- two-concept minimum partition F1: **1.000**;
+- three-concept minimum partition F1: **1.000**;
+- singleton-control correctness: **1.000**;
+- mean two-concept held-out gain over flat: **0.0476 nats/outcome**;
+- mean three-concept held-out gain over flat: **0.0267 nats/outcome**;
+- minimum held-out gain over the one-global-concept baseline: **0.2549 nats/outcome**;
+- maximum geometry-decoy F1: **0.3333**;
+- ambiguous-member unresolved rate: **1.000**;
+- lifecycle partition accuracy: **1.000**;
+- lifecycle event completeness: **1.000**;
+- final retraction/empty-state correctness: **1.000**;
+- candidate grammar size: **203** in every case.
+
+No gate or mechanism may now be changed before official evaluation. Any change
+after opening the official seed range requires a new protocol version and fresh
+untouched seeds.
 
 ## Claim boundary
 
