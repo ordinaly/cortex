@@ -52,7 +52,7 @@ $$
 \text{proof dependency},
 \quad
 \text{planning/replanning}.
-$
+$$
 
 Each benchmark should isolate one or two primitives before later campaigns
 combine them.
