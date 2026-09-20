@@ -1200,11 +1200,11 @@ Stage I isolates the question:
 
 Only after that is established should a Stage II experiment consider
 
-$
+$$
 \text{encoder}
 \leftrightarrow
 \text{Cortex}.
-$
+$$
 
 ### 31.1 Stage II-A semantic grounding and temporal revision
 
@@ -1218,11 +1218,11 @@ structure and maintains support over complete concept-to-label mappings.
 
 The central invariant is:
 
-$
+$$
 \text{concept identity}
 \neq
 \text{current semantic label}.
-$
+$$
 
 A concept may therefore remain stable while its human-readable label becomes
 challenged, unresolved, revised, or recovered.
@@ -1232,7 +1232,7 @@ can demote high-confidence but inconsistent neural labels while preserving
 genuine mapping ambiguity. The passed temporal semantic-revision campaign then
 separated the instantaneous grounding posterior from the accepted belief state:
 
-$
+$$
 \text{stable}
 \rightarrow
 \text{challenged}
@@ -1240,7 +1240,7 @@ $
 \text{unresolved}
 \rightarrow
 \text{revised stable}.
-$
+$$
 
 The subsequent noisy-confidence campaign extends this boundary with missing
 observations, stochastic neural errors, corrupted relational evidence, changing
