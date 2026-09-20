@@ -22,7 +22,7 @@ where its explicit unresolved state provides useful epistemic restraint.
 | latent concept induction | `latent-concept-induction-v1` | passed | exact recovery, ambiguity preservation, predictive gain, reversible lifecycle |
 | explicit proof dependency | `explicit-proof-dependency-v1` | passed | all frozen gates passed across 120 cases; exact alternate-support handling |
 | planning / replanning | `planning-replanning-v1` | passed | optimal local repair with 0.0875 mean expansion ratio vs full replanning |
-| open-world novelty attribution | planned | later | — |
+| open-world novelty attribution | `open-world-novelty-attribution-v1` | passed | 1.000 attribution; 0 false persistent edits; exact ambiguity abstention |
 
 All passed entries are research fixtures, not stable runtime semantics unless
 separately promoted through the executable-specification process.
@@ -51,8 +51,10 @@ $$
 \quad
 \text{proof dependency},
 \quad
-\text{planning/replanning}.
-$$
+\text{planning/replanning},
+\quad
+\text{novelty attribution}.
+$
 
 Each benchmark should isolate one or two primitives before later campaigns
 combine them.
@@ -232,7 +234,34 @@ general planning-complexity result.
 
 See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
 
-The next independent reasoning-map axis is **open-world novelty attribution**.
+## Completed axis: open-world novelty attribution
+
+`open-world-novelty-attribution-v1` compares competing predictive-description
+explanations for surprising evidence instead of emitting one generic novelty
+flag.
+
+Across **160 untouched official cases**:
+
+- exact attribution accuracy: **1.000**;
+- resolved/unresolved correctness: **1.000**;
+- exact edit locality: **1.000**;
+- false persistent edit rate: **0.000**;
+- post-edit no-further-change stability: **1.000**;
+- ambiguous instance-vs-type unresolved rate: **1.000**;
+- transient recovery/no-edit correctness: **1.000**.
+
+The nearest-known-type and global-reset baselines reached **0.375** and
+**0.125** exact attribution accuracy.
+
+The result distinguishes noise, new instances, new entity types, new
+relations, and new regimes within the declared finite fixtures while retaining
+unresolved when the structural edit itself is ambiguous.
+
+See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
+
+The next integration milestone is **Novelty-Aware Replanning v1**: use the
+attributed kind of world change to determine the scope of dependency
+invalidation and plan repair.
 
 ## Common evaluation axes
 
