@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.14-R`
+> **Research frontier:** `v1.15-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.14-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.15-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.14-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.15-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -95,6 +95,21 @@ flowchart LR
 ```
 
 The current `spec-v0.9.5` is immutable. Research does not silently mutate it.
+
+The current predictive-geometry engineering frontier, **v1.15-R**, is an
+attribution milestone rather than a semantic change. After v1.14-R removed
+redundant perceptual normalization, cache refresh became the dominant measured
+research stage. v1.15-R decomposed that refresh and found that, at 288 anchors,
+distance-row recomputation contributes **41.10%** and kernel regeneration
+**35.50%** of attributed refresh time. Together they account for about
+**76.6%**. All paired cache/prediction discrepancies were zero.
+
+This points to an exact v1.16-R candidate: exploit the unit-norm square-root
+probability feature geometry to compute dirty-row distances from dot products
+and regenerate multi-resolution kernel rows from the same squared-distance
+quantity, without changing sparse dirty-row selection or public semantics.
+
+See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
 
 ---
 
