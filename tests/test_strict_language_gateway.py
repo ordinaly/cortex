@@ -9,6 +9,7 @@ from cortex.gateway_server import build_gateway_from_env
 from cortex.strict_language_gateway import (
     DeterministicSymbolicEncoder,
     PromptEntity,
+    parse_prompt_ir_payload,
     StrictCortexLanguageGateway,
     StrictGatewayConfig,
 )
@@ -711,3 +712,151 @@ def test_server_factory_enables_explain_responses(tmp_path):
         gateway.config.explain_responses
         is True
     )
+
+
+def test_promptir_query_surface_reference_is_canonicalized_to_local_id():
+    prompt_ir = parse_prompt_ir_payload(
+        {
+            "language": "en",
+            "speech_act": "question",
+            "entities": [
+                {
+                    "id": "e0",
+                    "surface": "Alice",
+                    "kind": "person",
+                    "evidence": "Alice",
+                },
+                {
+                    "id": "e1",
+                    "surface": "Bob",
+                    "kind": "person",
+                    "evidence": "Bob",
+                },
+            ],
+            "observations": [],
+            "query_operation": "relation_lookup",
+            "query_subject": "Alice",
+            "query_predicate": "works_with",
+            "query_object": "Bob",
+        },
+        source_text=(
+            "Does Alice work with Bob?"
+        ),
+    )
+
+    assert (
+        prompt_ir.query_subject
+        == "e0"
+    )
+    assert (
+        prompt_ir.query_object
+        == "e1"
+    )
+
+
+def test_promptir_observation_surface_references_are_canonicalized():
+    prompt_ir = parse_prompt_ir_payload(
+        {
+            "language": "en",
+            "speech_act": "assertion",
+            "entities": [
+                {
+                    "id": "e0",
+                    "surface": "Alice",
+                    "kind": "person",
+                    "evidence": "Alice",
+                },
+                {
+                    "id": "e1",
+                    "surface": "Bob",
+                    "kind": "person",
+                    "evidence": "Bob",
+                },
+            ],
+            "observations": [
+                {
+                    "subject": "Alice",
+                    "predicate": "works_with",
+                    "object": "Bob",
+                    "asserted": True,
+                    "evidence": "Alice works with Bob",
+                }
+            ],
+            "query_operation": "none",
+            "query_subject": "",
+            "query_predicate": "",
+            "query_object": "",
+        },
+        source_text=(
+            "Alice works with Bob."
+        ),
+    )
+
+    assert (
+        prompt_ir.observations[0].subject
+        == "e0"
+    )
+    assert (
+        prompt_ir.observations[0].object
+        == "e1"
+    )
+
+
+def test_promptir_ambiguous_surface_reference_still_fails_closed():
+    with pytest.raises(
+        ValueError,
+        match="ambiguous",
+    ):
+        parse_prompt_ir_payload(
+            {
+                "language": "en",
+                "speech_act": "question",
+                "entities": [
+                    {
+                        "id": "e0",
+                        "surface": "Alex",
+                        "kind": "person",
+                        "evidence": "Alex",
+                    },
+                    {
+                        "id": "e1",
+                        "surface": "Alex",
+                        "kind": "organization",
+                        "evidence": "Alex",
+                    },
+                ],
+                "observations": [],
+                "query_operation": "entity_recall",
+                "query_subject": "Alex",
+                "query_predicate": "",
+                "query_object": "",
+            },
+            source_text="Tell me about Alex.",
+        )
+
+
+def test_promptir_unknown_surface_reference_still_fails_closed():
+    with pytest.raises(
+        ValueError,
+        match="unknown",
+    ):
+        parse_prompt_ir_payload(
+            {
+                "language": "en",
+                "speech_act": "question",
+                "entities": [
+                    {
+                        "id": "e0",
+                        "surface": "Alice",
+                        "kind": "person",
+                        "evidence": "Alice",
+                    }
+                ],
+                "observations": [],
+                "query_operation": "entity_recall",
+                "query_subject": "Bob",
+                "query_predicate": "",
+                "query_object": "",
+            },
+            source_text="Tell me about Alice.",
+        )
