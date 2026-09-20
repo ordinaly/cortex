@@ -66,6 +66,9 @@ class RevisionRead:
     instantaneous_label: Label | None
     instantaneous_confidence: float
     instantaneous_conflict: bool
+    current_neural_label: Label | None
+    current_neural_confidence: float
+    perceptual_conflict: bool
     trusted: bool
     neural_top_label: Label | None
     neural_top_confidence: float
@@ -319,12 +322,9 @@ class CortexSemanticRevision:
                 else 0.0
             )
             strong_conflict = (
-                (read.resolved and read.label != incumbent)
-                or (
-                    challenger is not None
-                    and challenger_support
-                    >= incumbent_support + self.withdrawal_margin
-                )
+                read.resolved
+                and read.label is not None
+                and read.label != incumbent
             )
             was_challenged = state.phase == "challenged"
             state.phase = "challenged"
@@ -458,6 +458,28 @@ class CortexSemanticRevision:
         for concept in self.concepts:
             self._advance_state(concept, grounding_reads[concept])
 
+        current_neural: dict[Concept, tuple[Label | None, float]] = {}
+        for concept in self.concepts:
+            matching = [
+                item for item in neural_items
+                if item.concept == concept
+            ]
+            if not matching:
+                current_neural[concept] = (None, 0.0)
+                continue
+            total_reliability = sum(item.reliability for item in matching)
+            averaged = {
+                label: sum(
+                    item.reliability * float(item.probabilities[label])
+                    for item in matching
+                ) / total_reliability
+                for label in self.labels
+            }
+            current_neural[concept] = max(
+                averaged.items(),
+                key=lambda item: item[1],
+            )
+
         self._reads = {}
         for concept in self.concepts:
             state = self._states[concept]
@@ -485,11 +507,21 @@ class CortexSemanticRevision:
                 and instant.resolved
                 and instant.label != state.accepted_label
             )
+            current_neural_label, current_neural_confidence = (
+                current_neural[concept]
+            )
+            perceptual_conflict = (
+                state.accepted_label is not None
+                and current_neural_label is not None
+                and current_neural_label != state.accepted_label
+                and current_neural_confidence >= 0.62
+            )
             trusted = (
                 state.phase == "stable"
                 and state.accepted_label is not None
                 and accepted_support >= self.grounder_accept_threshold
                 and not instantaneous_conflict
+                and not perceptual_conflict
             )
             self._reads[concept] = RevisionRead(
                 epoch=self.epoch,
@@ -509,6 +541,9 @@ class CortexSemanticRevision:
                 instantaneous_label=instant.label,
                 instantaneous_confidence=instant.confidence,
                 instantaneous_conflict=instantaneous_conflict,
+                current_neural_label=current_neural_label,
+                current_neural_confidence=current_neural_confidence,
+                perceptual_conflict=perceptual_conflict,
                 trusted=trusted,
                 neural_top_label=grounding.neural_top_label,
                 neural_top_confidence=grounding.neural_top_confidence,
