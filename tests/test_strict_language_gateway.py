@@ -5,6 +5,7 @@ from typing import Any, Mapping, Sequence
 import pytest
 
 import cortex.strict_language_gateway as strict_module
+from cortex.gateway_server import build_gateway_from_env
 from cortex.strict_language_gateway import (
     DeterministicSymbolicEncoder,
     PromptEntity,
@@ -532,3 +533,32 @@ def test_diagnostics_are_cortex_owned_in_strict_mode():
         ]["status"]
         == "diagnostic"
     )
+
+
+def test_server_factory_builds_strict_gateway_mode(tmp_path):
+    gateway = build_gateway_from_env(
+        chat_model="base-model",
+        strict_neural_boundary=True,
+        parser_model="parser-model",
+        renderer_model="renderer-model",
+        persistence_dir=str(tmp_path),
+        feature_dim=64,
+    )
+
+    assert isinstance(
+        gateway,
+        StrictCortexLanguageGateway,
+    )
+    assert (
+        gateway.config.parser_model
+        == "parser-model"
+    )
+    assert (
+        gateway.config.renderer_model
+        == "renderer-model"
+    )
+    assert (
+        gateway.config.embedding_model
+        == "sha256-symbolic-v1"
+    )
+    assert gateway.config.feature_dim == 64
