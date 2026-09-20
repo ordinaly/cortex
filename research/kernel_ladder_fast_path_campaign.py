@@ -23,7 +23,7 @@ from support_sparse_prediction import (
 
 OUTCOMES = 3
 PROTOCOL = "kernel-ladder-fast-path-v1.18-R"
-DEVELOPMENT_SEEDS = (0, 1, 2)
+DEVELOPMENT_SEEDS = tuple(range(8))
 OFFICIAL_SEEDS = (500, 501, 502)
 
 
