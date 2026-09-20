@@ -1,6 +1,6 @@
 # Cortex v1.16-R — Exact Semantic-Geometry Fast Path
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign completed with one failed gate**.
 
 Protocol ID: **exact-semantic-geometry-fast-path-v1.16-R**.
 
@@ -199,3 +199,37 @@ Final development result at 288 anchors:
 
 No implementation, threshold, or official seed may now be changed without
 creating a new protocol version.
+
+## Official outcome
+
+The untouched official campaign on seeds **300, 301, 302** preserved exactness
+and passed the direct performance gates, but **did not pass every frozen gate**.
+
+At 288 anchors:
+
+- median cache-refresh speedup: **1.5234×**;
+- median complete fused-step speedup: **1.1735×**;
+- median cache-refresh stage share: **0.3679**;
+- median candidate-readout share: **0.2077**;
+- maximum distance error: **5.55e-17**;
+- maximum kernel error: **3.33e-16**;
+- maximum candidate-prediction error: **2.22e-16**;
+- structural disagreements: **0**.
+
+The frozen cache-share gate required:
+
+- cache-refresh stage share <= **0.35**.
+
+The observed **0.3679** therefore fails that gate. The threshold is not
+weakened after evaluation.
+
+Interpretation:
+
+- the exact optimization itself is validated by paired parity and direct
+  speedup;
+- the preregistered claim that cache refresh would cease to occupy more than
+  35% of the profiled step is **not supported** by the official campaign;
+- cache refresh remains the leading official optimization target and should
+  be decomposed again in its optimized form before another change is chosen.
+
+See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
