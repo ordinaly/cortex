@@ -278,3 +278,49 @@ def test_multiple_text_parts_preserve_order(client):
         gateway.calls[-1]["user_text"]
         == "First part\nSecond part"
     )
+
+
+def test_openai_python_sdk_receives_streamed_delta_content(client):
+    http, _gateway = client
+    openai = pytest.importorskip("openai")
+
+    sdk = openai.OpenAI(
+        api_key="cortex",
+        base_url="http://testserver/v1",
+        http_client=http,
+    )
+
+    stream = sdk.chat.completions.create(
+        model="cortex",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": "Hello Cortex",
+                    }
+                ],
+            }
+        ],
+        stream=True,
+    )
+
+    pieces = []
+    finish_reason = None
+    for chunk in stream:
+        assert chunk.choices
+        choice = chunk.choices[0]
+        if choice.delta.content:
+            pieces.append(
+                choice.delta.content
+            )
+        if choice.finish_reason:
+            finish_reason = (
+                choice.finish_reason
+            )
+
+    assert "".join(
+        pieces
+    ) == "Hello from Cortex."
+    assert finish_reason == "stop"
