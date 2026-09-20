@@ -1,6 +1,6 @@
 # Cortex v1.17-R — Optimized Cache Re-Attribution
 
-Status: **frozen attribution protocol / development passed / official campaign untouched**.
+Status: **frozen attribution protocol / official campaign passed**.
 
 Protocol ID: **optimized-cache-reattribution-v1.17-R**.
 
@@ -65,7 +65,7 @@ Anchor counts: **72, 144, 288**.
 
 Development seeds: **0, 1, 2**.
 
-Reserved untouched official seeds: **400, 401, 402**.
+Official seeds: **400, 401, 402**.
 
 Each case uses the existing equivalent/divergent/reconverged deterministic
 trace.
@@ -144,3 +144,31 @@ was **13.30%**.
 
 No gate or mechanism may now change before the untouched official campaign.
 Any later mechanism change requires a new protocol version and fresh seeds.
+
+## Official outcome
+
+The untouched official campaign passed every frozen validity gate.
+
+At 288 anchors:
+
+- kernel regeneration: **48.63%**;
+- writes/bookkeeping: **24.94%**;
+- streamed semantic geometry: **13.69%**;
+- semantic features: **4.31%**;
+- dirty detection: **2.82%**;
+- outcome probabilities: **2.32%**;
+- accounting fraction: **96.84%**;
+- mean dirty-row fraction: **13.28%**.
+
+Inside streamed geometry:
+
+- squared-distance accumulation: **11.40%**;
+- distance square root: **2.21%**.
+
+All paired numerical discrepancies were **0**, with **0 dirty-mask** and
+**0 structural disagreements**.
+
+The official ordering reproduces development and selects kernel regeneration as
+the next engineering target.
+
+See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
