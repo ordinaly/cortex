@@ -414,7 +414,7 @@ Observed deterministic rates:
 The last result is a useful limitation rather than a hidden failure.
 
 Current Cortex relation memory can identify contradiction when the same
-subject/predicate/object tuple changes polarity. It cannot generically infer
+subject/predicate/object tuple changes polarity. It deliberately does not infer
 that:
 
 ```text
@@ -422,15 +422,21 @@ S --p--> A
 S --p--> B
 ```
 
-is contradictory, because many predicates legitimately allow multiple objects.
+is necessarily contradictory, because many relations legitimately admit
+multiple objects and real-world regularities can change.
 
-Detecting that class of divergence requires predicate semantics such as
-functional/exclusive cardinality, temporal scope, or an explicit relation
-contract. Until such metadata exists, Hybrid Core deliberately does not invent
-exclusivity.
+The next target is therefore **not** a hard predicate ontology such as
+`functional(p)=true`. Cortex should learn soft, contextual, revisable
+expectations about relation structure from experience: typical cardinality,
+persistence, symmetry, temporal scope, and other regularities.
+
+A second object under a historically one-object relation should initially
+produce structural surprise/tension. If coherent exceptions persist, Cortex
+must be able to revise the learned relation schema rather than reject reality.
 
 The campaign therefore gates the established v0.1 contracts but records
-alternative-object conflict detection as a characterization metric.
+alternative-object divergence as a characterization metric and a target for
+future relation-schema plasticity experiments.
 
 The CI workflow is
 `.github/workflows/hybrid-symbiosis-v0.1.yml`.
