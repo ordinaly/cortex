@@ -388,3 +388,30 @@ Results:
 The central qualitative result is that **mapping identity may remain uncertain while invariant structural consequences are certain**.
 
 See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md).
+
+
+## v1.22-R — single-buffer kernel refresh / allocation elision
+
+v1.21-R left cache refresh as the largest coarse Python/NumPy stage, so v1.22-R
+tested whether the remaining kernel-refresh cost was driven by allocation of the
+temporary resolutions-by-dirty-rows-by-anchors block.
+
+The candidate used one reusable two-dimensional buffer and regenerated one
+resolution at a time. Exactness was complete across the frozen development
+campaign: all prediction, state, kernel, and distance discrepancies were zero,
+with zero dirty-mask and structural disagreements.
+
+The performance hypothesis failed:
+
+- 72 anchors: refresh **0.963×**, fused **0.989×**;
+- 144 anchors: refresh **0.969×**, fused **0.991×**;
+- 288 anchors: refresh **0.990×**, fused **0.988×**.
+
+At 288 anchors the candidate won zero of six fused-step comparisons. Because
+the frozen development gates failed, official seeds 1200–1204 were not run.
+
+The candidate is retained for reproducibility but not promoted. This negative
+result argues against further layout-only optimization of the current cache
+without a new coarse performance hypothesis.
+
+See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
