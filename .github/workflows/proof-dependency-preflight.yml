@@ -1,0 +1,73 @@
+name: cortex-explicit-proof-dependency-v1
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "research/proof_dependency*.py"
+      - "tests/test_proof_dependency.py"
+      - "docs/PROOF_DEPENDENCY_V1_PROTOCOL.md"
+      - ".github/workflows/proof-dependency-preflight.yml"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  development:
+    if: github.event.action != 'ready_for_review'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_proof_dependency.py -q
+      - name: Run frozen development campaign
+        run: >-
+          python research/proof_dependency_campaign.py
+          --development
+          --output proof-dependency-development.jsonl
+      - name: Apply frozen development gates
+        run: >-
+          python research/proof_dependency_gate.py
+          proof-dependency-development.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: proof-dependency-development
+          path: proof-dependency-development.jsonl
+          if-no-files-found: ignore
+
+  official:
+    if: github.event.action == 'ready_for_review'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_proof_dependency.py -q
+      - name: Run untouched official campaign
+        run: >-
+          python research/proof_dependency_campaign.py
+          --official
+          --output proof-dependency-official.jsonl
+      - name: Apply frozen official gates
+        run: >-
+          python research/proof_dependency_gate.py
+          proof-dependency-official.jsonl
+          --official
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: proof-dependency-official
+          path: proof-dependency-official.jsonl
+          if-no-files-found: ignore
