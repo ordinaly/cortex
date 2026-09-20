@@ -1,0 +1,32 @@
+name: noisy-semantic-revision-official
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/noisy-semantic-revision-official.yml"
+
+jobs:
+  noisy-semantic-revision-official:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run untouched official campaign
+        run: >-
+          python research/noisy_semantic_revision_campaign.py
+          --official
+          --output noisy-semantic-revision-official.jsonl
+      - name: Check frozen official gates
+        run: >-
+          python research/noisy_semantic_revision_gate.py
+          --input noisy-semantic-revision-official.jsonl
+          --official
+          | tee noisy-semantic-revision-official-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: noisy-semantic-revision-official
+          path: |
+            noisy-semantic-revision-official.jsonl
+            noisy-semantic-revision-official-summary.json
