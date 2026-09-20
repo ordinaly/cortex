@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.15-R** |
+| research frontier | **v1.16-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -130,7 +130,9 @@ v1.14-R implemented the exact field-specific perceptual fast path identified by 
 
 v1.15-R then decomposed the new cache-refresh bottleneck. At 288 anchors, **distance-row recomputation accounts for 41.10%** of attributed refresh time, **kernel regeneration 35.50%**, and writes/bookkeeping 15.48%. Together, semantic geometry and kernel regeneration account for about **76.6%** of refresh cost, with exact paired cache parity and zero structural disagreements.
 
-The next engineering target is therefore an exact semantic-geometry fast path rather than feature/probability micro-optimization. See [docs/CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](docs/CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
+v1.16-R implements the resulting exact semantic-geometry fast path. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the full fused step **1.17× faster**, while distance/kernel discrepancies remained at **5.55e-17 / 3.33e-16** and structural disagreements stayed at zero. One preregistered gate nevertheless failed: cache refresh still occupied **36.79%** of the profiled step, above the frozen **35%** bottleneck-shift ceiling. The threshold was not weakened.
+
+The next engineering target is therefore a fresh decomposition of the **optimized cache** rather than an assumed candidate-readout optimization. See [docs/EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](docs/EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
 
 The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
 

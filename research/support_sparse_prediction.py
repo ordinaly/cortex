@@ -207,6 +207,138 @@ class SupportSparsePredictiveCache(PredictiveKernelCache):
         )
 
 
+class ExactSemanticGeometryPredictiveCache(
+    SupportSparsePredictiveCache
+):
+    """Sparse cache using exact streamed semantic geometry.
+
+    Refresh accumulates squared feature differences directly into a 2-D
+    dirty-row distance matrix rather than materializing a
+    dirty-rows × anchors × outcomes difference tensor. The same squared
+    distance is then reused to regenerate every resolution kernel row.
+
+    This preserves the legacy Euclidean distance arithmetic more closely than
+    the mathematically equivalent unit-norm dot-product identity near zero.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        resolutions = np.asarray(
+            self.resolutions,
+            dtype=float,
+        )
+        self._inverse_two_resolution_sq = (
+            0.5 / np.square(resolutions)
+        )
+
+    def _geometry_rows(
+        self,
+        features: np.ndarray,
+        *,
+        source_indices: np.ndarray | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        # Accumulate exact squared differences into a 2-D dirty-row matrix
+        # instead of materializing dirty_rows × anchors × outcomes. This is
+        # algebraically identical to the legacy Euclidean path while avoiding
+        # the near-zero cancellation of sqrt(1 - dot).
+        distance_squared = np.zeros(
+            (len(features), len(self.features)),
+            dtype=float,
+        )
+        for dimension in range(features.shape[1]):
+            delta = (
+                features[:, dimension, None]
+                - self.features[None, :, dimension]
+            )
+            distance_squared += delta * delta
+        distance_squared *= 0.5
+        if source_indices is not None:
+            distance_squared[
+                np.arange(len(source_indices)),
+                source_indices,
+            ] = 0.0
+        distances = np.sqrt(distance_squared)
+        return distance_squared, distances
+
+    def _kernel_rows_from_squared(
+        self,
+        distance_squared: np.ndarray,
+    ) -> np.ndarray:
+        return np.exp(
+            -self._inverse_two_resolution_sq[
+                :, None, None
+            ]
+            * distance_squared[None, :, :]
+        )
+
+    def refresh(self) -> np.ndarray:
+        current_features = self.field.features()
+        self.probabilities = (
+            self.field.outcome_probabilities()
+        )
+        anchors = len(self.field.anchors)
+        self.refresh_events += 1
+
+        if self.feature_tolerance == 0.0:
+            self.features = current_features
+            distance_squared, distances = (
+                self._geometry_rows(
+                    self.features,
+                    source_indices=np.arange(
+                        anchors,
+                        dtype=int,
+                    ),
+                )
+            )
+            self.distances = distances
+            self.kernels = (
+                self._kernel_rows_from_squared(
+                    distance_squared
+                )
+            )
+            self.last_dirty_mask = np.ones(
+                anchors,
+                dtype=bool,
+            )
+            self.kernel_revision += 1
+            self.full_rebuilds += 1
+            self.rows_refreshed += anchors
+            return self.last_dirty_mask.copy()
+
+        drift = np.linalg.norm(
+            current_features - self.features,
+            axis=1,
+        )
+        dirty = drift >= self.feature_tolerance
+        self.last_dirty_mask = dirty
+
+        if not np.any(dirty):
+            return dirty.copy()
+
+        self.features[dirty] = current_features[dirty]
+        dirty_indices = np.flatnonzero(dirty)
+        distance_squared, rows = self._geometry_rows(
+            self.features[dirty],
+            source_indices=dirty_indices,
+        )
+        self.distances[dirty, :] = rows
+        self.distances[:, dirty] = rows.T
+
+        kernel_rows = self._kernel_rows_from_squared(
+            distance_squared
+        )
+        for index in range(len(self.resolutions)):
+            kernel = self.kernels[index]
+            values = kernel_rows[index]
+            kernel[dirty, :] = values
+            kernel[:, dirty] = values.T
+
+        self.kernel_revision += 1
+        self.partial_refreshes += 1
+        self.rows_refreshed += int(np.sum(dirty))
+        return dirty.copy()
+
+
 class FusedSupportSparseLocalResolutionController(
     SparseCachedLocalResolutionController
 ):
@@ -255,7 +387,7 @@ class FusedSupportSparseLocalResolutionController(
                 "retained_mass must be in (0, 1]"
             )
         self.retained_mass = float(retained_mass)
-        self.cache = SupportSparsePredictiveCache(
+        self.cache = ExactSemanticGeometryPredictiveCache(
             field,
             resolutions=self.resolutions,
             feature_tolerance=feature_tolerance,

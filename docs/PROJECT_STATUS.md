@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.15-R**  
+Last consolidated research frontier: **v1.16-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,9 +30,9 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.15-R`.
+The current research frontier is `v1.16-R`.
 
-v1.15-R decomposes the cache-refresh bottleneck identified by v1.14-R. At 288 anchors, distance-row recomputation accounts for **41.10%** of attributed refresh time and kernel regeneration **35.50%**; together they account for about **76.6%**. Writes/bookkeeping contribute **15.48%**, while semantic features, dirty detection and outcome-probability refresh are individually below 3%. All paired cache/prediction discrepancies were exactly zero in the official campaign.
+v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling. The threshold was not weakened after evaluation.
 
 ## Strongest validated engineering results
 
@@ -268,23 +268,47 @@ The next engineering experiment should be an **exact semantic-geometry fast path
 
 See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
 
-### 4. v1.16-R — exact semantic-geometry fast path
+### 4. v1.16-R — exact semantic-geometry fast path — mixed official result
 
-Validate the unit-norm distance identity and fused multi-resolution kernel regeneration against the current cache with paired numerical, structural and timing gates. Do not modify sparse dirty-row selection or semantic behavior.
+The exact optimization itself is validated:
 
-### 5. Freeze the next executable research specification
+- cache-refresh speedup at 288 anchors: **1.523×**;
+- complete fused-step speedup: **1.174×**;
+- maximum distance error: **5.55e-17**;
+- maximum kernel error: **3.33e-16**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**.
+
+However, the frozen cache-share gate required the optimized cache-refresh stage
+to occupy at most **35%** of the profiled step. The official result was
+**36.79%**, so the full v1.16-R milestone did not pass every frozen gate.
+
+The implementation remains useful and exact, but the failed bottleneck-shift
+hypothesis is retained.
+
+See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
+
+### 5. v1.17-R — optimized cache re-attribution
+
+Re-decompose the **optimized** cache-refresh path before choosing another
+optimization. The development run suggested candidate readout might become
+dominant, but the untouched official run still measured cache refresh as the
+largest stage. A fresh internal attribution is therefore the correct next
+engineering experiment.
+
+### 6. Freeze the next executable research specification
 
 Once adaptive predictive geometry and relational composition stabilize, define a new frozen research specification rather than mutating `spec-v0.9.5`.
 
-### 6. Promote validated mechanisms to Rust
+### 7. Promote validated mechanisms to Rust
 
 Port only mechanisms accepted into that new specification, with differential contracts.
 
-### 7. Untouched external validation
+### 8. Untouched external validation
 
 Freeze configuration before evaluation and compare against fair online/continual/graph/neural baselines on external chronological structured data.
 
-### 8. Hybrid Cortex Stage II
+### 9. Hybrid Cortex Stage II
 
 Only after Stage I demonstrates value beyond the frozen encoder should Cortex feedback be allowed to influence representation learning.
 
