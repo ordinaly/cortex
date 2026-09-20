@@ -247,6 +247,29 @@ Streaming chat uses Ollama-compatible newline-delimited JSON rather than
 OpenAI SSE. Alpaca's structured title-generation request is detected and
 answered as a utility operation without entering Cortex state.
 
+### Alpaca diagnosis UI experiment
+
+On the `feature/alpaca-cortex-metadata` branch, the Ollama transport maps
+the hybrid result onto three distinct UI channels:
+
+```text
+Ollama message.content  -> neural answer
+Ollama message.thinking -> Cortex diagnosis
+Ollama timing fields    -> performance metadata
+```
+
+The Cortex diagnosis is a structured procedural assessment, not hidden
+chain-of-thought. It can contain the diagnosis status, reasoning mode,
+corroboration/conflict counts, memory-change state, runtime flags, and
+analysis warnings.
+
+Alpaca renders `message.thinking` in its existing reasoning/thought panel.
+Its metadata table is limited by Alpaca to standard Ollama timing/token
+fields, so Cortex-specific semantic diagnostics are intentionally not encoded
+into fake performance metrics.
+
+The feature remains isolated from `main` until validated interactively.
+
 The OpenAI-compatible `/v1/chat/completions` surface remains available, but
 the native Ollama path is the recommended Alpaca integration because it matches
 Alpaca's first-class Ollama client directly.
