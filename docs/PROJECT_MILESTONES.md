@@ -156,13 +156,13 @@ Across 80 untouched official cases:
 
 The full research path is now:
 
-$
+$$
 \text{predictive evidence}
 \rightarrow
 \text{latent concept}
 \rightarrow
 \text{semantic label}.
-$
+$$
 
 The next semantic extension is hierarchy/inheritance plus temporal revision
 across concept lineage. The next independent reasoning axis is explicit proof
