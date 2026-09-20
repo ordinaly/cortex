@@ -59,6 +59,11 @@ class RevisionRead:
     posterior_label: Label | None
     posterior_confidence: float
     posterior_margin: float
+    accepted_label_support: float
+    challenger_label: Label | None
+    challenger_support: float
+    revision_pressure: float
+    trusted: bool
     neural_top_label: Label | None
     neural_top_confidence: float
     grounding: SemanticRead
@@ -413,6 +418,28 @@ class CortexSemanticRevision:
         for concept in self.concepts:
             state = self._states[concept]
             grounding = grounding_reads[concept]
+            posterior = dict(grounding.posterior)
+            accepted_support = (
+                posterior.get(state.accepted_label, 0.0)
+                if state.accepted_label is not None
+                else 0.0
+            )
+            challenger_label = None
+            challenger_support = 0.0
+            for label, support in grounding.posterior:
+                if label != state.accepted_label:
+                    challenger_label = label
+                    challenger_support = support
+                    break
+            revision_pressure = max(
+                0.0,
+                challenger_support - accepted_support,
+            )
+            trusted = (
+                state.phase == "stable"
+                and state.accepted_label is not None
+                and accepted_support >= self.grounder_accept_threshold
+            )
             self._reads[concept] = RevisionRead(
                 epoch=self.epoch,
                 concept=concept,
@@ -424,6 +451,11 @@ class CortexSemanticRevision:
                 posterior_label=grounding.label,
                 posterior_confidence=grounding.confidence,
                 posterior_margin=grounding.margin,
+                accepted_label_support=accepted_support,
+                challenger_label=challenger_label,
+                challenger_support=challenger_support,
+                revision_pressure=revision_pressure,
+                trusted=trusted,
                 neural_top_label=grounding.neural_top_label,
                 neural_top_confidence=grounding.neural_top_confidence,
                 grounding=grounding,
