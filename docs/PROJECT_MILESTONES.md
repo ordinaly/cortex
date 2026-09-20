@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.19-R`;
+- predictive-geometry research frontier: `v1.20-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -386,7 +386,7 @@ See [LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](LOW_OVERHEAD_STAGE_PROFILE_V1_1
 
 ---
 
-## B7. v1.20-R — lazy distance materialization / write elision
+## B7. v1.20-R — lazy distance materialization / write elision — passed
 
 The hot predictive path uses kernels directly; the full cached distance matrix
 is not required by candidate readout, local readout, or complexity evaluation.
@@ -400,12 +400,19 @@ Test a cache variant that:
 - preserves the existing public distance API and exact diagnostic values;
 - falls back to the eager path if laziness cannot be made transparent.
 
-Evaluate focused refresh speed, full fused-step speed, memory traffic, and
-explicit distance-view access cost. Keep the current eager cache as the oracle.
+Officially, the lazy cache achieved **1.132× refresh speedup** and **1.025× fused-step speedup** at 288 anchors with zero numerical/state discrepancies. The public distance view remains exact on demand.
+
+See [LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md).
 
 ---
 
-## B8. Freeze the next executable research specification
+## B8. v1.21-R — post-lazy low-overhead stage profile
+
+Repeat the coarse independent-replay profile after promoting v1.20-R. Select the next target only from the new top-level ordering.
+
+---
+
+## B9. Freeze the next executable research specification
 
 
 
@@ -424,7 +431,7 @@ This is the boundary between successful research and promotable architecture.
 
 ---
 
-## B9. Promote accepted mechanisms to Rust
+## B10. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
