@@ -232,6 +232,42 @@ limitations.
 This gateway is an experimental orchestration layer and is **not** part of the
 frozen executable Cortex specification.
 
+### Strict neural-boundary mode
+
+Gateway v0.2 adds a stricter architecture in which Ollama is used only for
+language translation:
+
+```text
+text -> Ollama parser -> PromptIR -> Cortex -> AnswerIR -> Ollama renderer -> text
+```
+
+In strict mode:
+
+- the parser sees only the current user message;
+- the renderer never receives the original prompt or chat history;
+- the gateway makes no neural embedding calls;
+- Cortex observations use the deterministic `sha256-symbolic-v1` encoder;
+- Cortex/gateway code constructs the substantive answer before rendering;
+- unknown queries are semantically redacted before reaching the renderer.
+
+Example:
+
+```bash
+ollama create cortex-parser -f examples/ollama/Modelfile.parser
+ollama create cortex-renderer -f examples/ollama/Modelfile.renderer
+
+cortex-gateway \
+  --strict-neural-boundary \
+  --parser-model cortex-parser \
+  --renderer-model cortex-renderer \
+  --state-dir ~/.cortex/gateway
+```
+
+No Ollama embedding model is needed in this mode.
+
+See
+[docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md).
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
