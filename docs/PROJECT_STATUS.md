@@ -286,6 +286,29 @@ the full-search optimum.
 
 See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
 
+### Open-world novelty attribution
+
+The `open-world-novelty-attribution-v1` campaign now distinguishes the kind of
+structural explanation required by surprising evidence.
+
+Across **160 untouched official cases**:
+
+- exact attribution accuracy: **1.000**;
+- resolved/unresolved correctness: **1.000**;
+- exact edit locality: **1.000**;
+- false persistent edit rate: **0.000**;
+- post-edit stability: **1.000**;
+- ambiguous-case unresolved rate: **1.000**;
+- transient recovery/no-edit correctness: **1.000**.
+
+The frozen baselines reached **0.375** and **0.125** exact attribution accuracy.
+
+The result covers noise, new instances, new entity types, new relations, and
+new regimes under finite supplied evidence. It does not yet cover compound or
+adversarial novelty.
+
+See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -309,8 +332,8 @@ semantic vocabulary, correct adversarial label correction, unresolved naming
 for a real but unnamed concept, and correct semantic lineage through concept
 split, merge, and retraction.
 
-Planning / replanning has now passed. The next independent Reasoning Map
-axis is **open-world novelty attribution**. A natural semantic follow-up remains
+Open-world novelty attribution has now passed. The next integration milestone
+is **Novelty-Aware Replanning v1**. A natural semantic follow-up remains
 hierarchical grounding/inheritance together with temporal semantic revision
 across concept lineage.
 
