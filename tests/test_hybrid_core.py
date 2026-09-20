@@ -239,6 +239,21 @@ class FakeNeuralRuntime:
                 )
             elif (
                 user
+                == "France has capital Paris."
+            ):
+                text = (
+                    '{"language":"en","speech_act":"assertion",'
+                    '"entities":['
+                    '{"id":"e0","surface":"France","kind":"country","evidence":"France"},'
+                    '{"id":"e1","surface":"Paris","kind":"city","evidence":"Paris"}'
+                    '],"observations":['
+                    '{"subject":"e0","predicate":"capital","object":"e1",'
+                    '"asserted":true,"evidence":"France has capital Paris"}'
+                    '],"query_operation":"none","query_subject":"",'
+                    '"query_predicate":"","query_object":""}'
+                )
+            elif (
+                user
                 == "What is the capital of France?"
             ):
                 text = (
@@ -528,7 +543,59 @@ def test_neural_bootstrap_imports_provisional_cortex_memory():
         ][
             "status"
         ]
+        == "bootstrap_aligned"
+    )
+    statuses = [
+        item["status"]
+        for item
+        in result.cortex_context[
+            "diagnosis"
+        ][
+            "neural_claims"
+        ]
+    ]
+    assert statuses == [
+        "bootstrap_aligned"
+    ]
+
+
+def test_user_observation_promotes_bootstrap_relation_to_independent_evidence():
+    session, _runtime = make_session()
+
+    session.bootstrap_topics(
+        [
+            "basic geography",
+        ]
+    )
+    session.chat(
+        "France has capital Paris."
+    )
+    result = session.chat(
+        "What is the capital of France?"
+    )
+
+    assert (
+        result.cortex_context[
+            "diagnosis"
+        ][
+            "status"
+        ]
         == "supported"
+    )
+    assert [
+        item["status"]
+        for item
+        in result.cortex_context[
+            "diagnosis"
+        ][
+            "neural_claims"
+        ]
+    ] == [
+        "corroborated"
+    ]
+    assert (
+        "user_observation"
+        in session.relation_provenance.values()
     )
 
 
@@ -631,7 +698,11 @@ def test_hybrid_core_gateway_persists_bootstrap_memory(
         ][
             "status"
         ]
-        == "supported"
+        == "bootstrap_aligned"
+    )
+    assert (
+        "neural_bootstrap"
+        in session.relation_provenance.values()
     )
 
 
