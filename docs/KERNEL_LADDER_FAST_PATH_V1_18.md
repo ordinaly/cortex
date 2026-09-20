@@ -44,7 +44,7 @@ independently exponentiated.
 
 ## Candidate implementation
 
-The candidate allocates the final kernel tensor once.
+The candidate allocates the final kernel tensor once. Development also found a clear scale crossover, so ladder eligibility is decided once at cache construction: anchor banks below **192** use the unchanged direct path; larger canonical banks may use the ladder.
 
 It computes:
 
@@ -92,7 +92,7 @@ timing-order bias.
 
 Anchor counts: **72, 144, 288**.
 
-Development seeds: **0, 1, 2**.
+Development seeds: **0..7**.
 
 Reserved untouched official seeds: **500, 501, 502**.
 
