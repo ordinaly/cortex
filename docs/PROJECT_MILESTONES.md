@@ -335,9 +335,41 @@ This remains one of the strongest gates before broad scientific claims.
 
 ## C3. Hybrid Cortex Stage II
 
-Only after frozen-encoder Stage I demonstrates value beyond simpler matching should Cortex feedback influence representation learning.
+### Stage II-A — semantic grounding / inference-time feedback
 
-Questions for Stage II:
+A research prototype is now prepared under
+[hybrid-semantic-grounding-v1](HYBRID_SEMANTIC_GROUNDING_V1_PROTOCOL.md).
+
+Its invariant is:
+
+$
+\text{concept identity}\neq\text{current label}.
+$
+
+Neural perception supplies candidate-label distributions. Cortex scores those
+proposals jointly with relational structure and may return `reinforce`,
+`reinspect`, `broaden`, or `hold` feedback. Cortex can therefore demote a
+high-confidence neural label without deleting the underlying concept.
+
+Development preflight passed while the official seed range remains untouched.
+The official campaign should run only after the protocol is reviewed/frozen in
+the repository.
+
+The first protocol intentionally receives concept identities as input so it can
+isolate semantic adjudication. The intended integration order is therefore:
+
+$
+\text{latent concept induction}
+\rightarrow
+\text{semantic grounding}.
+$
+
+### Stage II-B — trainable representation feedback
+
+Only after inference-time grounding and frozen-encoder Stage I are characterized
+should Cortex feedback influence neural parameters.
+
+Questions for Stage II-B:
 
 - can structural uncertainty guide representation refinement?
 - can persistent entity/relation evidence improve the encoder?
@@ -352,17 +384,22 @@ Two tracks can proceed in parallel without contaminating each other:
 
 ### Scientific reasoning track
 
-$$
+$
 \boxed{
 A2\ \text{latent concepts}
+\rightarrow
+C3\text{-A}\ \text{semantic grounding}
 \rightarrow
 A3\ \text{noise/calibration}
 \rightarrow
 A4\ \text{proof dependency}
 }
-$$
+$
 
-Planning and open-world novelty follow once those primitives are better characterized.
+Semantic grounding is implemented as a separable research prototype now, but
+its full Cortex interpretation should consume concepts produced by A2 rather
+than externally supplied concept IDs. Planning and open-world novelty follow
+once those primitives are better characterized.
 
 ### Engineering track
 
