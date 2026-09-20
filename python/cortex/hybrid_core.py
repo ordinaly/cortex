@@ -136,8 +136,9 @@ HYBRID_TURN_SYSTEM_PROMPT = """You are the neural component of Cortex Hybrid Cor
 Produce a natural answer and, in the same structured response, a factual claim
 sidecar that describes only relation claims explicitly stated in your answer.
 
-A CORTEX_CONTEXT packet may be supplied. It is provenance-labelled session
-state, not universal truth. Use it when relevant. If it conflicts with your
+A HYBRID_EXCHANGE packet may be supplied. Its Cortex contribution is
+provenance-labelled session state, not universal truth. Use it when relevant.
+If it conflicts with your
 pretrained expectation, preserve the disagreement instead of silently
 overwriting either source.
 
@@ -1220,7 +1221,37 @@ class HybridCoreSession(
                 "user message must not be empty"
             )
 
-        self.neural_calls = []
+        plan = (
+            self.orchestration_policy.plan(
+                user_text=text,
+                has_relations=bool(
+                    self.relations
+                ),
+                has_bootstrap=bool(
+                    self.bootstrap_records
+                ),
+            )
+        )
+        exchange = HybridExchange(
+            session_id=(
+                self.session_id
+            ),
+            user_text=text,
+            plan=plan,
+        )
+        exchange.record(
+            phase="planned",
+            actor="orchestrator",
+            action="plan_selected",
+            metadata={
+                "route": plan.route,
+                "reason": plan.reason,
+            },
+        )
+        self.neural_session.begin_exchange(
+            exchange.exchange_id
+        )
+
         timings: dict[
             str,
             float,
@@ -1240,9 +1271,14 @@ class HybridCoreSession(
 
         started = perf_counter()
         try:
+            if not plan.parse_user:
+                raise RuntimeError(
+                    "current Hybrid Core policy requires PromptIR parsing"
+                )
             prompt_ir, parse_response = (
                 self._parse_user_turn(
-                    text
+                    text,
+                    exchange,
                 )
             )
             timings[
@@ -1250,6 +1286,11 @@ class HybridCoreSession(
             ] = (
                 parse_response.duration_s
             )
+
+            if not plan.observe_user:
+                raise RuntimeError(
+                    "current Hybrid Core policy requires Cortex observation"
+                )
             read, bindings = self._observe(
                 prompt_ir
             )
@@ -1285,12 +1326,41 @@ class HybridCoreSession(
                     diagnostic,
                 )
             )
+            self._cortex_contribution(
+                prompt_ir=prompt_ir,
+                cortex_answer=(
+                    cortex_answer
+                ),
+                read=read,
+                exchange=exchange,
+            )
         except Exception as exc:
             errors.append(
                 "Cortex pre-pass: "
                 + str(
                     exc
                 )
+            )
+            exchange.cortex = (
+                CortexContribution(
+                    available=False,
+                    answer_status=(
+                        "unavailable"
+                    ),
+                    query_operation=(
+                        "none"
+                    ),
+                )
+            )
+            exchange.record(
+                phase="cortex_unavailable",
+                actor="orchestrator",
+                action="continue_without_cortex",
+                metadata={
+                    "error": str(
+                        exc
+                    )
+                },
             )
         timings[
             "cortex_prepass_total"
@@ -1299,38 +1369,11 @@ class HybridCoreSession(
             - started
         )
 
-        if (
-            prompt_ir is None
-            or cortex_answer is None
-        ):
-            cortex_context: dict[
-                str,
-                Any,
-            ] = {
-                "provenance": (
-                    "cortex_session_state"
-                ),
-                "status": "unavailable",
-            }
-        else:
-            cortex_context = (
-                self._cortex_context(
-                    prompt_ir=prompt_ir,
-                    cortex_answer=(
-                        cortex_answer
-                    ),
-                    read=read,
-                )
-            )
-
         turn: HybridTurnIR | None = None
         try:
             turn, answer_response = (
                 self._generate_turn(
-                    text=text,
-                    cortex_context=(
-                        cortex_context
-                    ),
+                    exchange=exchange,
                 )
             )
             timings[
@@ -1344,6 +1387,16 @@ class HybridCoreSession(
                 + str(
                     exc
                 )
+            )
+            exchange.record(
+                phase="neural_failed",
+                actor="orchestrator",
+                action="fallback_answer",
+                metadata={
+                    "error": str(
+                        exc
+                    )
+                },
             )
 
         if turn is None:
@@ -1365,25 +1418,31 @@ class HybridCoreSession(
             errors=errors,
             timings=timings,
         )
+        exchange.diagnosis = (
+            diagnosis.packet()
+        )
+        exchange.record(
+            phase="assessed",
+            actor="cortex",
+            action="candidate_assessment",
+            metadata={
+                "status": (
+                    diagnosis.status
+                )
+            },
+        )
 
-        revisions = 0
         while (
             turn is not None
             and diagnosis.status
             == "conflict"
-            and revisions
-            < max(
-                0,
-                int(
-                    self.config.max_revision_cycles
-                ),
-            )
+            and exchange.revision_count
+            < exchange.plan.revision_budget
         ):
-            revisions += 1
             try:
                 turn, revision_response = (
                     self._revise_turn(
-                        text=text,
+                        exchange=exchange,
                         prior=turn,
                         diagnosis=diagnosis,
                     )
@@ -1407,6 +1466,24 @@ class HybridCoreSession(
                     errors=errors,
                     timings=timings,
                 )
+                exchange.diagnosis = (
+                    diagnosis.packet()
+                )
+                exchange.record(
+                    phase="reassessed",
+                    actor="cortex",
+                    action=(
+                        "revised_candidate_assessment"
+                    ),
+                    metadata={
+                        "status": (
+                            diagnosis.status
+                        ),
+                        "revision": (
+                            exchange.revision_count
+                        ),
+                    },
+                )
             except Exception as exc:
                 errors.append(
                     "Conflict revision: "
@@ -1424,7 +1501,36 @@ class HybridCoreSession(
                     errors=errors,
                     timings=timings,
                 )
+                exchange.diagnosis = (
+                    diagnosis.packet()
+                )
+                exchange.record(
+                    phase="revision_failed",
+                    actor="orchestrator",
+                    action=(
+                        "preserve_conflict"
+                    ),
+                    metadata={
+                        "error": str(
+                            exc
+                        )
+                    },
+                )
                 break
+
+        exchange.record(
+            phase="completed",
+            actor="orchestrator",
+            action="finalize",
+            metadata={
+                "diagnosis_status": (
+                    diagnosis.status
+                ),
+                "revision_count": (
+                    exchange.revision_count
+                ),
+            },
+        )
 
         self.history.extend(
             [
@@ -1442,6 +1548,15 @@ class HybridCoreSession(
             self.history[
                 -self.config.history_messages :
             ]
+        )
+
+        runtime_packet = (
+            self.neural_session.packet()
+        )
+        runtime_packet[
+            "revision_cycles"
+        ] = (
+            exchange.revision_count
         )
 
         return ChatResult(
@@ -1482,27 +1597,12 @@ class HybridCoreSession(
                 "diagnosis": (
                     diagnosis.packet()
                 ),
-                "hybrid_runtime": {
-                    "backend": (
-                        self.neural_runtime.backend_name
-                    ),
-                    "capabilities": (
-                        self.neural_runtime.capabilities.packet()
-                    ),
-                    "neural_call_count": len(
-                        self.neural_calls
-                    ),
-                    "neural_calls": [
-                        dict(
-                            item
-                        )
-                        for item
-                        in self.neural_calls
-                    ],
-                    "revision_cycles": (
-                        revisions
-                    ),
-                },
+                "hybrid_exchange": (
+                    exchange.packet()
+                ),
+                "hybrid_runtime": (
+                    runtime_packet
+                ),
                 "bootstrap": {
                     "claim_count": len(
                         self.bootstrap_records
