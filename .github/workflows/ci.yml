@@ -78,6 +78,7 @@ jobs:
           tests/test_noisy_semantic_revision.py
           tests/test_latent_concept_induction.py
           tests/test_concept_semantic_integration.py
+          tests/test_cache_refresh_attribution.py
           tests/test_versioning.py
           -q
 

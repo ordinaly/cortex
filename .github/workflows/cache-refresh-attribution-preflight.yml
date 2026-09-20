@@ -1,0 +1,31 @@
+name: cortex-v1-15-cache-refresh-attribution-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/cache_refresh_attribution_campaign.py"
+      - "research/cache_refresh_attribution_gate.py"
+      - "tests/test_cache_refresh_attribution.py"
+      - "docs/CACHE_REFRESH_ATTRIBUTION_V1_15.md"
+      - ".github/workflows/cache-refresh-attribution-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  cache-refresh-attribution-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy scipy
+      - run: pytest tests/test_cache_refresh_attribution.py -q
+      - name: Run development attribution campaign
+        run: >-
+          python research/cache_refresh_attribution_campaign.py
+          --development
+          --output cache-refresh-attribution-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/cache_refresh_attribution_gate.py
+          cache-refresh-attribution-development.jsonl

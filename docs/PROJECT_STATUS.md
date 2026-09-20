@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.14-R**  
+Last consolidated research frontier: **v1.15-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,9 +30,9 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.14-R`.
+The current research frontier is `v1.15-R`.
 
-The most recent exact optimization removed redundant anchor normalization from perceptual responsibility computation. The new measured bottleneck is **cache refresh**, about **45.5%** of the 288-anchor fused research step.
+v1.15-R decomposes the cache-refresh bottleneck identified by v1.14-R. At 288 anchors, distance-row recomputation accounts for **41.10%** of attributed refresh time and kernel regeneration **35.50%**; together they account for about **76.6%**. Writes/bookkeeping contribute **15.48%**, while semantic features, dirty detection and outcome-probability refresh are individually below 3%. All paired cache/prediction discrepancies were exactly zero in the official campaign.
 
 ## Strongest validated engineering results
 
@@ -248,23 +248,43 @@ temporal semantic revision across concept lineage.
 See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md)
 and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
-### 3. v1.15-R — cache-refresh attribution / decomposition
+### 3. v1.15-R — cache-refresh attribution / decomposition — passed
 
-Decompose the newly dominant cache-refresh stage before optimizing it. Attribute cost to semantic features, outcome probabilities, dirty detection, distance rows, kernel regeneration and bookkeeping. No internal winner is assumed in advance.
+The official attribution campaign passed every frozen validity gate.
 
-### 4. Freeze the next executable research specification
+At 288 anchors:
+
+- distance-row recomputation: **41.10%**;
+- kernel regeneration: **35.50%**;
+- writes/bookkeeping: **15.48%**;
+- semantic features: **2.90%**;
+- dirty detection: **1.88%**;
+- outcome probabilities: **1.55%**;
+- mean dirty-row fraction: **13.40%**.
+
+Geometry plus kernel regeneration therefore accounts for about **76.6%** of cache-refresh cost at the largest tested scale.
+
+The next engineering experiment should be an **exact semantic-geometry fast path**: exploit the unit-norm square-root probability features to replace dirty-row difference tensors with dot-product geometry, then derive all candidate-resolution kernel rows from the same squared-distance quantity.
+
+See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
+
+### 4. v1.16-R — exact semantic-geometry fast path
+
+Validate the unit-norm distance identity and fused multi-resolution kernel regeneration against the current cache with paired numerical, structural and timing gates. Do not modify sparse dirty-row selection or semantic behavior.
+
+### 5. Freeze the next executable research specification
 
 Once adaptive predictive geometry and relational composition stabilize, define a new frozen research specification rather than mutating `spec-v0.9.5`.
 
-### 5. Promote validated mechanisms to Rust
+### 6. Promote validated mechanisms to Rust
 
 Port only mechanisms accepted into that new specification, with differential contracts.
 
-### 6. Untouched external validation
+### 7. Untouched external validation
 
 Freeze configuration before evaluation and compare against fair online/continual/graph/neural baselines on external chronological structured data.
 
-### 7. Hybrid Cortex Stage II
+### 8. Hybrid Cortex Stage II
 
 Only after Stage I demonstrates value beyond the frozen encoder should Cortex feedback be allowed to influence representation learning.
 
