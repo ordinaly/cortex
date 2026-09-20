@@ -41,6 +41,9 @@ from .hybrid_core import (
 from .hybrid_core_gateway import (
     HybridCoreGateway,
 )
+from .hybrid_exchange import (
+    named_orchestration_policy,
+)
 
 
 def _bool_value(value: Any) -> bool | None:
@@ -1478,6 +1481,7 @@ def build_gateway_from_env(
     trace_stages: bool = False,
     explain_responses: bool = False,
     max_revision_cycles: int = 1,
+    hybrid_policy: str = "full",
 ) -> Any:
     model = (
         chat_model
@@ -1593,7 +1597,15 @@ def build_gateway_from_env(
             ),
         )
         return HybridCoreGateway(
-            core_config
+            core_config,
+            orchestration_policy=(
+                named_orchestration_policy(
+                    hybrid_policy,
+                    revision_budget=(
+                        max_revision_cycles
+                    ),
+                )
+            ),
         )
 
     if hybrid_cognition:
@@ -1717,6 +1729,20 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--hybrid-policy",
+        choices=(
+            "full",
+            "neural-direct",
+            "no-revision",
+            "no-cortex-context",
+        ),
+        default="full",
+        help=(
+            "Hybrid Core orchestration policy. Ablation policies provide "
+            "explicit control over Cortex participation and revision."
+        ),
+    )
+    parser.add_argument(
         "--explain-responses",
         action="store_true",
         help=(
@@ -1805,6 +1831,9 @@ def main() -> None:
         ),
         max_revision_cycles=(
             args.max_revision_cycles
+        ),
+        hybrid_policy=(
+            args.hybrid_policy
         ),
     )
     app = create_app(gateway)
