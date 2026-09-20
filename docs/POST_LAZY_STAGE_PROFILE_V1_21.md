@@ -57,7 +57,7 @@ Anchor counts: **72, 144, 288**.
 
 Development seeds: **10..15**.
 
-Reserved untouched official seeds: **1100..1104**.
+Official seeds: **1100..1104**.
 
 ## Validity gates
 
@@ -114,3 +114,23 @@ unchanged.
 
 No stage winner or optimization target is frozen before the untouched official
 campaign.
+
+## Official outcome
+
+The untouched official campaign passed every validity gate and retained cache
+refresh as the largest coarse stage.
+
+At 288 anchors:
+
+- cache refresh: **35.55%**;
+- candidate readout: **21.21%**;
+- hysteresis/state scan: **19.09%**;
+- complexity refresh: **13.94%**;
+- prediction-checksum discrepancy: **0**.
+
+Compared with v1.19-R, cache refresh is less dominant after v1.20-R but remains
+clearly first. The next engineering candidate must therefore target actual
+post-lazy cache work with coarse paired payoff validation rather than relying
+on unstable fine-grained internal attribution.
+
+See [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md).
