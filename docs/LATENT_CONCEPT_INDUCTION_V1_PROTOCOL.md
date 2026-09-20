@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Latent Concept Induction
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: **latent-concept-induction-v1**.
 
@@ -202,10 +202,9 @@ concept IDs and explicit lineage events.
 
 Development seeds: **0..39**.
 
-Reserved untouched official seeds: **700..719**.
+Official seeds: **700..719**.
 
-The official range must not be evaluated until development is green and the
-protocol/gates are frozen.
+The protocol and gates were frozen before this range was evaluated.
 
 ## Frozen official gates
 
@@ -277,3 +276,30 @@ create/split/merge/retract concept lifecycle.
 It would not establish unrestricted semantic concept formation, scalable
 ontology induction, natural-language meaning, or real-world unsupervised
 discovery.
+
+
+## Official outcome
+
+The untouched 100-case official campaign on seeds 700–719 passed every frozen
+gate.
+
+Official aggregate metrics:
+
+- two-concept minimum partition F1: **1.000**;
+- three-concept minimum partition F1: **1.000**;
+- no-shared-concept correctness: **1.000**;
+- mean two-concept held-out gain over flat: **0.0556 nats/outcome**;
+- mean three-concept held-out gain over flat: **0.0288 nats/outcome**;
+- minimum grouped-case gain over the one-global-concept predictor:
+  **0.2426 nats/outcome**;
+- maximum geometry-decoy F1: **0.3333**;
+- ambiguous-member unresolved rate: **1.000**;
+- lifecycle partition accuracy: **1.000**;
+- create/split/merge/retract event coverage: **1.000**;
+- final retraction/empty-state correctness: **1.000**;
+- candidate grammar size: **203** in every case.
+
+See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md) and
+[the committed aggregate summary](../benchmarks/results/latent_concept_induction_v1_summary.json).
+
+The frozen gates were not weakened after official evaluation.
