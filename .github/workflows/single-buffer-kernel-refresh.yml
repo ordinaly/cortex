@@ -1,12 +1,13 @@
-name: cortex-v1-22-single-buffer-kernel-refresh
+name: cortex-v1-22-single-buffer-kernel-refresh-repro
 
+# v1.22-R was rejected at development stage. Keep the exactness test and
+# frozen development campaign available for manual reproduction. The official
+# seeds were never run and remain intentionally untouched.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
 
 jobs:
-  development:
-    if: github.event.action != 'ready_for_review'
+  single-buffer-repro:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,12 +16,13 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip pytest numpy scipy
       - run: pytest tests/test_single_buffer_kernel_refresh.py -q
-      - name: Run frozen development campaign
+      - name: Reproduce frozen development campaign
         run: >-
           python research/single_buffer_kernel_refresh_campaign.py
           --development
           --output single-buffer-development.jsonl
-      - name: Apply frozen development gates
+      - name: Reproduce historical gates
+        continue-on-error: true
         run: >-
           python research/single_buffer_kernel_refresh_gate.py
           single-buffer-development.jsonl
@@ -29,31 +31,4 @@ jobs:
         with:
           name: v1-22-single-buffer-development
           path: single-buffer-development.jsonl
-          if-no-files-found: ignore
-
-  official:
-    if: github.event.action == 'ready_for_review'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - run: python -m pip install --upgrade pip pytest numpy scipy
-      - run: pytest tests/test_single_buffer_kernel_refresh.py -q
-      - name: Run untouched official campaign
-        run: >-
-          python research/single_buffer_kernel_refresh_campaign.py
-          --official
-          --output single-buffer-official.jsonl
-      - name: Apply frozen official gates
-        run: >-
-          python research/single_buffer_kernel_refresh_gate.py
-          single-buffer-official.jsonl
-          --official
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: v1-22-single-buffer-official
-          path: single-buffer-official.jsonl
           if-no-files-found: ignore
