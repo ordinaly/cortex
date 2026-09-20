@@ -235,12 +235,19 @@ class ExactSemanticGeometryPredictiveCache(
     def _geometry_rows(
         self,
         features: np.ndarray,
+        *,
+        source_indices: np.ndarray | None = None,
     ) -> tuple[np.ndarray, np.ndarray]:
         similarities = features @ self.features.T
         distance_squared = np.maximum(
             0.0,
             1.0 - similarities,
         )
+        if source_indices is not None:
+            distance_squared[
+                np.arange(len(source_indices)),
+                source_indices,
+            ] = 0.0
         distances = np.sqrt(distance_squared)
         return distance_squared, distances
 
@@ -266,7 +273,13 @@ class ExactSemanticGeometryPredictiveCache(
         if self.feature_tolerance == 0.0:
             self.features = current_features
             distance_squared, distances = (
-                self._geometry_rows(self.features)
+                self._geometry_rows(
+                    self.features,
+                    source_indices=np.arange(
+                        anchors,
+                        dtype=int,
+                    ),
+                )
             )
             self.distances = distances
             self.kernels = (
@@ -294,8 +307,10 @@ class ExactSemanticGeometryPredictiveCache(
             return dirty.copy()
 
         self.features[dirty] = current_features[dirty]
+        dirty_indices = np.flatnonzero(dirty)
         distance_squared, rows = self._geometry_rows(
-            self.features[dirty]
+            self.features[dirty],
+            source_indices=dirty_indices,
         )
         self.distances[dirty, :] = rows
         self.distances[:, dirty] = rows.T
