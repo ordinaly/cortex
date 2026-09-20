@@ -280,6 +280,224 @@ class CortexAnswerIR:
 
 
 @dataclass(frozen=True)
+class CortexReasoningReport:
+    parsed_entities: tuple[Mapping[str, Any], ...]
+    accepted_observations: tuple[Mapping[str, Any], ...]
+    bindings: tuple[Mapping[str, Any], ...]
+    query: Mapping[str, Any]
+    result: Mapping[str, Any]
+    runtime: Mapping[str, Any] | None
+    timings: Mapping[str, float]
+
+    def packet(self) -> dict[str, Any]:
+        return {
+            "parsed_entities": [
+                dict(item)
+                for item in self.parsed_entities
+            ],
+            "accepted_observations": [
+                dict(item)
+                for item in self.accepted_observations
+            ],
+            "bindings": [
+                dict(item)
+                for item in self.bindings
+            ],
+            "query": dict(self.query),
+            "result": dict(self.result),
+            "runtime": (
+                dict(self.runtime)
+                if self.runtime is not None
+                else None
+            ),
+            "timings": dict(self.timings),
+        }
+
+    def text(self) -> str:
+        lines = [
+            "",
+            "---",
+            "Cortex report",
+        ]
+
+        if self.parsed_entities:
+            rendered = ", ".join(
+                (
+                    f'{item["surface"]}'
+                    + (
+                        f' ({item["kind"]})'
+                        if item.get("kind")
+                        else ""
+                    )
+                )
+                for item
+                in self.parsed_entities
+            )
+            lines.append(
+                f"- Gathered entities: {rendered}"
+            )
+        else:
+            lines.append(
+                "- Gathered entities: none"
+            )
+
+        if self.accepted_observations:
+            lines.append(
+                "- Accepted observations:"
+            )
+            for item in self.accepted_observations:
+                assertion = (
+                    ""
+                    if item["asserted"]
+                    else "not "
+                )
+                lines.append(
+                    "  - "
+                    f'{item["subject"]} '
+                    f'{assertion}{item["predicate"]} '
+                    f'{item["object"]} '
+                    f'(evidence: "{item["evidence"]}")'
+                )
+        else:
+            lines.append(
+                "- Accepted observations: none"
+            )
+
+        if self.bindings:
+            rendered = ", ".join(
+                f'{item["surface"]} -> E{item["cortex_id"]}'
+                for item in self.bindings
+            )
+            lines.append(
+                f"- Cortex bindings: {rendered}"
+            )
+
+        operation = str(
+            self.query.get(
+                "operation",
+                "none",
+            )
+        )
+        if operation == "none":
+            lines.append(
+                "- Query: none; this turn was treated as an observation/update."
+            )
+        else:
+            target = " ".join(
+                piece
+                for piece in (
+                    str(
+                        self.query.get(
+                            "subject",
+                            "",
+                        )
+                    ),
+                    str(
+                        self.query.get(
+                            "predicate",
+                            "",
+                        )
+                    ),
+                    str(
+                        self.query.get(
+                            "object",
+                            "",
+                        )
+                    ),
+                )
+                if piece
+            )
+            lines.append(
+                f"- Query: {operation}"
+                + (
+                    f" [{target}]"
+                    if target
+                    else ""
+                )
+            )
+
+        status = str(
+            self.result.get(
+                "status",
+                "unknown",
+            )
+        )
+        lines.append(
+            f"- Decision: {status}"
+        )
+
+        claims = self.result.get(
+            "claims",
+            [],
+        )
+        if claims:
+            lines.append(
+                "- Support used:"
+            )
+            for claim in claims:
+                evidence = "; ".join(
+                    claim.get(
+                        "evidence",
+                        [],
+                    )
+                )
+                lines.append(
+                    "  - "
+                    f'{claim["subject"]} '
+                    f'{claim["predicate"]} '
+                    f'{claim["object"]} '
+                    f'[{claim["truth"]}]'
+                    + (
+                        f' from "{evidence}"'
+                        if evidence
+                        else ""
+                    )
+                )
+
+        if (
+            self.result.get(
+                "unknown_count",
+                0,
+            )
+        ):
+            lines.append(
+                "- Uncertainty: Cortex found no sufficient stored support for at least one requested fact."
+            )
+
+        if self.runtime is not None:
+            flags = []
+            for key in (
+                "unresolved",
+                "revision",
+                "reactivated",
+                "discovered",
+                "budget_pressure",
+            ):
+                if self.runtime.get(
+                    key
+                ):
+                    flags.append(key)
+            lines.append(
+                "- Runtime state: "
+                + (
+                    ", ".join(flags)
+                    if flags
+                    else "stable/no flagged condition"
+                )
+            )
+
+        lines.append(
+            "- Processing: "
+            + ", ".join(
+                f"{name}={value:.3f}s"
+                for name, value
+                in self.timings.items()
+            )
+        )
+        return "\n".join(lines)
+
+
+@dataclass(frozen=True)
 class RendererSegment:
     support_id: str
     kind: str
@@ -457,6 +675,7 @@ class StrictGatewayConfig:
     diagnostics_default: bool = False
     persistence_dir: str | None = None
     trace_stages: bool = False
+    explain_responses: bool = False
     chat_model: str = "cortex"
     embedding_model: str = SYMBOLIC_ENCODER_ID
 
@@ -1904,6 +2123,141 @@ class StrictCortexChatSession:
             )
         return text.strip()
 
+    def _reasoning_report(
+        self,
+        prompt_ir: PromptIR,
+        bindings: Mapping[str, int],
+        answer_ir: CortexAnswerIR,
+        read: Any | None,
+        timings: Mapping[str, float],
+    ) -> CortexReasoningReport:
+        entities_by_id = {
+            entity.local_id: entity
+            for entity in prompt_ir.entities
+        }
+
+        parsed_entities = tuple(
+            {
+                "local_id": entity.local_id,
+                "surface": entity.surface,
+                "kind": entity.kind,
+                "evidence": entity.evidence,
+            }
+            for entity in prompt_ir.entities
+        )
+
+        accepted_observations = tuple(
+            {
+                "subject": (
+                    entities_by_id[
+                        observation.subject
+                    ].surface
+                ),
+                "predicate": (
+                    observation.predicate
+                ),
+                "object": (
+                    entities_by_id[
+                        observation.object
+                    ].surface
+                ),
+                "asserted": (
+                    observation.asserted
+                ),
+                "evidence": (
+                    observation.evidence
+                ),
+            }
+            for observation
+            in prompt_ir.observations
+        )
+
+        binding_rows = tuple(
+            {
+                "local_id": entity.local_id,
+                "surface": entity.surface,
+                "cortex_id": bindings[
+                    entity.local_id
+                ],
+            }
+            for entity in prompt_ir.entities
+            if entity.local_id in bindings
+        )
+
+        query_subject = (
+            entities_by_id[
+                prompt_ir.query_subject
+            ].surface
+            if (
+                prompt_ir.query_subject
+                and prompt_ir.query_subject
+                in entities_by_id
+            )
+            else ""
+        )
+        query_object = (
+            entities_by_id[
+                prompt_ir.query_object
+            ].surface
+            if (
+                prompt_ir.query_object
+                and prompt_ir.query_object
+                in entities_by_id
+            )
+            else ""
+        )
+
+        runtime = (
+            {
+                "prediction": float(
+                    read.prediction
+                ),
+                "unresolved": bool(
+                    read.unresolved
+                ),
+                "revision": bool(
+                    read.revision
+                ),
+                "reactivated": bool(
+                    read.reactivated
+                ),
+                "discovered": bool(
+                    read.discovered
+                ),
+                "budget_pressure": bool(
+                    read.budget_pressure
+                ),
+                "stored": int(
+                    read.stored
+                ),
+            }
+            if read is not None
+            else None
+        )
+
+        return CortexReasoningReport(
+            parsed_entities=(
+                parsed_entities
+            ),
+            accepted_observations=(
+                accepted_observations
+            ),
+            bindings=binding_rows,
+            query={
+                "operation": (
+                    prompt_ir.query_operation
+                ),
+                "subject": query_subject,
+                "predicate": (
+                    prompt_ir.query_predicate
+                ),
+                "object": query_object,
+            },
+            result=answer_ir.packet(),
+            runtime=runtime,
+            timings=dict(timings),
+        )
+
     def context_packet(
         self,
         *,
@@ -1983,15 +2337,20 @@ class StrictCortexChatSession:
                 "user message must not be empty"
             )
 
+        timings: dict[str, float] = {}
+
         self._trace("parser:start")
         stage_started = perf_counter()
         prompt_ir = self._parse(
             text
         )
+        timings["parser"] = (
+            perf_counter()
+            - stage_started
+        )
         self._trace(
             "parser:done",
-            perf_counter()
-            - stage_started,
+            timings["parser"],
         )
 
         self._trace("cortex:start")
@@ -1999,10 +2358,13 @@ class StrictCortexChatSession:
         read, bindings = self._observe(
             prompt_ir
         )
+        timings["cortex"] = (
+            perf_counter()
+            - stage_started
+        )
         self._trace(
             "cortex:done",
-            perf_counter()
-            - stage_started,
+            timings["cortex"],
         )
 
         diagnostic_enabled = (
@@ -2041,11 +2403,29 @@ class StrictCortexChatSession:
         content = self._render(
             render_packet
         )
+        timings["renderer"] = (
+            perf_counter()
+            - stage_started
+        )
         self._trace(
             "renderer:done",
-            perf_counter()
-            - stage_started,
+            timings["renderer"],
         )
+
+        reasoning_report = (
+            self._reasoning_report(
+                prompt_ir,
+                bindings,
+                answer_ir,
+                read,
+                timings,
+            )
+        )
+        if self.config.explain_responses:
+            content = (
+                content.rstrip()
+                + reasoning_report.text()
+            ).strip()
 
         self.history.extend(
             [
@@ -2096,6 +2476,9 @@ class StrictCortexChatSession:
                 ),
                 "renderer_packet": (
                     render_packet.packet()
+                ),
+                "reasoning_report": (
+                    reasoning_report.packet()
                 ),
                 "state": (
                     self.context_packet(
