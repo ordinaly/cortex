@@ -36,8 +36,9 @@ EXTRACTION_SCHEMA: dict[str, Any] = {
                     "name": {"type": "string"},
                     "kind": {"type": "string"},
                     "description": {"type": "string"},
+                    "evidence": {"type": "string"},
                 },
-                "required": ["id", "name", "kind", "description"],
+                "required": ["id", "name", "kind", "description", "evidence"],
             },
         },
         "relations": {
@@ -49,8 +50,9 @@ EXTRACTION_SCHEMA: dict[str, Any] = {
                     "target": {"type": "string"},
                     "label": {"type": "string"},
                     "asserted": {"type": "boolean"},
+                    "evidence": {"type": "string"},
                 },
-                "required": ["source", "target", "label", "asserted"],
+                "required": ["source", "target", "label", "asserted", "evidence"],
             },
         },
     },
@@ -63,7 +65,10 @@ Extract only entities and explicit relations supported by the current user
 message. Do not infer unstated facts. Use short local IDs such as e0, e1 inside
 this extraction only. Each relation source/target must reference an entity ID
 from the same extraction. Mark asserted=false only when the message explicitly
-negates the relation. Respond exactly to the provided JSON schema."""
+negates the relation. For every entity and relation, include a short evidence
+field copied verbatim from the current user message that grounds the extraction.
+Do not output an item if you cannot quote supporting text. Respond exactly to
+the provided JSON schema."""
 
 
 ANSWER_SYSTEM_PROMPT = """You are the language articulation layer for Cortex.
@@ -110,6 +115,7 @@ class ExtractedEntity:
     name: str
     kind: str
     description: str
+    evidence: str
 
     @property
     def embedding_text(self) -> str:
@@ -124,6 +130,7 @@ class ExtractedRelation:
     target: str
     label: str
     asserted: bool
+    evidence: str
 
 
 @dataclass(frozen=True)
@@ -138,6 +145,7 @@ class PersistentEntity:
     names: set[str] = field(default_factory=set)
     kinds: set[str] = field(default_factory=set)
     descriptions: list[str] = field(default_factory=list)
+    evidence_snippets: list[str] = field(default_factory=list)
     mentions: int = 0
 
     def absorb(self, entity: ExtractedEntity) -> None:
@@ -149,6 +157,10 @@ class PersistentEntity:
         if description and description not in self.descriptions:
             self.descriptions.append(description)
             self.descriptions[:] = self.descriptions[-4:]
+        evidence = entity.evidence.strip()
+        if evidence and evidence not in self.evidence_snippets:
+            self.evidence_snippets.append(evidence)
+            self.evidence_snippets[:] = self.evidence_snippets[-4:]
         self.mentions += 1
 
     def packet(self) -> dict[str, Any]:
@@ -157,6 +169,9 @@ class PersistentEntity:
             "names": sorted(self.names),
             "kinds": sorted(self.kinds),
             "descriptions": list(self.descriptions),
+            "evidence_snippets": list(self.evidence_snippets),
+            "provenance": "user_message",
+            "extractor": "ollama_structured",
             "mentions": self.mentions,
         }
 
@@ -167,6 +182,7 @@ class PersistentRelation:
     target_id: int
     label: str
     asserted: bool
+    evidence: str
 
     def packet(self) -> dict[str, Any]:
         return {
@@ -174,6 +190,9 @@ class PersistentRelation:
             "target_id": self.target_id,
             "label": self.label,
             "asserted": self.asserted,
+            "evidence": self.evidence,
+            "provenance": "user_message",
+            "extractor": "ollama_structured",
         }
 
 
@@ -297,7 +316,23 @@ class OllamaClient:
         return vectors
 
 
-def parse_semantic_observation(raw: str) -> SemanticObservation:
+def _normalized_text(value: str) -> str:
+    return " ".join(value.casefold().split())
+
+
+def _evidence_is_anchored(evidence: str, source_text: str | None) -> bool:
+    if source_text is None:
+        return True
+    needle = _normalized_text(evidence)
+    haystack = _normalized_text(source_text)
+    return bool(needle) and needle in haystack
+
+
+def parse_semantic_observation(
+    raw: str,
+    *,
+    source_text: str | None = None,
+) -> SemanticObservation:
     try:
         payload = loads(raw)
     except Exception as exc:
@@ -320,9 +355,12 @@ def parse_semantic_observation(raw: str) -> SemanticObservation:
             name=str(item.get("name", "")).strip(),
             kind=str(item.get("kind", "")).strip(),
             description=str(item.get("description", "")).strip(),
+            evidence=str(item.get("evidence", "")).strip(),
         )
         if not entity.local_id or entity.local_id in seen_ids:
             raise ValueError("entity IDs must be unique and non-empty")
+        if not _evidence_is_anchored(entity.evidence, source_text):
+            raise ValueError("entity evidence is not anchored in the source message")
         seen_ids.add(entity.local_id)
         entities.append(entity)
 
@@ -335,7 +373,10 @@ def parse_semantic_observation(raw: str) -> SemanticObservation:
             target=str(item.get("target", "")).strip(),
             label=str(item.get("label", "")).strip(),
             asserted=bool(item.get("asserted", True)),
+            evidence=str(item.get("evidence", "")).strip(),
         )
+        if not _evidence_is_anchored(relation.evidence, source_text):
+            raise ValueError("relation evidence is not anchored in the source message")
         if (
             relation.source not in seen_ids
             or relation.target not in seen_ids
@@ -471,7 +512,10 @@ class CortexChatSession:
             ],
             format_schema=EXTRACTION_SCHEMA,
         )
-        return parse_semantic_observation(raw)
+        return parse_semantic_observation(
+            raw,
+            source_text=user_text,
+        )
 
     def _ensure_runtime(self, feature_dim: int) -> Any:
         if self.runtime is not None:
@@ -546,6 +590,7 @@ class CortexChatSession:
                 target_id=bindings[target_index],
                 label=relation.label,
                 asserted=relation.asserted,
+                evidence=relation.evidence,
             )
             key = (
                 persistent_relation.source_id,
