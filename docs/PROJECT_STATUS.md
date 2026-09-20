@@ -194,6 +194,30 @@ while Cortex recovered the predictive grouping at **1.000** F1.
 
 See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
 
+### Concept-to-semantics integration
+
+The `concept-semantic-integration-v1` campaign now composes internally
+discovered latent concepts with semantic grounding.
+
+Across 80 untouched official cases:
+
+- minimum latent concept partition F1: **1.000**;
+- raw neural semantic accuracy: **0.3333**;
+- Cortex semantic accuracy / coverage: **1.000 / 1.000**;
+- distractor-label resolution rate: **0.000**;
+- label-causal-isolation rate: **1.000**;
+- nameable-concept semantic accuracy: **1.000**;
+- unnamed-concept unresolved rate: **1.000** at maximum support **0.3333**;
+- split/merge semantic-lineage correctness: **1.000 / 1.000**;
+- semantic invalidation after concept retraction: **1.000**;
+- concept identity-lineage correctness: **1.000**.
+
+The result establishes a clean research boundary between ontology and language:
+a concept can exist without a resolved name, and a semantic belief disappears
+when its concept is retracted.
+
+See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -209,25 +233,20 @@ At 288 anchors:
 
 The new measured bottleneck is **cache refresh** at about **45.5%**. See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md).
 
-### 2. Concept-to-semantics integration and proof dependency
+### 2. Concept-to-semantics integration — passed
 
-Latent concept induction has passed its frozen official campaign. The next
-scientific integration is to replace the externally supplied concept IDs in the
-semantic-grounding/revision experiments with concept identities discovered by
-Cortex itself.
+Internally discovered latent concept IDs now feed the semantic-grounding layer.
+The official campaign confirmed exact causal isolation of concept identity from
+semantic vocabulary, correct adversarial label correction, unresolved naming
+for a real but unnamed concept, and correct semantic lineage through concept
+split, merge, and retraction.
 
-That pipeline should test:
+The next independent Reasoning Map axis is **explicit proof dependency**. A
+natural semantic follow-up is hierarchical grounding/inheritance together with
+temporal semantic revision across concept lineage.
 
-- whether semantic labels survive concept split/merge lineage correctly;
-- whether an internally discovered but unnamed concept can remain label-unresolved;
-- whether semantic revision changes a label without silently changing concept identity;
-- whether concept retraction invalidates dependent semantic beliefs.
-
-Immediately after that integration, the next independent Reasoning Map axis is
-**explicit proof dependency**.
-
-See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md) and
-[REASONING_MAP_V1.md](REASONING_MAP_V1.md).
+See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md)
+and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 ### 3. v1.15-R — cache-refresh attribution / decomposition
 

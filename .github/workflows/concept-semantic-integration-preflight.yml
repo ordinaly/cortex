@@ -1,0 +1,33 @@
+name: concept-semantic-integration-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/concept_semantic_integration.py"
+      - "research/concept_semantic_integration_campaign.py"
+      - "research/concept_semantic_integration_gate.py"
+      - "research/semantic_grounding.py"
+      - "tests/test_concept_semantic_integration.py"
+      - "docs/CONCEPT_SEMANTIC_INTEGRATION_V1_PROTOCOL.md"
+      - ".github/workflows/concept-semantic-integration-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  concept-semantic-integration-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy
+      - run: pytest tests/test_semantic_grounding.py tests/test_latent_concept_induction.py tests/test_concept_semantic_integration.py -q
+      - name: Run development campaign
+        run: >-
+          python research/concept_semantic_integration_campaign.py
+          --development
+          --output concept-semantic-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/concept_semantic_integration_gate.py
+          --input concept-semantic-development.jsonl

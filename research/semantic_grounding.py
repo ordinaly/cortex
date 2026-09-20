@@ -93,8 +93,10 @@ class CortexSemanticGrounder:
 
         if not self.concepts or not self.labels:
             raise ValueError("concepts and labels must be non-empty")
-        if len(self.concepts) != len(self.labels):
-            raise ValueError("semantic-grounding-v1 requires equal concept/label counts")
+        if len(self.concepts) > len(self.labels):
+            raise ValueError(
+                "semantic grounding requires at least as many labels as concepts"
+            )
         if len(self.concepts) != len(set(self.concepts)):
             raise ValueError("concepts must be unique")
         if len(self.labels) != len(set(self.labels)):
@@ -223,8 +225,14 @@ class CortexSemanticGrounder:
             return self._posterior_cache
 
         scored = [
-            (tuple(label_targets), self._mapping_log_score(tuple(label_targets)))
-            for label_targets in permutations(self.labels)
+            (
+                tuple(label_targets),
+                self._mapping_log_score(tuple(label_targets)),
+            )
+            for label_targets in permutations(
+                self.labels,
+                len(self.concepts),
+            )
         ]
         maximum = max(score for _, score in scored)
         weights = [math.exp(score - maximum) for _, score in scored]

@@ -167,6 +167,15 @@ flat per-entity prediction was **0.0556 / 0.0288 nats per outcome** for the two
 grouped families. See
 [docs/LATENT_CONCEPT_INDUCTION_V1.md](docs/LATENT_CONCEPT_INDUCTION_V1.md).
 
+The next integration campaign, **concept-semantic-integration-v1**, feeds those
+internally discovered concept IDs directly into semantic grounding. On 80
+untouched official cases, adversarial neural naming improved from **0.3333**
+raw accuracy to **1.000 Cortex semantic accuracy at full coverage**. Replacing
+the complete label vocabulary changed no concept identities, a genuinely
+unnamed concept remained unresolved at **0.3333** support, and semantic lineage
+through concept split, merge, and retraction was exact. See
+[docs/CONCEPT_SEMANTIC_INTEGRATION_V1.md](docs/CONCEPT_SEMANTIC_INTEGRATION_V1.md).
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
