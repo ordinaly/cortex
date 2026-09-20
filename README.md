@@ -16,9 +16,9 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.21-R** |
+| research frontier | **v1.22-R** |
 
-The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.21-R research frontier**.
+The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.22-R research frontier**.
 
 For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
@@ -67,7 +67,7 @@ Versioning and validation conventions are documented in
 [docs/VERSIONING.md](docs/VERSIONING.md). Historical implementation and
 performance reports remain available under `docs/`.
 
-## Research frontier — v1.21-R
+## Research frontier — v1.22-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -90,10 +90,11 @@ Recent engineering work has focused on making the adaptive predictive-geometry p
 - v1.19-R used low-overhead independent replay profiling and measured cache refresh at **37.22%** of the 288-anchor fused step;
 - v1.20-R introduced **lazy distance materialization**, improving 288-anchor refresh by **1.132×** and the complete fused step by **1.025×** with zero numerical or structural discrepancy;
 - v1.21-R repeated the same low-overhead profile after that promotion. Cache refresh remains the largest coarse stage at **35.55%**, followed by candidate readout (**21.21%**), hysteresis/state scan (**19.09%**), and complexity refresh (**13.94%**).
+- v1.22-R tested a reusable 2-D single-buffer kernel refresh. It preserved exact behavior but was slower in development: at 288 anchors median refresh speedup was **0.990×** and complete fused-step speedup **0.988×**, with no fused-step wins across six seeds. The candidate was not promoted and the official seeds were not run.
 
-The next engineering milestone is **v1.22-R single-buffer kernel refresh / allocation elision**. It will test whether the current `resolutions × dirty_rows × anchors` temporary can be replaced by a reusable two-dimensional buffer, with promotion contingent on an actual paired fused-step gain.
+The v1.22-R allocation-elision hypothesis is therefore closed as a development-stage negative result. If performance engineering continues, the next candidate should come from a different coarse stage or a genuinely different cache algorithm rather than another layout-only rewrite. Candidate readout remains the next-largest measured stage at about **21%**.
 
-See [docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md) and [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md) for the detailed engineering history, including retained negative results.
+See [docs/SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](docs/SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md), [docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md), and [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md) for the detailed engineering history, including retained negative results.
 
 ## Relational reasoning
 
