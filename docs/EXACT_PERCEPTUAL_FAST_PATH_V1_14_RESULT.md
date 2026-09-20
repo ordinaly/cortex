@@ -49,7 +49,7 @@ $$
 $$
 
 The small numerical differences arise from floating-point re-normalization
-order and are far below the frozen \(10^{-12}\) gates.
+order and are far below the frozen $10^{-12}$ gates.
 
 ## Paired speedup
 
