@@ -140,23 +140,33 @@ structure.
 
 See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
 
-### Next integration
+### Concept-to-semantics integration — passed
 
-Feed Cortex-discovered concept IDs into semantic grounding/revision so that the
-full path becomes:
+The follow-up `concept-semantic-integration-v1` now feeds Cortex-discovered
+concept IDs into semantic grounding.
 
-$$
+Across 80 untouched official cases:
+
+- raw neural semantic accuracy: **0.3333**;
+- Cortex semantic accuracy / coverage: **1.000 / 1.000**;
+- label-causal-isolation rate: **1.000**;
+- unnamed-concept unresolved rate: **1.000**;
+- split/merge semantic-lineage correctness: **1.000 / 1.000**;
+- retraction invalidation correctness: **1.000**.
+
+The full research path is now:
+
+$
 \text{predictive evidence}
 \rightarrow
 \text{latent concept}
 \rightarrow
-\text{semantic label}
-\rightarrow
-\text{temporal semantic revision}.
-$$
+\text{semantic label}.
+$
 
-This integration should remain separate from the next independent reasoning
-axis, explicit proof dependency.
+The next semantic extension is hierarchy/inheritance plus temporal revision
+across concept lineage. The next independent reasoning axis is explicit proof
+dependency.
 
 ---
 
