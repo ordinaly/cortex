@@ -11,6 +11,12 @@ from cortex.hybrid_core import (
     HybridCoreConfig,
     HybridCoreSession,
 )
+from cortex.hybrid_core_gateway import (
+    HybridCoreGateway,
+)
+from cortex.gateway_server import (
+    build_gateway_from_env,
+)
 from cortex.neural_runtime import (
     NeuralCapabilities,
     NeuralResponse,
@@ -569,3 +575,97 @@ def test_low_confidence_bootstrap_claim_is_not_imported():
 
     assert imported == tuple()
     assert not session.relations
+
+
+
+def test_hybrid_core_gateway_persists_bootstrap_memory(
+    tmp_path,
+):
+    runtime = FakeNeuralRuntime()
+    config = HybridCoreConfig(
+        chat_model="knowledge",
+        parser_model="parser",
+        feature_dim=64,
+        include_diagnosis=False,
+        persistence_dir=str(
+            tmp_path
+        ),
+    )
+    gateway = HybridCoreGateway(
+        config,
+        runtime=runtime,
+    )
+
+    imported = gateway.bootstrap(
+        "persist",
+        [
+            "basic geography",
+        ],
+    )
+    assert len(
+        imported
+    ) == 1
+
+    restored = HybridCoreGateway(
+        config,
+        runtime=FakeNeuralRuntime(),
+    )
+    session = restored.session(
+        "persist"
+    )
+
+    assert len(
+        session.bootstrap_records
+    ) == 1
+    assert len(
+        session.relations
+    ) == 1
+
+    result = restored.chat(
+        "persist",
+        "What is the capital of France?",
+    )
+    assert (
+        result.cortex_context[
+            "diagnosis"
+        ][
+            "status"
+        ]
+        == "supported"
+    )
+
+
+def test_server_factory_builds_hybrid_runtime_mode(
+    tmp_path,
+):
+    gateway = build_gateway_from_env(
+        chat_model="qwen-test",
+        parser_model="parser-test",
+        hybrid_runtime=True,
+        persistence_dir=str(
+            tmp_path
+        ),
+        feature_dim=64,
+        max_revision_cycles=2,
+    )
+
+    assert isinstance(
+        gateway,
+        HybridCoreGateway,
+    )
+    assert (
+        gateway.config.chat_model
+        == "qwen-test"
+    )
+    assert (
+        gateway.config.parser_model
+        == "parser-test"
+    )
+    assert (
+        gateway.config.max_revision_cycles
+        == 2
+    )
+    assert (
+        gateway.runtime.backend_name
+        == "ollama"
+    )
