@@ -28,9 +28,10 @@ The tracks should remain distinct. A successful research prototype is not automa
   - latent concept induction;
   - explicit proof dependency;
   - planning / replanning;
-  - open-world novelty attribution.
+  - open-world novelty attribution;
+  - novelty-aware replanning integration.
 
-The next integration milestone is **Novelty-Aware Replanning v1**.
+The next scientific milestone is **Open-World Robustness v1**.
 Concept-to-semantics integration is already complete; hierarchy/inheritance and
 temporal semantic lineage remain separate semantic follow-ups.
 
@@ -288,23 +289,60 @@ See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md)
 
 ---
 
-## A7. Novelty-Aware Replanning v1 — next integration milestone
+## A7. Novelty-Aware Replanning v1 — passed integration
 
-Connect the passed novelty-attribution and planning/replanning primitives.
+The official campaign passed every frozen gate across **160** untouched cases.
 
-The core question is whether the **kind of attributed novelty** determines the
-scope of revision:
+Cortex now composes novelty attribution with explicit planning dependencies:
 
-- noise -> preserve plan and model;
-- new instance -> bind locally and preserve unaffected support;
-- new relation -> invalidate only relation-dependent support;
-- new entity type -> revise ontology-dependent support;
-- new regime -> reconsider transition assumptions more broadly;
-- unresolved -> avoid irreversible structural revision.
+- noise preserves model and plan;
+- irrelevant structural novelty updates the model but performs zero planning
+  search;
+- relevant new instances, relations, and entity types trigger local repair;
+- regime change triggers global replanning;
+- unresolved novelty triggers no edit, no search, and execution deferral.
 
-Primary metrics should include attribution-to-repair consistency, invalidation
-locality, unnecessary-replan rate, optimal-cost agreement, unresolved safety,
-and search work relative to full restart.
+Official results:
+
+- attribution accuracy: **1.000**;
+- novelty-to-replanning decision accuracy: **1.000**;
+- structural model locality: **1.000**;
+- repair optimality: **1.000**;
+- preserve-case exactness / zero-search rate: **1.000 / 1.000**;
+- local impact localization: **1.000**;
+- local prefix / suffix preservation: **1.000 / 1.000**;
+- local search-saving rate: **1.000**;
+- mean local/full expansion ratio: **0.03846**;
+- regime-global correctness: **1.000**;
+- unresolved deferral safety: **1.000**.
+
+The always-replan baseline reached **0.375** decision accuracy, while the
+ignore-novelty baseline had **0.000** optimality on planning-relevant novelty.
+
+See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
+
+---
+
+## A8. Open-World Robustness v1 — next scientific milestone
+
+Stress the combined adaptive loop rather than add another deterministic
+primitive.
+
+The campaign should vary:
+
+- stochastic observation corruption;
+- missing evidence;
+- novelty persistence;
+- gradual versus abrupt regime change;
+- simultaneous compound novelty;
+- evidence reliability;
+- memory pressure;
+- planning consequences under uncertain attribution.
+
+Primary metrics should include calibration, false-certainty, attribution
+precision/coverage, unresolved precision, structural false-edit rate,
+revision/recovery latency, unnecessary-replan rate, plan regret, and the point
+at which abstention begins before wrong structural revision dominates.
 
 ---
 
