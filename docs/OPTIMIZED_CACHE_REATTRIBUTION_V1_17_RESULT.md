@@ -1,1 +1,119 @@
-# Cortex v1.17-R — Optimized Cache Re-Attribution Result\n\nStatus: **passed engineering attribution milestone**.\n\nProtocol: **optimized-cache-reattribution-v1.17-R**.\n\nOfficial GitHub Actions run: **35503268072**.\n\n## Objective\n\nv1.16-R made semantic geometry exact and faster, but cache refresh still\noccupied 36.79% of the official profiled fused step. Development and official\nstage ordering also disagreed on whether candidate readout had become dominant.\n\nv1.17-R therefore re-attributes the **optimized** cache before selecting\nanother micro-optimization.\n\n## Exactness\n\nThe timed cache reproduced the current `ExactSemanticGeometryPredictiveCache`\nexactly on every official trace:\n\n- candidate/local prediction discrepancy: **0**;\n- outcome-count discrepancy: **0**;\n- feature/probability discrepancy: **0**;\n- distance discrepancy: **0**;\n- kernel discrepancy: **0**;\n- dirty-mask disagreements: **0**;\n- structural disagreements: **0**.\n\n## Official attribution\n\n| group | 72 anchors | 144 anchors | 288 anchors |\n|---|---:|---:|---:|\n| kernel regeneration | 18.23% | **37.25%** | **48.63%** |\n| writes / bookkeeping | **32.67%** | 26.34% | **24.94%** |\n| streamed semantic geometry | 16.82% | 14.95% | 13.69% |\n| semantic features | 10.84% | 7.20% | 4.31% |\n| dirty detection | 6.70% | 4.55% | 2.82% |\n| outcome probabilities | 4.85% | 3.74% | 2.32% |\n\nAt 288 anchors, kernel regeneration is now by far the largest remaining\ncache-refresh computation.\n\n## Geometry substage\n\nAt 288 anchors, the streamed-geometry group decomposes into:\n\n- squared-distance accumulation: **11.40%**;\n- distance square root: **2.21%**.\n\nThis confirms that the v1.16 geometry rewrite materially reduced the geometry\nshare. Another geometry-focused optimization is not justified by the current\nprofile.\n\n## Sparse-refresh duty\n\nEvery official event had at least one dirty anchor. The median dirty-row\nfraction fell with scale and was **13.28%** at 288 anchors.\n\nThe optimized sparse selection therefore remains effective; the dominant cost\nis what must be regenerated for each selected row.\n\n## Next exact optimization candidate\n\nThe current kernel for resolution r is\n\n```math\nK_r\n=\n\exp\left(-\frac{d^2}{2r^2}\right).\n```\n\nFor the canonical resolution ladder 0.03, 0.06, 0.12, 0.25, the first three\nresolutions have exact squared-scale ratios:\n\n```math\n\alpha_{0.03}=16\alpha_{0.12},\n\qquad\n\alpha_{0.06}=4\alpha_{0.12},\n```\n\nwhere `alpha_r = 1 / (2 r^2)`.\n\nTherefore the 0.12 kernel can be exponentiated once and the 0.06 / 0.03\nkernels can, in principle, be derived by exact integer powers:\n\n```math\nK_{0.06}=K_{0.12}^{4},\n\qquad\nK_{0.03}=K_{0.12}^{16}.\n```\n\nThe 0.25 kernel still requires an independent exponential.\n\nA v1.18-R experiment should test this **kernel-ladder fast path** against the\ncurrent direct four-exponential implementation. It must preserve kernel and\nprediction parity under the existing strict gates; underflow and accumulated\nroundoff must be measured rather than assumed safe.\n\n## Secondary target\n\nWrites/bookkeeping remain **24.94%** of optimized refresh, with kernel writes\nalone about **16.39%**. If the kernel-ladder experiment succeeds, cache-memory\nlayout or write fusion is the next likely target.\n\n## Claim boundary\n\nThis result characterizes the current Python/NumPy optimized cache on the\ndeclared synthetic traces. It does not imply the same ordering in Rust or on\nexternal workloads.\n\n## Reproducibility\n\n- `research/optimized_cache_reattribution_campaign.py`\n- `research/optimized_cache_reattribution_gate.py`\n- `tests/test_optimized_cache_reattribution.py`\n- `docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17.md`\n- `benchmarks/results/optimized_cache_reattribution_v1_17_summary.json`\n
+# Cortex v1.17-R — Optimized Cache Re-Attribution Result
+
+Status: **passed engineering attribution milestone**.
+
+Protocol: **optimized-cache-reattribution-v1.17-R**.
+
+Official GitHub Actions run: **35503268072**.
+
+## Objective
+
+v1.16-R made semantic geometry exact and faster, but cache refresh still
+occupied 36.79% of the official profiled fused step. Development and official
+stage ordering also disagreed on whether candidate readout had become dominant.
+
+v1.17-R therefore re-attributes the **optimized** cache before selecting
+another micro-optimization.
+
+## Exactness
+
+The timed cache reproduced the current `ExactSemanticGeometryPredictiveCache`
+exactly on every official trace:
+
+- candidate/local prediction discrepancy: **0**;
+- outcome-count discrepancy: **0**;
+- feature/probability discrepancy: **0**;
+- distance discrepancy: **0**;
+- kernel discrepancy: **0**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**.
+
+## Official attribution
+
+| group | 72 anchors | 144 anchors | 288 anchors |
+|---|---:|---:|---:|
+| kernel regeneration | 18.23% | **37.25%** | **48.63%** |
+| writes / bookkeeping | **32.67%** | 26.34% | **24.94%** |
+| streamed semantic geometry | 16.82% | 14.95% | 13.69% |
+| semantic features | 10.84% | 7.20% | 4.31% |
+| dirty detection | 6.70% | 4.55% | 2.82% |
+| outcome probabilities | 4.85% | 3.74% | 2.32% |
+
+At 288 anchors, kernel regeneration is now by far the largest remaining
+cache-refresh computation.
+
+## Geometry substage
+
+At 288 anchors, the streamed-geometry group decomposes into:
+
+- squared-distance accumulation: **11.40%**;
+- distance square root: **2.21%**.
+
+This confirms that the v1.16 geometry rewrite materially reduced the geometry
+share. Another geometry-focused optimization is not justified by the current
+profile.
+
+## Sparse-refresh duty
+
+Every official event had at least one dirty anchor. The median dirty-row
+fraction fell with scale and was **13.28%** at 288 anchors.
+
+The optimized sparse selection therefore remains effective; the dominant cost
+is what must be regenerated for each selected row.
+
+## Next exact optimization candidate
+
+The current kernel for resolution r is
+
+```math
+K_r
+=
+\exp\left(-\frac{d^2}{2r^2}\right).
+```
+
+For the canonical resolution ladder 0.03, 0.06, 0.12, 0.25, the first three
+resolutions have exact squared-scale ratios:
+
+```math
+\alpha_{0.03}=16\alpha_{0.12},
+\qquad
+\alpha_{0.06}=4\alpha_{0.12},
+```
+
+where `alpha_r = 1 / (2 r^2)`.
+
+Therefore the 0.12 kernel can be exponentiated once and the 0.06 / 0.03
+kernels can, in principle, be derived by exact integer powers:
+
+```math
+K_{0.06}=K_{0.12}^{4},
+\qquad
+K_{0.03}=K_{0.12}^{16}.
+```
+
+The 0.25 kernel still requires an independent exponential.
+
+A v1.18-R experiment should test this **kernel-ladder fast path** against the
+current direct four-exponential implementation. It must preserve kernel and
+prediction parity under the existing strict gates; underflow and accumulated
+roundoff must be measured rather than assumed safe.
+
+## Secondary target
+
+Writes/bookkeeping remain **24.94%** of optimized refresh, with kernel writes
+alone about **16.39%**. If the kernel-ladder experiment succeeds, cache-memory
+layout or write fusion is the next likely target.
+
+## Claim boundary
+
+This result characterizes the current Python/NumPy optimized cache on the
+declared synthetic traces. It does not imply the same ordering in Rust or on
+external workloads.
+
+## Reproducibility
+
+- `research/optimized_cache_reattribution_campaign.py`
+- `research/optimized_cache_reattribution_gate.py`
+- `tests/test_optimized_cache_reattribution.py`
+- `docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17.md`
+- `benchmarks/results/optimized_cache_reattribution_v1_17_summary.json`
