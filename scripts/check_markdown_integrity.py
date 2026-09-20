@@ -99,6 +99,15 @@ def check_file(path: Path) -> list[str]:
         if in_fence:
             continue
 
+        heading_match = HEADING_RE.match(line)
+        if heading_match:
+            heading = INLINE_CODE_RE.sub("", heading_match.group(1))
+            if HEADING_LATEX_RE.search(heading):
+                errors.append(
+                    f"{name}:{lineno}: raw LaTeX/math syntax in Markdown heading; "
+                    "use plain Unicode/text in headings and put equations in the body"
+                )
+
         if SINGLE_DOLLAR_RE.match(line):
             errors.append(
                 f"{name}:{lineno}: standalone single-dollar line; "
