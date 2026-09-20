@@ -109,6 +109,7 @@ class CortexSemanticRevision:
         neural_decay: float = 0.72,
         structural_decay: float = 0.82,
         evidence_horizon: int = 12,
+        initial_acceptance_patience: int = 1,
         challenge_patience: int = 2,
         revision_patience: int = 2,
         grounder_accept_threshold: float = 0.70,
@@ -128,6 +129,10 @@ class CortexSemanticRevision:
             raise ValueError("structural_decay must be in (0, 1]")
         if evidence_horizon < 1:
             raise ValueError("evidence_horizon must be positive")
+        if initial_acceptance_patience < 1:
+            raise ValueError(
+                "initial_acceptance_patience must be positive"
+            )
         if challenge_patience < 1:
             raise ValueError("challenge_patience must be positive")
         if revision_patience < 1:
@@ -155,6 +160,9 @@ class CortexSemanticRevision:
         self.neural_decay = float(neural_decay)
         self.structural_decay = float(structural_decay)
         self.evidence_horizon = int(evidence_horizon)
+        self.initial_acceptance_patience = int(
+            initial_acceptance_patience
+        )
         self.challenge_patience = int(challenge_patience)
         self.revision_patience = int(revision_patience)
         self.grounder_accept_threshold = float(grounder_accept_threshold)
@@ -284,23 +292,41 @@ class CortexSemanticRevision:
         state = self._states[concept]
         posterior_candidate = self._posterior_candidate(read)
 
-        # Initial acceptance requires the normal grounding resolution rule.
+        # Initial acceptance can require repeated resolved support. The
+        # default remains one epoch so semantic-revision-v1 is unchanged.
         if state.accepted_label is None and state.previous_label is None:
             if read.resolved and read.label is not None:
-                state.accepted_label = read.label
-                state.phase = "stable"
+                if state.candidate_label == read.label:
+                    state.candidate_streak += 1
+                else:
+                    state.candidate_label = read.label
+                    state.candidate_streak = 1
+
+                if (
+                    state.candidate_streak
+                    >= self.initial_acceptance_patience
+                ):
+                    accepted = read.label
+                    state.accepted_label = accepted
+                    state.phase = "stable"
+                    state.candidate_label = None
+                    state.candidate_streak = 0
+                    state.conflict_streak = 0
+                    self._emit(
+                        concept,
+                        "accepted",
+                        None,
+                        accepted,
+                        accepted,
+                        read,
+                        (
+                            "initial semantic posterior earned sustained "
+                            "acceptance"
+                        ),
+                    )
+            else:
                 state.candidate_label = None
                 state.candidate_streak = 0
-                state.conflict_streak = 0
-                self._emit(
-                    concept,
-                    "accepted",
-                    None,
-                    read.label,
-                    read.label,
-                    read,
-                    "initial semantic posterior passed acceptance gates",
-                )
             return
 
         if state.accepted_label is not None:
