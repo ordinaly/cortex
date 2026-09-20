@@ -1,0 +1,53 @@
+{
+  "protocol": "noisy-semantic-revision-v1",
+  "mode": "official",
+  "rows": 60,
+  "metrics": {
+    "bounded_neural_history_rate": 1.0,
+    "bounded_structural_history_rate": 1.0,
+    "cases_without_false_revision": 1.0,
+    "initial_correct_rate": 1.0,
+    "mean_cortex_brier": 0.06892059008150911,
+    "mean_cortex_top_accuracy": 0.963939393939394,
+    "mean_false_certainty_rate": 0.0019541883120293238,
+    "mean_neural_brier": 0.35632020731449243,
+    "mean_neural_top_accuracy": 0.8061150473444305,
+    "mean_posterior_ece": 0.0357409875947144,
+    "mean_trusted_accuracy": 0.9980458116879707,
+    "mean_trusted_coverage": 0.7806818181818181,
+    "mean_trusted_ece": 0.0019077716466867648,
+    "mean_uncertainty_interception_rate": 0.9749702380952381,
+    "recovery_latency_p95": 7.0,
+    "recovery_success_rate": 1.0,
+    "shift_latency_p95": 7.0,
+    "shift_success_rate": 1.0,
+    "unaffected_preservation_rate": 1.0
+  },
+  "checks": {
+    "bounded_neural_history": true,
+    "bounded_structural_history": true,
+    "cortex_brier": true,
+    "cortex_top_accuracy": true,
+    "false_certainty": true,
+    "false_revision_resistance": true,
+    "initial_correct_rate": true,
+    "locality": true,
+    "posterior_ece": true,
+    "protocol_exact": true,
+    "recovery_latency": true,
+    "recovery_success": true,
+    "row_count": true,
+    "seeds_exact": true,
+    "shift_latency": true,
+    "shift_success": true,
+    "trusted_accuracy": true,
+    "trusted_coverage": true,
+    "uncertainty_interception": true
+  },
+  "diagnostics": {
+    "false_revision_cases": [],
+    "locality_failures": []
+  },
+  "passed": true,
+  "workflow_run_id": 35496437294
+}

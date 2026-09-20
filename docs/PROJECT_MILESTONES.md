@@ -371,6 +371,16 @@ latencies were both **4 epochs**.
 
 See [SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md).
 
+The follow-up **noisy-semantic-revision-v1** campaign has also passed its frozen
+official gates. Under neural dropout/errors and sparse corrupted structural
+evidence, Cortex improved top-label accuracy from **0.8061 neural to 0.9639**,
+reduced Brier score from **0.3563 to 0.0689**, and achieved **0.9980 trusted
+accuracy** at **0.7807 coverage**. False certainty was **0.00195**, uncertainty
+interception **0.9750**, shift/recovery success **1.000 / 1.000**, and
+unaffected-concept preservation **1.000**.
+
+See [NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md).
+
 The grounding protocols intentionally receive concept identities as input so
 they can isolate semantic adjudication and revision. The intended integration
 order is therefore:

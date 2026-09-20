@@ -1,0 +1,32 @@
+name: noisy-semantic-revision-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/semantic_revision.py"
+      - "research/noisy_semantic_revision_campaign.py"
+      - "research/noisy_semantic_revision_gate.py"
+      - "tests/test_noisy_semantic_revision.py"
+      - "docs/NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md"
+      - ".github/workflows/noisy-semantic-revision-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  noisy-semantic-revision-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_semantic_revision.py tests/test_noisy_semantic_revision.py -q
+      - name: Run development campaign
+        run: >-
+          python research/noisy_semantic_revision_campaign.py
+          --development
+          --output noisy-semantic-revision-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/noisy_semantic_revision_gate.py
+          --input noisy-semantic-revision-development.jsonl

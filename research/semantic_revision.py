@@ -59,6 +59,17 @@ class RevisionRead:
     posterior_label: Label | None
     posterior_confidence: float
     posterior_margin: float
+    accepted_label_support: float
+    challenger_label: Label | None
+    challenger_support: float
+    revision_pressure: float
+    instantaneous_label: Label | None
+    instantaneous_confidence: float
+    instantaneous_conflict: bool
+    current_neural_label: Label | None
+    current_neural_confidence: float
+    perceptual_conflict: bool
+    trusted: bool
     neural_top_label: Label | None
     neural_top_confidence: float
     grounding: SemanticRead
@@ -98,10 +109,13 @@ class CortexSemanticRevision:
         neural_decay: float = 0.72,
         structural_decay: float = 0.82,
         evidence_horizon: int = 12,
+        initial_acceptance_patience: int = 1,
         challenge_patience: int = 2,
         revision_patience: int = 2,
         grounder_accept_threshold: float = 0.70,
         grounder_margin_threshold: float = 0.15,
+        withdrawal_margin: float = 0.05,
+        require_resolved_challenger: bool = False,
     ) -> None:
         self.concepts = tuple(concepts)
         self.labels = tuple(labels)
@@ -114,10 +128,16 @@ class CortexSemanticRevision:
             raise ValueError("structural_decay must be in (0, 1]")
         if evidence_horizon < 1:
             raise ValueError("evidence_horizon must be positive")
+        if initial_acceptance_patience < 1:
+            raise ValueError(
+                "initial_acceptance_patience must be positive"
+            )
         if challenge_patience < 1:
             raise ValueError("challenge_patience must be positive")
         if revision_patience < 1:
             raise ValueError("revision_patience must be positive")
+        if not 0.0 <= withdrawal_margin <= 1.0:
+            raise ValueError("withdrawal_margin must be in [0, 1]")
 
         # Validate the declared grounding problem immediately.
         CortexSemanticGrounder(
@@ -132,10 +152,17 @@ class CortexSemanticRevision:
         self.neural_decay = float(neural_decay)
         self.structural_decay = float(structural_decay)
         self.evidence_horizon = int(evidence_horizon)
+        self.initial_acceptance_patience = int(
+            initial_acceptance_patience
+        )
         self.challenge_patience = int(challenge_patience)
         self.revision_patience = int(revision_patience)
         self.grounder_accept_threshold = float(grounder_accept_threshold)
         self.grounder_margin_threshold = float(grounder_margin_threshold)
+        self.withdrawal_margin = float(withdrawal_margin)
+        self.require_resolved_challenger = bool(
+            require_resolved_challenger
+        )
 
         self.epoch = -1
         self._neural_history: list[TimedNeuralEvidence] = []
@@ -250,23 +277,41 @@ class CortexSemanticRevision:
         state = self._states[concept]
         posterior_candidate = self._posterior_candidate(read)
 
-        # Initial acceptance requires the normal grounding resolution rule.
+        # Initial acceptance can require repeated resolved support. The
+        # default remains one epoch so semantic-revision-v1 is unchanged.
         if state.accepted_label is None and state.previous_label is None:
             if read.resolved and read.label is not None:
-                state.accepted_label = read.label
-                state.phase = "stable"
+                if state.candidate_label == read.label:
+                    state.candidate_streak += 1
+                else:
+                    state.candidate_label = read.label
+                    state.candidate_streak = 1
+
+                if (
+                    state.candidate_streak
+                    >= self.initial_acceptance_patience
+                ):
+                    accepted = read.label
+                    state.accepted_label = accepted
+                    state.phase = "stable"
+                    state.candidate_label = None
+                    state.candidate_streak = 0
+                    state.conflict_streak = 0
+                    self._emit(
+                        concept,
+                        "accepted",
+                        None,
+                        accepted,
+                        accepted,
+                        read,
+                        (
+                            "initial semantic posterior earned sustained "
+                            "acceptance"
+                        ),
+                    )
+            else:
                 state.candidate_label = None
                 state.candidate_streak = 0
-                state.conflict_streak = 0
-                self._emit(
-                    concept,
-                    "accepted",
-                    None,
-                    read.label,
-                    read.label,
-                    read,
-                    "initial semantic posterior passed acceptance gates",
-                )
             return
 
         if state.accepted_label is not None:
@@ -299,11 +344,37 @@ class CortexSemanticRevision:
                     else None
                 )
             )
-            state.conflict_streak += 1
+            posterior = dict(read.posterior)
+            incumbent_support = posterior.get(incumbent, 0.0)
+            challenger_support = (
+                posterior.get(challenger, 0.0)
+                if challenger is not None
+                else 0.0
+            )
+            resolved_challenger = (
+                read.resolved
+                and read.label is not None
+                and read.label != incumbent
+            )
+            margin_challenger = (
+                challenger is not None
+                and challenger_support
+                >= incumbent_support + self.withdrawal_margin
+            )
+            strong_conflict = (
+                resolved_challenger
+                if self.require_resolved_challenger
+                else (resolved_challenger or margin_challenger)
+            )
+            was_challenged = state.phase == "challenged"
             state.phase = "challenged"
             state.candidate_label = challenger
+            if strong_conflict:
+                state.conflict_streak += 1
+            else:
+                state.conflict_streak = 0
 
-            if state.conflict_streak == 1:
+            if not was_challenged:
                 self._emit(
                     concept,
                     "challenged",
@@ -311,10 +382,13 @@ class CortexSemanticRevision:
                     incumbent,
                     challenger,
                     read,
-                    "current posterior no longer supports the incumbent label",
+                    "current posterior no longer securely supports the incumbent label",
                 )
 
-            if state.conflict_streak >= self.challenge_patience:
+            if (
+                strong_conflict
+                and state.conflict_streak >= self.challenge_patience
+            ):
                 state.previous_label = incumbent
                 state.accepted_label = None
                 state.phase = "unresolved"
@@ -406,6 +480,44 @@ class CortexSemanticRevision:
             concept: self._grounder.read(concept)
             for concept in self.concepts
         }
+
+        instantaneous = CortexSemanticGrounder(
+            self.concepts,
+            self.labels,
+            self.relations,
+            self.semantic_edges,
+            accept_threshold=self.grounder_accept_threshold,
+            margin_threshold=self.grounder_margin_threshold,
+        )
+        instantaneous.observe_neural_many(neural_items)
+        instantaneous.observe_structure_many(structural_items)
+        instantaneous_reads = {
+            concept: instantaneous.read(concept)
+            for concept in self.concepts
+        }
+
+        current_neural: dict[Concept, tuple[Label | None, float]] = {}
+        for concept in self.concepts:
+            matching = [
+                item for item in neural_items
+                if item.concept == concept
+            ]
+            if not matching:
+                current_neural[concept] = (None, 0.0)
+                continue
+            total_reliability = sum(item.reliability for item in matching)
+            averaged = {
+                label: sum(
+                    item.reliability * float(item.probabilities[label])
+                    for item in matching
+                ) / total_reliability
+                for label in self.labels
+            }
+            current_neural[concept] = max(
+                averaged.items(),
+                key=lambda item: item[1],
+            )
+
         for concept in self.concepts:
             self._advance_state(concept, grounding_reads[concept])
 
@@ -413,6 +525,45 @@ class CortexSemanticRevision:
         for concept in self.concepts:
             state = self._states[concept]
             grounding = grounding_reads[concept]
+            posterior = dict(grounding.posterior)
+            accepted_support = (
+                posterior.get(state.accepted_label, 0.0)
+                if state.accepted_label is not None
+                else 0.0
+            )
+            challenger_label = None
+            challenger_support = 0.0
+            for label, support in grounding.posterior:
+                if label != state.accepted_label:
+                    challenger_label = label
+                    challenger_support = support
+                    break
+            revision_pressure = max(
+                0.0,
+                challenger_support - accepted_support,
+            )
+            instant = instantaneous_reads[concept]
+            instantaneous_conflict = (
+                state.accepted_label is not None
+                and instant.resolved
+                and instant.label != state.accepted_label
+            )
+            current_neural_label, current_neural_confidence = (
+                current_neural[concept]
+            )
+            perceptual_conflict = (
+                state.accepted_label is not None
+                and current_neural_label is not None
+                and current_neural_label != state.accepted_label
+                and current_neural_confidence >= 0.62
+            )
+            trusted = (
+                state.phase == "stable"
+                and state.accepted_label is not None
+                and accepted_support >= self.grounder_accept_threshold
+                and not instantaneous_conflict
+                and not perceptual_conflict
+            )
             self._reads[concept] = RevisionRead(
                 epoch=self.epoch,
                 concept=concept,
@@ -424,6 +575,17 @@ class CortexSemanticRevision:
                 posterior_label=grounding.label,
                 posterior_confidence=grounding.confidence,
                 posterior_margin=grounding.margin,
+                accepted_label_support=accepted_support,
+                challenger_label=challenger_label,
+                challenger_support=challenger_support,
+                revision_pressure=revision_pressure,
+                instantaneous_label=instant.label,
+                instantaneous_confidence=instant.confidence,
+                instantaneous_conflict=instantaneous_conflict,
+                current_neural_label=current_neural_label,
+                current_neural_confidence=current_neural_confidence,
+                perceptual_conflict=perceptual_conflict,
+                trusted=trusted,
                 neural_top_label=grounding.neural_top_label,
                 neural_top_confidence=grounding.neural_top_confidence,
                 grounding=grounding,

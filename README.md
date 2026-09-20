@@ -175,9 +175,18 @@ persistent neural + structural disagreement moves through
 and recovered correctly, unaffected concepts were preserved, and maximum shift
 or recovery latency was 4 epochs.
 
+The next `noisy-semantic-revision-v1` campaign stress-tested that loop with
+neural dropout/errors, sparse corrupted structural evidence, and changing
+reliability. On 60 untouched cases, raw neural top-label accuracy was **0.8061**
+versus **0.9639** for Cortex; trusted accepted-label accuracy reached **0.9980**
+at **0.7807 coverage**, with **0.00195 false certainty**, no false pre-shift
+revisions, complete shift/recovery success, and complete preservation of
+unaffected concepts.
+
 See [docs/HYBRID_STAGE_I.md](docs/HYBRID_STAGE_I.md),
 [docs/HYBRID_SEMANTIC_GROUNDING_V1.md](docs/HYBRID_SEMANTIC_GROUNDING_V1.md),
-and [docs/SEMANTIC_REVISION_V1.md](docs/SEMANTIC_REVISION_V1.md).
+[docs/SEMANTIC_REVISION_V1.md](docs/SEMANTIC_REVISION_V1.md), and
+[docs/NOISY_SEMANTIC_REVISION_V1.md](docs/NOISY_SEMANTIC_REVISION_V1.md).
 
 ## Repository layout
 
