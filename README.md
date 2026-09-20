@@ -232,6 +232,49 @@ limitations.
 This gateway is an experimental orchestration layer and is **not** part of the
 frozen executable Cortex specification.
 
+### Cognitive Orchestrator v0.1 (experimental)
+
+The next experimental layer makes Cortex and the neural model bidirectional
+collaborators rather than running Cortex only after the LLM:
+
+```text
+user
+  -> Cortex pre-pass
+  -> route / neural activation
+  -> LLM with bounded Cortex session context
+  -> Cortex candidate check
+  -> optional bounded neural revision
+  -> answer + Cortex diagnosis + learning proposal
+```
+
+The Adaptive Neural Interface in v0.1 is deliberately conservative:
+
+- Cortex may select a pre-existing Ollama model/adapter variant;
+- explicit evidence is counted in a persistent confirmation ledger;
+- repeated consistent evidence may produce an `adapter_candidate`;
+- **no adapter training or base-model weight mutation exists in v0.1**;
+- conflict, unresolved state, or partial analysis blocks adaptation.
+
+Run the unified Alpaca backend with:
+
+```bash
+cortex-gateway \
+  --cognitive-orchestrator \
+  --chat-model qwen3:8b \
+  --parser-model cortex-parser \
+  --state-dir ~/.cortex/gateway \
+  --trace-stages
+```
+
+Alpaca still connects as one **Ollama (External)** model at
+`http://127.0.0.1:11435`, model `cortex:latest`.
+
+This mode is currently maintained on an experimental feature branch and should
+not be merged into `main` until interactive validation is complete.
+
+See
+[docs/CORTEX_COGNITIVE_ORCHESTRATOR_V0_1.md](docs/CORTEX_COGNITIVE_ORCHESTRATOR_V0_1.md).
+
 ### Hybrid cognition mode (recommended for chat)
 
 Gateway v0.3 restores the neural model's normal role as a conversational
