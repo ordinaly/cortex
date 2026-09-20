@@ -28,6 +28,11 @@ from .strict_language_gateway import (
     StrictCortexLanguageGateway,
     StrictGatewayConfig,
 )
+from .hybrid_language_gateway import (
+    HYBRID_GATEWAY_VERSION,
+    HybridCortexLanguageGateway,
+    HybridGatewayConfig,
+)
 
 
 def _bool_value(value: Any) -> bool | None:
@@ -295,7 +300,14 @@ def create_app(
                     gateway,
                     StrictCortexLanguageGateway,
                 )
-                else "cortex-language-gateway-v0.1"
+                else (
+                    HYBRID_GATEWAY_VERSION
+                    if isinstance(
+                        gateway,
+                        HybridCortexLanguageGateway,
+                    )
+                    else "cortex-language-gateway-v0.1"
+                )
             ),
             "ollama_url": gateway.config.ollama_url,
             "chat_model": gateway.config.chat_model,
@@ -303,6 +315,10 @@ def create_app(
             "strict_neural_boundary": isinstance(
                 gateway,
                 StrictCortexLanguageGateway,
+            ),
+            "hybrid_cognition": isinstance(
+                gateway,
+                HybridCortexLanguageGateway,
             ),
             "parser_model": getattr(
                 gateway.config,
@@ -605,6 +621,7 @@ def build_gateway_from_env(
     diagnostics_default: bool | None = None,
     persistence_dir: str | None = None,
     strict_neural_boundary: bool = False,
+    hybrid_cognition: bool = False,
     parser_model: str | None = None,
     renderer_model: str | None = None,
     feature_dim: int = 128,
@@ -693,6 +710,35 @@ def build_gateway_from_env(
             strict_config
         )
 
+    if hybrid_cognition:
+        hybrid_config = HybridGatewayConfig(
+            chat_model=model,
+            parser_model=(
+                parser_model
+                or os.environ.get(
+                    "CORTEX_PARSER_MODEL"
+                )
+                or model
+            ),
+            ollama_url=url,
+            feature_dim=int(
+                feature_dim
+            ),
+            diagnostics_default=bool(
+                default_diag
+            ),
+            persistence_dir=(
+                state_dir or None
+            ),
+            trace_stages=bool(
+                trace_stages
+            ),
+            include_diagnosis=True,
+        )
+        return HybridCortexLanguageGateway(
+            hybrid_config
+        )
+
     config = GatewayConfig(
         chat_model=model,
         embedding_model=embed,
@@ -735,6 +781,14 @@ def main() -> None:
         help=(
             "Use Gateway v0.2: stateless parser/renderer, deterministic "
             "Cortex encoding, and Cortex-owned AnswerIR."
+        ),
+    )
+    parser.add_argument(
+        "--hybrid-cognition",
+        action="store_true",
+        help=(
+            "Use Gateway v0.3: normal neural knowledge answers plus "
+            "Cortex structural reasoning/diagnosis. Recommended for chat."
         ),
     )
     parser.add_argument(
@@ -791,6 +845,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    if (
+        args.strict_neural_boundary
+        and args.hybrid_cognition
+    ):
+        parser.error(
+            "--strict-neural-boundary and --hybrid-cognition are mutually exclusive"
+        )
+
     try:
         import uvicorn
     except ImportError as exc:  # pragma: no cover - optional runtime dependency
@@ -810,6 +872,9 @@ def main() -> None:
         ),
         strict_neural_boundary=(
             args.strict_neural_boundary
+        ),
+        hybrid_cognition=(
+            args.hybrid_cognition
         ),
         parser_model=args.parser_model,
         renderer_model=(
