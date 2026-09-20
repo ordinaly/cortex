@@ -1,6 +1,6 @@
 # Cortex v1.15-R — Cache-Refresh Attribution
 
-Status: **frozen attribution protocol / development passed / official campaign untouched**.
+Status: **frozen attribution protocol / official campaign passed**.
 
 Protocol ID: **cache-refresh-attribution-v1.15-R**.
 
@@ -156,3 +156,27 @@ anchor rows were refreshed per event at 288 anchors.
 No gate or mechanism may now be changed before the untouched official
 evaluation. Any change after opening official seeds requires a new protocol
 version and fresh seeds.
+
+## Official outcome
+
+The untouched official campaign on seeds **100, 101, 102** passed every frozen
+validity gate.
+
+At 288 anchors:
+
+- distance-row recomputation: **41.10%**;
+- kernel regeneration: **35.50%**;
+- writes/bookkeeping: **15.48%**;
+- semantic features: **2.90%**;
+- dirty detection: **1.88%**;
+- outcome probabilities: **1.55%**;
+- accounting fraction: **98.44%**;
+- mean dirty-row fraction: **13.40%**.
+
+All numerical cache and prediction discrepancies were exactly **0** in the
+paired campaign, with **0 structural disagreements**.
+
+The frozen gates were not weakened after official evaluation.
+
+See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md)
+and [the committed aggregate summary](../benchmarks/results/cache_refresh_attribution_v1_15_summary.json).
