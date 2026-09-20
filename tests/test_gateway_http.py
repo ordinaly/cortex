@@ -1,0 +1,206 @@
+from __future__ import annotations
+
+import json
+from types import SimpleNamespace
+
+import pytest
+
+from cortex.gateway_server import create_app
+from cortex.language_gateway import ChatResult
+
+
+class DummyGateway:
+    def __init__(self):
+        self.config = SimpleNamespace(
+            ollama_url="http://localhost:11434",
+            chat_model="dummy",
+            embedding_model="dummy",
+        )
+        self.sessions = {}
+        self.calls = []
+
+    def chat(
+        self,
+        session_id: str,
+        user_text: str,
+        *,
+        diagnostics=None,
+    ):
+        self.calls.append(
+            {
+                "session_id": session_id,
+                "user_text": user_text,
+                "diagnostics": diagnostics,
+            }
+        )
+        return ChatResult(
+            response_id="chatcmpl-test",
+            session_id=session_id,
+            model="cortex",
+            content="Hello from Cortex.",
+            cortex_context={},
+            diagnostics=None,
+        )
+
+    def list_persisted_sessions(self):
+        return []
+
+    def set_diagnostics(self, session_id, enabled):
+        pass
+
+    def reset(self, session_id):
+        pass
+
+    def save(self, session_id):
+        return "/tmp/test.json"
+
+    def load(self, session_id):
+        return SimpleNamespace(
+            history=[],
+            frames=[],
+        )
+
+    def session(self, session_id):
+        return SimpleNamespace(
+            diagnostics_enabled=False,
+            last_read=None,
+            history=[],
+            config=SimpleNamespace(
+                memory_budget=24,
+            ),
+            context_packet=lambda diagnostics=None: {},
+        )
+
+
+@pytest.fixture()
+def client():
+    pytest.importorskip("fastapi")
+    pytest.importorskip("httpx")
+    from fastapi.testclient import TestClient
+
+    gateway = DummyGateway()
+    return (
+        TestClient(
+            create_app(
+                gateway
+            )
+        ),
+        gateway,
+    )
+
+
+def test_openai_chat_body_is_not_treated_as_query_parameter(client):
+    http, gateway = client
+
+    response = http.post(
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Hello Cortex",
+                }
+            ],
+            "stream": False,
+        },
+        headers={
+            "X-Cortex-Session": "alpaca-test",
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert (
+        payload["choices"][0]["message"]["content"]
+        == "Hello from Cortex."
+    )
+    assert gateway.calls == [
+        {
+            "session_id": "alpaca-test",
+            "user_text": "Hello Cortex",
+            "diagnostics": None,
+        }
+    ]
+
+
+def test_alpaca_style_streaming_returns_openai_sse(client):
+    http, _gateway = client
+
+    with http.stream(
+        "POST",
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Hello Cortex",
+                }
+            ],
+            "stream": True,
+            "temperature": 0.7,
+        },
+    ) as response:
+        assert response.status_code == 200
+        assert response.headers[
+            "content-type"
+        ].startswith(
+            "text/event-stream"
+        )
+        body = "".join(
+            response.iter_text()
+        )
+
+    lines = [
+        line
+        for line in body.splitlines()
+        if line.startswith("data: ")
+    ]
+    assert lines[-1] == "data: [DONE]"
+
+    chunks = []
+    for line in lines[:-1]:
+        payload = json.loads(
+            line[len("data: ") :]
+        )
+        assert (
+            payload["object"]
+            == "chat.completion.chunk"
+        )
+        chunks.append(
+            payload
+        )
+
+    text = "".join(
+        chunk["choices"][0][
+            "delta"
+        ].get(
+            "content",
+            "",
+        )
+        for chunk in chunks
+    )
+    assert text == "Hello from Cortex."
+    assert (
+        chunks[-1]["choices"][0][
+            "finish_reason"
+        ]
+        == "stop"
+    )
+
+
+def test_diagnostics_endpoint_accepts_json_body(client):
+    http, _gateway = client
+
+    response = http.post(
+        "/cortex/sessions/alpaca-test/diagnostics",
+        json={
+            "enabled": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()[
+        "diagnostics_enabled"
+    ] is True
