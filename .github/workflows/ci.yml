@@ -82,6 +82,7 @@ jobs:
           tests/test_exact_semantic_geometry_fast_path.py
           tests/test_optimized_cache_reattribution.py
           tests/test_kernel_ladder_fast_path.py
+          tests/test_low_overhead_stage_profile.py
           tests/test_versioning.py
           -q
 

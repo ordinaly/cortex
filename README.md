@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.18-R** |
+| research frontier | **v1.19-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -108,7 +108,7 @@ See:
 - [docs/NATIVE_STAGE_ATTRIBUTION.md](docs/NATIVE_STAGE_ATTRIBUTION.md)
 - [docs/ARTICULATION_ATTRIBUTION.md](docs/ARTICULATION_ATTRIBUTION.md)
 
-## Research frontier — v1.18-R
+## Research frontier — v1.19-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -136,7 +136,9 @@ v1.17-R re-attributed that optimized cache. At 288 anchors, **kernel regeneratio
 
 v1.18-R tested that exact kernel ladder. The transformation was numerically safe (maximum kernel error **1.89e-15**, zero underflow/dirty/structural mismatches), but the untouched official performance campaign rejected promotion: at 288 anchors the kernel path was only **1.115×** faster, refresh **1.017×**, and the full fused step **0.998×**, below all frozen performance gates.
 
-The next engineering step is therefore a **low-overhead fused-stage crossover profile** rather than another cache micro-optimization chosen from fine-grained internal timers. See [docs/KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](docs/KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
+v1.19-R then measured each fused stage in a separate fresh replay to reduce observer interference. The untouched official profile reproduced development: at 288 anchors, **cache refresh is 37.22%**, candidate readout **21.80%**, hysteresis/state scan **17.60%**, and complexity refresh **13.41%**, with zero prediction-checksum discrepancy.
+
+The next engineering experiment is **v1.20-R lazy distance materialization / write elision**: keep the kernel cache hot, stop eagerly synchronizing the full distance matrix on every dirty refresh, and materialize the diagnostic distance view only when explicitly requested. See [docs/LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](docs/LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
 
 The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
 

@@ -1,0 +1,45 @@
+{
+  "protocol": "low-overhead-fused-stage-profile-v1.19-R",
+  "mode": "official",
+  "workflow_run_id": 35504250664,
+  "seeds": [600, 601, 602, 603, 604],
+  "anchor_cases": [72, 144, 288],
+  "max_checksum_error": 0.0,
+  "cases": {
+    "72": {
+      "total_us_per_step": 462.97734814814817,
+      "accounted_fraction": 0.9972443496235684,
+      "dominant_stage": "cache_refresh",
+      "cache_refresh_share": 0.3401633889742025,
+      "candidate_readout_share": 0.19273898721418928,
+      "hysteresis_scan_share": 0.19820793910295922,
+      "complexity_share": 0.04454221055326147
+    },
+    "144": {
+      "total_us_per_step": 954.0892592592592,
+      "accounted_fraction": 0.9929451667593844,
+      "dominant_stage": "cache_refresh",
+      "cache_refresh_share": 0.3615244437055438,
+      "candidate_readout_share": 0.17636180868239287,
+      "hysteresis_scan_share": 0.23623962725139588,
+      "complexity_share": 0.07870406565734009
+    },
+    "288": {
+      "total_us_per_step": 2146.3773703703705,
+      "accounted_fraction": 0.9929476669773454,
+      "dominant_stage": "cache_refresh",
+      "cache_refresh_share": 0.3721702850631859,
+      "candidate_readout_share": 0.21803996059592037,
+      "hysteresis_scan_share": 0.1759663764442988,
+      "complexity_share": 0.13412264512088665,
+      "cache_refresh_us_per_step": 797.0014111111111,
+      "candidate_readout_us_per_step": 467.82681481481484,
+      "hysteresis_scan_us_per_step": 375.6085777777778,
+      "complexity_us_per_step": 287.32389629629625,
+      "kernel_row_refresh_fraction": 0.13536541615416153,
+      "anchor_scan_fraction": 0.27486772486772487,
+      "svd_fraction": 0.033210332103321034
+    }
+  },
+  "passed": true
+}

@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.18-R**  
+Last consolidated research frontier: **v1.19-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,13 +30,15 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.18-R`.
+The current research frontier is `v1.19-R`.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 
 v1.17-R then re-attributed the optimized cache. At 288 anchors, **kernel regeneration was 48.63%** of instrumented refresh, writes/bookkeeping **24.94%**, and streamed geometry **13.69%**.
 
 v1.18-R tested an exact scale-gated kernel ladder. Numerical behavior remained effectively identical (maximum kernel error **1.89e-15**, zero underflow/dirty/structural mismatches), but the untouched official performance campaign rejected promotion: at 288 anchors the kernel path was only **1.115×** faster, refresh **1.017×**, and the complete fused step **0.998×**, below all frozen performance gates. The candidate remains research-only.
+
+v1.19-R then re-profiled the fused research path with one timed stage per fresh replay to reduce observer interference. The untouched official profile reproduced development: at 288 anchors, cache refresh is **37.22%**, candidate readout **21.80%**, hysteresis/state scan **17.60%**, and complexity refresh **13.41%**, with **0 prediction-checksum discrepancy**. Cache refresh is therefore confirmed as the largest coarse Python/NumPy stage.
 
 ## Strongest validated engineering results
 
@@ -330,38 +332,52 @@ The ladder is therefore not promoted into the default cache path.
 
 See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
 
-### 7. v1.19-R — low-overhead fused-stage crossover profile
+### 7. v1.19-R — low-overhead fused-stage crossover profile — passed
 
-Re-profile the current optimized research path with **coarse timing boundaries**
-and a wider seed sample before selecting another micro-optimization. v1.18 shows
-that fine-grained within-refresh attribution can materially overstate the
-end-to-end value of a substage optimization.
+The untouched official profile reproduced the development ordering with **0**
+prediction-checksum discrepancy.
 
-The next profile should compare at minimum:
+At 288 anchors:
 
-- cache refresh;
-- candidate readout;
-- local readout;
-- hysteresis/state scan;
-- complexity refresh;
-- field/tracker updates.
+- cache refresh: **37.22%**;
+- candidate readout: **21.80%**;
+- hysteresis/state scan: **17.60%**;
+- complexity refresh: **13.41%**.
 
-Only return to cache-write optimization if cache refresh remains clearly
-dominant under this lower-observer-overhead campaign.
+Cache refresh is therefore confirmed as the largest coarse stage rather than an
+artifact of the earlier fine-grained profiler.
 
-### 8. Freeze the next executable research specification
+See [LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
+
+### 8. v1.20-R — lazy distance materialization / write elision
+
+The hot predictive path consumes cached kernels, not the full cached distance
+matrix. Test whether distance-matrix synchronization can be deferred until the
+distance view is explicitly requested.
+
+The candidate must:
+
+- keep cached features, probabilities, kernels, dirty masks, and structural
+  behavior identical;
+- preserve the public `distances` view by synchronizing it lazily on access;
+- compare against the eager v1.16 cache step-by-step;
+- measure cache-refresh and full fused-step speedup;
+- include explicit tests where diagnostics request distances after arbitrary
+  sequences of refreshes.
+
+### 9. Freeze the next executable research specification
 
 Once adaptive predictive geometry and relational composition stabilize, define a new frozen research specification rather than mutating `spec-v0.9.5`.
 
-### 9. Promote validated mechanisms to Rust
+### 10. Promote validated mechanisms to Rust
 
 Port only mechanisms accepted into that new specification, with differential contracts.
 
-### 10. Untouched external validation
+### 11. Untouched external validation
 
 Freeze configuration before evaluation and compare against fair online/continual/graph/neural baselines on external chronological structured data.
 
-### 11. Hybrid Cortex Stage II
+### 12. Hybrid Cortex Stage II
 
 Only after Stage I demonstrates value beyond the frozen encoder should Cortex feedback be allowed to influence representation learning.
 
