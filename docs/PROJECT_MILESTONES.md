@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.20-R`;
+- predictive-geometry research frontier: `v1.21-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -406,13 +406,45 @@ See [LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](LAZY_DISTANCE_MATERIALIZATIO
 
 ---
 
-## B8. v1.21-R — post-lazy low-overhead stage profile
+## B8. v1.21-R — post-lazy low-overhead stage profile — passed
 
-Repeat the coarse independent-replay profile after promoting v1.20-R. Select the next target only from the new top-level ordering.
+The untouched official profile retained cache refresh as the largest coarse stage.
+
+At 288 anchors:
+
+- cache refresh: **35.55%**;
+- candidate readout: **21.21%**;
+- hysteresis/state scan: **19.09%**;
+- complexity refresh: **13.94%**.
+
+The result preserves the v1.19 ordering while showing that cache refresh is less dominant after v1.20-R.
+
+See [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md).
 
 ---
 
-## B9. Freeze the next executable research specification
+## B9. v1.22-R — single-buffer kernel refresh / allocation elision
+
+The current lazy refresh computes a temporary kernel-row tensor with dimensions
+`resolutions × dirty_rows × anchors` before copying each resolution into the
+persistent kernel cache.
+
+Test whether the same exact kernels can be produced one resolution at a time
+into a reusable two-dimensional scratch buffer. This targets temporary
+allocation and memory traffic without changing the kernel formula.
+
+Require:
+
+- exact paired kernel/prediction/state parity;
+- zero structural disagreements;
+- preserved lazy distance behavior;
+- focused refresh and full fused-step timing;
+- explicit temporary-memory accounting;
+- no promotion without a clear paired full-step gain.
+
+---
+
+## B10. Freeze the next executable research specification
 
 
 
@@ -431,7 +463,7 @@ This is the boundary between successful research and promotable architecture.
 
 ---
 
-## B10. Promote accepted mechanisms to Rust
+## B11. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 

@@ -1,0 +1,31 @@
+name: cortex-v1-21-post-lazy-stage-profile
+
+on:
+  pull_request:
+    paths:
+      - "research/post_lazy_stage_profile_campaign.py"
+      - "research/post_lazy_stage_profile_gate.py"
+      - "tests/test_post_lazy_stage_profile.py"
+      - "docs/POST_LAZY_STAGE_PROFILE_V1_21.md"
+      - ".github/workflows/post-lazy-stage-profile.yml"
+  workflow_dispatch:
+
+jobs:
+  post-lazy-stage-profile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy scipy
+      - run: pytest tests/test_post_lazy_stage_profile.py -q
+      - name: Run development campaign
+        run: >-
+          python research/post_lazy_stage_profile_campaign.py
+          --development
+          --output post-lazy-stage-profile-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/post_lazy_stage_profile_gate.py
+          post-lazy-stage-profile-development.jsonl

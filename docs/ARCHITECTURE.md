@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.20-R`
+> **Research frontier:** `v1.21-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.20-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.21-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.20-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.21-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -96,7 +96,7 @@ flowchart LR
 
 The current `spec-v0.9.5` is immutable. Research does not silently mutate it.
 
-The current predictive-geometry engineering frontier is **v1.20-R**.
+The current predictive-geometry engineering frontier is **v1.21-R**.
 
 v1.15-R first decomposed cache refresh and found that, at 288 anchors,
 distance-row recomputation plus kernel regeneration accounted for about
@@ -158,9 +158,17 @@ Cache refresh was thus confirmed as the largest coarse Python/NumPy stage.
 
 v1.20-R then validated lazy distance materialization. The hot predictive path keeps squared semantic geometry and cached kernels current, while the ordinary distance matrix is rebuilt only when its public view is explicitly requested. At 288 anchors, refresh improved **1.132×** and the complete fused step **1.025×**, with **0 numerical/state discrepancies** and **0 hot-path distance materializations**. Explicit distance access remained exact and cost about **780 µs** in the official 288-anchor case.
 
-The validated lazy cache is now the default research fused-cache path. The next engineering action is v1.21-R low-overhead top-level re-attribution after this promotion.
+v1.21-R repeated the same low-overhead independent-replay profiler after that promotion. On untouched official seeds at 288 anchors:
 
-See [LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md).
+- cache refresh: **35.55%**;
+- candidate readout: **21.21%**;
+- hysteresis/state scan: **19.09%**;
+- complexity refresh: **13.94%**;
+- prediction-checksum discrepancy: **0**.
+
+Cache refresh is less dominant than before v1.20-R but remains the largest coarse stage. The next engineering candidate is v1.22-R single-buffer kernel refresh: eliminate the `resolutions × dirty_rows × anchors` temporary by computing one resolution at a time into a reusable two-dimensional buffer, with promotion contingent on a paired full-step gain.
+
+See [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md).
 
 ---
 
