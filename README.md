@@ -260,7 +260,9 @@ cortex-gateway \
   --strict-neural-boundary \
   --parser-model cortex-parser \
   --renderer-model cortex-renderer \
-  --state-dir ~/.cortex/gateway
+  --state-dir ~/.cortex/gateway \
+  --trace-stages \
+  --explain-responses
 ```
 
 No Ollama embedding model is needed in this mode.
