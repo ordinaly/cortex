@@ -78,6 +78,12 @@ class NeuralRequest:
     exchange_id: str | None = None
     cache_policy: str = "reuse_if_supported"
     adapter: str | None = None
+    control: Mapping[
+        str,
+        Any,
+    ] = field(
+        default_factory=dict
+    )
 
     def packet(self) -> dict[str, Any]:
         return {
@@ -94,6 +100,12 @@ class NeuralRequest:
                 self.cache_policy
             ),
             "adapter": self.adapter,
+            "control_keys": sorted(
+                str(
+                    key
+                )
+                for key in self.control
+            ),
             "message_count": len(
                 self.messages
             ),
@@ -128,6 +140,15 @@ class NeuralCall:
             "adapter"
         ] = (
             self.request.adapter
+        )
+        packet[
+            "control_keys"
+        ] = sorted(
+            str(
+                key
+            )
+            for key
+            in self.request.control
         )
         return packet
 
@@ -220,6 +241,9 @@ class NeuralSession:
                 request.cache_policy
             ),
             adapter=request.adapter,
+            control=dict(
+                request.control
+            ),
         )
         response = (
             self.runtime.generate(
@@ -268,6 +292,30 @@ class NeuralSession:
                 in self.calls
             ],
         }
+
+
+class NeuralSessionFactory(Protocol):
+    def create(
+        self,
+        *,
+        session_id: str,
+        runtime: "NeuralRuntime",
+    ) -> NeuralSession:
+        ...
+
+
+@dataclass(frozen=True)
+class DefaultNeuralSessionFactory:
+    def create(
+        self,
+        *,
+        session_id: str,
+        runtime: "NeuralRuntime",
+    ) -> NeuralSession:
+        return NeuralSession(
+            session_id=session_id,
+            runtime=runtime,
+        )
 
 
 class NeuralRuntime(Protocol):
