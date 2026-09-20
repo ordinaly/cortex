@@ -1,0 +1,32 @@
+name: cortex-v1-20-lazy-distance-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/support_sparse_prediction.py"
+      - "research/lazy_distance_materialization_campaign.py"
+      - "research/lazy_distance_materialization_gate.py"
+      - "tests/test_lazy_distance_materialization.py"
+      - "docs/LAZY_DISTANCE_MATERIALIZATION_V1_20.md"
+      - ".github/workflows/lazy-distance-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  lazy-distance-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy scipy
+      - run: pytest tests/test_lazy_distance_materialization.py -q
+      - name: Run development campaign
+        run: >-
+          python research/lazy_distance_materialization_campaign.py
+          --development
+          --output lazy-distance-development.jsonl
+      - name: Check development validity gates
+        run: >-
+          python research/lazy_distance_materialization_gate.py
+          lazy-distance-development.jsonl
