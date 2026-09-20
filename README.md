@@ -232,9 +232,61 @@ limitations.
 This gateway is an experimental orchestration layer and is **not** part of the
 frozen executable Cortex specification.
 
+### Hybrid cognition mode (recommended for chat)
+
+Gateway v0.3 restores the neural model's normal role as a conversational
+language model and broad pretrained knowledge base, while Cortex acts as a
+separate structural/metacognitive layer:
+
+```text
+user -> neural answer
+          |
+          +-> candidate claims
+user -> PromptIR
+          |
+          v
+        Cortex -> diagnosis
+          |
+          v
+neural answer + Cortex diagnosis
+```
+
+In hybrid mode:
+
+- the neural model can answer ordinary factual questions from pretrained
+  knowledge;
+- neural factual claims are tagged as `neural_prior` and are **not** written
+  to Cortex memory;
+- only explicit user observations may update Cortex structural state;
+- Cortex can corroborate, conflict with, or remain neutral toward the neural
+  answer;
+- Cortex parsing/diagnosis failures never suppress a valid neural response;
+- Cortex diagnoses are shown to the user but are never fed back into the neural
+  model's own conversation history;
+- Cortex uses the deterministic `sha256-symbolic-v1` encoder rather than a
+  neural embedding model.
+
+Run:
+
+```bash
+ollama create cortex-parser -f examples/ollama/Modelfile.parser
+
+cortex-gateway \
+  --hybrid-cognition \
+  --chat-model qwen3:8b \
+  --parser-model cortex-parser \
+  --state-dir ~/.cortex/gateway \
+  --trace-stages
+```
+
+No embedding model or strict renderer model is required.
+
+See
+[docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md).
+
 ### Strict neural-boundary mode
 
-Gateway v0.2 adds a stricter architecture in which Ollama is used only for
+Gateway v0.2 is retained as a knowledge-isolation/benchmark configuration in which Ollama is used only for
 language translation:
 
 ```text
