@@ -364,7 +364,7 @@ appropriately protected state directory if the conversation is sensitive.
 
 The prototype currently does **not** provide:
 
-- streaming chat completions;
+- token-level incremental generation (OpenAI-compatible SSE transport is supported after the Cortex answer is complete);
 - tool-call orchestration;
 - native O(1) snapshot restore (v0.1 rebuilds the runtime by deterministic event replay);
 - full typed natural-language relation semantics inside the native graph;
