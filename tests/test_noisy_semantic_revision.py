@@ -137,3 +137,47 @@ def test_current_perceptual_conflict_suspends_trust_before_revision():
     assert read.perceptual_conflict
     assert not read.trusted
 
+
+
+def test_noisy_initial_acceptance_requires_persistent_resolution():
+    concepts, labels, _edges, semantic_edges, truth = build_world(
+        "asymmetric-chain",
+        10,
+    )
+    concepts = list(concepts)
+    labels = list(labels)
+    model = CortexSemanticRevision(
+        concepts,
+        labels,
+        RELATIONS,
+        semantic_edges,
+        initial_acceptance_patience=3,
+        require_resolved_challenger=True,
+    )
+
+    for epoch in range(3):
+        neural, _ = noisy_neural(
+            concepts,
+            labels,
+            truth,
+            seed=10,
+            family="asymmetric-chain",
+            epoch=epoch,
+            error_rate=0.0,
+            missing_rate=0.0,
+        )
+        structural = noisy_structure(
+            concepts,
+            truth,
+            semantic_edges,
+            seed=10,
+            family="asymmetric-chain",
+            epoch=epoch,
+            observation_rate=1.0,
+            flip_rate=0.0,
+        )
+        model.advance(epoch, neural=neural, structural=structural)
+        if epoch < 2:
+            assert model.accepted_mapping() == {}
+
+    assert model.accepted_mapping() == dict(truth)
