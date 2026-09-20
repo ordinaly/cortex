@@ -148,7 +148,7 @@ Z_{\mathrm{new}}\text{ exists}
 can coexist with
 
 ```math
-\operatorname{label}(Z_{\mathrm{new}})
+\mathrm{label}(Z_{\mathrm{new}})
 =
 \texttt{unresolved}.
 ```
