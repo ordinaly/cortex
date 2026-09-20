@@ -342,9 +342,9 @@ A research prototype is now prepared under
 
 Its invariant is:
 
-$
+$$
 \text{concept identity}\neq\text{current label}.
-$
+$$
 
 Neural perception supplies candidate-label distributions. Cortex scores those
 proposals jointly with relational structure and may return `reinforce`,
@@ -358,11 +358,11 @@ the repository.
 The first protocol intentionally receives concept identities as input so it can
 isolate semantic adjudication. The intended integration order is therefore:
 
-$
+$$
 \text{latent concept induction}
 \rightarrow
 \text{semantic grounding}.
-$
+$$
 
 ### Stage II-B — trainable representation feedback
 
@@ -384,7 +384,7 @@ Two tracks can proceed in parallel without contaminating each other:
 
 ### Scientific reasoning track
 
-$
+$$
 \boxed{
 A2\ \text{latent concepts}
 \rightarrow
@@ -394,7 +394,7 @@ A3\ \text{noise/calibration}
 \rightarrow
 A4\ \text{proof dependency}
 }
-$
+$$
 
 Semantic grounding is implemented as a separable research prototype now, but
 its full Cortex interpretation should consume concepts produced by A2 rather
