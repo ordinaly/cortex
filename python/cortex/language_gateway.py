@@ -22,9 +22,15 @@ from urllib.request import Request, urlopen
 from uuid import uuid4
 
 try:
-    from . import CortexRuntime
+    from . import (
+        CortexRuntime,
+        __spec_version__,
+        __version__,
+    )
 except Exception:  # pragma: no cover - native extension may be absent in docs tooling
     CortexRuntime = None  # type: ignore[assignment]
+    __version__ = "unknown"
+    __spec_version__ = "unknown"
 
 
 EXTRACTION_SCHEMA: dict[str, Any] = {
@@ -956,6 +962,21 @@ class CortexChatSession:
                 self.config.embedding_model
             ),
             "feature_dim": self.feature_dim,
+            "cortex_version": __version__,
+            "cortex_spec_version": (
+                __spec_version__
+            ),
+            "runtime_snapshot_json": (
+                self.runtime.snapshot_json()
+                if (
+                    self.runtime is not None
+                    and hasattr(
+                        self.runtime,
+                        "snapshot_json",
+                    )
+                )
+                else None
+            ),
             "diagnostics_enabled": (
                 self.diagnostics_enabled
             ),
@@ -973,20 +994,9 @@ class CortexChatSession:
         self,
         payload: Mapping[str, Any],
     ) -> None:
-        chat_model = payload.get(
-            "chat_model"
-        )
         embedding_model = payload.get(
             "embedding_model"
         )
-        if (
-            chat_model
-            and chat_model
-            != self.config.chat_model
-        ):
-            raise ValueError(
-                "persisted chat model does not match gateway configuration"
-            )
         if (
             embedding_model
             and embedding_model
@@ -1075,6 +1085,28 @@ class CortexChatSession:
                 frame,
                 record=True,
             )
+
+        expected_snapshot = payload.get(
+            "runtime_snapshot_json"
+        )
+        if (
+            expected_snapshot is not None
+            and self.runtime is not None
+            and hasattr(
+                self.runtime,
+                "snapshot_json",
+            )
+        ):
+            actual_snapshot = (
+                self.runtime.snapshot_json()
+            )
+            if (
+                actual_snapshot
+                != expected_snapshot
+            ):
+                raise ValueError(
+                    "persisted Cortex session replay diverged from its saved native snapshot"
+                )
 
 
     def context_packet(self, *, diagnostics: DiagnosticReport | None) -> dict[str, Any]:
