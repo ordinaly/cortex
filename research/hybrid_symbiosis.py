@@ -635,7 +635,7 @@ class ScriptedNeuralRuntime:
         )
         if (
             self.respect_cortex_context
-            and "CORTEX_CONTEXT="
+            and "HYBRID_EXCHANGE="
             in system
             and self.world.object_true
             in system
