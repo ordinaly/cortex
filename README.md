@@ -188,6 +188,50 @@ full replanning while preserving the same minimum cost. See
 
 The next scientific milestone is **Open-World Robustness v1**.
 
+## Experimental Ollama chatbot gateway
+
+The research branch now includes **Cortex Language Gateway v0.1**, an
+experimental Ollama-backed chatbot integration that keeps language generation
+separate from Cortex structural state.
+
+The gateway:
+
+- uses Ollama structured outputs to extract entities and explicit relations;
+- requires verbatim source-evidence anchors before an extracted item can reach
+  Cortex;
+- embeds extracted entities through Ollama and feeds those vectors into the
+  native `CortexRuntime`;
+- maintains persistent Cortex sessions and a bounded semantic entity/relation
+  ledger;
+- auto-saves validated semantic frames and their exact embedding vectors to a
+  versioned file-backed session store;
+- reconstructs the native runtime after restart by deterministic event replay,
+  without re-calling the extractor or embedding model;
+- exposes an OpenAI-compatible `/v1/chat/completions` endpoint;
+- provides an opt-in diagnostics switch that reports Cortex's internal runtime
+  state without feeding self-reports back into world observations.
+
+Install the optional gateway dependencies and start it with:
+
+```bash
+python -m pip install -e '.[gateway]'
+cortex-gateway \
+  --chat-model qwen3:8b \
+  --embedding-model embeddinggemma \
+  --state-dir ~/.cortex/gateway
+```
+
+Persistence is enabled by default. Use `--no-persistence` for an ephemeral
+session store.
+
+See
+[docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md)
+for the architecture, HTTP/session API, diagnostics behavior, and current
+limitations.
+
+This gateway is an experimental orchestration layer and is **not** part of the
+frozen executable Cortex specification.
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:

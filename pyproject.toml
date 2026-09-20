@@ -26,3 +26,13 @@ strip = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+
+[project.optional-dependencies]
+gateway = [
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.30,<1",
+]
+
+[project.scripts]
+cortex-gateway = "cortex.gateway_server:main"
