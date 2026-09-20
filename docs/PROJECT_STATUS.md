@@ -264,6 +264,28 @@ discovery.
 
 See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
 
+### Planning / replanning
+
+The `planning-replanning-v1` campaign now connects explicit dependency
+tracking to action selection and repair.
+
+Across **140 untouched official cases**, every frozen gate passed:
+
+- repair-mode and impact-localization accuracy: **1.000 / 1.000**;
+- feasible optimal-cost agreement: **1.000**;
+- local repair / immediate rejoin: **1.000 / 1.000**;
+- prefix / suffix preservation: **1.000 / 1.000**;
+- cost adaptation and reversible restoration: **1.000 / 1.000**;
+- irrelevant-change stability: **1.000**;
+- global-fallback correctness: **1.000**;
+- infeasible detection: **1.000**.
+
+On 80 local-change cases, local repair expanded **2.425 states** on average
+versus **27.5** for full replanning, a mean ratio of **0.08745**, while matching
+the full-search optimum.
+
+See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -287,8 +309,8 @@ semantic vocabulary, correct adversarial label correction, unresolved naming
 for a real but unnamed concept, and correct semantic lineage through concept
 split, merge, and retraction.
 
-Explicit proof dependency has now passed. The next independent Reasoning Map
-axis is **planning / replanning**. A natural semantic follow-up remains
+Planning / replanning has now passed. The next independent Reasoning Map
+axis is **open-world novelty attribution**. A natural semantic follow-up remains
 hierarchical grounding/inheritance together with temporal semantic revision
 across concept lineage.
 
