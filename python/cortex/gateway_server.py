@@ -19,6 +19,11 @@ from .language_gateway import (
     GatewayConfig,
     openai_chat_completion,
 )
+from .strict_language_gateway import (
+    STRICT_GATEWAY_VERSION,
+    StrictCortexLanguageGateway,
+    StrictGatewayConfig,
+)
 
 
 def _bool_value(value: Any) -> bool | None:
@@ -49,7 +54,7 @@ def _last_user_text(messages: Any) -> str:
 
 
 def create_app(
-    gateway: CortexLanguageGateway,
+    gateway: Any,
     *,
     public_model_name: str = "cortex",
 ):
@@ -71,10 +76,31 @@ def create_app(
     def health() -> dict[str, Any]:
         return {
             "status": "ok",
-            "gateway": "cortex-language-gateway-v0.1",
+            "gateway": (
+                STRICT_GATEWAY_VERSION
+                if isinstance(
+                    gateway,
+                    StrictCortexLanguageGateway,
+                )
+                else "cortex-language-gateway-v0.1"
+            ),
             "ollama_url": gateway.config.ollama_url,
             "chat_model": gateway.config.chat_model,
             "embedding_model": gateway.config.embedding_model,
+            "strict_neural_boundary": isinstance(
+                gateway,
+                StrictCortexLanguageGateway,
+            ),
+            "parser_model": getattr(
+                gateway.config,
+                "parser_model",
+                None,
+            ),
+            "renderer_model": getattr(
+                gateway.config,
+                "renderer_model",
+                None,
+            ),
         }
 
     @app.get("/v1/models")
@@ -301,7 +327,11 @@ def build_gateway_from_env(
     ollama_url: str | None = None,
     diagnostics_default: bool | None = None,
     persistence_dir: str | None = None,
-) -> CortexLanguageGateway:
+    strict_neural_boundary: bool = False,
+    parser_model: str | None = None,
+    renderer_model: str | None = None,
+    feature_dim: int = 128,
+) -> Any:
     model = (
         chat_model
         or os.environ.get("CORTEX_CHAT_MODEL")
@@ -347,6 +377,37 @@ def build_gateway_from_env(
         )
         else state_dir
     )
+    if strict_neural_boundary:
+        strict_config = StrictGatewayConfig(
+            parser_model=(
+                parser_model
+                or os.environ.get(
+                    "CORTEX_PARSER_MODEL"
+                )
+                or model
+            ),
+            renderer_model=(
+                renderer_model
+                or os.environ.get(
+                    "CORTEX_RENDERER_MODEL"
+                )
+                or model
+            ),
+            ollama_url=url,
+            feature_dim=int(
+                feature_dim
+            ),
+            diagnostics_default=bool(
+                default_diag
+            ),
+            persistence_dir=(
+                state_dir or None
+            ),
+        )
+        return StrictCortexLanguageGateway(
+            strict_config
+        )
+
     config = GatewayConfig(
         chat_model=model,
         embedding_model=embed,
@@ -381,6 +442,31 @@ def main() -> None:
     parser.add_argument(
         "--embedding-model",
         default=None,
+        help="Legacy v0.1 embedding model; unused in strict mode.",
+    )
+    parser.add_argument(
+        "--strict-neural-boundary",
+        action="store_true",
+        help=(
+            "Use Gateway v0.2: stateless parser/renderer, deterministic "
+            "Cortex encoding, and Cortex-owned AnswerIR."
+        ),
+    )
+    parser.add_argument(
+        "--parser-model",
+        default=None,
+        help="Ollama model used only for text -> PromptIR.",
+    )
+    parser.add_argument(
+        "--renderer-model",
+        default=None,
+        help="Ollama model used only for RendererPacket -> text.",
+    )
+    parser.add_argument(
+        "--feature-dim",
+        type=int,
+        default=128,
+        help="Deterministic Cortex feature dimension in strict mode.",
     )
     parser.add_argument(
         "--ollama-url",
@@ -422,6 +508,14 @@ def main() -> None:
             if args.no_persistence
             else args.state_dir
         ),
+        strict_neural_boundary=(
+            args.strict_neural_boundary
+        ),
+        parser_model=args.parser_model,
+        renderer_model=(
+            args.renderer_model
+        ),
+        feature_dim=args.feature_dim,
     )
     app = create_app(gateway)
     uvicorn.run(
