@@ -16,7 +16,7 @@ import os
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
-from time import time
+from time import sleep, time
 from typing import Any
 
 from .language_gateway import (
@@ -33,6 +33,13 @@ from .hybrid_language_gateway import (
     HYBRID_GATEWAY_VERSION,
     HybridCortexLanguageGateway,
     HybridGatewayConfig,
+)
+from .hybrid_core import (
+    HYBRID_CORE_VERSION,
+    HybridCoreConfig,
+)
+from .hybrid_core_gateway import (
+    HybridCoreGateway,
 )
 
 
@@ -290,19 +297,294 @@ def _ollama_created_at() -> str:
     )
 
 
+def _ollama_visible_content(
+    result: Any,
+) -> str:
+    context = getattr(
+        result,
+        "cortex_context",
+        None,
+    )
+    if isinstance(
+        context,
+        dict,
+    ):
+        neural_answer = context.get(
+            "neural_answer"
+        )
+        if (
+            isinstance(
+                neural_answer,
+                str,
+            )
+            and neural_answer.strip()
+        ):
+            return neural_answer
+    return str(
+        getattr(
+            result,
+            "content",
+            "",
+        )
+    )
+
+
+def _cortex_thinking_text(
+    result: Any,
+) -> str:
+    context = getattr(
+        result,
+        "cortex_context",
+        None,
+    )
+    if not isinstance(
+        context,
+        dict,
+    ):
+        return ""
+    diagnosis = context.get(
+        "diagnosis"
+    )
+    if not isinstance(
+        diagnosis,
+        dict,
+    ):
+        return ""
+
+    lines = [
+        "Cortex diagnosis",
+        (
+            "Status: "
+            + str(
+                diagnosis.get(
+                    "status",
+                    "unknown",
+                )
+            )
+        ),
+        (
+            "Reasoning mode: "
+            + str(
+                diagnosis.get(
+                    "reasoning_mode",
+                    "unknown",
+                )
+            )
+        ),
+    ]
+    summary = diagnosis.get(
+        "summary"
+    )
+    if (
+        isinstance(
+            summary,
+            str,
+        )
+        and summary.strip()
+    ):
+        lines.append(
+            "Assessment: "
+            + summary.strip()
+        )
+    lines.append(
+        (
+            "Memory: structural state changed on this turn."
+            if diagnosis.get(
+                "memory_changed"
+            )
+            else "Memory: no structural state change."
+        )
+    )
+
+    runtime = context.get(
+        "hybrid_runtime"
+    )
+    if isinstance(
+        runtime,
+        dict,
+    ):
+        lines.extend(
+            [
+                "",
+                "Hybrid runtime",
+                (
+                    "Backend: "
+                    + str(
+                        runtime.get(
+                            "backend",
+                            "unknown",
+                        )
+                    )
+                ),
+                (
+                    "Neural calls: "
+                    + str(
+                        runtime.get(
+                            "neural_call_count",
+                            0,
+                        )
+                    )
+                ),
+                (
+                    "Revision cycles: "
+                    + str(
+                        runtime.get(
+                            "revision_cycles",
+                            0,
+                        )
+                    )
+                ),
+            ]
+        )
+        calls = runtime.get(
+            "neural_calls"
+        )
+        if isinstance(
+            calls,
+            list,
+        ):
+            stages = [
+                str(
+                    item.get(
+                        "stage",
+                        "unknown",
+                    )
+                )
+                for item in calls
+                if isinstance(
+                    item,
+                    dict,
+                )
+            ]
+            if stages:
+                lines.append(
+                    "Stages: "
+                    + " -> ".join(
+                        stages
+                    )
+                )
+
+    bootstrap = context.get(
+        "bootstrap"
+    )
+    if isinstance(
+        bootstrap,
+        dict,
+    ):
+        lines.append(
+            (
+                "Bootstrap claims: "
+                + str(
+                    bootstrap.get(
+                        "claim_count",
+                        0,
+                    )
+                )
+            )
+        )
+
+    errors = diagnosis.get(
+        "analysis_errors"
+    )
+    if (
+        isinstance(
+            errors,
+            list,
+        )
+        and errors
+    ):
+        lines.append(
+            "Analysis warnings: "
+            + "; ".join(
+                str(
+                    item
+                )
+                for item in errors
+            )
+        )
+
+    return "\n".join(
+        lines
+    )
+
+
+def _ollama_timing_metadata(
+    result: Any,
+) -> dict[str, int]:
+    context = getattr(
+        result,
+        "cortex_context",
+        None,
+    )
+    diagnosis = (
+        context.get(
+            "diagnosis"
+        )
+        if isinstance(
+            context,
+            dict,
+        )
+        else None
+    )
+    timings = (
+        diagnosis.get(
+            "timings"
+        )
+        if isinstance(
+            diagnosis,
+            dict,
+        )
+        else None
+    )
+    total_seconds = 0.0
+    if isinstance(
+        timings,
+        dict,
+    ):
+        for value in timings.values():
+            if isinstance(
+                value,
+                (
+                    int,
+                    float,
+                ),
+            ):
+                total_seconds += max(
+                    0.0,
+                    float(
+                        value
+                    ),
+                )
+    return {
+        "total_duration": int(
+            total_seconds
+            * 1_000_000_000
+        ),
+        "load_duration": 0,
+        "prompt_eval_count": 0,
+        "prompt_eval_duration": 0,
+        "eval_count": 0,
+        "eval_duration": 0,
+    }
+
+
 def _ollama_chat_payload(
     *,
     model: str,
     content: str,
     done: bool,
+    thinking: str = "",
+    metrics: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     return {
         "model": model,
-        "created_at": _ollama_created_at(),
+        "created_at": (
+            _ollama_created_at()
+        ),
         "message": {
             "role": "assistant",
             "content": content,
-            "thinking": "",
+            "thinking": thinking,
             "tool_calls": [],
         },
         "done": done,
@@ -311,12 +593,17 @@ def _ollama_chat_payload(
             if done
             else None
         ),
-        "total_duration": 0,
-        "load_duration": 0,
-        "prompt_eval_count": 0,
-        "prompt_eval_duration": 0,
-        "eval_count": 0,
-        "eval_duration": 0,
+        **(
+            metrics
+            or {
+                "total_duration": 0,
+                "load_duration": 0,
+                "prompt_eval_count": 0,
+                "prompt_eval_duration": 0,
+                "eval_count": 0,
+                "eval_duration": 0,
+            }
+        ),
     }
 
 
@@ -326,23 +613,32 @@ def _ollama_stream_events(
     model: str,
     trace: bool = False,
 ):
-    content = result.content
-    chunk_size = 64
-    emitted = 0
-    for offset in range(
-        0,
-        len(content),
-        chunk_size,
-    ):
-        emitted += 1
+    content = (
+        _ollama_visible_content(
+            result
+        )
+    )
+    thinking = (
+        _cortex_thinking_text(
+            result
+        )
+    )
+    metrics = (
+        _ollama_timing_metadata(
+            result
+        )
+    )
+    emitted_content = 0
+    emitted_thinking = 0
+
+    if thinking:
+        emitted_thinking = 1
         yield (
             json.dumps(
                 _ollama_chat_payload(
                     model=model,
-                    content=content[
-                        offset : offset
-                        + chunk_size
-                    ],
+                    content="",
+                    thinking=thinking,
                     done=False,
                 ),
                 ensure_ascii=False,
@@ -351,12 +647,34 @@ def _ollama_stream_events(
             + "\n"
         )
 
+    if content:
+        # Alpaca queues text through GLib.idle_add and can finalize before
+        # multiple artificial chunks are rendered. Cortex already has the full
+        # answer here, so expose it atomically and leave a tiny GTK flush window.
+        emitted_content = 1
+        yield (
+            json.dumps(
+                _ollama_chat_payload(
+                    model=model,
+                    content=content,
+                    done=False,
+                ),
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+            + "\n"
+        )
+        sleep(
+            0.075
+        )
+
     yield (
         json.dumps(
             _ollama_chat_payload(
                 model=model,
                 content="",
                 done=True,
+                metrics=metrics,
             ),
             ensure_ascii=False,
             separators=(",", ":"),
@@ -367,7 +685,10 @@ def _ollama_stream_events(
     if trace:
         print(
             f"[cortex-gateway:{result.session_id}] "
-            f"ollama:done ({len(content)} chars, {emitted} content chunks)",
+            f"ollama:done ({len(content)} answer chars, "
+            f"{len(thinking)} diagnosis chars, "
+            f"{emitted_content} answer chunks, "
+            f"{emitted_thinking} diagnosis chunks)",
             flush=True,
         )
 
@@ -396,18 +717,25 @@ def create_app(
         return {
             "status": "ok",
             "gateway": (
-                STRICT_GATEWAY_VERSION
+                HYBRID_CORE_VERSION
                 if isinstance(
                     gateway,
-                    StrictCortexLanguageGateway,
+                    HybridCoreGateway,
                 )
                 else (
-                    HYBRID_GATEWAY_VERSION
+                    STRICT_GATEWAY_VERSION
                     if isinstance(
                         gateway,
-                        HybridCortexLanguageGateway,
+                        StrictCortexLanguageGateway,
                     )
-                    else "cortex-language-gateway-v0.1"
+                    else (
+                        HYBRID_GATEWAY_VERSION
+                        if isinstance(
+                            gateway,
+                            HybridCortexLanguageGateway,
+                        )
+                        else "cortex-language-gateway-v0.1"
+                    )
                 )
             ),
             "ollama_url": gateway.config.ollama_url,
@@ -420,6 +748,18 @@ def create_app(
             "hybrid_cognition": isinstance(
                 gateway,
                 HybridCortexLanguageGateway,
+            ),
+            "hybrid_runtime": isinstance(
+                gateway,
+                HybridCoreGateway,
+            ),
+            "neural_backend": (
+                gateway.runtime.backend_name
+                if isinstance(
+                    gateway,
+                    HybridCoreGateway,
+                )
+                else None
             ),
             "parser_model": getattr(
                 gateway.config,
@@ -519,15 +859,27 @@ def create_app(
             },
             "model_info": {
                 "general.architecture": (
-                    "cortex-hybrid"
-                ),
-                "cortex.gateway": (
-                    HYBRID_GATEWAY_VERSION
+                    "cortex-hybrid-core"
                     if isinstance(
                         gateway,
-                        HybridCortexLanguageGateway,
+                        HybridCoreGateway,
                     )
-                    else "cortex"
+                    else "cortex-hybrid"
+                ),
+                "cortex.gateway": (
+                    HYBRID_CORE_VERSION
+                    if isinstance(
+                        gateway,
+                        HybridCoreGateway,
+                    )
+                    else (
+                        HYBRID_GATEWAY_VERSION
+                        if isinstance(
+                            gateway,
+                            HybridCortexLanguageGateway,
+                        )
+                        else "cortex"
+                    )
                 ),
             },
             "parameters": "",
@@ -678,8 +1030,22 @@ def create_app(
         return JSONResponse(
             _ollama_chat_payload(
                 model=model_name,
-                content=result.content,
+                content=(
+                    _ollama_visible_content(
+                        result
+                    )
+                ),
+                thinking=(
+                    _cortex_thinking_text(
+                        result
+                    )
+                ),
                 done=True,
+                metrics=(
+                    _ollama_timing_metadata(
+                        result
+                    )
+                ),
             )
         )
 
@@ -902,6 +1268,63 @@ def create_app(
         }
 
     @app.post(
+        "/cortex/sessions/{session_id}/bootstrap"
+    )
+    async def bootstrap_session(
+        session_id: str,
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        bootstrap = getattr(
+            gateway,
+            "bootstrap",
+            None,
+        )
+        if not callable(
+            bootstrap
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "this gateway mode does not support neural bootstrap"
+                ),
+            )
+        topics = payload.get(
+            "topics",
+            []
+        )
+        if (
+            not isinstance(
+                topics,
+                list,
+            )
+            or not all(
+                isinstance(
+                    item,
+                    str,
+                )
+                for item in topics
+            )
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="topics must be an array of strings",
+            )
+        records = bootstrap(
+            session_id,
+            topics,
+        )
+        return {
+            "session_id": session_id,
+            "imported": len(
+                records
+            ),
+            "records": [
+                record.packet()
+                for record in records
+            ],
+        }
+
+    @app.post(
         "/cortex/sessions/{session_id}/diagnostics"
     )
     async def set_diagnostics(
@@ -953,11 +1376,13 @@ def build_gateway_from_env(
     persistence_dir: str | None = None,
     strict_neural_boundary: bool = False,
     hybrid_cognition: bool = False,
+    hybrid_runtime: bool = False,
     parser_model: str | None = None,
     renderer_model: str | None = None,
     feature_dim: int = 128,
     trace_stages: bool = False,
     explain_responses: bool = False,
+    max_revision_cycles: int = 1,
 ) -> Any:
     model = (
         chat_model
@@ -1039,6 +1464,41 @@ def build_gateway_from_env(
         )
         return StrictCortexLanguageGateway(
             strict_config
+        )
+
+    if hybrid_runtime:
+        core_config = HybridCoreConfig(
+            chat_model=model,
+            parser_model=(
+                parser_model
+                or os.environ.get(
+                    "CORTEX_PARSER_MODEL"
+                )
+                or model
+            ),
+            ollama_url=url,
+            feature_dim=int(
+                feature_dim
+            ),
+            diagnostics_default=bool(
+                default_diag
+            ),
+            persistence_dir=(
+                state_dir or None
+            ),
+            trace_stages=bool(
+                trace_stages
+            ),
+            include_diagnosis=False,
+            max_revision_cycles=max(
+                0,
+                int(
+                    max_revision_cycles
+                ),
+            ),
+        )
+        return HybridCoreGateway(
+            core_config
         )
 
     if hybrid_cognition:
@@ -1123,6 +1583,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--hybrid-runtime",
+        action="store_true",
+        help=(
+            "Use Hybrid Core v0.1: provider-independent NeuralRuntime, "
+            "Cortex pre-pass, fused answer+claim sidecar, and bounded revision."
+        ),
+    )
+    parser.add_argument(
         "--parser-model",
         default=None,
         help="Ollama model used only for text -> PromptIR.",
@@ -1143,6 +1611,14 @@ def main() -> None:
         action="store_true",
         help=(
             "Print strict gateway parser/Cortex/renderer stage timings."
+        ),
+    )
+    parser.add_argument(
+        "--max-revision-cycles",
+        type=int,
+        default=1,
+        help=(
+            "Maximum Hybrid Core NN/Cortex conflict-revision cycles per turn."
         ),
     )
     parser.add_argument(
@@ -1176,12 +1652,23 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if (
-        args.strict_neural_boundary
-        and args.hybrid_cognition
-    ):
+    selected_modes = sum(
+        (
+            bool(
+                args.strict_neural_boundary
+            ),
+            bool(
+                args.hybrid_cognition
+            ),
+            bool(
+                args.hybrid_runtime
+            ),
+        )
+    )
+    if selected_modes > 1:
         parser.error(
-            "--strict-neural-boundary and --hybrid-cognition are mutually exclusive"
+            "--strict-neural-boundary, --hybrid-cognition, and "
+            "--hybrid-runtime are mutually exclusive"
         )
 
     try:
@@ -1207,6 +1694,9 @@ def main() -> None:
         hybrid_cognition=(
             args.hybrid_cognition
         ),
+        hybrid_runtime=(
+            args.hybrid_runtime
+        ),
         parser_model=args.parser_model,
         renderer_model=(
             args.renderer_model
@@ -1217,6 +1707,9 @@ def main() -> None:
         ),
         explain_responses=(
             args.explain_responses
+        ),
+        max_revision_cycles=(
+            args.max_revision_cycles
         ),
     )
     app = create_app(gateway)
