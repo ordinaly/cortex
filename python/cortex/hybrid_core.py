@@ -20,6 +20,7 @@ from uuid import uuid4
 
 from .hybrid_language_gateway import (
     CandidateAnswerIR,
+    ClaimAssessment,
     HybridCortexChatSession,
     HybridDiagnosis,
     HybridGatewayConfig,
@@ -351,6 +352,10 @@ class HybridCoreSession(
             str,
             BootstrapRecord,
         ] = {}
+        self.relation_provenance: dict[
+            str,
+            str,
+        ] = {}
         super().__init__(
             session_id,
             config,
@@ -358,6 +363,298 @@ class HybridCoreSession(
                 runtime
             ),
         )
+
+    @staticmethod
+    def _provenance_key(
+        source_id: int,
+        target_id: int,
+        predicate: str,
+    ) -> str:
+        return (
+            str(
+                source_id
+            )
+            + "|"
+            + str(
+                target_id
+            )
+            + "|"
+            + normalize_predicate(
+                predicate
+            )
+        )
+
+    def _mark_observation_provenance(
+        self,
+        prompt_ir: PromptIR,
+        bindings: Mapping[
+            str,
+            int,
+        ],
+        provenance: str,
+    ) -> None:
+        for observation in (
+            prompt_ir.observations
+        ):
+            source_id = bindings.get(
+                observation.subject
+            )
+            target_id = bindings.get(
+                observation.object
+            )
+            if (
+                source_id is None
+                or target_id is None
+            ):
+                continue
+            self.relation_provenance[
+                self._provenance_key(
+                    source_id,
+                    target_id,
+                    observation.predicate,
+                )
+            ] = provenance
+
+    def _assess_candidate(
+        self,
+        candidate: CandidateAnswerIR,
+    ) -> tuple[
+        ClaimAssessment,
+        ...,
+    ]:
+        assessments: list[
+            ClaimAssessment
+        ] = []
+        for claim in candidate.claims:
+            source_id = (
+                self._persistent_id_for_surface(
+                    claim.subject
+                )
+            )
+            target_id = (
+                self._persistent_id_for_surface(
+                    claim.object
+                )
+            )
+            matching: list[
+                tuple[
+                    Any,
+                    str,
+                ]
+            ] = []
+            if (
+                source_id is not None
+                and target_id is not None
+            ):
+                for (
+                    key_source,
+                    key_target,
+                    key_predicate,
+                ), relation in self.relations.items():
+                    if (
+                        key_source
+                        == source_id
+                        and key_target
+                        == target_id
+                        and key_predicate
+                        == claim.predicate
+                    ):
+                        provenance = (
+                            self.relation_provenance.get(
+                                self._provenance_key(
+                                    key_source,
+                                    key_target,
+                                    key_predicate,
+                                ),
+                                "user_observation",
+                            )
+                        )
+                        matching.append(
+                            (
+                                relation,
+                                provenance,
+                            )
+                        )
+
+            if not matching:
+                assessments.append(
+                    ClaimAssessment(
+                        claim=claim,
+                        status="neural_prior",
+                    )
+                )
+                continue
+
+            independent = [
+                pair
+                for pair in matching
+                if pair[1]
+                != "neural_bootstrap"
+            ]
+            bootstrap = [
+                pair
+                for pair in matching
+                if pair[1]
+                == "neural_bootstrap"
+            ]
+
+            if independent:
+                agreeing = [
+                    relation
+                    for relation, _provenance
+                    in independent
+                    if relation.asserted
+                    == claim.asserted
+                ]
+                if agreeing:
+                    assessments.append(
+                        ClaimAssessment(
+                            claim=claim,
+                            status="corroborated",
+                            cortex_evidence=tuple(
+                                relation.evidence
+                                for relation
+                                in agreeing
+                            ),
+                        )
+                    )
+                else:
+                    assessments.append(
+                        ClaimAssessment(
+                            claim=claim,
+                            status="conflict",
+                            cortex_evidence=tuple(
+                                relation.evidence
+                                for relation, _provenance
+                                in independent
+                            ),
+                        )
+                    )
+                continue
+
+            agreeing_bootstrap = [
+                relation
+                for relation, _provenance
+                in bootstrap
+                if relation.asserted
+                == claim.asserted
+            ]
+            assessments.append(
+                ClaimAssessment(
+                    claim=claim,
+                    status=(
+                        "bootstrap_aligned"
+                        if agreeing_bootstrap
+                        else "bootstrap_divergence"
+                    ),
+                    cortex_evidence=tuple(
+                        relation.evidence
+                        for relation, _provenance
+                        in bootstrap
+                    ),
+                )
+            )
+
+        return tuple(
+            assessments
+        )
+
+    def _diagnose(
+        self,
+        *,
+        prompt_ir: PromptIR | None,
+        candidate: CandidateAnswerIR | None,
+        cortex_answer: CortexAnswerIR | None,
+        read: Any | None,
+        errors: Sequence[str],
+        timings: Mapping[str, float],
+    ) -> HybridDiagnosis:
+        diagnosis = super()._diagnose(
+            prompt_ir=prompt_ir,
+            candidate=candidate,
+            cortex_answer=cortex_answer,
+            read=read,
+            errors=errors,
+            timings=timings,
+        )
+        statuses = {
+            assessment.status
+            for assessment
+            in diagnosis.neural_claims
+        }
+        if (
+            diagnosis.status
+            != "conflict"
+            and "bootstrap_divergence"
+            in statuses
+        ):
+            return HybridDiagnosis(
+                status="bootstrap_divergence",
+                reasoning_mode=(
+                    "neural_vs_bootstrap_prior"
+                ),
+                summary=(
+                    "The neural answer diverges from provisional "
+                    "neural-bootstrap memory. This is not treated as "
+                    "independent Cortex evidence, so no forced revision "
+                    "is triggered."
+                ),
+                neural_claims=(
+                    diagnosis.neural_claims
+                ),
+                cortex_claims=(
+                    diagnosis.cortex_claims
+                ),
+                accepted_user_observations=(
+                    diagnosis.accepted_user_observations
+                ),
+                memory_changed=(
+                    diagnosis.memory_changed
+                ),
+                analysis_errors=(
+                    diagnosis.analysis_errors
+                ),
+                runtime=diagnosis.runtime,
+                timings=diagnosis.timings,
+            )
+        if (
+            diagnosis.status
+            not in {
+                "conflict",
+                "supported",
+            }
+            and "bootstrap_aligned"
+            in statuses
+        ):
+            return HybridDiagnosis(
+                status="bootstrap_aligned",
+                reasoning_mode=(
+                    "neural_bootstrap_alignment"
+                ),
+                summary=(
+                    "The neural answer matches provisional "
+                    "neural-bootstrap memory. This is alignment with "
+                    "the neural prior, not independent corroboration."
+                ),
+                neural_claims=(
+                    diagnosis.neural_claims
+                ),
+                cortex_claims=(
+                    diagnosis.cortex_claims
+                ),
+                accepted_user_observations=(
+                    diagnosis.accepted_user_observations
+                ),
+                memory_changed=(
+                    diagnosis.memory_changed
+                ),
+                analysis_errors=(
+                    diagnosis.analysis_errors
+                ),
+                runtime=diagnosis.runtime,
+                timings=diagnosis.timings,
+            )
+        return diagnosis
 
     def _record_neural(
         self,
@@ -802,8 +1099,13 @@ class HybridCoreSession(
                     query_predicate="",
                     query_object="",
                 )
-                self._observe(
+                _read, bootstrap_bindings = self._observe(
                     prompt_ir
+                )
+                self._mark_observation_provenance(
+                    prompt_ir,
+                    bootstrap_bindings,
+                    "neural_bootstrap",
                 )
                 self.bootstrap_records[
                     record.key
@@ -859,6 +1161,11 @@ class HybridCoreSession(
             )
             read, bindings = self._observe(
                 prompt_ir
+            )
+            self._mark_observation_provenance(
+                prompt_ir,
+                bindings,
+                "user_observation",
             )
             diagnostic_enabled = (
                 self.diagnostics_enabled
