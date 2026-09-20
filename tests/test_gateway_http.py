@@ -204,3 +204,77 @@ def test_diagnostics_endpoint_accepts_json_body(client):
     assert response.json()[
         "diagnostics_enabled"
     ] is True
+
+
+def test_alpaca_content_parts_are_extracted_as_user_text(client):
+    http, gateway = client
+
+    response = http.post(
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "System instructions",
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": "data:image/png;base64,AAAA",
+                            },
+                        },
+                        {
+                            "type": "text",
+                            "text": "Hello from Alpaca",
+                        },
+                    ],
+                },
+            ],
+            "stream": True,
+        },
+    )
+
+    assert response.status_code == 200
+    assert gateway.calls[-1]["user_text"] == "Hello from Alpaca"
+
+
+def test_multiple_text_parts_preserve_order(client):
+    http, gateway = client
+
+    response = http.post(
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "First part",
+                        },
+                        {
+                            "type": "text",
+                            "text": "Second part",
+                        },
+                    ],
+                }
+            ],
+            "stream": False,
+        },
+    )
+
+    assert response.status_code == 200
+    assert (
+        gateway.calls[-1]["user_text"]
+        == "First part\nSecond part"
+    )
