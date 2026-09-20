@@ -1,6 +1,6 @@
 # Noisy semantic revision v1 — confidence and revision under stochastic evidence
 
-Status: **development protocol / official campaign not yet opened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: `noisy-semantic-revision-v1`.
 
@@ -187,9 +187,10 @@ weaknesses and motivate changes to the mechanism or thresholds.
 Any post-official change requires a new protocol version and fresh untouched
 seeds.
 
-## Current development gates
+## Frozen official gates
 
-The initial development gate is intentionally conservative and tests:
+The development campaign passed the following gates. They are now frozen
+unchanged for the untouched official campaign:
 
 - at least 95% correct establishment;
 - Cortex top-label accuracy at least 3 percentage points above raw neural
@@ -206,9 +207,24 @@ The initial development gate is intentionally conservative and tests:
 - unaffected-concept preservation >= 0.98;
 - bounded-history compliance = 1.0.
 
-These are development gates, not yet an official preregistration. They may be
-tightened or the model may be revised using development evidence. They will not
-be weakened after official evaluation begins.
+The passing 72-case development campaign measured:
+
+- neural top-label accuracy: **0.7975**;
+- Cortex top-label accuracy: **0.9631**;
+- neural Brier score: **0.3686**;
+- Cortex Brier score: **0.0699**;
+- mean top-support ECE: **0.0364**;
+- trusted accuracy: **0.9976** at **0.7755** coverage;
+- false-certainty rate: **0.00236**;
+- uncertainty-interception rate: **0.9715**;
+- false revision cases: **0**;
+- unaffected-concept preservation: **1.000**;
+- shift success: **1.000**, p95 latency **7 epochs**;
+- recovery success: **1.000**, p95 latency **8 epochs**.
+
+No gate or mechanism may now be changed before official evaluation. Any change
+after opening the official seed range requires a new protocol version and fresh
+untouched seeds.
 
 ## Claim boundary
 
