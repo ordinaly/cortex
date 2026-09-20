@@ -1,0 +1,32 @@
+name: semantic-grounding-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/semantic_grounding.py"
+      - "research/semantic_grounding_campaign.py"
+      - "research/semantic_grounding_gate.py"
+      - "tests/test_semantic_grounding.py"
+      - "docs/HYBRID_SEMANTIC_GROUNDING_V1_PROTOCOL.md"
+      - ".github/workflows/semantic-grounding-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  semantic-grounding-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: pytest tests/test_semantic_grounding.py -q
+      - name: Run development campaign
+        run: >-
+          python research/semantic_grounding_campaign.py
+          --development
+          --output semantic-grounding-development.jsonl
+      - name: Check frozen development gates
+        run: >-
+          python research/semantic_grounding_gate.py
+          --input semantic-grounding-development.jsonl
