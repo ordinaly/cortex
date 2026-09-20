@@ -19,6 +19,7 @@ on:
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md"
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md"
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md"
+      - "docs/CORTEX_HYBRID_CORE_V0_1.md"
       - "README.md"
       - "pyproject.toml"
       - ".github/workflows/language-gateway.yml"
