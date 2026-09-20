@@ -1,0 +1,32 @@
+name: latent-concept-induction-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/latent_concept_induction.py"
+      - "research/latent_concept_induction_campaign.py"
+      - "research/latent_concept_induction_gate.py"
+      - "tests/test_latent_concept_induction.py"
+      - "docs/LATENT_CONCEPT_INDUCTION_V1_PROTOCOL.md"
+      - ".github/workflows/latent-concept-induction-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  latent-concept-induction-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy
+      - run: pytest tests/test_latent_concept_induction.py -q
+      - name: Run development campaign
+        run: >-
+          python research/latent_concept_induction_campaign.py
+          --development
+          --output latent-concept-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/latent_concept_induction_gate.py
+          --input latent-concept-development.jsonl
