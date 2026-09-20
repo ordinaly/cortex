@@ -31,9 +31,18 @@ from .language_gateway import (
     DiagnosticReport,
     diagnose_runtime,
 )
+from .hybrid_exchange import (
+    CortexContribution,
+    DefaultHybridOrchestrationPolicy,
+    HybridExchange,
+    NeuralContribution,
+    TextHybridExchangeAdapter,
+)
 from .neural_runtime import (
+    NeuralRequest,
     NeuralResponse,
     NeuralRuntime,
+    NeuralSession,
     RuntimeClientAdapter,
 )
 from .strict_language_gateway import (
@@ -345,9 +354,20 @@ class HybridCoreSession(
         runtime: NeuralRuntime,
     ) -> None:
         self.neural_runtime = runtime
-        self.neural_calls: list[
-            Mapping[str, Any]
-        ] = []
+        self.neural_session = NeuralSession(
+            session_id=session_id,
+            runtime=runtime,
+        )
+        self.exchange_adapter = (
+            TextHybridExchangeAdapter()
+        )
+        self.orchestration_policy = (
+            DefaultHybridOrchestrationPolicy(
+                revision_budget=(
+                    config.max_revision_cycles
+                )
+            )
+        )
         self.bootstrap_records: dict[
             str,
             BootstrapRecord,
@@ -656,90 +676,114 @@ class HybridCoreSession(
             )
         return diagnosis
 
-    def _record_neural(
-        self,
-        response: NeuralResponse,
-        *,
-        stage: str,
-    ) -> None:
-        packet = response.packet()
-        packet[
-            "stage"
-        ] = stage
-        self.neural_calls.append(
-            packet
-        )
-
     def _parse_user_turn(
         self,
         text: str,
+        exchange: HybridExchange,
     ) -> tuple[
         PromptIR,
         NeuralResponse,
     ]:
         response = (
-            self.neural_runtime.generate(
-                model=(
-                    self.config.parser_model
-                ),
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            PARSER_SYSTEM_PROMPT
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": text,
-                    },
-                ],
-                schema=(
-                    PROMPT_IR_SCHEMA
-                ),
-                temperature=0,
+            self.neural_session.execute(
+                NeuralRequest(
+                    stage="prompt_parse",
+                    model=(
+                        self.config.parser_model
+                    ),
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                PARSER_SYSTEM_PROMPT
+                            ),
+                        },
+                        {
+                            "role": "user",
+                            "content": text,
+                        },
+                    ],
+                    schema=(
+                        PROMPT_IR_SCHEMA
+                    ),
+                    temperature=0,
+                    exchange_id=(
+                        exchange.exchange_id
+                    ),
+                    cache_policy=(
+                        "isolated_structured_parse"
+                    ),
+                )
             )
         )
-        self._record_neural(
-            response,
-            stage="prompt_parse",
+        prompt_ir = parse_prompt_ir(
+            response.text,
+            source_text=text,
+        )
+        exchange.prompt_ir = (
+            prompt_ir_packet(
+                prompt_ir
+            )
+        )
+        exchange.record(
+            phase="parsed",
+            actor="neural",
+            action="prompt_ir",
+            metadata={
+                "model": response.model,
+                "backend": (
+                    response.backend
+                ),
+            },
         )
         return (
-            parse_prompt_ir(
-                response.text,
-                source_text=text,
-            ),
+            prompt_ir,
             response,
         )
 
-    def _cortex_context(
+    def _cortex_contribution(
         self,
         *,
         prompt_ir: PromptIR,
         cortex_answer: CortexAnswerIR,
         read: Any | None,
-    ) -> dict[str, Any]:
-        return {
-            "provenance": (
-                "cortex_session_state"
-            ),
-            "query": {
-                "operation": (
-                    prompt_ir.query_operation
-                ),
-                "predicate": (
-                    prompt_ir.query_predicate
-                ),
-            },
-            "claims": [
-                claim.packet()
-                for claim
-                in cortex_answer.claims
-            ],
-            "answer_status": (
+        exchange: HybridExchange,
+    ) -> CortexContribution:
+        tokens = text_tokens(
+            prompt_ir
+        )
+        bootstrap_claims = tuple(
+            record.packet()
+            for record
+            in self.bootstrap_records.values()
+            if (
+                record.subject.casefold()
+                in tokens
+                or record.object.casefold()
+                in tokens
+            )
+        )[
+            : exchange.plan.bootstrap_claim_limit
+        ]
+        contribution = CortexContribution(
+            available=True,
+            answer_status=(
                 cortex_answer.status
             ),
-            "runtime": (
+            query_operation=(
+                prompt_ir.query_operation
+            ),
+            claims=tuple(
+                claim.packet()
+                for claim
+                in cortex_answer.claims[
+                    : exchange.plan.context_claim_limit
+                ]
+            ),
+            bootstrap_claims=(
+                bootstrap_claims
+            ),
+            runtime=(
                 {
                     "unresolved": bool(
                         getattr(
@@ -773,85 +817,103 @@ class HybridCoreSession(
                 if read is not None
                 else None
             ),
-            "bootstrap_claims": [
-                record.packet()
-                for record
-                in self.bootstrap_records.values()
-                if (
-                    record.subject.casefold()
-                    in text_tokens(
-                        prompt_ir
-                    )
-                    or record.object.casefold()
-                    in text_tokens(
-                        prompt_ir
-                    )
-                )
-            ][
-                :8
-            ],
-        }
+        )
+        exchange.cortex = (
+            contribution
+        )
+        exchange.record(
+            phase="cortex_ready",
+            actor="cortex",
+            action="structural_contribution",
+            metadata={
+                "answer_status": (
+                    cortex_answer.status
+                ),
+                "claim_count": len(
+                    contribution.claims
+                ),
+                "bootstrap_claim_count": len(
+                    contribution.bootstrap_claims
+                ),
+            },
+        )
+        return contribution
 
     def _generate_turn(
         self,
         *,
-        text: str,
-        cortex_context: Mapping[
-            str,
-            Any,
-        ],
+        exchange: HybridExchange,
     ) -> tuple[
         HybridTurnIR,
         NeuralResponse,
     ]:
-        system = (
-            HYBRID_TURN_SYSTEM_PROMPT
-            + "\n\nCORTEX_CONTEXT="
-            + dumps(
-                dict(
-                    cortex_context
+        messages = (
+            self.exchange_adapter.answer_messages(
+                exchange=exchange,
+                history=self.history[
+                    -self.config.history_messages :
+                ],
+                system_prompt=(
+                    HYBRID_TURN_SYSTEM_PROMPT
                 ),
-                sort_keys=True,
             )
         )
         response = (
-            self.neural_runtime.generate(
-                model=(
-                    self.config.chat_model
-                ),
-                messages=[
-                    {
-                        "role": "system",
-                        "content": system,
-                    },
-                    *self.history[
-                        -self.config.history_messages :
-                    ],
-                    {
-                        "role": "user",
-                        "content": text,
-                    },
-                ],
-                schema=(
-                    HYBRID_TURN_SCHEMA
-                ),
+            self.neural_session.execute(
+                NeuralRequest(
+                    stage=(
+                        "answer_with_sidecar"
+                    ),
+                    model=(
+                        self.config.chat_model
+                    ),
+                    messages=messages,
+                    schema=(
+                        HYBRID_TURN_SCHEMA
+                    ),
+                    exchange_id=(
+                        exchange.exchange_id
+                    ),
+                    cache_policy=(
+                        "reuse_conversation_if_supported"
+                    ),
+                )
             )
         )
-        self._record_neural(
-            response,
-            stage="answer_with_sidecar",
+        turn = parse_hybrid_turn(
+            response.text
+        )
+        exchange.neural = NeuralContribution(
+            answer=turn.answer,
+            candidate=(
+                turn.candidate.packet()
+            ),
+            model=response.model,
+            backend=response.backend,
+        )
+        exchange.record(
+            phase="neural_proposed",
+            actor="neural",
+            action="answer_with_sidecar",
+            metadata={
+                "model": response.model,
+                "backend": (
+                    response.backend
+                ),
+                "claim_count": len(
+                    turn.candidate.claims
+                ),
+            },
         )
         return (
-            parse_hybrid_turn(
-                response.text
-            ),
+            turn,
             response,
         )
 
     def _revise_turn(
         self,
         *,
-        text: str,
+        exchange: HybridExchange,
         prior: HybridTurnIR,
         diagnosis: HybridDiagnosis,
     ) -> tuple[
@@ -867,47 +929,64 @@ class HybridCoreSession(
                 == "conflict"
             )
         ]
-        response = (
-            self.neural_runtime.generate(
-                model=(
-                    self.config.chat_model
+        messages = (
+            self.exchange_adapter.revision_messages(
+                exchange=exchange,
+                system_prompt=(
+                    HYBRID_REVISION_SYSTEM_PROMPT
                 ),
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            HYBRID_REVISION_SYSTEM_PROMPT
-                        ),
-                    },
-                    {
-                        "role": "user",
-                        "content": dumps(
-                            {
-                                "user_request": text,
-                                "candidate_answer": (
-                                    prior.answer
-                                ),
-                                "cortex_conflicts": (
-                                    conflicts
-                                ),
-                            },
-                            sort_keys=True,
-                        ),
-                    },
-                ],
-                schema=(
-                    HYBRID_TURN_SCHEMA
-                ),
+                conflicts=conflicts,
             )
         )
-        self._record_neural(
-            response,
-            stage="conflict_revision",
+        response = (
+            self.neural_session.execute(
+                NeuralRequest(
+                    stage=(
+                        "conflict_revision"
+                    ),
+                    model=(
+                        self.config.chat_model
+                    ),
+                    messages=messages,
+                    schema=(
+                        HYBRID_TURN_SCHEMA
+                    ),
+                    exchange_id=(
+                        exchange.exchange_id
+                    ),
+                    cache_policy=(
+                        "reuse_conversation_if_supported"
+                    ),
+                )
+            )
+        )
+        turn = parse_hybrid_turn(
+            response.text
+        )
+        exchange.revision_count += 1
+        exchange.neural = NeuralContribution(
+            answer=turn.answer,
+            candidate=(
+                turn.candidate.packet()
+            ),
+            model=response.model,
+            backend=response.backend,
+        )
+        exchange.record(
+            phase="neural_revised",
+            actor="neural",
+            action="conflict_revision",
+            metadata={
+                "revision": (
+                    exchange.revision_count
+                ),
+                "conflict_count": len(
+                    conflicts
+                ),
+            },
         )
         return (
-            parse_hybrid_turn(
-                response.text
-            ),
+            turn,
             response,
         )
 
@@ -927,39 +1006,51 @@ class HybridCoreSession(
             )
             if not normalized_topic:
                 continue
-            response = (
-                self.neural_runtime.generate(
-                    model=(
-                        self.config.chat_model
-                    ),
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": (
-                                BOOTSTRAP_SYSTEM_PROMPT
-                            ),
-                        },
-                        {
-                            "role": "user",
-                            "content": (
-                                "Topic: "
-                                + normalized_topic
-                                + "\nMaximum claims: "
-                                + str(
-                                    self.config.bootstrap_max_claims_per_topic
-                                )
-                            ),
-                        },
-                    ],
-                    schema=(
-                        BOOTSTRAP_SCHEMA
-                    ),
-                    temperature=0,
-                )
+            bootstrap_exchange_id = (
+                "bootstrap-"
+                + uuid4().hex
             )
-            self._record_neural(
-                response,
-                stage="bootstrap",
+            self.neural_session.begin_exchange(
+                bootstrap_exchange_id
+            )
+            response = (
+                self.neural_session.execute(
+                    NeuralRequest(
+                        stage="bootstrap",
+                        model=(
+                            self.config.chat_model
+                        ),
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": (
+                                    BOOTSTRAP_SYSTEM_PROMPT
+                                ),
+                            },
+                            {
+                                "role": "user",
+                                "content": (
+                                    "Topic: "
+                                    + normalized_topic
+                                    + "\nMaximum claims: "
+                                    + str(
+                                        self.config.bootstrap_max_claims_per_topic
+                                    )
+                                ),
+                            },
+                        ],
+                        schema=(
+                            BOOTSTRAP_SCHEMA
+                        ),
+                        temperature=0,
+                        exchange_id=(
+                            bootstrap_exchange_id
+                        ),
+                        cache_policy=(
+                            "isolated_bootstrap"
+                        ),
+                    )
+                )
             )
             payload = loads(
                 response.text
