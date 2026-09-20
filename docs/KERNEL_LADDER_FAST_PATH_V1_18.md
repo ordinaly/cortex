@@ -1,6 +1,6 @@
 # Cortex v1.18-R — Exact Kernel-Ladder Fast Path
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign rejected by performance gates**.
 
 Protocol ID: **kernel-ladder-fast-path-v1.18-R**.
 
@@ -94,7 +94,7 @@ Anchor counts: **72, 144, 288**.
 
 Development seeds: **0..7**.
 
-Reserved untouched official seeds: **500, 501, 502**.
+Official seeds: **500, 501, 502**.
 
 ## Development validity gates
 
@@ -153,3 +153,26 @@ Frozen official performance gates:
 - 288 fused speedup >= **1.02×**.
 
 No mechanism or threshold may change before official evaluation.
+
+## Official outcome
+
+The untouched official campaign preserved numerical and structural behavior but
+failed all three frozen large-scale performance gates.
+
+At 288 anchors:
+
+- kernel speedup: **1.115×** (gate >= 1.40×);
+- refresh speedup: **1.017×** (gate >= 1.10×);
+- fused-step speedup: **0.998×** (gate >= 1.02×).
+
+Exactness remained strong:
+
+- maximum kernel error: **1.89e-15**;
+- underflow-pattern mismatches: **0**;
+- dirty-mask disagreements: **0**;
+- structural disagreements: **0**.
+
+The ladder candidate is therefore retained only as a research result and is not
+promoted into the default cache path.
+
+See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
