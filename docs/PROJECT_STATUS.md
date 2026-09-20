@@ -170,6 +170,30 @@ the label itself.
 
 See [NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md).
 
+### Latent concept induction
+
+The `latent-concept-induction-v1` campaign removes the assumption that every
+useful category is supplied in advance. Cortex evaluates a bounded partition
+grammar and admits shared categories only when they improve
+predictive-description economy.
+
+Across 100 untouched official cases:
+
+- minimum two-concept partition F1: **1.000**;
+- minimum three-concept partition F1: **1.000**;
+- no-shared-concept control correctness: **1.000**;
+- mean held-out gain over flat per-entity prediction:
+  **0.0556 / 0.0288 nats per outcome**;
+- minimum gain over one global concept: **0.2426 nats/outcome**;
+- ambiguous-member unresolved rate: **1.000**;
+- create/split/merge/retract lifecycle coverage: **1.000**;
+- final concept retraction correctness: **1.000**.
+
+The deliberately wrong geometry-decoy grouping reached at most **0.3333** F1,
+while Cortex recovered the predictive grouping at **1.000** F1.
+
+See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -185,19 +209,25 @@ At 288 anchors:
 
 The new measured bottleneck is **cache refresh** at about **45.5%**. See [EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md](EXACT_PERCEPTUAL_FAST_PATH_V1_14_RESULT.md).
 
-### 2. Cortex Reasoning Map v1 — latent concept induction
+### 2. Concept-to-semantics integration and proof dependency
 
-`structural-analogy-v1` passed every frozen gate. With only 12 of 90 target typed facts, mean held-out coverage was **0.9718** at **1.000 resolved accuracy**; 24 and 36 facts reached full coverage. Genuine graph automorphisms remained mapping-ambiguous, while near-isomorphic and explicitly broken analogies were rejected in every case.
+Latent concept induction has passed its frozen official campaign. The next
+scientific integration is to replace the externally supplied concept IDs in the
+semantic-grounding/revision experiments with concept identities discovered by
+Cortex itself.
 
-The next Reasoning Map axis is **latent concept induction**:
+That pipeline should test:
 
-- useful categories are not supplied to the learner;
-- a latent grouping must earn its complexity through predictive/compressive gain;
-- random/no-category controls should not produce persistent concepts;
-- later evidence should be able to split, merge or retract a concept;
-- ambiguous evidence should remain unresolved rather than force a partition.
+- whether semantic labels survive concept split/merge lineage correctly;
+- whether an internally discovered but unnamed concept can remain label-unresolved;
+- whether semantic revision changes a label without silently changing concept identity;
+- whether concept retraction invalidates dependent semantic beliefs.
 
-See [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md) and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
+Immediately after that integration, the next independent Reasoning Map axis is
+**explicit proof dependency**.
+
+See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md) and
+[REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 ### 3. v1.15-R — cache-refresh attribution / decomposition
 
