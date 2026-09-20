@@ -1,0 +1,31 @@
+name: cortex-v1-17-optimized-cache-reattribution
+
+on:
+  pull_request:
+    paths:
+      - "research/optimized_cache_reattribution_campaign.py"
+      - "research/optimized_cache_reattribution_gate.py"
+      - "tests/test_optimized_cache_reattribution.py"
+      - "docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17.md"
+      - ".github/workflows/optimized-cache-reattribution-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  optimized-cache-reattribution-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest numpy scipy
+      - run: pytest tests/test_optimized_cache_reattribution.py -q
+      - name: Run development attribution campaign
+        run: >-
+          python research/optimized_cache_reattribution_campaign.py
+          --development
+          --output optimized-cache-reattribution-development.jsonl
+      - name: Check development gates
+        run: >-
+          python research/optimized_cache_reattribution_gate.py
+          optimized-cache-reattribution-development.jsonl

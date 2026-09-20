@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.16-R`
+> **Research frontier:** `v1.17-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.16-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.17-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.16-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.17-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -121,11 +121,23 @@ The preregistered bottleneck-shift gate did not fully pass: cache refresh still
 occupied **36.79%** of the profiled step, above the frozen **35%** ceiling.
 The threshold was retained unchanged.
 
-The next engineering action is therefore another attribution pass inside the
-**optimized** cache rather than assuming candidate readout has become the next
-target.
+v1.17-R then re-attributed the optimized cache. At 288 anchors:
 
-See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
+- kernel regeneration: **48.63%**;
+- writes/bookkeeping: **24.94%**;
+- streamed semantic geometry: **13.69%**;
+- semantic features: **4.31%**;
+- dirty detection: **2.82%**;
+- outcome probabilities: **2.32%**.
+
+The geometry group itself is now only **11.40% squared-distance accumulation**
+plus **2.21% square root**, so the next measured target is kernel regeneration.
+
+The next engineering action is a v1.18-R exact kernel-ladder experiment that
+tries to reduce repeated exponential evaluation for the canonical resolution
+ladder while keeping the current direct kernel computation as the oracle.
+
+See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
 
 ---
 

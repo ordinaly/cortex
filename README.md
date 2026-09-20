@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.16-R** |
+| research frontier | **v1.17-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -108,7 +108,7 @@ See:
 - [docs/NATIVE_STAGE_ATTRIBUTION.md](docs/NATIVE_STAGE_ATTRIBUTION.md)
 - [docs/ARTICULATION_ATTRIBUTION.md](docs/ARTICULATION_ATTRIBUTION.md)
 
-## Research frontier — v1.14-R
+## Research frontier — v1.17-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -132,7 +132,9 @@ v1.15-R then decomposed the new cache-refresh bottleneck. At 288 anchors, **dist
 
 v1.16-R implements the resulting exact semantic-geometry fast path. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the full fused step **1.17× faster**, while distance/kernel discrepancies remained at **5.55e-17 / 3.33e-16** and structural disagreements stayed at zero. One preregistered gate nevertheless failed: cache refresh still occupied **36.79%** of the profiled step, above the frozen **35%** bottleneck-shift ceiling. The threshold was not weakened.
 
-The next engineering target is therefore a fresh decomposition of the **optimized cache** rather than an assumed candidate-readout optimization. See [docs/EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](docs/EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md).
+v1.17-R re-attributed that optimized cache. At 288 anchors, **kernel regeneration is 48.63%** of refresh, writes/bookkeeping **24.94%**, and streamed semantic geometry **13.69%**. Squared-distance accumulation itself is only **11.40%**, confirming that v1.16 successfully moved the dominant internal cost away from geometry.
+
+The next measured target is therefore a v1.18-R exact kernel-ladder fast path, not another geometry rewrite. See [docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
 
 The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
 

@@ -80,6 +80,7 @@ jobs:
           tests/test_concept_semantic_integration.py
           tests/test_cache_refresh_attribution.py
           tests/test_exact_semantic_geometry_fast_path.py
+          tests/test_optimized_cache_reattribution.py
           tests/test_versioning.py
           -q
 

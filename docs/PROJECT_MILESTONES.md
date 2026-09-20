@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.16-R`;
+- predictive-geometry research frontier: `v1.17-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -320,27 +320,59 @@ See [EXACT_SEMANTIC_GEOMETRY_FAST_PATH_V1_16_RESULT.md](EXACT_SEMANTIC_GEOMETRY_
 
 ---
 
-## B4. v1.17-R — optimized cache re-attribution
+## B4. v1.17-R — optimized cache re-attribution — passed
 
-Re-profile the internals of the **optimized** cache path before selecting another
-micro-optimization.
+The untouched official campaign reproduced the development ordering with exact
+paired cache and prediction parity.
 
-Required groups:
+At 288 anchors:
 
-- semantic-feature recomputation;
-- outcome-probability refresh;
-- dirty-anchor detection;
-- streamed squared-distance accumulation;
-- multi-resolution kernel regeneration;
-- writes/bookkeeping and unattributed remainder.
+- kernel regeneration: **48.63%**;
+- writes/bookkeeping: **24.94%**;
+- streamed semantic geometry: **13.69%**;
+- semantic features: **4.31%**;
+- dirty detection: **2.82%**;
+- outcome-probability refresh: **2.32%**.
 
-The official v1.16 stage profile still places cache refresh first, while its
-development profile temporarily placed candidate readout first. That
-disagreement makes fresh attribution preferable to assuming the next target.
+Raw geometry substages were:
+
+- squared-distance accumulation: **11.40%**;
+- final square root: **2.21%**.
+
+Kernel regeneration is therefore the measured next target.
+
+See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
 
 ---
 
-## B5. Freeze the next executable research specification
+## B5. v1.18-R — exact kernel-ladder fast path
+
+For the canonical resolutions 0.03, 0.06, 0.12 and 0.25, the first three
+kernel exponents have exact scale ratios 16:4:1 relative to 0.12.
+
+Test an exact-or-near-machine-parity ladder:
+
+```math
+K_{0.06}=K_{0.12}^{4},
+\qquad
+K_{0.03}=K_{0.12}^{16},
+```
+
+while keeping the 0.25 kernel independently exponentiated.
+
+Required safeguards:
+
+- direct-kernel oracle retained;
+- strict kernel and prediction differential parity;
+- explicit underflow comparison;
+- zero structural disagreements;
+- focused kernel-regeneration timing and full fused-step timing;
+- no acceptance if numerical drift exceeds the frozen tolerances.
+
+---
+
+## B6. Freeze the next executable research specification
+
 
 Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying `spec-v0.9.5`.
 
@@ -357,7 +389,7 @@ This is the boundary between successful research and promotable architecture.
 
 ---
 
-## B6. Promote accepted mechanisms to Rust
+## B7. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
