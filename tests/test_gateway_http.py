@@ -324,3 +324,67 @@ def test_openai_python_sdk_receives_streamed_delta_content(client):
         pieces
     ) == "Hello from Cortex."
     assert finish_reason == "stop"
+
+
+def test_alpaca_title_request_bypasses_cortex_state(client):
+    http, gateway = client
+
+    response = http.post(
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Generate a concise title.",
+                },
+                {
+                    "role": "user",
+                    "content": "Generate a title for this prompt:\nAlice works with Bob.",
+                },
+            ],
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "ChatTitle",
+                    "schema": {
+                        "type": "object"
+                    },
+                },
+            },
+        },
+    )
+
+    assert response.status_code == 200
+    assert gateway.calls == []
+    payload = response.json()
+    content = payload[
+        "choices"
+    ][0]["message"]["content"]
+    parsed = json.loads(content)
+    assert parsed["title"]
+    assert parsed["emoji"] == ""
+
+
+def test_alpaca_plain_title_fallback_bypasses_cortex_state(client):
+    http, gateway = client
+
+    response = http.post(
+        "/v1/chat/completions",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Generate a title for this prompt:\nAlice works with Bob.",
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    assert gateway.calls == []
+    content = response.json()[
+        "choices"
+    ][0]["message"]["content"]
+    assert "Alice" in content
