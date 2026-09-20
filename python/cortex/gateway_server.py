@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 from time import time
@@ -271,6 +272,106 @@ def _openai_stream_events(
         )
 
 
+def _ollama_title_request(
+    user_text: str,
+) -> bool:
+    return user_text.startswith(
+        "You are an assistant that generates short chat titles"
+    )
+
+
+def _ollama_created_at() -> str:
+    return (
+        datetime.now(
+            timezone.utc
+        )
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
+def _ollama_chat_payload(
+    *,
+    model: str,
+    content: str,
+    done: bool,
+) -> dict[str, Any]:
+    return {
+        "model": model,
+        "created_at": _ollama_created_at(),
+        "message": {
+            "role": "assistant",
+            "content": content,
+            "thinking": "",
+            "tool_calls": [],
+        },
+        "done": done,
+        "done_reason": (
+            "stop"
+            if done
+            else None
+        ),
+        "total_duration": 0,
+        "load_duration": 0,
+        "prompt_eval_count": 0,
+        "prompt_eval_duration": 0,
+        "eval_count": 0,
+        "eval_duration": 0,
+    }
+
+
+def _ollama_stream_events(
+    result: Any,
+    *,
+    model: str,
+    trace: bool = False,
+):
+    content = result.content
+    chunk_size = 64
+    emitted = 0
+    for offset in range(
+        0,
+        len(content),
+        chunk_size,
+    ):
+        emitted += 1
+        yield (
+            json.dumps(
+                _ollama_chat_payload(
+                    model=model,
+                    content=content[
+                        offset : offset
+                        + chunk_size
+                    ],
+                    done=False,
+                ),
+                ensure_ascii=False,
+                separators=(",", ":"),
+            )
+            + "\n"
+        )
+
+    yield (
+        json.dumps(
+            _ollama_chat_payload(
+                model=model,
+                content="",
+                done=True,
+            ),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )
+
+    if trace:
+        print(
+            f"[cortex-gateway:{result.session_id}] "
+            f"ollama:done ({len(content)} chars, {emitted} content chunks)",
+            flush=True,
+        )
+
+
 def create_app(
     gateway: Any,
     *,
@@ -351,6 +452,236 @@ def create_app(
                 }
             ],
         }
+
+    @app.get("/api/tags")
+    def ollama_tags() -> dict[str, Any]:
+        return {
+            "models": [
+                {
+                    "name": (
+                        public_model_name
+                        + ":latest"
+                    ),
+                    "model": (
+                        public_model_name
+                        + ":latest"
+                    ),
+                    "modified_at": (
+                        _ollama_created_at()
+                    ),
+                    "size": 0,
+                    "digest": (
+                        "sha256:"
+                        + sha256(
+                            public_model_name.encode(
+                                "utf-8"
+                            )
+                        ).hexdigest()
+                    ),
+                    "details": {
+                        "parent_model": "",
+                        "format": "cortex-gateway",
+                        "family": "cortex",
+                        "families": [
+                            "cortex"
+                        ],
+                        "parameter_size": (
+                            "hybrid"
+                        ),
+                        "quantization_level": (
+                            "N/A"
+                        ),
+                    },
+                }
+            ]
+        }
+
+    @app.post("/api/show")
+    async def ollama_show(
+        payload: dict[str, Any] = Body(...),
+    ) -> dict[str, Any]:
+        return {
+            "modified_at": (
+                _ollama_created_at()
+            ),
+            "template": "",
+            "modelfile": "",
+            "license": "",
+            "details": {
+                "parent_model": "",
+                "format": "cortex-gateway",
+                "family": "cortex",
+                "families": [
+                    "cortex"
+                ],
+                "parameter_size": "hybrid",
+                "quantization_level": "N/A",
+            },
+            "model_info": {
+                "general.architecture": (
+                    "cortex-hybrid"
+                ),
+                "cortex.gateway": (
+                    HYBRID_GATEWAY_VERSION
+                    if isinstance(
+                        gateway,
+                        HybridCortexLanguageGateway,
+                    )
+                    else "cortex"
+                ),
+            },
+            "parameters": "",
+            "capabilities": [
+                "completion"
+            ],
+        }
+
+    @app.get("/api/ps")
+    def ollama_ps() -> dict[str, Any]:
+        return {
+            "models": []
+        }
+
+    @app.post("/api/chat")
+    async def ollama_chat(
+        payload: dict[str, Any] = Body(...),
+    ):
+        try:
+            messages = payload.get(
+                "messages"
+            )
+            user_text = _last_user_text(
+                messages
+            )
+            model_name = str(
+                payload.get(
+                    "model",
+                    public_model_name,
+                )
+            )
+
+            if (
+                _ollama_title_request(
+                    user_text
+                )
+                and isinstance(
+                    payload.get(
+                        "format"
+                    ),
+                    dict,
+                )
+            ):
+                _, _, prompt = (
+                    user_text.partition(
+                        "\n\n"
+                    )
+                )
+                title = _alpaca_title_text(
+                    "Generate a title for this prompt:"
+                    + prompt
+                )
+                content = json.dumps(
+                    {
+                        "title": title,
+                    },
+                    separators=(",", ":"),
+                )
+                response = (
+                    _ollama_chat_payload(
+                        model=model_name,
+                        content=content,
+                        done=True,
+                    )
+                )
+                if bool(
+                    getattr(
+                        gateway.config,
+                        "trace_stages",
+                        False,
+                    )
+                ):
+                    print(
+                        "[cortex-gateway:utility] "
+                        f"ollama-title:bypass ({len(content)} chars)",
+                        flush=True,
+                    )
+                return JSONResponse(
+                    response
+                )
+
+            session_id = str(
+                payload.get(
+                    "cortex_session",
+                    "default",
+                )
+            )
+            result = gateway.chat(
+                session_id,
+                user_text,
+                diagnostics=None,
+            )
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=str(
+                    exc
+                ),
+            ) from exc
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=502,
+                detail=str(
+                    exc
+                ),
+            ) from exc
+
+        trace_http = bool(
+            getattr(
+                gateway.config,
+                "trace_stages",
+                False,
+            )
+        )
+        stream = bool(
+            payload.get(
+                "stream",
+                False,
+            )
+        )
+        if trace_http:
+            print(
+                f"[cortex-gateway:{result.session_id}] "
+                f"ollama:ready ({len(result.content)} chars, stream={stream})",
+                flush=True,
+            )
+
+        if stream:
+            return StreamingResponse(
+                _ollama_stream_events(
+                    result,
+                    model=model_name,
+                    trace=trace_http,
+                ),
+                media_type=(
+                    "application/x-ndjson"
+                ),
+                headers={
+                    "Cache-Control": (
+                        "no-cache"
+                    ),
+                    "X-Accel-Buffering": (
+                        "no"
+                    ),
+                },
+            )
+
+        return JSONResponse(
+            _ollama_chat_payload(
+                model=model_name,
+                content=result.content,
+                done=True,
+            )
+        )
 
     @app.post("/v1/chat/completions")
     async def chat_completions(
