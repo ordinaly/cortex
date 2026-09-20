@@ -143,6 +143,33 @@ Across all 60 untouched official cases:
 
 See [SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md).
 
+### Noisy semantic confidence and revision
+
+The `noisy-semantic-revision-v1` campaign adds missing observations,
+stochastic neural label errors, corrupted structural facts, changing evidence
+reliability, intermittent contradiction, and simultaneous semantic regime
+changes.
+
+Across 60 untouched official cases:
+
+- raw neural top-label accuracy was **0.8061**;
+- Cortex top-label accuracy was **0.9639**;
+- neural/Cortex Brier scores were **0.3563 / 0.0689**;
+- trusted accepted-label accuracy was **0.9980** at **0.7807** coverage;
+- false certainty was **0.00195**;
+- **97.50%** of periods carrying a temporarily wrong old label were intercepted
+  as untrusted;
+- false pre-shift revision cases: **0**;
+- shift and recovery success: **1.000 / 1.000**;
+- p95 shift and recovery latency: **7 / 7 epochs**;
+- unaffected-concept preservation: **1.000**.
+
+A key distinction is now explicit: Cortex may retain an accepted semantic label
+in memory while suspending trust in it before enough evidence exists to revise
+the label itself.
+
+See [NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
