@@ -25,6 +25,8 @@ HEADING_LATEX_RE = re.compile(
     r"(?:\$|\\[A-Za-z]+|\\[()\[\]]|_\{|\^\{)"
 )
 LEGACY_INLINE_MATH_RE = re.compile(r"\\[()\[\]]")
+INLINE_MATH_SPAN_RE = re.compile(r"(?<!\\)\$[^$\n]+?(?<!\\)\$")
+TEX_COMMAND_RE = re.compile(r"\\[A-Za-z]+")
 
 
 def rel(path: Path) -> str:
@@ -157,10 +159,19 @@ def check_file(path: Path) -> list[str]:
             math_open = not math_open
             if math_open:
                 math_start = lineno
-        elif not math_open and unescaped_dollar_count(line) % 2 != 0:
-            errors.append(
-                f"{name}:{lineno}: unbalanced inline $ delimiter"
-            )
+        elif not math_open:
+            if unescaped_dollar_count(line) % 2 != 0:
+                errors.append(
+                    f"{name}:{lineno}: unbalanced inline $ delimiter"
+                )
+
+            outside_math = INLINE_CODE_RE.sub("", line)
+            outside_math = INLINE_MATH_SPAN_RE.sub("", outside_math)
+            if TEX_COMMAND_RE.search(outside_math):
+                errors.append(
+                    f"{name}:{lineno}: raw TeX command outside a math span; "
+                    "wrap math in $...$ or use plain Unicode/text"
+                )
 
         if TABLE_LINE_RE.match(line):
             table_rows.append((lineno, unescaped_pipe_count(line)))
