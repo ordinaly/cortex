@@ -27,9 +27,10 @@ The tracks should remain distinct. A successful research prototype is not automa
   - structural analogy / isomorphism;
   - latent concept induction;
   - explicit proof dependency;
-  - planning / replanning.
+  - planning / replanning;
+  - open-world novelty attribution.
 
-The next independent Reasoning Map axis is **open-world novelty attribution**.
+The next integration milestone is **Novelty-Aware Replanning v1**.
 Concept-to-semantics integration is already complete; hierarchy/inheritance and
 temporal semantic lineage remain separate semantic follow-ups.
 
@@ -256,19 +257,54 @@ See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
 
 ---
 
-## A6. Open-world novelty attribution v1
+## A6. Open-world novelty attribution v1 — passed
 
-Present evidence that cannot be explained by the current ontology.
+The official campaign passed every frozen gate across **160** untouched cases.
 
-Cortex must distinguish among:
+Cortex now compares predictive-description explanations for surprising evidence
+across:
 
-- noise;
+- noise / no edit;
 - new instance;
 - new entity type;
 - new relation;
-- new regime.
+- new regime;
+- unresolved structural ambiguity.
 
-The key metric is not merely novelty detection but **novelty attribution**: what kind of model extension was required?
+Official results:
+
+- exact attribution accuracy: **1.000**;
+- resolved/unresolved correctness: **1.000**;
+- exact edit locality: **1.000**;
+- false persistent edit rate: **0.000**;
+- post-edit stability: **1.000**;
+- ambiguous instance-vs-type unresolved rate: **1.000**;
+- transient recovery/no-edit correctness: **1.000**.
+
+The nearest-known-type and global-reset baselines reached **0.375** and
+**0.125** exact attribution accuracy.
+
+See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
+
+---
+
+## A7. Novelty-Aware Replanning v1 — next integration milestone
+
+Connect the passed novelty-attribution and planning/replanning primitives.
+
+The core question is whether the **kind of attributed novelty** determines the
+scope of revision:
+
+- noise -> preserve plan and model;
+- new instance -> bind locally and preserve unaffected support;
+- new relation -> invalidate only relation-dependent support;
+- new entity type -> revise ontology-dependent support;
+- new regime -> reconsider transition assumptions more broadly;
+- unresolved -> avoid irreversible structural revision.
+
+Primary metrics should include attribution-to-repair consistency, invalidation
+locality, unnecessary-replan rate, optimal-cost agreement, unresolved safety,
+and search work relative to full restart.
 
 ---
 
