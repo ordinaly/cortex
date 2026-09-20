@@ -746,3 +746,143 @@ def action_sequence_cost(
     except (KeyError, ValueError):
         return None
     return replay.total_cost
+
+def repair_plan_from_index(
+    original_world: PlanningWorld,
+    updated_world: PlanningWorld,
+    original_plan: Plan,
+    impact_index: int,
+    *,
+    max_expansions: int = 50_000,
+) -> RepairResult:
+    """Repair from a declared dependency-impact point.
+
+    This variant is used when an external structural change does not alter an
+    action already present in the original plan, but does change the set of
+    alternatives available from a known trajectory point. The prefix before
+    impact_index must remain exactly valid. Cortex then searches for the
+    earliest old trajectory state that can be rejoined while preserving the
+    unchanged suffix. If no such rejoin exists, it falls back to a full replan.
+    """
+
+    if not plan_valid(
+        original_world,
+        original_plan,
+    ):
+        raise ValueError(
+            "original plan must be valid in original world"
+        )
+    if not (
+        0 <= impact_index
+        < len(original_plan.action_ids)
+    ):
+        raise ValueError(
+            "impact_index must identify an original action"
+        )
+
+    prefix_ids = original_plan.action_ids[
+        :impact_index
+    ]
+    try:
+        prefix = execute_actions(
+            updated_world,
+            prefix_ids,
+        )
+    except (KeyError, ValueError) as exc:
+        raise ValueError(
+            "declared unaffected prefix is not valid"
+        ) from exc
+
+    expected_prefix_states = original_plan.states[
+        : impact_index + 1
+    ]
+    if prefix.states != expected_prefix_states:
+        raise ValueError(
+            "declared unaffected prefix changed state"
+        )
+
+    prefix_state = original_plan.states[
+        impact_index
+    ]
+    local_expanded = 0
+
+    for rejoin_index in range(
+        impact_index + 1,
+        len(original_plan.states),
+    ):
+        if not _suffix_unchanged_and_valid(
+            original_world,
+            updated_world,
+            original_plan,
+            rejoin_index,
+        ):
+            continue
+
+        segment = uniform_cost_plan(
+            updated_world,
+            start_state=prefix_state,
+            target=original_plan.states[
+                rejoin_index
+            ],
+            exact_target=True,
+            max_expansions=max_expansions,
+        )
+        if segment is None:
+            continue
+        local_expanded += segment.expanded_states
+
+        candidate = _combine_repair(
+            updated_world,
+            original_plan,
+            impact_index=impact_index,
+            rejoin_index=rejoin_index,
+            repair_segment=segment,
+        )
+        if not plan_valid(
+            updated_world,
+            candidate,
+        ):
+            continue
+
+        return RepairResult(
+            mode="local-repair",
+            plan=candidate,
+            impact_index=impact_index,
+            rejoin_index=rejoin_index,
+            preserved_prefix_actions=impact_index,
+            preserved_suffix_actions=(
+                len(original_plan.action_ids)
+                - rejoin_index
+            ),
+            local_expanded_states=local_expanded,
+            fallback_expanded_states=0,
+        )
+
+    fallback = uniform_cost_plan(
+        updated_world,
+        max_expansions=max_expansions,
+    )
+    if fallback is None:
+        return RepairResult(
+            mode="infeasible",
+            plan=None,
+            impact_index=impact_index,
+            rejoin_index=None,
+            preserved_prefix_actions=0,
+            preserved_suffix_actions=0,
+            local_expanded_states=local_expanded,
+            fallback_expanded_states=0,
+        )
+
+    return RepairResult(
+        mode="full-replan",
+        plan=fallback,
+        impact_index=impact_index,
+        rejoin_index=None,
+        preserved_prefix_actions=0,
+        preserved_suffix_actions=0,
+        local_expanded_states=local_expanded,
+        fallback_expanded_states=(
+            fallback.expanded_states
+        ),
+    )
