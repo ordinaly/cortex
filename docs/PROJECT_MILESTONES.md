@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.17-R`;
+- predictive-geometry research frontier: `v1.18-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -345,33 +345,53 @@ See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTIO
 
 ---
 
-## B5. v1.18-R — exact kernel-ladder fast path
+## B5. v1.18-R — exact kernel-ladder fast path — rejected for performance
 
-For the canonical resolutions 0.03, 0.06, 0.12 and 0.25, the first three
-kernel exponents have exact scale ratios 16:4:1 relative to 0.12.
+The candidate retained strict numerical and structural behavior, including zero
+underflow-pattern mismatches, but the untouched official speedups did not meet
+the frozen performance gates.
 
-Test an exact-or-near-machine-parity ladder:
+At 288 anchors:
 
-```math
-K_{0.06}=K_{0.12}^{4},
-\qquad
-K_{0.03}=K_{0.12}^{16},
-```
+- kernel speedup: **1.115×** (gate >= 1.40×);
+- refresh speedup: **1.017×** (gate >= 1.10×);
+- fused speedup: **0.998×** (gate >= 1.02×);
+- maximum kernel error: **1.89e-15**;
+- structural disagreements: **0**.
 
-while keeping the 0.25 kernel independently exponentiated.
+The development timing overestimated the end-to-end benefit, so the candidate
+is not promoted.
 
-Required safeguards:
-
-- direct-kernel oracle retained;
-- strict kernel and prediction differential parity;
-- explicit underflow comparison;
-- zero structural disagreements;
-- focused kernel-regeneration timing and full fused-step timing;
-- no acceptance if numerical drift exceeds the frozen tolerances.
+See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
 
 ---
 
-## B6. Freeze the next executable research specification
+## B6. v1.19-R — low-overhead fused-stage crossover profile
+
+Run a wider-seed stage profile with coarse timers on the current optimized
+research implementation.
+
+Required stages:
+
+- cache refresh;
+- candidate readout;
+- local readout;
+- hysteresis/state scan;
+- complexity refresh;
+- tracker and field updates;
+- perceptual computation and unattributed remainder.
+
+The goal is to determine whether cache refresh is still the real end-to-end
+bottleneck after v1.16, or whether candidate readout should become the next
+optimization target.
+
+Do not choose another cache micro-optimization from fine-grained internal
+timings alone.
+
+---
+
+## B7. Freeze the next executable research specification
+
 
 
 Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying `spec-v0.9.5`.
@@ -389,7 +409,7 @@ This is the boundary between successful research and promotable architecture.
 
 ---
 
-## B7. Promote accepted mechanisms to Rust
+## B8. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
