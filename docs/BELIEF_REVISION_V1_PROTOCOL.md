@@ -17,7 +17,7 @@ contradicts it, without either:
 
 The desired trajectory is:
 
-$$
+```math
 \text{active}
 \rightarrow
 \text{unresolved}
@@ -27,7 +27,7 @@ $$
 \text{unresolved}
 \rightarrow
 \text{recovered}.
-$$
+```
 
 The benchmark also asks whether unrelated structure remains exactly unchanged.
 
@@ -69,33 +69,33 @@ Every world has 8 anonymously relabeled nodes.
 
 The distinguished causal chain is:
 
-$$
+```math
 A\rightarrow B\rightarrow C.
-$$
+```
 
 The revised belief is the edge:
 
-$$
+```math
 A\rightarrow B.
-$$
+```
 
 The downstream edge $B\rightarrow C$ remains stable throughout the campaign.
 
 Two additional stable causal edges are included as unrelated structure:
 
-$$
+```math
 D\rightarrow E,
 \qquad
 F\rightarrow G.
-$$
+```
 
 All other ordered pairs are initialized as resolved null.
 
 This means the query
 
-$$
+```math
 A\leadsto C
-$$
+```
 
 tracks the reasoning consequence of revising only $A\rightarrow B$.
 
@@ -105,13 +105,13 @@ The benchmark uses three prior-strength conditions.
 
 One **causal support batch** contains:
 
-$$
+```math
 n_{do}^{+}=18,\quad n_{do}^{-}=2,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
-$$
+```
 
 The target belief receives:
 
@@ -127,13 +127,13 @@ Stronger priors should require more contradictory evidence to retract.
 
 One strong contradictory batch is a null-effect batch:
 
-$$
+```math
 n_{do}^{+}=2,\quad n_{do}^{-}=18,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
-$$
+```
 
 Batches are added sequentially to the same cumulative target cell.
 
@@ -161,13 +161,13 @@ used as an overreaction control.
 
 A separate fresh copy receives 20 weaker contradictory batches:
 
-$$
+```math
 n_{do}^{+}=4,\quad n_{do}^{-}=16,
-$$
+```
 
-$$
+```math
 n_{ctrl}^{+}=2,\quad n_{ctrl}^{-}=18.
-$$
+```
 
 This evidence weakens the original causal effect but does not itself establish
 a clean null regime.
@@ -199,35 +199,35 @@ Therefore the expected query progression is:
 
 ### Initial active belief
 
-$$
+```math
 A\leadsto C
 =
 \text{affected}.
-$$
+```
 
 ### Target unresolved
 
-$$
+```math
 A\leadsto C
 =
 \text{unresolved}.
-$$
+```
 
 ### Target retracted / null
 
-$$
+```math
 A\leadsto C
 =
 \text{unaffected}.
-$$
+```
 
 ### Target recovered
 
-$$
+```math
 A\leadsto C
 =
 \text{affected}.
-$$
+```
 
 This links local belief revision to reasoning consequences rather than scoring
 the evidence cell in isolation.
@@ -248,23 +248,23 @@ Cumulative evidence should create rational inertia.
 
 The frozen qualitative hypotheses are:
 
-$$
+```math
 L_{retract}(prior\text{-}1)
 <
 L_{retract}(prior\text{-}2)
 <
 L_{retract}(prior\text{-}3),
-$$
+```
 
 and
 
-$$
+```math
 L_{recover}(prior\text{-}1)
 <
 L_{recover}(prior\text{-}2)
 <
 L_{recover}(prior\text{-}3).
-$$
+```
 
 The benchmark does not hard-code the exact expected batch counts into the
 official gate; it tests the ordering plus maximum latency bounds.
@@ -310,15 +310,15 @@ Development/preflight uses seeds below 100.
 
 The untouched official campaign uses:
 
-$$
+```math
 200,\ldots,219.
-$$
+```
 
 There are:
 
-$$
+```math
 20\text{ seeds}\times 3\text{ prior strengths}=60
-$$
+```
 
 official revision cases.
 
