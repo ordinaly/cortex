@@ -142,6 +142,20 @@ unnamed concept remained unresolved at **0.3333** support, and semantic lineage
 through concept split, merge, and retraction was exact. See
 [docs/CONCEPT_SEMANTIC_INTEGRATION_V1.md](docs/CONCEPT_SEMANTIC_INTEGRATION_V1.md).
 
+
+The fifth Reasoning Map campaign, **explicit-proof-dependency-v1**, moves from
+carrying one valid reasoning path to maintaining explicit finite proof
+alternatives with transitive fact/rule dependencies. Across **120 untouched
+official cases**, every frozen gate passed: redundant support survived removal
+of one proof, a longer proof took over when the shortest derivation was broken,
+shared hidden premises invalidated all dependent branches, simultaneous
+positive/negative proofs remained unresolved, nested invalidation stayed local,
+and unrelated premise removal left the target explanation unchanged. A
+single-proof baseline failed every alternate-support case. See
+[docs/PROOF_DEPENDENCY_V1.md](docs/PROOF_DEPENDENCY_V1.md).
+
+The next independent Reasoning Map axis is **planning / replanning v1**.
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
