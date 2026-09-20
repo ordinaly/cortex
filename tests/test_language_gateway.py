@@ -6,6 +6,10 @@ from typing import Any, Mapping, Sequence
 import pytest
 
 import cortex.language_gateway as gateway_module
+from cortex import (
+    CortexRuntime as NativeCortexRuntime,
+    NATIVE_AVAILABLE,
+)
 from cortex.gateway_server import _bool_value, _last_user_text
 from cortex.language_gateway import (
     CortexLanguageGateway,
@@ -366,6 +370,50 @@ def test_persistent_session_restores_without_reextracting_or_reembedding(tmp_pat
         relation.packet()
         for relation in restored.relations.values()
     ] == first_relation_packets
+
+
+def test_native_runtime_snapshot_is_exact_after_event_replay(tmp_path, monkeypatch):
+    if not NATIVE_AVAILABLE:
+        pytest.skip(
+            "native extension is not built in this test environment"
+        )
+
+    monkeypatch.setattr(
+        gateway_module,
+        "CortexRuntime",
+        NativeCortexRuntime,
+    )
+    client = FakeClient()
+    gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+
+    gateway.chat(
+        "native-replay",
+        "Alice knows Bob.",
+    )
+    gateway.chat(
+        "native-replay",
+        "Alice is still here.",
+    )
+    original = gateway.session(
+        "native-replay"
+    )
+    assert original.runtime is not None
+    before = original.runtime.snapshot_json()
+
+    restored_gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+    restored = restored_gateway.session(
+        "native-replay"
+    )
+    assert restored.runtime is not None
+    after = restored.runtime.snapshot_json()
+
+    assert after == before
 
 
 def test_persistence_uses_saved_vectors_not_embedding_model_on_restore(tmp_path):
