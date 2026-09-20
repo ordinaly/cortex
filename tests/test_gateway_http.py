@@ -38,7 +38,38 @@ class DummyGateway:
             session_id=session_id,
             model="cortex",
             content="Hello from Cortex.",
-            cortex_context={},
+            cortex_context={
+                "diagnosis": {
+                    "status": "neural_prior",
+                    "reasoning_mode": "pretrained_knowledge",
+                    "summary": (
+                        "The neural model supplied the answer; "
+                        "Cortex found no conflicting stored evidence."
+                    ),
+                    "neural_claims": [
+                        {
+                            "status": "neural_prior",
+                        }
+                    ],
+                    "cortex_claims": [],
+                    "accepted_user_observations": 0,
+                    "memory_changed": False,
+                    "analysis_errors": [],
+                    "runtime": {
+                        "unresolved": False,
+                        "revision": False,
+                        "reactivated": False,
+                        "discovered": False,
+                        "budget_pressure": False,
+                        "stored": 1,
+                    },
+                    "timings": {
+                        "knowledge": 0.25,
+                        "cortex_prompt": 0.05,
+                        "candidate": 0.10,
+                    },
+                }
+            },
             diagnostics=None,
         )
 
@@ -525,9 +556,61 @@ def test_ollama_chat_stream_matches_alpaca_ollama_0_6_1(client):
         chunks[-1].done_reason
         == "stop"
     )
+    thinking = "".join(
+        chunk.message.thinking
+        or ""
+        for chunk in chunks
+    )
+    assert (
+        "Cortex diagnosis"
+        in thinking
+    )
+    assert (
+        "Reasoning mode: pretrained_knowledge"
+        in thinking
+    )
+    assert (
+        chunks[-1].total_duration
+        == 400_000_000
+    )
     assert gateway.calls[-1][
         "user_text"
     ] == "Hello Cortex"
+
+
+def test_ollama_non_streaming_exposes_cortex_thinking_and_timing(client):
+    http, _gateway = client
+    ollama = pytest.importorskip("ollama")
+
+    response = http.post(
+        "/api/chat",
+        json={
+            "model": "cortex",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Hello Cortex",
+                }
+            ],
+            "stream": False,
+        },
+    )
+
+    assert response.status_code == 200
+    parsed = ollama.ChatResponse.model_validate(
+        response.json()
+    )
+    assert (
+        "Cortex diagnosis"
+        in (
+            parsed.message.thinking
+            or ""
+        )
+    )
+    assert (
+        parsed.total_duration
+        == 400_000_000
+    )
 
 
 def test_ollama_alpaca_title_request_bypasses_cortex(client):
