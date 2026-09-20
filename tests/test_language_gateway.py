@@ -523,18 +523,6 @@ def test_parser_rejects_unanchored_extractor_hallucination():
         )
 
 
-@pytest.mark.parametrize(
-    ("raw", "expected"),
-    [
-        ("true", True),
-        ("on", True),
-        ("1", True),
-        ("false", False),
-        ("off", False),
-        ("0", False),
-        (None, None),
-    ],
-)
 def test_ollama_client_normalizes_host_without_scheme():
     client = OllamaClient(
         "127.0.0.1:11434"
@@ -587,6 +575,18 @@ def test_failed_answer_still_persists_accepted_observation(tmp_path):
     assert len(restored.entities) == 1
 
 
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("true", True),
+        ("on", True),
+        ("1", True),
+        ("false", False),
+        ("off", False),
+        ("0", False),
+        (None, None),
+    ],
+)
 def test_gateway_boolean_parser(raw, expected):
     assert _bool_value(raw) is expected
 
