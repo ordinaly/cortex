@@ -106,7 +106,7 @@ Z_{\mathrm{new}}\text{ exists}
 while simultaneously representing:
 
 ```math
-\operatorname{label}(Z_{\mathrm{new}})
+\mathrm{label}(Z_{\mathrm{new}})
 =
 \texttt{unresolved}.
 ```
