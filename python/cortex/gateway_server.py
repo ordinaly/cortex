@@ -16,7 +16,7 @@ import os
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
-from time import time
+from time import sleep, time
 from typing import Any
 
 from .language_gateway import (
@@ -528,18 +528,21 @@ def _ollama_stream_events(
     model: str,
     trace: bool = False,
 ):
-    content = _ollama_visible_content(result)
-    thinking = _cortex_thinking_text(result)
-    metrics = _ollama_timing_metadata(result)
-    chunk_size = 64
+    content = _ollama_visible_content(
+        result
+    )
+    thinking = _cortex_thinking_text(
+        result
+    )
+    metrics = _ollama_timing_metadata(
+        result
+    )
     emitted_content = 0
     emitted_thinking = 0
 
     if thinking:
-        # Alpaca schedules Thinking-block insertion through GLib.idle_add.
-        # Multiple rapid thinking chunks can therefore each create a new
-        # block before the previous one becomes attached. Emit the Cortex
-        # diagnosis atomically as one thinking event.
+        # Alpaca schedules Thought-block insertion through GLib.idle_add.
+        # Emit the diagnosis atomically so only one Thought attachment is made.
         emitted_thinking = 1
         yield (
             json.dumps(
@@ -555,13 +558,19 @@ def _ollama_stream_events(
             + "\n"
         )
 
-    for offset in range(0, len(content), chunk_size):
-        emitted_content += 1
+    if content:
+        # Cortex has already computed the complete answer before transport
+        # streaming begins. Alpaca queues message text with GLib.idle_add(),
+        # then reads the buffer synchronously in finish_generation(). Sending
+        # many rapid artificial chunks followed immediately by done can race
+        # that GTK queue and produce an empty visible message. Emit the final
+        # answer atomically and leave a short UI flush window before done.
+        emitted_content = 1
         yield (
             json.dumps(
                 _ollama_chat_payload(
                     model=model,
-                    content=content[offset : offset + chunk_size],
+                    content=content,
                     done=False,
                 ),
                 ensure_ascii=False,
@@ -569,6 +578,10 @@ def _ollama_stream_events(
             )
             + "\n"
         )
+
+        # Temporary Alpaca compatibility shim. This is transport pacing, not
+        # model latency and not part of Cortex cognition.
+        sleep(0.075)
 
     yield (
         json.dumps(
@@ -593,6 +606,7 @@ def _ollama_stream_events(
             f"{emitted_thinking} diagnosis chunks)",
             flush=True,
         )
+
 
 def create_app(
     gateway: Any,
