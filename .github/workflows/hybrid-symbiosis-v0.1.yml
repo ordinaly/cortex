@@ -1,0 +1,48 @@
+name: cortex-hybrid-symbiosis-v0.1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "python/cortex/hybrid_core.py"
+      - "python/cortex/hybrid_core_gateway.py"
+      - "python/cortex/neural_runtime.py"
+      - "python/cortex/hybrid_language_gateway.py"
+      - "python/cortex/strict_language_gateway.py"
+      - "research/hybrid_symbiosis.py"
+      - "research/hybrid_symbiosis_campaign.py"
+      - "research/hybrid_symbiosis_gate.py"
+      - ".github/workflows/hybrid-symbiosis-v0.1.yml"
+
+jobs:
+  hybrid-symbiosis:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: "python:research"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - name: Compile campaign
+        run: >-
+          python -m py_compile
+          research/hybrid_symbiosis.py
+          research/hybrid_symbiosis_campaign.py
+          research/hybrid_symbiosis_gate.py
+      - name: Run Hybrid Symbiosis campaign
+        run: >-
+          python research/hybrid_symbiosis_campaign.py
+          --seeds 10
+          --output hybrid-symbiosis-v0.1.jsonl
+      - name: Enforce Hybrid Symbiosis gates
+        run: >-
+          python research/hybrid_symbiosis_gate.py
+          hybrid-symbiosis-v0.1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-hybrid-symbiosis-v0.1
+          path: hybrid-symbiosis-v0.1.jsonl
