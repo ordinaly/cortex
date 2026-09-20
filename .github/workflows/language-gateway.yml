@@ -7,9 +7,11 @@ on:
       - "python/cortex/gateway_server.py"
       - "python/cortex/strict_language_gateway.py"
       - "python/cortex/hybrid_language_gateway.py"
+      - "python/cortex/cognitive_orchestrator.py"
       - "tests/test_language_gateway.py"
       - "tests/test_strict_language_gateway.py"
       - "tests/test_hybrid_language_gateway.py"
+      - "tests/test_cognitive_orchestrator.py"
       - "tests/test_gateway_http.py"
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md"
       - "docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md"
@@ -30,8 +32,8 @@ jobs:
         with:
           python-version: "3.13"
       - run: python -m pip install --upgrade pip pytest fastapi uvicorn httpx "openai==1.84.0" "ollama==0.6.1"
-      - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/hybrid_language_gateway.py python/cortex/gateway_server.py
-      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py tests/test_hybrid_language_gateway.py tests/test_gateway_http.py -q
+      - run: python -m py_compile python/cortex/language_gateway.py python/cortex/strict_language_gateway.py python/cortex/hybrid_language_gateway.py python/cortex/cognitive_orchestrator.py python/cortex/gateway_server.py
+      - run: pytest tests/test_language_gateway.py tests/test_strict_language_gateway.py tests/test_hybrid_language_gateway.py tests/test_cognitive_orchestrator.py tests/test_gateway_http.py -q
       - name: Import HTTP app surfaces
         run: |
           python - <<'PY'
