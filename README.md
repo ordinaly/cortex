@@ -16,9 +16,9 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.20-R** |
+| research frontier | **v1.21-R** |
 
-The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.20-R research frontier**.
+The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.21-R research frontier**.
 
 For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
@@ -67,7 +67,7 @@ Versioning and validation conventions are documented in
 [docs/VERSIONING.md](docs/VERSIONING.md). Historical implementation and
 performance reports remain available under `docs/`.
 
-## Research frontier — v1.20-R
+## Research frontier — v1.21-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -87,13 +87,13 @@ The progression has established:
 
 Recent engineering work has focused on making the adaptive predictive-geometry path cheaper without changing its behavior. The important current results are:
 
-- v1.19-R used low-overhead independent replay profiling and confirmed that cache refresh was the largest coarse Python/NumPy stage at **37.22%** of the 288-anchor fused step, ahead of candidate readout (**21.80%**), hysteresis/state scan (**17.60%**), and complexity refresh (**13.41%**);
-- v1.20-R introduced **lazy distance materialization**: the hot path keeps squared semantic geometry and predictive kernels current, while the ordinary distance matrix is reconstructed only when explicitly requested;
-- on untouched official v1.20-R cases at 288 anchors, refresh became **1.132× faster** and the complete fused step **1.025× faster**, with **zero numerical or structural discrepancy** and exact distance reconstruction on demand.
+- v1.19-R used low-overhead independent replay profiling and measured cache refresh at **37.22%** of the 288-anchor fused step;
+- v1.20-R introduced **lazy distance materialization**, improving 288-anchor refresh by **1.132×** and the complete fused step by **1.025×** with zero numerical or structural discrepancy;
+- v1.21-R repeated the same low-overhead profile after that promotion. Cache refresh remains the largest coarse stage at **35.55%**, followed by candidate readout (**21.21%**), hysteresis/state scan (**19.09%**), and complexity refresh (**13.94%**).
 
-The lazy cache is now the default research fused-cache path. The next engineering milestone is **v1.21-R post-lazy low-overhead stage profiling**, which will re-measure the new top-level cost structure before another optimization is selected.
+The next engineering milestone is **v1.22-R single-buffer kernel refresh / allocation elision**. It will test whether the current `resolutions × dirty_rows × anchors` temporary can be replaced by a reusable two-dimensional buffer, with promotion contingent on an actual paired fused-step gain.
 
-See [docs/LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](docs/LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md) and [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md) for the detailed engineering history, including retained negative results.
+See [docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](docs/POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md) and [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md) for the detailed engineering history, including retained negative results.
 
 ## Relational reasoning
 
