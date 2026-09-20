@@ -154,8 +154,13 @@ Rules:
 - For relation_lookup, use query_subject as the source entity. If the user asks
   for an unknown object (for example "What is X's capital?"), leave
   query_object empty.
-- Use introspection only when the user explicitly asks about Cortex's internal
-  state, uncertainty, memory pressure, diagnosis, or why Cortex revised.
+- Use introspection when the user explicitly asks Cortex about itself, its
+  current knowledge/memory, internal state, uncertainty, memory pressure,
+  diagnosis, or why Cortex revised.
+- "Cortex" used as direct address or self-reference is not an external entity.
+  For self/introspection requests, leave query_subject and query_object empty.
+- Examples such as "Hello Cortex. What do you know?" or "What are you
+  uncertain about?" are introspection requests with no entity reference.
 - Respond exactly to the supplied JSON schema."""
 
 
@@ -953,22 +958,6 @@ def parse_prompt_ir_payload(
             "",
         )
     ).strip()
-    query_subject = (
-        _resolve_prompt_entity_ref(
-            raw_query_subject,
-            entities,
-        )
-        if raw_query_subject
-        else ""
-    )
-    query_object = (
-        _resolve_prompt_entity_ref(
-            raw_query_object,
-            entities,
-        )
-        if raw_query_object
-        else ""
-    )
     query_predicate = (
         _normalized_predicate(
             str(
@@ -979,6 +968,47 @@ def parse_prompt_ir_payload(
             )
         )
     )
+
+    self_subject = (
+        _normalized_text(
+            raw_query_subject
+        )
+        in {
+            "cortex",
+            "you",
+            "yourself",
+        }
+    )
+
+    # Self-directed recall is introspection, not lookup of an external entity.
+    if (
+        operation
+        == "entity_recall"
+        and self_subject
+    ):
+        operation = "introspection"
+
+    if operation == "introspection":
+        query_subject = ""
+        query_object = ""
+    else:
+        query_subject = (
+            _resolve_prompt_entity_ref(
+                raw_query_subject,
+                entities,
+            )
+            if raw_query_subject
+            else ""
+        )
+        query_object = (
+            _resolve_prompt_entity_ref(
+                raw_query_object,
+                entities,
+            )
+            if raw_query_object
+            else ""
+        )
+
     if (
         operation
         == "relation_lookup"
@@ -1930,21 +1960,67 @@ class StrictCortexChatSession:
             prompt_ir.query_operation
             == "introspection"
         ):
+            claims = tuple(
+                AnswerClaim(
+                    claim_id=(
+                        f"claim:{index}"
+                    ),
+                    subject=(
+                        self._entity_name(
+                            relation.source_id
+                        )
+                    ),
+                    predicate=(
+                        relation.predicate
+                    ),
+                    object=(
+                        self._entity_name(
+                            relation.target_id
+                        )
+                    ),
+                    truth=(
+                        "supported"
+                        if relation.asserted
+                        else "refuted"
+                    ),
+                    evidence=(
+                        relation.evidence,
+                    ),
+                )
+                for index, relation
+                in enumerate(
+                    sorted(
+                        self.relations.values(),
+                        key=lambda item: (
+                            item.source_id,
+                            item.target_id,
+                            item.predicate,
+                        ),
+                    )
+                )
+            )
             return CortexAnswerIR(
                 status=(
                     "diagnostic"
                     if diagnostic
                     is not None
-                    else "unknown"
+                    else (
+                        "resolved"
+                        if claims
+                        else "unknown"
+                    )
                 ),
                 language=(
                     prompt_ir.language
                 ),
-                claims=tuple(),
+                claims=claims,
                 unknown_count=(
                     0
-                    if diagnostic
-                    is not None
+                    if (
+                        claims
+                        or diagnostic
+                        is not None
+                    )
                     else 1
                 ),
                 accepted_observations=len(
