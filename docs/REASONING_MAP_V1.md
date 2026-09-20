@@ -50,7 +50,7 @@ $$
 \text{latent abstraction},
 \quad
 \text{proof dependency}.
-$
+$$
 
 Each benchmark should isolate one or two primitives before later campaigns
 combine them.
