@@ -16,8 +16,8 @@ $$
 R \times D \times A,
 $$
 
-where \(R\) is the number of candidate resolutions, \(D\) the dirty-row count,
-and \(A\) the anchor count.
+where $R$ is the number of candidate resolutions, $D$ the dirty-row count,
+and $A$ the anchor count.
 
 The v1.22-R candidate tests whether that temporary can be removed without
 changing numerical or structural behavior.
