@@ -556,10 +556,17 @@ def test_ollama_chat_stream_matches_alpaca_ollama_0_6_1(client):
         chunks[-1].done_reason
         == "stop"
     )
-    thinking = "".join(
+    thinking_chunks = [
         chunk.message.thinking
-        or ""
         for chunk in chunks
+        if chunk.message.thinking
+    ]
+    assert len(
+        thinking_chunks
+    ) == 1
+
+    thinking = "".join(
+        thinking_chunks
     )
     assert (
         "Cortex diagnosis"
