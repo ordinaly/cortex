@@ -349,13 +349,17 @@ class KernelLadderSemanticGeometryPredictiveCache(
     exponentiated once, while 0.06 and 0.03 are derived by repeated squaring.
     The 0.25 kernel remains independently exponentiated.
 
-    Non-canonical resolution sets fall back to the parent implementation.
+    Non-canonical resolution sets and anchor banks below 192 anchors fall back
+    to the parent implementation. The scale gate is a development-stage result:
+    repeated-squaring overhead dominated at 72 and 144 anchors, while the
+    ladder became beneficial at 288 anchors.
     """
 
     _canonical_resolutions = np.asarray(
         (0.03, 0.06, 0.12, 0.25),
         dtype=float,
     )
+    _minimum_ladder_anchors = 192
 
     def _uses_canonical_ladder(self) -> bool:
         values = np.asarray(
@@ -376,7 +380,10 @@ class KernelLadderSemanticGeometryPredictiveCache(
         self,
         distance_squared: np.ndarray,
     ) -> np.ndarray:
-        if not self._uses_canonical_ladder():
+        if (
+            not self._uses_canonical_ladder()
+            or len(self.features) < self._minimum_ladder_anchors
+        ):
             return super()._kernel_rows_from_squared(
                 distance_squared
             )
