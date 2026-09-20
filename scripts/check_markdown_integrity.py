@@ -19,6 +19,9 @@ SINGLE_DOLLAR_RE = re.compile(r"^\s*\$\s*$")
 LEGACY_DISPLAY_RE = re.compile(r"^\s*\\[\[\]]\s*$")
 LITERAL_BRACKET_RE = re.compile(r"^\s*[\[\]]\s*$")
 TABLE_LINE_RE = re.compile(r"^\s*\|.*\|\s*$")
+HEADING_RE = re.compile(r"^\\s*#{1,6}\\s+(.+?)\\s*$")
+INLINE_CODE_RE = re.compile(r"`[^`]*`")
+HEADING_LATEX_RE = re.compile(r"(?:\\$|\\\\[A-Za-z]+|_\\{|\\^\\{)")
 
 
 def rel(path: Path) -> str:
