@@ -1,0 +1,46 @@
+name: cortex-hybrid-orchestration-ablation-v0.1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "python/cortex/hybrid_core.py"
+      - "python/cortex/hybrid_exchange.py"
+      - "python/cortex/neural_runtime.py"
+      - "research/hybrid_symbiosis.py"
+      - "research/hybrid_orchestration_ablation.py"
+      - "research/hybrid_orchestration_ablation_gate.py"
+      - ".github/workflows/hybrid-orchestration-ablation-v0.1.yml"
+
+jobs:
+  orchestration-ablation:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: "python:research"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - name: Compile ablation
+        run: >-
+          python -m py_compile
+          research/hybrid_symbiosis.py
+          research/hybrid_orchestration_ablation.py
+          research/hybrid_orchestration_ablation_gate.py
+      - name: Run orchestration ablation
+        run: >-
+          python research/hybrid_orchestration_ablation.py
+          --seeds 10
+          --output hybrid-orchestration-ablation-v0.1.jsonl
+      - name: Enforce orchestration gates
+        run: >-
+          python research/hybrid_orchestration_ablation_gate.py
+          hybrid-orchestration-ablation-v0.1.jsonl
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-hybrid-orchestration-ablation-v0.1
+          path: hybrid-orchestration-ablation-v0.1.jsonl
