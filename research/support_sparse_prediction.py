@@ -612,7 +612,7 @@ class FusedSupportSparseLocalResolutionController(
                 "retained_mass must be in (0, 1]"
             )
         self.retained_mass = float(retained_mass)
-        self.cache = ExactSemanticGeometryPredictiveCache(
+        self.cache = LazyDistanceSemanticGeometryPredictiveCache(
             field,
             resolutions=self.resolutions,
             feature_tolerance=feature_tolerance,
