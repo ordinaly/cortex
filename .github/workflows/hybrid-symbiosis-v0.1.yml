@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - "python/cortex/hybrid_core.py"
+      - "python/cortex/hybrid_exchange.py"
       - "python/cortex/hybrid_core_gateway.py"
       - "python/cortex/neural_runtime.py"
       - "python/cortex/hybrid_language_gateway.py"
