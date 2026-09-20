@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import argparse
 import os
-from dataclasses import replace
+from pathlib import Path
 from typing import Any
 
 from .language_gateway import (
@@ -154,6 +154,72 @@ def create_app(
             openai_chat_completion(result)
         )
 
+    @app.get("/cortex/sessions")
+    def list_sessions() -> dict[str, Any]:
+        return {
+            "active": sorted(
+                gateway.sessions
+            ),
+            "persisted": (
+                gateway.list_persisted_sessions()
+            ),
+        }
+
+    @app.post(
+        "/cortex/sessions/{session_id}/save"
+    )
+    def save_session(
+        session_id: str,
+    ) -> dict[str, Any]:
+        try:
+            path = gateway.save(
+                session_id
+            )
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=409,
+                detail=str(exc),
+            ) from exc
+        return {
+            "session_id": session_id,
+            "saved": True,
+            "path": path,
+        }
+
+    @app.post(
+        "/cortex/sessions/{session_id}/load"
+    )
+    def load_session(
+        session_id: str,
+    ) -> dict[str, Any]:
+        try:
+            session = gateway.load(
+                session_id
+            )
+        except FileNotFoundError as exc:
+            raise HTTPException(
+                status_code=404,
+                detail=str(exc),
+            ) from exc
+        except (
+            RuntimeError,
+            ValueError,
+        ) as exc:
+            raise HTTPException(
+                status_code=409,
+                detail=str(exc),
+            ) from exc
+        return {
+            "session_id": session_id,
+            "loaded": True,
+            "history_messages": len(
+                session.history
+            ),
+            "frames": len(
+                session.frames
+            ),
+        }
+
     @app.get("/cortex/sessions/{session_id}")
     def session_state(
         session_id: str,
@@ -234,6 +300,7 @@ def build_gateway_from_env(
     embedding_model: str | None = None,
     ollama_url: str | None = None,
     diagnostics_default: bool | None = None,
+    persistence_dir: str | None = None,
 ) -> CortexLanguageGateway:
     model = (
         chat_model
@@ -260,12 +327,35 @@ def build_gateway_from_env(
             )
         )
     )
+    state_dir = (
+        persistence_dir
+        if persistence_dir is not None
+        else os.environ.get(
+            "CORTEX_STATE_DIR",
+            str(
+                Path.home()
+                / ".cortex"
+                / "gateway"
+            ),
+        )
+    )
+    state_dir = (
+        state_dir.strip()
+        if isinstance(
+            state_dir,
+            str,
+        )
+        else state_dir
+    )
     config = GatewayConfig(
         chat_model=model,
         embedding_model=embed,
         ollama_url=url,
         diagnostics_default=bool(
             default_diag
+        ),
+        persistence_dir=(
+            state_dir or None
         ),
     )
     return CortexLanguageGateway(config)
@@ -300,6 +390,19 @@ def main() -> None:
         "--diagnostics",
         action="store_true",
     )
+    parser.add_argument(
+        "--state-dir",
+        default=None,
+        help=(
+            "Directory for persistent Cortex sessions "
+            "(default: CORTEX_STATE_DIR or ~/.cortex/gateway)."
+        ),
+    )
+    parser.add_argument(
+        "--no-persistence",
+        action="store_true",
+        help="Disable gateway session persistence.",
+    )
     args = parser.parse_args()
 
     try:
@@ -314,6 +417,11 @@ def main() -> None:
         embedding_model=args.embedding_model,
         ollama_url=args.ollama_url,
         diagnostics_default=args.diagnostics,
+        persistence_dir=(
+            ""
+            if args.no_persistence
+            else args.state_dir
+        ),
     )
     app = create_app(gateway)
     uvicorn.run(
