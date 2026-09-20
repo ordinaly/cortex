@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.18-R`
+> **Research frontier:** `v1.19-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.18-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.19-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.18-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.19-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -96,7 +96,7 @@ flowchart LR
 
 The current `spec-v0.9.5` is immutable. Research does not silently mutate it.
 
-The current predictive-geometry engineering frontier is **v1.16-R**.
+The current predictive-geometry engineering frontier is **v1.19-R**.
 
 v1.15-R first decomposed cache refresh and found that, at 288 anchors,
 distance-row recomputation plus kernel regeneration accounted for about
@@ -142,10 +142,26 @@ fused step **0.998×**, all below frozen performance gates.
 
 This discrepancy between fine-grained internal attribution and coarse
 end-to-end timing indicates a non-negligible observer effect from the internal
-profiler. The next engineering action is therefore a v1.19-R low-overhead
-fused-stage crossover profile before any further cache micro-optimization.
+profiler.
 
-See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
+v1.19-R therefore measured each top-level stage in an independent fresh replay,
+with only one stage timed per replay. The untouched official result reproduced
+development. At 288 anchors:
+
+- cache refresh: **37.22%**;
+- candidate readout: **21.80%**;
+- hysteresis/state scan: **17.60%**;
+- complexity refresh: **13.41%**;
+- prediction-checksum discrepancy: **0**.
+
+Cache refresh is thus confirmed as the largest coarse Python/NumPy stage.
+Dependency inspection shows that the hot predictive path consumes cached
+kernels directly; it does not require the full cached distance matrix each
+step. The next engineering candidate is therefore v1.20-R lazy distance
+materialization: defer symmetric distance-cache writes until the distance view
+is explicitly requested, while keeping kernels and public diagnostics exact.
+
+See [LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
 
 ---
 
