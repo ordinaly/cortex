@@ -56,8 +56,8 @@ A fork remains possible later if Cortex needs hooks inside generation itself.
 For each new user message:
 
 1. Ollama receives a constrained semantic-extraction request.
-2. The extraction contains only entities and explicit relations from the
-   current user message.
+2. Every extracted entity/relation must include a verbatim evidence snippet
+   anchored in the current user message; unanchored items are rejected.
 3. Entity descriptions are embedded through Ollama's embedding endpoint.
 4. The embedding vectors become Cortex detections.
 5. Extracted relations become Cortex relation observations for the current
@@ -216,6 +216,7 @@ of:
 
 - persistent Cortex entity IDs;
 - observed names/kinds/descriptions;
+- user-message evidence snippets and extraction provenance;
 - persistent labeled relations from the semantic gateway;
 - current prediction;
 - unresolved/revision/reactivation/discovery signals;
@@ -271,10 +272,16 @@ The prototype currently does **not** provide:
   conversations;
 - compound multimodal observations.
 
-The extraction model is explicitly instructed not to infer unstated facts, but
-v0.1 still relies on LLM extraction quality. Provenance/confidence hardening is
-therefore a required follow-up before treating conversational memory as
-high-trust long-term knowledge.
+The extraction model is explicitly instructed not to infer unstated facts.
+Every extracted entity and relation must also carry a verbatim evidence snippet
+that the gateway verifies against the current user message before updating
+Cortex. This provides a first provenance barrier against extractor
+hallucinations.
+
+It does **not** yet provide source-confidence weighting, contradiction-aware
+trust policies, or cryptographic/source-system provenance. Those remain
+required before treating conversational memory as high-trust long-term
+knowledge.
 
 ## Diagnostics invariance requirement
 
@@ -301,7 +308,7 @@ The unit suite explicitly checks this invariant.
 
 Recommended follow-ups:
 
-1. provenance + source-confidence envelopes;
+1. source-confidence and trust-policy envelopes;
 2. persistent save/restore;
 3. semantic retrieval for context selection;
 4. typed language relations;
