@@ -1431,28 +1431,74 @@ class HybridCoreSession(
             answer = turn.answer
             candidate = turn.candidate
 
-        diagnosis = self._diagnose(
-            prompt_ir=prompt_ir,
-            candidate=candidate,
-            cortex_answer=(
-                cortex_answer
-            ),
-            read=read,
-            errors=errors,
-            timings=timings,
-        )
+        if exchange.plan.assess_candidate:
+            diagnosis = self._diagnose(
+                prompt_ir=prompt_ir,
+                candidate=candidate,
+                cortex_answer=(
+                    cortex_answer
+                ),
+                read=read,
+                errors=errors,
+                timings=timings,
+            )
+            exchange.record(
+                phase="assessed",
+                actor="cortex",
+                action="candidate_assessment",
+                metadata={
+                    "status": (
+                        diagnosis.status
+                    )
+                },
+            )
+        else:
+            diagnosis = HybridDiagnosis(
+                status="neural_only",
+                reasoning_mode=(
+                    "neural_direct"
+                ),
+                summary=(
+                    "Cortex assessment was skipped by the orchestration policy."
+                ),
+                neural_claims=tuple(
+                    ClaimAssessment(
+                        claim=claim,
+                        status=(
+                            "neural_prior"
+                        ),
+                    )
+                    for claim
+                    in (
+                        candidate.claims
+                        if candidate
+                        is not None
+                        else ()
+                    )
+                ),
+                cortex_claims=(),
+                accepted_user_observations=0,
+                memory_changed=False,
+                analysis_errors=tuple(
+                    errors
+                ),
+                runtime=None,
+                timings=dict(
+                    timings
+                ),
+            )
+            exchange.record(
+                phase="assessment_skipped",
+                actor="orchestrator",
+                action="skip_cortex_assessment",
+                metadata={
+                    "route": (
+                        exchange.plan.route
+                    )
+                },
+            )
         exchange.diagnosis = (
             diagnosis.packet()
-        )
-        exchange.record(
-            phase="assessed",
-            actor="cortex",
-            action="candidate_assessment",
-            metadata={
-                "status": (
-                    diagnosis.status
-                )
-            },
         )
 
         while (
