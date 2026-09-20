@@ -523,6 +523,53 @@ def test_parser_rejects_unanchored_extractor_hallucination():
         )
 
 
+def test_structured_ollama_call_disables_thinking(monkeypatch):
+    client = OllamaClient(
+        "http://localhost:11434"
+    )
+    captured = {}
+
+    def fake_post(path, payload):
+        captured["path"] = path
+        captured["payload"] = payload
+        return {
+            "message": {
+                "content": "{}"
+            }
+        }
+
+    monkeypatch.setattr(
+        client,
+        "_post",
+        fake_post,
+    )
+
+    client.chat(
+        model="parser",
+        messages=[
+            {
+                "role": "user",
+                "content": "hello",
+            }
+        ],
+        format_schema={
+            "type": "object",
+        },
+    )
+
+    assert captured["path"] == "/api/chat"
+    assert (
+        captured["payload"]["think"]
+        is False
+    )
+    assert (
+        captured["payload"]["options"][
+            "temperature"
+        ]
+        == 0
+    )
+
+
 def test_ollama_client_normalizes_host_without_scheme():
     client = OllamaClient(
         "127.0.0.1:11434"

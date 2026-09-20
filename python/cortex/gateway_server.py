@@ -458,6 +458,7 @@ def build_gateway_from_env(
     parser_model: str | None = None,
     renderer_model: str | None = None,
     feature_dim: int = 128,
+    trace_stages: bool = False,
 ) -> Any:
     model = (
         chat_model
@@ -530,6 +531,9 @@ def build_gateway_from_env(
             persistence_dir=(
                 state_dir or None
             ),
+            trace_stages=bool(
+                trace_stages
+            ),
         )
         return StrictCortexLanguageGateway(
             strict_config
@@ -596,6 +600,13 @@ def main() -> None:
         help="Deterministic Cortex feature dimension in strict mode.",
     )
     parser.add_argument(
+        "--trace-stages",
+        action="store_true",
+        help=(
+            "Print strict gateway parser/Cortex/renderer stage timings."
+        ),
+    )
+    parser.add_argument(
         "--ollama-url",
         default=None,
     )
@@ -643,6 +654,9 @@ def main() -> None:
             args.renderer_model
         ),
         feature_dim=args.feature_dim,
+        trace_stages=(
+            args.trace_stages
+        ),
     )
     app = create_app(gateway)
     uvicorn.run(

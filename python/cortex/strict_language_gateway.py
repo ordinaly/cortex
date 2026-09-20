@@ -19,6 +19,7 @@ from math import sqrt
 from os import replace as atomic_replace
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from time import perf_counter
 from typing import Any, Mapping, Sequence
 
 try:
@@ -455,6 +456,7 @@ class StrictGatewayConfig:
     memory_budget: int = 24
     diagnostics_default: bool = False
     persistence_dir: str | None = None
+    trace_stages: bool = False
     chat_model: str = "cortex"
     embedding_model: str = SYMBOLIC_ENCODER_ID
 
@@ -1161,6 +1163,23 @@ class StrictCortexChatSession:
     ) -> None:
         self.diagnostics_enabled = bool(
             enabled
+        )
+
+    def _trace(
+        self,
+        stage: str,
+        duration: float | None = None,
+    ) -> None:
+        if not self.config.trace_stages:
+            return
+        suffix = (
+            ""
+            if duration is None
+            else f" ({duration:.3f}s)"
+        )
+        print(
+            f"[cortex-gateway:{self.session_id}] {stage}{suffix}",
+            flush=True,
         )
 
     def _ensure_runtime(
@@ -1964,15 +1983,26 @@ class StrictCortexChatSession:
                 "user message must not be empty"
             )
 
-        prompt_ir = (
-            self._parse(
-                text
-            )
+        self._trace("parser:start")
+        stage_started = perf_counter()
+        prompt_ir = self._parse(
+            text
         )
-        read, bindings = (
-            self._observe(
-                prompt_ir
-            )
+        self._trace(
+            "parser:done",
+            perf_counter()
+            - stage_started,
+        )
+
+        self._trace("cortex:start")
+        stage_started = perf_counter()
+        read, bindings = self._observe(
+            prompt_ir
+        )
+        self._trace(
+            "cortex:done",
+            perf_counter()
+            - stage_started,
         )
 
         diagnostic_enabled = (
@@ -2006,8 +2036,15 @@ class StrictCortexChatSession:
                 answer_ir
             )
         )
+        self._trace("renderer:start")
+        stage_started = perf_counter()
         content = self._render(
             render_packet
+        )
+        self._trace(
+            "renderer:done",
+            perf_counter()
+            - stage_started,
         )
 
         self.history.extend(
