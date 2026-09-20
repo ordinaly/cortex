@@ -21,7 +21,7 @@ LITERAL_BRACKET_RE = re.compile(r"^\s*[\[\]]\s*$")
 TABLE_LINE_RE = re.compile(r"^\s*\|.*\|\s*$")
 HEADING_RE = re.compile(r"^\\s*#{1,6}\\s+(.+?)\\s*$")
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
-HEADING_LATEX_RE = re.compile(r"(?:\\$|\\\\[A-Za-z]+|_\\{|\\^\\{)")
+HEADING_LATEX_RE = re.compile(r"(?:\\$|\\\\[A-Za-z]+|\\\\[()\\[\\]]|_\\{|\\^\\{)")\nLEGACY_INLINE_MATH_RE = re.compile(r"\\\\[()\\[\\]]")
 
 
 def rel(path: Path) -> str:
@@ -127,12 +127,34 @@ def check_file(path: Path) -> list[str]:
                 f"{name}:{lineno}: standalone bracket line; likely malformed display math"
             )
 
+        if LEGACY_INLINE_MATH_RE.search(line):
+            errors.append(
+                f"{name}:{lineno}: legacy inline/display LaTeX delimiter; "
+                "use GitHub-compatible $...$ or $ blocks"
+            )
+
         if DISPLAY_MATH_RE.match(line):
             if math_open:
                 math_open = False
             else:
                 math_open = True
                 math_start = lineno
+        elif not math_open:
+            unescaped_dollars = 0
+            escaped = False
+            for char in line:
+                if escaped:
+                    escaped = False
+                    continue
+                if char == "\\":
+                    escaped = True
+                    continue
+                if char == "$":
+                    unescaped_dollars += 1
+            if unescaped_dollars % 2 != 0:
+                errors.append(
+                    f"{name}:{lineno}: unbalanced inline $ delimiter"
+                )
 
         if TABLE_LINE_RE.match(line):
             table_rows.append((lineno, unescaped_pipe_count(line)))
