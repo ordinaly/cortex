@@ -57,8 +57,8 @@ def summarize(rows: list[dict], *, official: bool) -> dict:
         ),
     }
 
-    # Development gates are intentionally conservative. They become frozen
-    # official gates only after the development campaign is reviewed.
+    # Frozen gates shared by development verification and the untouched
+    # official campaign. Do not weaken after official evaluation begins.
     checks = {
         "protocol_exact": all(r["protocol"] == PROTOCOL for r in rows),
         "row_count": len(rows) == len(seeds) * len(FAMILY_EDGES),
