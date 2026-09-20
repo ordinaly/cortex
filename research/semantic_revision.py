@@ -114,6 +114,7 @@ class CortexSemanticRevision:
         grounder_accept_threshold: float = 0.70,
         grounder_margin_threshold: float = 0.15,
         withdrawal_margin: float = 0.05,
+        require_resolved_challenger: bool = False,
     ) -> None:
         self.concepts = tuple(concepts)
         self.labels = tuple(labels)
@@ -151,6 +152,9 @@ class CortexSemanticRevision:
         self.grounder_accept_threshold = float(grounder_accept_threshold)
         self.grounder_margin_threshold = float(grounder_margin_threshold)
         self.withdrawal_margin = float(withdrawal_margin)
+        self.require_resolved_challenger = bool(
+            require_resolved_challenger
+        )
 
         self.epoch = -1
         self._neural_history: list[TimedNeuralEvidence] = []
@@ -321,10 +325,20 @@ class CortexSemanticRevision:
                 if challenger is not None
                 else 0.0
             )
-            strong_conflict = (
+            resolved_challenger = (
                 read.resolved
                 and read.label is not None
                 and read.label != incumbent
+            )
+            margin_challenger = (
+                challenger is not None
+                and challenger_support
+                >= incumbent_support + self.withdrawal_margin
+            )
+            strong_conflict = (
+                resolved_challenger
+                if self.require_resolved_challenger
+                else (resolved_challenger or margin_challenger)
             )
             was_challenged = state.phase == "challenged"
             state.phase = "challenged"
