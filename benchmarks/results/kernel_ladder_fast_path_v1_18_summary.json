@@ -1,0 +1,43 @@
+{
+  "protocol": "kernel-ladder-fast-path-v1.18-R",
+  "mode": "official",
+  "workflow_run_id": 35503800382,
+  "seeds": [500, 501, 502],
+  "anchor_cases": [72, 144, 288],
+  "max_candidate_error": 1.1102230246251565e-16,
+  "max_local_error": 0.0,
+  "max_outcome_count_error": 0.0,
+  "max_feature_error": 0.0,
+  "max_probability_error": 0.0,
+  "max_distance_error": 0.0,
+  "max_kernel_error": 1.887379141862766e-15,
+  "underflow_mismatches": 0,
+  "dirty_disagreements": 0,
+  "structural_disagreements": 0,
+  "performance": {
+    "72": {
+      "kernel_speedup": 0.9629270080223815,
+      "refresh_speedup": 0.9978621691054979,
+      "fused_speedup": 1.0011545216471285
+    },
+    "144": {
+      "kernel_speedup": 0.9720370942182387,
+      "refresh_speedup": 0.9913208083636081,
+      "fused_speedup": 1.017042942137858
+    },
+    "288": {
+      "kernel_speedup": 1.114520343819777,
+      "refresh_speedup": 1.0167334863093738,
+      "fused_speedup": 0.9984689899622095
+    }
+  },
+  "checks": {
+    "exactness": true,
+    "underflow_parity": true,
+    "small_scale_no_regression": true,
+    "large_scale_kernel_speedup": false,
+    "large_scale_refresh_speedup": false,
+    "large_scale_fused_speedup": false
+  },
+  "passed": false
+}

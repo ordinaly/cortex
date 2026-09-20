@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.17-R`
+> **Research frontier:** `v1.18-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.17-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.18-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.17-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.18-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -133,11 +133,19 @@ v1.17-R then re-attributed the optimized cache. At 288 anchors:
 The geometry group itself is now only **11.40% squared-distance accumulation**
 plus **2.21% square root**, so the next measured target is kernel regeneration.
 
-The next engineering action is a v1.18-R exact kernel-ladder experiment that
-tries to reduce repeated exponential evaluation for the canonical resolution
-ladder while keeping the current direct kernel computation as the oracle.
+v1.18-R tested that kernel ladder with the current direct kernel computation as
+the paired oracle. The candidate preserved numerical and structural behavior,
+including **0 underflow-pattern mismatches**, but the untouched official
+performance campaign rejected promotion. At 288 anchors, focused kernel
+regeneration improved only **1.115×**, cache refresh **1.017×**, and the full
+fused step **0.998×**, all below frozen performance gates.
 
-See [OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
+This discrepancy between fine-grained internal attribution and coarse
+end-to-end timing indicates a non-negligible observer effect from the internal
+profiler. The next engineering action is therefore a v1.19-R low-overhead
+fused-stage crossover profile before any further cache micro-optimization.
+
+See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
 
 ---
 

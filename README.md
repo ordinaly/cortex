@@ -16,7 +16,7 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.17-R** |
+| research frontier | **v1.18-R** |
 
 The native runtime migration is complete at the composed stateful level. The frozen Python specification remains an executable oracle for differential validation. The research frontier is intentionally separate: experimental mechanisms are not promoted into the native contract merely because they look promising.
 
@@ -108,7 +108,7 @@ See:
 - [docs/NATIVE_STAGE_ATTRIBUTION.md](docs/NATIVE_STAGE_ATTRIBUTION.md)
 - [docs/ARTICULATION_ATTRIBUTION.md](docs/ARTICULATION_ATTRIBUTION.md)
 
-## Research frontier — v1.17-R
+## Research frontier — v1.18-R
 
 The active research line studies how Cortex should allocate predictive distinctions rather than assuming every perceptual distinction deserves permanent structure.
 
@@ -134,7 +134,9 @@ v1.16-R implements the resulting exact semantic-geometry fast path. On untouched
 
 v1.17-R re-attributed that optimized cache. At 288 anchors, **kernel regeneration is 48.63%** of refresh, writes/bookkeeping **24.94%**, and streamed semantic geometry **13.69%**. Squared-distance accumulation itself is only **11.40%**, confirming that v1.16 successfully moved the dominant internal cost away from geometry.
 
-The next measured target is therefore a v1.18-R exact kernel-ladder fast path, not another geometry rewrite. See [docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md](docs/OPTIMIZED_CACHE_REATTRIBUTION_V1_17_RESULT.md).
+v1.18-R tested that exact kernel ladder. The transformation was numerically safe (maximum kernel error **1.89e-15**, zero underflow/dirty/structural mismatches), but the untouched official performance campaign rejected promotion: at 288 anchors the kernel path was only **1.115×** faster, refresh **1.017×**, and the full fused step **0.998×**, below all frozen performance gates.
+
+The next engineering step is therefore a **low-overhead fused-stage crossover profile** rather than another cache micro-optimization chosen from fine-grained internal timers. See [docs/KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](docs/KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md).
 
 The concise research record is in [docs/RESEARCH_HISTORY.md](docs/RESEARCH_HISTORY.md).
 
