@@ -232,7 +232,57 @@ limitations.
 This gateway is an experimental orchestration layer and is **not** part of the
 frozen executable Cortex specification.
 
-### Hybrid cognition mode (recommended for chat)
+### Hybrid Core v0.1 (experimental)
+
+The new hybrid path moves the NN boundary behind a provider-independent
+`NeuralRuntime` and reduces the normal request path to two neural passes:
+
+```text
+user
+  -> structured PromptIR
+  -> Cortex pre-pass
+  -> one neural turn {answer + factual sidecar}
+  -> Cortex assessment
+```
+
+The factual sidecar is produced together with the natural answer, so Cortex no
+longer asks the neural model to parse its own answer in a third pass.
+
+Run the current Ollama-backed implementation with:
+
+```bash
+cortex-gateway \
+  --hybrid-runtime \
+  --chat-model qwen3:8b \
+  --parser-model cortex-parser \
+  --state-dir ~/.cortex/gateway \
+  --trace-stages
+```
+
+Alpaca still connects to a single **Ollama (External)** model at
+`http://127.0.0.1:11435`, model `cortex:latest`.
+
+Hybrid Core also supports explicit neural bootstrap of provisional Cortex
+memory through:
+
+```text
+POST /cortex/sessions/{session_id}/bootstrap
+```
+
+Bootstrap claims are tagged `provenance=neural_bootstrap`, remain provisional,
+and may later be corroborated, revised, or rejected. Normal neural answers are
+still not silently written into Cortex memory.
+
+The current backend is Ollama, but Cortex now depends on the `NeuralRuntime`
+capability contract rather than Ollama/Qwen directly. This leaves explicit
+extension points for future in-process backends, hidden states, KV-cache reuse,
+logits, adapters, and adapter training.
+
+See
+[docs/CORTEX_HYBRID_CORE_V0_1.md](docs/CORTEX_HYBRID_CORE_V0_1.md).
+
+### Hybrid cognition v0.3 (baseline)
+
 
 Gateway v0.3 restores the neural model's normal role as a conversational
 language model and broad pretrained knowledge base, while Cortex acts as a
