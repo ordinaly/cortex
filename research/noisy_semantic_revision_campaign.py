@@ -26,6 +26,7 @@ NEURAL_MISSING = 0.10
 NEURAL_ERROR = 0.18
 STRUCTURAL_OBSERVATION = 0.35
 STRUCTURAL_FLIP = 0.08
+NOISY_CHALLENGE_PATIENCE = 3
 
 
 def _family_code(family: str) -> int:
@@ -213,6 +214,7 @@ def run_case(family: str, seed: int) -> dict:
         labels,
         RELATIONS,
         semantic_edges,
+        challenge_patience=NOISY_CHALLENGE_PATIENCE,
     )
 
     neural_briers: list[float] = []
