@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.13-R+`
+> **Research frontier:** `v1.14-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.13-R+` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.14-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.13-R+"]
+    R["Research prototypes<br/>v1.1-R ... v1.14-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -1200,11 +1200,59 @@ Stage I isolates the question:
 
 Only after that is established should a Stage II experiment consider
 
-$$
+$
 \text{encoder}
 \leftrightarrow
 \text{Cortex}.
-$$
+$
+
+### 31.1 Stage II-A semantic grounding and temporal revision
+
+The first bidirectional research step keeps the neural encoder frozen and lets
+perception and structural reasoning exchange **semantic evidence** rather than
+gradients.
+
+Neural perception proposes a distribution over candidate labels for each
+persistent concept. Cortex combines those proposals with typed relational
+structure and maintains support over complete concept-to-label mappings.
+
+The central invariant is:
+
+$
+\text{concept identity}
+\neq
+\text{current semantic label}.
+$
+
+A concept may therefore remain stable while its human-readable label becomes
+challenged, unresolved, revised, or recovered.
+
+The passed semantic-grounding campaign demonstrated that structural evidence
+can demote high-confidence but inconsistent neural labels while preserving
+genuine mapping ambiguity. The passed temporal semantic-revision campaign then
+separated the instantaneous grounding posterior from the accepted belief state:
+
+$
+\text{stable}
+\rightarrow
+\text{challenged}
+\rightarrow
+\text{unresolved}
+\rightarrow
+\text{revised stable}.
+$
+
+The current noisy-confidence research extends this boundary with missing
+observations, stochastic neural errors, corrupted relational evidence, changing
+reliability, and explicit trust suspension before an accepted label is
+withdrawn.
+
+These mechanisms remain **research-only**. They do not modify the frozen native
+runtime or train neural encoder parameters.
+
+See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md),
+[SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md), and
+[NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md](NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md).
 
 ---
 
@@ -1435,9 +1483,14 @@ Across 60 untouched official cases, initial support strengths 1, 2, and 3 produc
 
 This is a research characterization of the cumulative evidence semantics, not a claim that the stable runtime contains a general-purpose epistemic revision controller. The evidence in v1 is deterministic.
 
-The next Reasoning Map axis is structural analogy / isomorphism.
+Structural analogy / isomorphism subsequently passed its own frozen campaign.
+The next Reasoning Map axis is **latent concept induction**, where useful
+categories are not supplied in advance but must earn their complexity through
+predictive compression.
 
-See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md) and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
+See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md),
+[STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md), and
+[REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
 
