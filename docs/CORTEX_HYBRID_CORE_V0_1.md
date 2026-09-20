@@ -254,6 +254,80 @@ The architecture now has explicit capability slots for those features.
 The next backend experiment should be an in-process model runtime built on an
 existing inference library rather than a new transformer implementation.
 
+## Hybrid Symbiosis v0.1 characterization
+
+A deterministic architecture campaign was added to separate hybrid-control
+behavior from stochastic language-model behavior.
+
+Protocol:
+
+```text
+hybrid-symbiosis-v0.1
+11 scenario families
+10 synthetic worlds per family
+110 total cases
+```
+
+The campaign covers:
+
+- neural-prior passthrough with empty Cortex memory;
+- independent Cortex corroboration;
+- Cortex context influencing the neural candidate before generation completes;
+- explicit polarity conflict and bounded neural revision;
+- a stubborn neural conflict that remains exposed after the revision budget;
+- neural-bootstrap alignment without circular corroboration;
+- neural-bootstrap divergence without forced revision;
+- promotion of bootstrap memory after independent user evidence;
+- parser failure with neural-answer survival;
+- alternative-object divergence;
+- cold Cortex versus neural-bootstrapped Cortex.
+
+Observed deterministic rates:
+
+| Metric | Result |
+| --- | ---: |
+| Neural-prior passthrough | 1.000 |
+| Independent support | 1.000 |
+| Pre-generation Cortex guidance | 1.000 |
+| Conflict revision trigger | 1.000 |
+| Conflict revision success | 1.000 |
+| Stubborn-conflict boundedness | 1.000 |
+| Stubborn-conflict preservation | 1.000 |
+| Bootstrap alignment | 1.000 |
+| Bootstrap circular-confirmation prevention | 1.000 |
+| Bootstrap divergence preserved without forced revision | 1.000 |
+| Bootstrap promotion after independent evidence | 1.000 |
+| Parser-failure answer survival | 1.000 |
+| Bootstrap cold-start resolution | 1.000 |
+| Normal two-neural-call path | 1.000 |
+| Conflict three-neural-call path | 1.000 |
+| Non-empty final answer | 1.000 |
+| Alternative-object conflict detection | **0.000** |
+
+The last result is a useful limitation rather than a hidden failure.
+
+Current Cortex relation memory can identify contradiction when the same
+subject/predicate/object tuple changes polarity. It cannot generically infer
+that:
+
+```text
+S --p--> A
+S --p--> B
+```
+
+is contradictory, because many predicates legitimately allow multiple objects.
+
+Detecting that class of divergence requires predicate semantics such as
+functional/exclusive cardinality, temporal scope, or an explicit relation
+contract. Until such metadata exists, Hybrid Core deliberately does not invent
+exclusivity.
+
+The campaign therefore gates the established v0.1 contracts but records
+alternative-object conflict detection as a characterization metric.
+
+The CI workflow is
+`.github/workflows/hybrid-symbiosis-v0.1.yml`.
+
 ## Next experiments
 
 1. Compare Gateway v0.3 and Hybrid Core v0.1 on the same local Qwen model.
