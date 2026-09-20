@@ -479,7 +479,10 @@ class OllamaClient:
         *,
         timeout: float = 120.0,
     ) -> None:
-        self.base_url = base_url.rstrip("/")
+        normalized = base_url.strip()
+        if "://" not in normalized:
+            normalized = "http://" + normalized
+        self.base_url = normalized.rstrip("/")
         self.timeout = float(timeout)
 
     def _post(
@@ -1357,15 +1360,26 @@ class CortexLanguageGateway:
         *,
         diagnostics: bool | None = None,
     ) -> ChatResult:
-        result = self.session(
+        session = self.session(
             session_id
-        ).chat(
-            user_text,
-            diagnostics=diagnostics,
         )
+        try:
+            result = session.chat(
+                user_text,
+                diagnostics=diagnostics,
+            )
+        except Exception:
+            if self.store is not None:
+                try:
+                    self.store.save(
+                        session
+                    )
+                except Exception:
+                    pass
+            raise
         if self.store is not None:
-            self.save(
-                session_id
+            self.store.save(
+                session
             )
         return result
 
