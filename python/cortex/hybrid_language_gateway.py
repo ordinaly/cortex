@@ -1122,6 +1122,28 @@ class HybridCortexChatSession(
             else None
         )
 
+        if runtime is not None:
+            if runtime["unresolved"]:
+                summary += (
+                    " Cortex currently marks the structural state as unresolved."
+                )
+            if runtime["revision"]:
+                summary += (
+                    " Cortex revised part of its structural state on this turn."
+                )
+            if runtime["reactivated"]:
+                summary += (
+                    " Cortex reactivated previously stored structure."
+                )
+            if runtime["discovered"]:
+                summary += (
+                    " Cortex registered a new structural state."
+                )
+            if runtime["budget_pressure"]:
+                summary += (
+                    " Cortex reports memory-budget pressure."
+                )
+
         return HybridDiagnosis(
             status=status,
             reasoning_mode=(
