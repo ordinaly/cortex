@@ -1100,10 +1100,20 @@ class CortexChatSession:
             actual_snapshot = (
                 self.runtime.snapshot_json()
             )
-            if (
-                actual_snapshot
-                != expected_snapshot
-            ):
+            try:
+                snapshots_equal = (
+                    loads(actual_snapshot)
+                    == loads(
+                        str(
+                            expected_snapshot
+                        )
+                    )
+                )
+            except Exception as exc:
+                raise ValueError(
+                    "persisted native snapshot is malformed"
+                ) from exc
+            if not snapshots_equal:
                 raise ValueError(
                     "persisted Cortex session replay diverged from its saved native snapshot"
                 )
