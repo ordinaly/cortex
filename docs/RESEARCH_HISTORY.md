@@ -525,3 +525,41 @@ excursion; it does not yet establish full discovery and lifecycle tracking of a
 strong temporary regime.
 
 See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
+
+
+## novelty-aware-replanning-v1 — attributed surprise to scoped plan revision
+
+This integration campaign composed open-world novelty attribution with finite
+planning/replanning.
+
+Untouched official seeds 1600–1619 across eight structural families produced
+**160 cases**.
+
+Every frozen gate passed:
+
+- novelty attribution accuracy: **1.000**;
+- novelty-to-replanning decision accuracy: **1.000**;
+- result validity: **1.000**;
+- structural model-component locality: **1.000**;
+- repair optimality: **1.000**;
+- preserve-case exactness / zero-search rate: **1.000 / 1.000**;
+- local impact localization: **1.000**;
+- local prefix/suffix preservation: **1.000 / 1.000**;
+- local search-saving rate: **1.000**;
+- mean local/full expansion ratio: **0.03846**;
+- regime-global correctness: **1.000**;
+- unresolved deferral safety: **1.000**.
+
+The always-replan baseline reached **0.375** decision accuracy. The
+ignore-novelty baseline had **0.000** optimality on planning-relevant novelty.
+
+Interpretation: in the declared finite fixtures, Cortex can distinguish model
+revision from plan revision. Structural novelty only triggers planning work
+when the concrete edit intersects an explicit planning dependency; regime
+change broadens the scope to global replanning, while unresolved structural
+attribution blocks mutation and execution.
+
+The state-expansion advantage is fixture-specific and is not a general
+complexity theorem.
+
+See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
