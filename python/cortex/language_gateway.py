@@ -530,6 +530,10 @@ class OllamaClient:
         if format_schema is not None:
             payload["format"] = dict(format_schema)
             payload["options"] = {"temperature": 0}
+            # Parser/renderer structured calls are translation boundaries,
+            # not reasoning stages. Disable model thinking explicitly so
+            # models such as Qwen do not spend hidden deliberation time here.
+            payload["think"] = False
         result = self._post("/api/chat", payload)
         message = result.get("message")
         if not isinstance(message, dict):
