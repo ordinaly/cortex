@@ -104,6 +104,8 @@ def summarize(rows: list[dict], *, official: bool) -> dict:
         ),
     }
 
+    # Frozen gates shared by development verification and the untouched
+    # official campaign. Do not weaken after official evaluation begins.
     expected_rows = len(seeds) * 5
     checks = {
         "protocol_exact": all(
