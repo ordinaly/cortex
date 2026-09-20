@@ -168,7 +168,16 @@ The encoder remains frozen so experiments can ask whether Cortex adds persistent
 
 A separate research-only **Stage II-A semantic grounding** campaign now tests inference-time mutual reinforcement without changing encoder weights. Neural perception proposes candidate labels while Cortex adjudicates them against persistent relational structure. On the untouched `hybrid-semantic-grounding-v1` campaign, one adversarial swapped label pair improved from **0.600 neural accuracy to 0.9933 Cortex resolved accuracy** at 0.9933 coverage; with two swapped pairs, **0.200 neural accuracy became 0.960 resolved accuracy at full coverage**. False reinspection of neural-correct concepts remained zero, and exact structural symmetries remained unresolved.
 
-See [docs/HYBRID_STAGE_I.md](docs/HYBRID_STAGE_I.md) and [docs/HYBRID_SEMANTIC_GROUNDING_V1.md](docs/HYBRID_SEMANTIC_GROUNDING_V1.md).
+The follow-up `semantic-revision-v1` experiment adds temporal hysteresis:
+a transient neural contradiction does not rewrite the accepted label, while
+persistent neural + structural disagreement moves through
+`challenged → unresolved → revised`. All 60 untouched official cases revised
+and recovered correctly, unaffected concepts were preserved, and maximum shift
+or recovery latency was 4 epochs.
+
+See [docs/HYBRID_STAGE_I.md](docs/HYBRID_STAGE_I.md),
+[docs/HYBRID_SEMANTIC_GROUNDING_V1.md](docs/HYBRID_SEMANTIC_GROUNDING_V1.md),
+and [docs/SEMANTIC_REVISION_V1.md](docs/SEMANTIC_REVISION_V1.md).
 
 ## Repository layout
 

@@ -126,6 +126,23 @@ induction; it is not yet part of the stable native runtime.
 
 See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md).
 
+### Temporal semantic revision
+
+The follow-up `semantic-revision-v1` campaign separates the instantaneous
+grounding posterior from Cortex's accepted semantic state. Accepted labels now
+have explicit hysteresis and bounded fading evidence.
+
+Across all 60 untouched official cases:
+
+- one-epoch contradictory neural shocks caused **0 semantic flips**;
+- sustained semantic shifts revised successfully in **100%** of cases;
+- every revision passed through challenged and unresolved states first;
+- the original mapping recovered in **100%** of cases;
+- unaffected concepts were preserved in **100%** of cases;
+- maximum shift and recovery latency were both **4 epochs**.
+
+See [SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed

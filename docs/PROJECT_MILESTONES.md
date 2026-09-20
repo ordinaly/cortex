@@ -361,13 +361,26 @@ support.
 
 See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md).
 
-The first protocol intentionally receives concept identities as input so it can
-isolate semantic adjudication. The intended integration order is therefore:
+A follow-up **semantic-revision-v1** campaign now adds chronological revision
+hysteresis and bounded fading evidence. Across 60 untouched official cases,
+Cortex preserved the incumbent under a one-epoch contradictory neural shock,
+revised every sustained two-label semantic shift through
+`challenged → unresolved → revised`, recovered every original mapping, and
+never revised the three unaffected concepts. Maximum shift and recovery
+latencies were both **4 epochs**.
+
+See [SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md).
+
+The grounding protocols intentionally receive concept identities as input so
+they can isolate semantic adjudication and revision. The intended integration
+order is therefore:
 
 $$
 \text{latent concept induction}
 \rightarrow
-\text{semantic grounding}.
+\text{semantic grounding}
+\rightarrow
+\text{semantic revision}.
 $$
 
 ### Stage II-B — trainable representation feedback
