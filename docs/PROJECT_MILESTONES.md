@@ -24,9 +24,12 @@ The tracks should remain distinct. A successful research prototype is not automa
   - cross-world law transfer;
   - structural counterfactual reasoning;
   - belief revision under contradiction;
-  - structural analogy / isomorphism.
+  - structural analogy / isomorphism;
+  - latent concept induction.
 
-The next Reasoning Map axis is **latent concept induction**.
+The next independent Reasoning Map axis is **explicit proof dependency**.
+Before that, a near-term integration milestone should connect internally
+discovered concept identities to semantic grounding and semantic revision.
 
 ---
 
@@ -100,38 +103,60 @@ The result supports structural analogy under declared finite relational fixtures
 
 ---
 
-## A2. Latent concept induction v1
+## A2. Latent concept induction v1 — passed
 
 ### Question
 
-Can Cortex introduce a new latent category because doing so compresses predictive structure?
+Can Cortex introduce a new latent category because doing so compresses
+predictive structure?
 
-Instead of supplying every useful concept, construct observations where several entities become easier to explain under a shared latent articulation:
+The official answer is **yes within the declared finite partition grammar**.
+
+### Passing result
+
+Across untouched official seeds 700–719:
+
+- two-concept minimum partition F1: **1.000**;
+- three-concept minimum partition F1: **1.000**;
+- no-shared-concept control correctness: **1.000**;
+- mean held-out gain over flat per-entity prediction:
+  **0.0556 / 0.0288 nats per outcome**;
+- minimum grouped-case gain over one global concept:
+  **0.2426 nats/outcome**;
+- ambiguous-member unresolved rate: **1.000**;
+- create/split/merge/retract lifecycle coverage: **1.000**;
+- final concept retraction correctness: **1.000**.
+
+The deliberately wrong geometry-decoy grouping reached at most **0.3333** F1,
+while Cortex recovered every planted predictive grouping at **1.000** F1.
+
+### Architectural consequence
+
+A latent concept is now treated as a revisable predictive articulation rather
+than a supplied class label. Exact member blocks preserve persistent concept
+IDs; split and merge transitions create new IDs with explicit lineage; a
+concept can disappear when predictive evidence no longer justifies shared
+structure.
+
+See [LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md).
+
+### Next integration
+
+Feed Cortex-discovered concept IDs into semantic grounding/revision so that the
+full path becomes:
 
 $$
-\{e_1,e_3,e_7\}\rightarrow Z.
+\text{predictive evidence}
+\rightarrow
+\text{latent concept}
+\rightarrow
+\text{semantic label}
+\rightarrow
+\text{temporal semantic revision}.
 $$
 
-### Required behavior
-
-Cortex should:
-
-- propose the latent grouping only when it improves predictive compression;
-- avoid inventing a category under random/noisy controls;
-- split the category when future evidence makes it insufficient;
-- merge/retract it when the distinction ceases to matter.
-
-### Primary metrics
-
-- latent-group recovery;
-- predictive gain;
-- complexity cost;
-- false-concept rate;
-- split/merge reversibility;
-- sample efficiency;
-- unresolved behavior.
-
-This would be one of the strongest tests of Cortex's core principle that structure must be earned by evidence.
+This integration should remain separate from the next independent reasoning
+axis, explicit proof dependency.
 
 ---
 
@@ -417,9 +442,7 @@ $$
 \boxed{
 A2\ \text{latent concepts}
 \rightarrow
-C3\text{-A}\ \text{semantic grounding}
-\rightarrow
-A3\ \text{noise/calibration}
+C3\text{-A}\ \text{concept/semantic integration}
 \rightarrow
 A4\ \text{proof dependency}
 }
