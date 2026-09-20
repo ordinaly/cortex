@@ -32,6 +32,7 @@ def test_default_policy_is_explicit_and_conservative():
     assert plan.parse_user
     assert plan.observe_user
     assert plan.inject_cortex
+    assert plan.assess_candidate
     assert plan.require_sidecar
     assert (
         plan.revision_budget
