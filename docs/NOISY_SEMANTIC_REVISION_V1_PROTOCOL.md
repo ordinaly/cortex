@@ -27,11 +27,11 @@ The revision layer now exposes three distinct quantities.
 For an accepted label `l*`, the revision read exposes its current support,
 the strongest competing label/support, and
 
-$$
+```math
 P_{rev}
 =
 \max(0, s_{challenger}-s_{incumbent}),
-$$
+```
 
 called **revision pressure**.
 
@@ -117,7 +117,7 @@ marks that label as **not trusted**.
 
 The desired behavior during a regime change is therefore:
 
-$$
+```math
 \text{old label trusted}
 \rightarrow
 \text{old label not trusted}
@@ -125,7 +125,7 @@ $$
 \text{unresolved}
 \rightarrow
 \text{new label trusted}.
-$$
+```
 
 ### Revision behavior
 
@@ -161,15 +161,15 @@ Separately, a sufficiently strong current-epoch neural disagreement can suspend
 the `trusted` flag immediately while the accepted label remains in memory.
 This separates:
 
-$$
+```math
 \text{stop trusting}
-$$
+```
 
 from
 
-$$
+```math
 \text{change the accepted label}.
-$$
+```
 
 These are robustness parameters for the noisy experiment, not retroactive
 changes to the already published clean semantic-revision-v1 protocol.
