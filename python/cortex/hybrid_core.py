@@ -35,6 +35,7 @@ from .hybrid_exchange import (
     CortexContribution,
     DefaultHybridOrchestrationPolicy,
     HybridExchange,
+    HybridOrchestrationPolicy,
     NeuralContribution,
     TextHybridExchangeAdapter,
 )
@@ -353,6 +354,10 @@ class HybridCoreSession(
         session_id: str,
         config: HybridCoreConfig,
         runtime: NeuralRuntime,
+        orchestration_policy: (
+            HybridOrchestrationPolicy
+            | None
+        ) = None,
     ) -> None:
         self.neural_runtime = runtime
         self.neural_session = NeuralSession(
@@ -363,7 +368,8 @@ class HybridCoreSession(
             TextHybridExchangeAdapter()
         )
         self.orchestration_policy = (
-            DefaultHybridOrchestrationPolicy(
+            orchestration_policy
+            or DefaultHybridOrchestrationPolicy(
                 revision_budget=(
                     config.max_revision_cycles
                 )
@@ -1271,85 +1277,89 @@ class HybridCoreSession(
 
         started = perf_counter()
         try:
-            if not plan.parse_user:
-                raise RuntimeError(
-                    "current Hybrid Core policy requires PromptIR parsing"
+            if plan.parse_user:
+                prompt_ir, parse_response = (
+                    self._parse_user_turn(
+                        text,
+                        exchange,
+                    )
                 )
-            prompt_ir, parse_response = (
-                self._parse_user_turn(
-                    text,
-                    exchange,
+                timings[
+                    "prompt_parse"
+                ] = (
+                    parse_response.duration_s
                 )
-            )
-            timings[
-                "prompt_parse"
-            ] = (
-                parse_response.duration_s
-            )
+            else:
+                exchange.record(
+                    phase="parse_skipped",
+                    actor="orchestrator",
+                    action="skip_prompt_ir",
+                    metadata={
+                        "route": plan.route,
+                    },
+                )
 
-            if not plan.observe_user:
-                raise RuntimeError(
-                    "current Hybrid Core policy requires Cortex observation"
+            if (
+                prompt_ir is not None
+                and plan.observe_user
+            ):
+                read, bindings = self._observe(
+                    prompt_ir
                 )
-            read, bindings = self._observe(
-                prompt_ir
-            )
-            self._mark_observation_provenance(
-                prompt_ir,
-                bindings,
-                "user_observation",
-            )
-            diagnostic_enabled = (
-                self.diagnostics_enabled
-                if diagnostics is None
-                else bool(
-                    diagnostics
-                )
-            )
-            diagnostic = (
-                diagnose_runtime(
-                    read,
-                    memory_budget=(
-                        self.config.memory_budget
-                    ),
-                )
-                if (
-                    diagnostic_enabled
-                    and read is not None
-                )
-                else None
-            )
-            cortex_answer = (
-                self._answer_ir(
+                self._mark_observation_provenance(
                     prompt_ir,
                     bindings,
-                    diagnostic,
+                    "user_observation",
                 )
-            )
-            self._cortex_contribution(
-                prompt_ir=prompt_ir,
-                cortex_answer=(
-                    cortex_answer
-                ),
-                read=read,
-                exchange=exchange,
-            )
+                diagnostic_enabled = (
+                    self.diagnostics_enabled
+                    if diagnostics is None
+                    else bool(
+                        diagnostics
+                    )
+                )
+                diagnostic = (
+                    diagnose_runtime(
+                        read,
+                        memory_budget=(
+                            self.config.memory_budget
+                        ),
+                    )
+                    if (
+                        diagnostic_enabled
+                        and read is not None
+                    )
+                    else None
+                )
+                cortex_answer = (
+                    self._answer_ir(
+                        prompt_ir,
+                        bindings,
+                        diagnostic,
+                    )
+                )
+                self._cortex_contribution(
+                    prompt_ir=prompt_ir,
+                    cortex_answer=(
+                        cortex_answer
+                    ),
+                    read=read,
+                    exchange=exchange,
+                )
+            elif prompt_ir is not None:
+                exchange.record(
+                    phase="cortex_skipped",
+                    actor="orchestrator",
+                    action="skip_cortex_observation",
+                    metadata={
+                        "route": plan.route,
+                    },
+                )
         except Exception as exc:
             errors.append(
                 "Cortex pre-pass: "
                 + str(
                     exc
-                )
-            )
-            exchange.cortex = (
-                CortexContribution(
-                    available=False,
-                    answer_status=(
-                        "unavailable"
-                    ),
-                    query_operation=(
-                        "none"
-                    ),
                 )
             )
             exchange.record(
@@ -1361,6 +1371,19 @@ class HybridCoreSession(
                         exc
                     )
                 },
+            )
+
+        if exchange.cortex is None:
+            exchange.cortex = (
+                CortexContribution(
+                    available=False,
+                    answer_status=(
+                        "unavailable"
+                    ),
+                    query_operation=(
+                        "none"
+                    ),
+                )
             )
         timings[
             "cortex_prepass_total"
