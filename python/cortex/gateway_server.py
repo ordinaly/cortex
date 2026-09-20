@@ -396,6 +396,101 @@ def _cortex_thinking_text(
         )
     )
 
+    exchange = context.get(
+        "hybrid_exchange"
+    )
+    if isinstance(
+        exchange,
+        dict,
+    ):
+        plan = exchange.get(
+            "plan"
+        )
+        if isinstance(
+            plan,
+            dict,
+        ):
+            lines.extend(
+                [
+                    "",
+                    "Orchestration",
+                    (
+                        "Route: "
+                        + str(
+                            plan.get(
+                                "route",
+                                "unknown",
+                            )
+                        )
+                    ),
+                    (
+                        "Cortex context: "
+                        + (
+                            "enabled"
+                            if plan.get(
+                                "inject_cortex"
+                            )
+                            else "disabled"
+                        )
+                    ),
+                    (
+                        "Revision budget: "
+                        + str(
+                            plan.get(
+                                "revision_budget",
+                                0,
+                            )
+                        )
+                    ),
+                ]
+            )
+            reason = plan.get(
+                "reason"
+            )
+            if (
+                isinstance(
+                    reason,
+                    str,
+                )
+                and reason.strip()
+            ):
+                lines.append(
+                    "Route reason: "
+                    + reason.strip()
+                )
+        events = exchange.get(
+            "events"
+        )
+        if isinstance(
+            events,
+            list,
+        ):
+            phases = [
+                str(
+                    item.get(
+                        "phase",
+                        "",
+                    )
+                )
+                for item in events
+                if (
+                    isinstance(
+                        item,
+                        dict,
+                    )
+                    and item.get(
+                        "phase"
+                    )
+                )
+            ]
+            if phases:
+                lines.append(
+                    "Exchange phases: "
+                    + " -> ".join(
+                        phases
+                    )
+                )
+
     runtime = context.get(
         "hybrid_runtime"
     )
