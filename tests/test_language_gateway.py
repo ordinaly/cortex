@@ -146,13 +146,23 @@ def fake_native_runtime(monkeypatch):
     )
 
 
-def make_gateway(*, diagnostics=False):
-    client = FakeClient()
+def make_gateway(
+    *,
+    diagnostics=False,
+    persistence_dir=None,
+    client=None,
+):
+    client = client or FakeClient()
     config = GatewayConfig(
         chat_model="test-chat",
         embedding_model="test-embed",
         diagnostics_default=diagnostics,
         history_messages=6,
+        persistence_dir=(
+            None
+            if persistence_dir is None
+            else str(persistence_dir)
+        ),
     )
     return CortexLanguageGateway(
         config,
@@ -296,6 +306,159 @@ def test_parser_rejects_relation_to_unknown_local_entity():
     )
     with pytest.raises(ValueError):
         parse_semantic_observation(raw)
+
+
+def test_persistent_session_restores_without_reextracting_or_reembedding(tmp_path):
+    client = FakeClient()
+    gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+
+    gateway.chat(
+        "persistent",
+        "Alice knows Bob.",
+    )
+    gateway.set_diagnostics(
+        "persistent",
+        True,
+    )
+
+    first_session = gateway.session(
+        "persistent"
+    )
+    first_entity_packets = [
+        entity.packet()
+        for entity in sorted(
+            first_session.entities.values(),
+            key=lambda entity: entity.cortex_id,
+        )
+    ]
+    first_relation_packets = [
+        relation.packet()
+        for relation in first_session.relations.values()
+    ]
+    extraction_calls = client.extract_calls
+    assert extraction_calls == 1
+    assert len(FakeRuntime.instances) == 1
+
+    restored_gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+    restored = restored_gateway.session(
+        "persistent"
+    )
+
+    assert client.extract_calls == extraction_calls
+    assert len(FakeRuntime.instances) == 2
+    assert restored.diagnostics_enabled
+    assert len(restored.frames) == 1
+    assert len(restored.history) == 2
+    assert [
+        entity.packet()
+        for entity in sorted(
+            restored.entities.values(),
+            key=lambda entity: entity.cortex_id,
+        )
+    ] == first_entity_packets
+    assert [
+        relation.packet()
+        for relation in restored.relations.values()
+    ] == first_relation_packets
+
+
+def test_persistence_uses_saved_vectors_not_embedding_model_on_restore(tmp_path):
+    client = FakeClient()
+    gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=client,
+    )
+    gateway.chat(
+        "vectors",
+        "Alice is here.",
+    )
+    extraction_calls = client.extract_calls
+
+    class NoEmbedClient(FakeClient):
+        def embed(self, *, model: str, inputs: Sequence[str]):
+            raise AssertionError(
+                "restore must not call the embedding model"
+            )
+
+    restored_client = NoEmbedClient()
+    restored_client.extract_calls = extraction_calls
+    restored_gateway, _ = make_gateway(
+        persistence_dir=tmp_path,
+        client=restored_client,
+    )
+    restored = restored_gateway.session(
+        "vectors"
+    )
+
+    assert len(restored.frames) == 1
+    assert len(restored.entities) == 1
+
+
+def test_reset_deletes_persisted_session_by_default(tmp_path):
+    gateway, _client = make_gateway(
+        persistence_dir=tmp_path,
+    )
+    gateway.chat(
+        "erase-me",
+        "Alice is here.",
+    )
+    assert (
+        "erase-me"
+        in gateway.list_persisted_sessions()
+    )
+
+    gateway.reset(
+        "erase-me"
+    )
+
+    assert (
+        "erase-me"
+        not in gateway.list_persisted_sessions()
+    )
+
+
+def test_save_load_roundtrip_can_replace_in_memory_session(tmp_path):
+    gateway, _client = make_gateway(
+        persistence_dir=tmp_path,
+    )
+    gateway.chat(
+        "roundtrip",
+        "Alice is here.",
+    )
+    original = gateway.session(
+        "roundtrip"
+    )
+    original_mentions = next(
+        iter(
+            original.entities.values()
+        )
+    ).mentions
+
+    path = gateway.save(
+        "roundtrip"
+    )
+    assert path.endswith(".json")
+
+    original.entities.clear()
+    assert not original.entities
+
+    loaded = gateway.load(
+        "roundtrip"
+    )
+    assert (
+        next(
+            iter(
+                loaded.entities.values()
+            )
+        ).mentions
+        == original_mentions
+    )
 
 
 def test_parser_rejects_unanchored_extractor_hallucination():
