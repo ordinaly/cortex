@@ -122,13 +122,13 @@ such that the old suffix beginning at $s_j$ is still unchanged and valid.
 
 If such a rejoin exists, the repaired plan is:
 
-$
+$$
 \pi' = (a_0,\ldots,a_{k-1})
 \Vert
 \rho_{k\rightarrow j}
 \Vert
 (a_j,\ldots,a_{n-1}).
-$
+$$
 
 where $\rho_{k\rightarrow j}$ is a minimum-cost repair segment.
 
