@@ -1,0 +1,32 @@
+name: semantic-revision-official
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/semantic-revision-official.yml"
+
+jobs:
+  semantic-revision-official:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Run untouched official campaign
+        run: >-
+          python research/semantic_revision_campaign.py
+          --official
+          --output semantic-revision-official.jsonl
+      - name: Check frozen official gates
+        run: >-
+          python research/semantic_revision_gate.py
+          --input semantic-revision-official.jsonl
+          --official
+          | tee semantic-revision-official-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: semantic-revision-official
+          path: |
+            semantic-revision-official.jsonl
+            semantic-revision-official-summary.json
