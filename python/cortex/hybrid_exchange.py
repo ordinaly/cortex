@@ -109,6 +109,95 @@ class DefaultHybridOrchestrationPolicy:
 
 
 @dataclass(frozen=True)
+class StaticHybridOrchestrationPolicy:
+    """Return one explicit plan for every turn.
+
+    Useful for ablations and backend experiments where orchestration decisions
+    must be controlled independently of Cortex/NN behavior.
+    """
+
+    plan_template: OrchestrationPlan
+
+    def plan(
+        self,
+        *,
+        user_text: str,
+        has_relations: bool,
+        has_bootstrap: bool,
+    ) -> OrchestrationPlan:
+        del user_text
+        del has_relations
+        del has_bootstrap
+        return self.plan_template
+
+
+def named_orchestration_policy(
+    name: str,
+    *,
+    revision_budget: int = 1,
+) -> HybridOrchestrationPolicy:
+    normalized = (
+        name.strip().casefold()
+    )
+    if normalized == "full":
+        return (
+            DefaultHybridOrchestrationPolicy(
+                revision_budget=(
+                    revision_budget
+                )
+            )
+        )
+    if normalized == "neural-direct":
+        return StaticHybridOrchestrationPolicy(
+            OrchestrationPlan(
+                route="neural_direct",
+                parse_user=False,
+                observe_user=False,
+                inject_cortex=False,
+                revision_budget=0,
+                reason=(
+                    "Ablation route: neural generation without Cortex pre-pass."
+                ),
+            )
+        )
+    if normalized == "no-revision":
+        return StaticHybridOrchestrationPolicy(
+            OrchestrationPlan(
+                route="hybrid_no_revision",
+                revision_budget=0,
+                reason=(
+                    "Ablation route: full Cortex context with revision disabled."
+                ),
+            )
+        )
+    if normalized == "no-cortex-context":
+        return StaticHybridOrchestrationPolicy(
+            OrchestrationPlan(
+                route=(
+                    "hybrid_no_cortex_context"
+                ),
+                inject_cortex=False,
+                revision_budget=(
+                    max(
+                        0,
+                        int(
+                            revision_budget
+                        ),
+                    )
+                ),
+                reason=(
+                    "Ablation route: Cortex observes and assesses, "
+                    "but its pre-generation context is withheld from the NN."
+                ),
+            )
+        )
+    raise ValueError(
+        "unknown hybrid orchestration policy: "
+        + name
+    )
+
+
+@dataclass(frozen=True)
 class CortexContribution:
     available: bool
     answer_status: str
