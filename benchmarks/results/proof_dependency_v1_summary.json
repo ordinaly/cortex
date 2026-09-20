@@ -1,0 +1,51 @@
+{
+  "protocol": "explicit-proof-dependency-v1",
+  "status": "official_passed",
+  "official_run_id": 35510159225,
+  "official_job_id": 106076541674,
+  "official_seeds": [
+    1300,
+    1301,
+    1302,
+    1303,
+    1304,
+    1305,
+    1306,
+    1307,
+    1308,
+    1309,
+    1310,
+    1311,
+    1312,
+    1313,
+    1314,
+    1315,
+    1316,
+    1317,
+    1318,
+    1319
+  ],
+  "families": [
+    "redundant-branches",
+    "short-vs-long",
+    "shared-root",
+    "contradictory",
+    "nested-redundancy",
+    "irrelevant-premise"
+  ],
+  "rows": 120,
+  "metrics": {
+    "dag_valid_rate": 1,
+    "provenance_valid_rate": 1,
+    "selected_shortest_rate": 1,
+    "restoration_exact_rate": 1,
+    "redundant_survival_rate": 1,
+    "single_proof_baseline_failure_rate": 1,
+    "deeper_takeover_rate": 1,
+    "shared_root_invalidation_rate": 1,
+    "conflict_detection_rate": 1,
+    "nested_partial_invalidation_rate": 1,
+    "irrelevant_locality_rate": 1
+  },
+  "passed": true
+}
