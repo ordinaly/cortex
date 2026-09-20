@@ -14,6 +14,9 @@ from .hybrid_core import (
     HybridCoreConfig,
     HybridCoreSession,
 )
+from .hybrid_exchange import (
+    HybridOrchestrationPolicy,
+)
 from .language_gateway import ChatResult
 from .neural_runtime import (
     NeuralRuntime,
@@ -348,6 +351,10 @@ class HybridCoreGateway:
         config: HybridCoreConfig,
         *,
         runtime: NeuralRuntime | None = None,
+        orchestration_policy: (
+            HybridOrchestrationPolicy
+            | None
+        ) = None,
     ) -> None:
         self.config = config
         self.runtime = (
@@ -355,6 +362,9 @@ class HybridCoreGateway:
             or OllamaNeuralRuntime(
                 config.ollama_url
             )
+        )
+        self.orchestration_policy = (
+            orchestration_policy
         )
         self.sessions: dict[
             str,
@@ -376,6 +386,9 @@ class HybridCoreGateway:
             session_id,
             self.config,
             self.runtime,
+            orchestration_policy=(
+                self.orchestration_policy
+            ),
         )
 
     def session(
