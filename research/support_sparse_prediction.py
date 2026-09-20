@@ -339,6 +339,80 @@ class ExactSemanticGeometryPredictiveCache(
         return dirty.copy()
 
 
+class KernelLadderSemanticGeometryPredictiveCache(
+    ExactSemanticGeometryPredictiveCache
+):
+    """Exact-kernel candidate that reuses one exponential across a scale ladder.
+
+    For the canonical resolutions 0.03, 0.06, 0.12, 0.25, the first three
+    inverse squared scales have ratios 16:4:1. The 0.12 kernel is therefore
+    exponentiated once, while 0.06 and 0.03 are derived by repeated squaring.
+    The 0.25 kernel remains independently exponentiated.
+
+    Non-canonical resolution sets fall back to the parent implementation.
+    """
+
+    _canonical_resolutions = np.asarray(
+        (0.03, 0.06, 0.12, 0.25),
+        dtype=float,
+    )
+
+    def _uses_canonical_ladder(self) -> bool:
+        values = np.asarray(
+            self.resolutions,
+            dtype=float,
+        )
+        return (
+            values.shape == self._canonical_resolutions.shape
+            and np.allclose(
+                values,
+                self._canonical_resolutions,
+                atol=0.0,
+                rtol=1.0e-12,
+            )
+        )
+
+    def _kernel_rows_from_squared(
+        self,
+        distance_squared: np.ndarray,
+    ) -> np.ndarray:
+        if not self._uses_canonical_ladder():
+            return super()._kernel_rows_from_squared(
+                distance_squared
+            )
+
+        shape = (
+            len(self.resolutions),
+            *distance_squared.shape,
+        )
+        kernels = np.empty(shape, dtype=float)
+
+        # Base exponential for r=0.12.
+        np.multiply(
+            distance_squared,
+            -self._inverse_two_resolution_sq[2],
+            out=kernels[2],
+        )
+        np.exp(kernels[2], out=kernels[2])
+
+        # K_0.06 = K_0.12^4.
+        np.square(kernels[2], out=kernels[1])
+        np.square(kernels[1], out=kernels[1])
+
+        # K_0.03 = K_0.12^16.
+        np.square(kernels[1], out=kernels[0])
+        np.square(kernels[0], out=kernels[0])
+
+        # r=0.25 has no exact integer-power relation to the ladder above.
+        np.multiply(
+            distance_squared,
+            -self._inverse_two_resolution_sq[3],
+            out=kernels[3],
+        )
+        np.exp(kernels[3], out=kernels[3])
+        return kernels
+
+
 class FusedSupportSparseLocalResolutionController(
     SparseCachedLocalResolutionController
 ):
