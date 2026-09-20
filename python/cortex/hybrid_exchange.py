@@ -20,6 +20,7 @@ class OrchestrationPlan:
     parse_user: bool = True
     observe_user: bool = True
     inject_cortex: bool = True
+    assess_candidate: bool = True
     require_sidecar: bool = True
     revision_budget: int = 1
     context_claim_limit: int = 8
@@ -34,6 +35,7 @@ class OrchestrationPlan:
             "parse_user": self.parse_user,
             "observe_user": self.observe_user,
             "inject_cortex": self.inject_cortex,
+            "assess_candidate": self.assess_candidate,
             "require_sidecar": self.require_sidecar,
             "revision_budget": self.revision_budget,
             "context_claim_limit": self.context_claim_limit,
@@ -154,6 +156,7 @@ def named_orchestration_policy(
                 parse_user=False,
                 observe_user=False,
                 inject_cortex=False,
+                assess_candidate=False,
                 revision_budget=0,
                 reason=(
                     "Ablation route: neural generation without Cortex pre-pass."
