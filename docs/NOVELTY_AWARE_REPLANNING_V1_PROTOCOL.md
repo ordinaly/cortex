@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Novelty-Aware Replanning v1
 
-Status: **frozen protocol / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: novelty-aware-replanning-v1.
 
@@ -334,3 +334,33 @@ It would not establish:
 
 The official campaign must remain untouched until development preflight is
 green.
+
+
+## Official outcome
+
+The untouched official campaign on seeds **1600–1619** passed every frozen
+gate across **160** cases.
+
+Official metrics:
+
+- novelty attribution accuracy: **1.000**;
+- novelty-to-replanning decision accuracy: **1.000**;
+- returned/deferred plan validity: **1.000**;
+- structural model-component locality: **1.000**;
+- repair optimal-cost agreement: **1.000**;
+- exact preserve-case plan stability: **1.000**;
+- zero-search preservation: **1.000**;
+- local impact-index accuracy: **1.000**;
+- local prefix/suffix preservation: **1.000 / 1.000**;
+- local search-saving rate: **1.000**;
+- mean local/full expansion ratio: **0.03846**;
+- regime-global correctness: **1.000**;
+- unresolved safety/deferral: **1.000**;
+- always-replan decision accuracy: **0.375**;
+- ignore-novelty optimality on affected cases: **0.000**.
+
+See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md)
+and
+[benchmarks/results/novelty_aware_replanning_v1_summary.json](../benchmarks/results/novelty_aware_replanning_v1_summary.json).
+
+The frozen policy and gates above were not changed after official evaluation.
