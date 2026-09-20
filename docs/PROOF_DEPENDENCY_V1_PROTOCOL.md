@@ -1,6 +1,6 @@
 # Cortex Reasoning Map v1 — Explicit Proof Dependency v1
 
-Status: **frozen protocol / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: \`explicit-proof-dependency-v1\`.
 
@@ -282,3 +282,30 @@ It would not establish:
 
 The official campaign must remain untouched until development preflight is
 green.
+
+
+## Official outcome
+
+The untouched official campaign on seeds **1300–1319** passed every frozen
+gate across **120** cases.
+
+All measured rates were **1.000**, including:
+
+- proof-DAG validity;
+- provenance validity;
+- shortest-proof selection;
+- exact restoration;
+- redundant-proof survival;
+- deeper-proof takeover;
+- shared-root invalidation;
+- contradictory-proof conflict handling;
+- nested partial invalidation;
+- irrelevant-premise locality.
+
+The single-proof baseline failed every designated alternate-support case, as
+intended.
+
+See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md) and
+[\`benchmarks/results/proof_dependency_v1_summary.json\`](../benchmarks/results/proof_dependency_v1_summary.json).
+
+The frozen gates above were not changed after official evaluation.
