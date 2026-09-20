@@ -361,6 +361,13 @@ class KernelLadderSemanticGeometryPredictiveCache(
     )
     _minimum_ladder_anchors = 192
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._kernel_ladder_enabled = (
+            len(self.features) >= self._minimum_ladder_anchors
+            and self._uses_canonical_ladder()
+        )
+
     def _uses_canonical_ladder(self) -> bool:
         values = np.asarray(
             self.resolutions,
@@ -380,10 +387,7 @@ class KernelLadderSemanticGeometryPredictiveCache(
         self,
         distance_squared: np.ndarray,
     ) -> np.ndarray:
-        if (
-            not self._uses_canonical_ladder()
-            or len(self.features) < self._minimum_ladder_anchors
-        ):
+        if not self._kernel_ladder_enabled:
             return super()._kernel_rows_from_squared(
                 distance_squared
             )
