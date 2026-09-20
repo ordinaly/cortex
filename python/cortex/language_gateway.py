@@ -12,6 +12,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from json import dumps, loads
+from os import replace as atomic_replace
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 from time import time
 from typing import Any, Mapping, Protocol, Sequence
 from urllib.error import HTTPError, URLError
@@ -107,6 +110,7 @@ class GatewayConfig:
     memory_budget: int = 24
     history_messages: int = 12
     diagnostics_default: bool = False
+    persistence_dir: str | None = None
 
 
 @dataclass(frozen=True)
@@ -220,6 +224,244 @@ class ChatResult:
     content: str
     cortex_context: Mapping[str, Any]
     diagnostics: DiagnosticReport | None
+
+
+@dataclass(frozen=True)
+class ObservationFrame:
+    entities: tuple[ExtractedEntity, ...]
+    relations: tuple[ExtractedRelation, ...]
+    vectors: tuple[tuple[float, ...], ...]
+
+    def packet(self) -> dict[str, Any]:
+        return {
+            "entities": [
+                {
+                    "id": entity.local_id,
+                    "name": entity.name,
+                    "kind": entity.kind,
+                    "description": entity.description,
+                    "evidence": entity.evidence,
+                }
+                for entity in self.entities
+            ],
+            "relations": [
+                {
+                    "source": relation.source,
+                    "target": relation.target,
+                    "label": relation.label,
+                    "asserted": relation.asserted,
+                    "evidence": relation.evidence,
+                }
+                for relation in self.relations
+            ],
+            "vectors": [
+                list(vector)
+                for vector in self.vectors
+            ],
+        }
+
+    @classmethod
+    def from_packet(
+        cls,
+        payload: Mapping[str, Any],
+    ) -> "ObservationFrame":
+        entities = tuple(
+            ExtractedEntity(
+                local_id=str(item["id"]),
+                name=str(item["name"]),
+                kind=str(item["kind"]),
+                description=str(
+                    item.get("description", "")
+                ),
+                evidence=str(
+                    item.get("evidence", "")
+                ),
+            )
+            for item in payload.get(
+                "entities",
+                [],
+            )
+        )
+        relations = tuple(
+            ExtractedRelation(
+                source=str(item["source"]),
+                target=str(item["target"]),
+                label=str(item["label"]),
+                asserted=bool(
+                    item.get("asserted", True)
+                ),
+                evidence=str(
+                    item.get("evidence", "")
+                ),
+            )
+            for item in payload.get(
+                "relations",
+                [],
+            )
+        )
+        vectors = tuple(
+            tuple(float(value) for value in vector)
+            for vector in payload.get(
+                "vectors",
+                [],
+            )
+        )
+        if len(vectors) != len(entities):
+            raise ValueError(
+                "persisted frame vector/entity count mismatch"
+            )
+        return cls(
+            entities=entities,
+            relations=relations,
+            vectors=vectors,
+        )
+
+
+class FileSessionStore:
+    SCHEMA = "cortex-language-session-v1"
+
+    def __init__(self, root: str | Path) -> None:
+        self.root = Path(root).expanduser()
+        self.root.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+    @staticmethod
+    def _safe_name(
+        session_id: str,
+    ) -> str:
+        from hashlib import sha256
+
+        digest = sha256(
+            session_id.encode("utf-8")
+        ).hexdigest()[:16]
+        readable = "".join(
+            ch
+            if ch.isalnum()
+            or ch in ("-", "_")
+            else "_"
+            for ch in session_id
+        ).strip("_")[:48]
+        return (
+            f"{readable or 'session'}-{digest}.json"
+        )
+
+    def path_for(
+        self,
+        session_id: str,
+    ) -> Path:
+        return self.root / self._safe_name(
+            session_id
+        )
+
+    def exists(
+        self,
+        session_id: str,
+    ) -> bool:
+        return self.path_for(
+            session_id
+        ).is_file()
+
+    def list_sessions(self) -> list[str]:
+        sessions: list[str] = []
+        for path in sorted(
+            self.root.glob("*.json")
+        ):
+            try:
+                payload = loads(
+                    path.read_text(
+                        encoding="utf-8"
+                    )
+                )
+            except Exception:
+                continue
+            if (
+                isinstance(payload, dict)
+                and payload.get("schema")
+                == self.SCHEMA
+                and isinstance(
+                    payload.get("session_id"),
+                    str,
+                )
+            ):
+                sessions.append(
+                    payload["session_id"]
+                )
+        return sessions
+
+    def save(
+        self,
+        session: "CortexChatSession",
+    ) -> Path:
+        payload = session.persistence_packet()
+        target = self.path_for(
+            session.session_id
+        )
+        with NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=str(self.root),
+            prefix=".cortex-session-",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            handle.write(
+                dumps(
+                    payload,
+                    sort_keys=True,
+                    indent=2,
+                )
+            )
+            handle.write("\n")
+            temporary = Path(handle.name)
+        atomic_replace(
+            temporary,
+            target,
+        )
+        return target
+
+    def load_packet(
+        self,
+        session_id: str,
+    ) -> Mapping[str, Any]:
+        path = self.path_for(
+            session_id
+        )
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"no persisted Cortex session: {session_id}"
+            )
+        payload = loads(
+            path.read_text(
+                encoding="utf-8"
+            )
+        )
+        if not isinstance(payload, dict):
+            raise ValueError(
+                "persisted Cortex session must be an object"
+            )
+        if payload.get("schema") != self.SCHEMA:
+            raise ValueError(
+                "unsupported Cortex session schema"
+            )
+        if payload.get("session_id") != session_id:
+            raise ValueError(
+                "persisted Cortex session ID mismatch"
+            )
+        return payload
+
+    def delete(
+        self,
+        session_id: str,
+    ) -> bool:
+        path = self.path_for(
+            session_id
+        )
+        if not path.exists():
+            return False
+        path.unlink()
+        return True
 
 
 class OllamaClient:
@@ -492,6 +734,7 @@ class CortexChatSession:
         self.history: list[dict[str, str]] = []
         self.entities: dict[int, PersistentEntity] = {}
         self.relations: dict[tuple[int, int, str], PersistentRelation] = {}
+        self.frames: list[ObservationFrame] = []
         self.last_read: Any | None = None
 
     def set_diagnostics(self, enabled: bool) -> None:
@@ -536,32 +779,56 @@ class CortexChatSession:
         )
         return self.runtime
 
-    def _observe(self, observation: SemanticObservation) -> Any | None:
-        if not observation.entities:
+    def _apply_frame(
+        self,
+        frame: ObservationFrame,
+        *,
+        record: bool,
+    ) -> Any | None:
+        if not frame.entities:
+            if record:
+                self.frames.append(
+                    frame
+                )
             return self.last_read
 
-        vectors = self.client.embed(
-            model=self.config.embedding_model,
-            inputs=[entity.embedding_text for entity in observation.entities],
-        )
-        if not vectors:
-            return self.last_read
+        vectors = [
+            list(vector)
+            for vector in frame.vectors
+        ]
         dimension = len(vectors[0])
-        if dimension <= 0 or any(len(vector) != dimension for vector in vectors):
-            raise RuntimeError("embedding vectors must share a positive dimension")
+        if (
+            dimension <= 0
+            or any(
+                len(vector) != dimension
+                for vector in vectors
+            )
+        ):
+            raise RuntimeError(
+                "embedding vectors must share a positive dimension"
+            )
 
-        runtime = self._ensure_runtime(dimension)
+        runtime = self._ensure_runtime(
+            dimension
+        )
         local_index = {
             entity.local_id: index
-            for index, entity in enumerate(observation.entities)
+            for index, entity
+            in enumerate(frame.entities)
         }
         relation_obs = [
             (
-                local_index[relation.source],
-                local_index[relation.target],
-                1 if relation.asserted else 0,
+                local_index[
+                    relation.source
+                ],
+                local_index[
+                    relation.target
+                ],
+                1
+                if relation.asserted
+                else 0,
             )
-            for relation in observation.relations
+            for relation in frame.relations
         ]
         read = runtime.step(
             vectors,
@@ -572,34 +839,243 @@ class CortexChatSession:
         )
         self.last_read = read
 
-        bindings = [int(value) for value in read.bindings]
-        for entity, cortex_id in zip(observation.entities, bindings):
-            persistent = self.entities.setdefault(
-                cortex_id,
-                PersistentEntity(cortex_id=cortex_id),
+        bindings = [
+            int(value)
+            for value in read.bindings
+        ]
+        for entity, cortex_id in zip(
+            frame.entities,
+            bindings,
+        ):
+            persistent = (
+                self.entities.setdefault(
+                    cortex_id,
+                    PersistentEntity(
+                        cortex_id=cortex_id
+                    ),
+                )
             )
-            persistent.absorb(entity)
+            persistent.absorb(
+                entity
+            )
 
-        for relation in observation.relations:
-            source_index = local_index[relation.source]
-            target_index = local_index[relation.target]
-            if source_index >= len(bindings) or target_index >= len(bindings):
+        for relation in frame.relations:
+            source_index = local_index[
+                relation.source
+            ]
+            target_index = local_index[
+                relation.target
+            ]
+            if (
+                source_index >= len(bindings)
+                or target_index
+                >= len(bindings)
+            ):
                 continue
-            persistent_relation = PersistentRelation(
-                source_id=bindings[source_index],
-                target_id=bindings[target_index],
-                label=relation.label,
-                asserted=relation.asserted,
-                evidence=relation.evidence,
+            persistent_relation = (
+                PersistentRelation(
+                    source_id=bindings[
+                        source_index
+                    ],
+                    target_id=bindings[
+                        target_index
+                    ],
+                    label=relation.label,
+                    asserted=(
+                        relation.asserted
+                    ),
+                    evidence=(
+                        relation.evidence
+                    ),
+                )
             )
             key = (
                 persistent_relation.source_id,
                 persistent_relation.target_id,
                 persistent_relation.label,
             )
-            self.relations[key] = persistent_relation
+            self.relations[
+                key
+            ] = persistent_relation
 
+        if record:
+            self.frames.append(
+                frame
+            )
         return read
+
+    def _observe(
+        self,
+        observation: SemanticObservation,
+    ) -> Any | None:
+        if not observation.entities:
+            frame = ObservationFrame(
+                entities=observation.entities,
+                relations=observation.relations,
+                vectors=tuple(),
+            )
+            return self._apply_frame(
+                frame,
+                record=True,
+            )
+
+        vectors = self.client.embed(
+            model=self.config.embedding_model,
+            inputs=[
+                entity.embedding_text
+                for entity
+                in observation.entities
+            ],
+        )
+        frame = ObservationFrame(
+            entities=observation.entities,
+            relations=observation.relations,
+            vectors=tuple(
+                tuple(
+                    float(value)
+                    for value in vector
+                )
+                for vector in vectors
+            ),
+        )
+        return self._apply_frame(
+            frame,
+            record=True,
+        )
+
+    def persistence_packet(
+        self,
+    ) -> dict[str, Any]:
+        return {
+            "schema": FileSessionStore.SCHEMA,
+            "session_id": self.session_id,
+            "chat_model": (
+                self.config.chat_model
+            ),
+            "embedding_model": (
+                self.config.embedding_model
+            ),
+            "feature_dim": self.feature_dim,
+            "diagnostics_enabled": (
+                self.diagnostics_enabled
+            ),
+            "history": [
+                dict(message)
+                for message in self.history
+            ],
+            "frames": [
+                frame.packet()
+                for frame in self.frames
+            ],
+        }
+
+    def restore_packet(
+        self,
+        payload: Mapping[str, Any],
+    ) -> None:
+        chat_model = payload.get(
+            "chat_model"
+        )
+        embedding_model = payload.get(
+            "embedding_model"
+        )
+        if (
+            chat_model
+            and chat_model
+            != self.config.chat_model
+        ):
+            raise ValueError(
+                "persisted chat model does not match gateway configuration"
+            )
+        if (
+            embedding_model
+            and embedding_model
+            != self.config.embedding_model
+        ):
+            raise ValueError(
+                "persisted embedding model does not match gateway configuration"
+            )
+
+        history = payload.get(
+            "history",
+            [],
+        )
+        if not isinstance(
+            history,
+            list,
+        ):
+            raise ValueError(
+                "persisted history must be an array"
+            )
+
+        frames_payload = payload.get(
+            "frames",
+            [],
+        )
+        if not isinstance(
+            frames_payload,
+            list,
+        ):
+            raise ValueError(
+                "persisted frames must be an array"
+            )
+
+        self.runtime = None
+        self.feature_dim = None
+        self.entities.clear()
+        self.relations.clear()
+        self.frames.clear()
+        self.last_read = None
+        self.history = [
+            {
+                "role": str(
+                    message.get(
+                        "role",
+                        "",
+                    )
+                ),
+                "content": str(
+                    message.get(
+                        "content",
+                        "",
+                    )
+                ),
+            }
+            for message in history
+            if isinstance(
+                message,
+                dict,
+            )
+        ][
+            -self.config.history_messages:
+        ]
+        self.diagnostics_enabled = bool(
+            payload.get(
+                "diagnostics_enabled",
+                self.config.diagnostics_default,
+            )
+        )
+
+        for frame_payload in (
+            frames_payload
+        ):
+            if not isinstance(
+                frame_payload,
+                dict,
+            ):
+                raise ValueError(
+                    "persisted frame must be an object"
+                )
+            frame = (
+                ObservationFrame.from_packet(
+                    frame_payload
+                )
+            )
+            self._apply_frame(
+                frame,
+                record=True,
+            )
+
 
     def context_packet(self, *, diagnostics: DiagnosticReport | None) -> dict[str, Any]:
         recent_entities = sorted(
@@ -694,28 +1170,143 @@ class CortexLanguageGateway:
         client: LanguageModelClient | None = None,
     ) -> None:
         self.config = config
-        self.client = client or OllamaClient(config.ollama_url)
-        self.sessions: dict[str, CortexChatSession] = {}
+        self.client = (
+            client
+            or OllamaClient(
+                config.ollama_url
+            )
+        )
+        self.sessions: dict[
+            str,
+            CortexChatSession,
+        ] = {}
+        self.store = (
+            FileSessionStore(
+                config.persistence_dir
+            )
+            if config.persistence_dir
+            else None
+        )
 
-    def session(self, session_id: str) -> CortexChatSession:
+    def _new_session(
+        self,
+        session_id: str,
+    ) -> CortexChatSession:
+        return CortexChatSession(
+            session_id,
+            self.config,
+            self.client,
+        )
+
+    def session(
+        self,
+        session_id: str,
+    ) -> CortexChatSession:
         normalized = session_id.strip()
         if not normalized:
-            raise ValueError("session_id must not be empty")
-        session = self.sessions.get(normalized)
-        if session is None:
-            session = CortexChatSession(
-                normalized,
-                self.config,
-                self.client,
+            raise ValueError(
+                "session_id must not be empty"
             )
-            self.sessions[normalized] = session
+        session = self.sessions.get(
+            normalized
+        )
+        if session is not None:
+            return session
+
+        session = self._new_session(
+            normalized
+        )
+        if (
+            self.store is not None
+            and self.store.exists(
+                normalized
+            )
+        ):
+            session.restore_packet(
+                self.store.load_packet(
+                    normalized
+                )
+            )
+        self.sessions[
+            normalized
+        ] = session
         return session
 
-    def reset(self, session_id: str) -> None:
-        self.sessions.pop(session_id, None)
+    def save(
+        self,
+        session_id: str,
+    ) -> str:
+        if self.store is None:
+            raise RuntimeError(
+                "gateway persistence is disabled"
+            )
+        path = self.store.save(
+            self.session(
+                session_id
+            )
+        )
+        return str(path)
 
-    def set_diagnostics(self, session_id: str, enabled: bool) -> None:
-        self.session(session_id).set_diagnostics(enabled)
+    def load(
+        self,
+        session_id: str,
+    ) -> CortexChatSession:
+        if self.store is None:
+            raise RuntimeError(
+                "gateway persistence is disabled"
+            )
+        session = self._new_session(
+            session_id
+        )
+        session.restore_packet(
+            self.store.load_packet(
+                session_id
+            )
+        )
+        self.sessions[
+            session_id
+        ] = session
+        return session
+
+    def list_persisted_sessions(
+        self,
+    ) -> list[str]:
+        if self.store is None:
+            return []
+        return self.store.list_sessions()
+
+    def reset(
+        self,
+        session_id: str,
+        *,
+        delete_persisted: bool = True,
+    ) -> None:
+        self.sessions.pop(
+            session_id,
+            None,
+        )
+        if (
+            delete_persisted
+            and self.store is not None
+        ):
+            self.store.delete(
+                session_id
+            )
+
+    def set_diagnostics(
+        self,
+        session_id: str,
+        enabled: bool,
+    ) -> None:
+        self.session(
+            session_id
+        ).set_diagnostics(
+            enabled
+        )
+        if self.store is not None:
+            self.save(
+                session_id
+            )
 
     def chat(
         self,
@@ -724,10 +1315,17 @@ class CortexLanguageGateway:
         *,
         diagnostics: bool | None = None,
     ) -> ChatResult:
-        return self.session(session_id).chat(
+        result = self.session(
+            session_id
+        ).chat(
             user_text,
             diagnostics=diagnostics,
         )
+        if self.store is not None:
+            self.save(
+                session_id
+            )
+        return result
 
 
 def openai_chat_completion(result: ChatResult) -> dict[str, Any]:
