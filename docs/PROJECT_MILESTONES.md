@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.14-R`;
+- predictive-geometry research frontier: `v1.15-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -269,24 +269,52 @@ Numerical differences remained at floating-point scale. See [EXACT_PERCEPTUAL_FA
 
 ---
 
-## B2. v1.15-R — cache-refresh attribution / decomposition
+## B2. v1.15-R — cache-refresh attribution / decomposition — passed
 
-v1.14-R re-profiling identifies **cache refresh** as the new dominant stage at about **45.5%** of the 288-anchor step. Candidate readout is second at about 21%.
+The official campaign decomposed the cache-refresh bottleneck without changing cache behavior.
 
-The next milestone should measure cache-refresh internals before changing them:
+At 288 anchors:
 
-- semantic-feature recomputation;
-- outcome-probability refresh;
-- dirty-anchor detection;
-- pairwise distance-row updates;
-- kernel-row regeneration;
-- writes/bookkeeping and unattributed remainder.
+- distance-row recomputation: **41.10%**;
+- kernel regeneration: **35.50%**;
+- writes/bookkeeping: **15.48%**;
+- semantic features: **2.90%**;
+- dirty detection: **1.88%**;
+- outcome-probability refresh: **1.55%**;
+- mean dirty-row fraction: **13.40%**.
 
-No substage winner is preregistered. The attribution campaign chooses the next exact optimization target.
+All paired numerical discrepancies were **0** and structural disagreements were **0**.
+
+The measured next target is therefore semantic geometry plus kernel regeneration, not feature/probability refresh.
+
+See [CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md](CACHE_REFRESH_ATTRIBUTION_V1_15_RESULT.md).
 
 ---
 
-## B3. Freeze the next executable research specification
+## B3. v1.16-R — exact semantic-geometry fast path
+
+The semantic feature rows are square roots of categorical probability vectors and therefore have unit Euclidean norm up to floating-point precision.
+
+Instead of materializing a dirty-rows × anchors × outcomes difference tensor, test the exact identity:
+
+```math
+d_{ij}
+=
+\sqrt{\max(0,1-f_i^\top f_j)}.
+```
+
+The candidate optimization should:
+
+- compute dirty-row dot products against all cached feature rows;
+- recover the same predictive distances;
+- regenerate every candidate-resolution kernel from the same squared-distance quantity;
+- preserve the existing sparse dirty-row selection;
+- preserve cached distance/kernel semantics;
+- pass paired numerical/structural parity before any performance claim.
+
+---
+
+## B4. Freeze the next executable research specification
 
 Once the selected reasoning and predictive-geometry mechanisms stabilize, create a **new frozen specification** rather than modifying `spec-v0.9.5`.
 
@@ -302,8 +330,7 @@ The freeze should include:
 This is the boundary between successful research and promotable architecture.
 
 ---
-
-## B4. Promote accepted mechanisms to Rust
+## B5. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
