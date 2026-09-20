@@ -11,8 +11,11 @@ currently computes the complete answer before chunks are emitted.
 from __future__ import annotations
 
 import argparse
+import json
 import os
+from hashlib import sha256
 from pathlib import Path
+from time import time
 from typing import Any
 
 from .language_gateway import (
@@ -102,7 +105,78 @@ def _last_user_text(messages: Any) -> str:
     )
 
 
-def _openai_stream_events(result: Any):
+def _alpaca_title_request(
+    user_text: str,
+) -> bool:
+    return user_text.startswith(
+        "Generate a title for this prompt:"
+    )
+
+
+def _alpaca_title_text(
+    user_text: str,
+) -> str:
+    _, _, prompt = user_text.partition(
+        ":"
+    )
+    cleaned = " ".join(
+        prompt.strip().split()
+    )
+    if not cleaned:
+        return "New Chat"
+    words = cleaned.split()
+    title = " ".join(
+        words[:6]
+    )
+    if len(title) > 30:
+        title = title[:30].rstrip()
+    return title or "New Chat"
+
+
+def _utility_chat_completion(
+    *,
+    model: str,
+    content: str,
+) -> dict[str, Any]:
+    created = int(
+        time()
+    )
+    response_id = (
+        "chatcmpl-util-"
+        + sha256(
+            content.encode(
+                "utf-8"
+            )
+        ).hexdigest()[:20]
+    )
+    return {
+        "id": response_id,
+        "object": "chat.completion",
+        "created": created,
+        "model": model,
+        "choices": [
+            {
+                "index": 0,
+                "message": {
+                    "role": "assistant",
+                    "content": content,
+                },
+                "finish_reason": "stop",
+            }
+        ],
+        "usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0,
+        },
+    }
+
+
+def _openai_stream_events(
+    result: Any,
+    *,
+    trace: bool = False,
+):
     """Emit a minimal OpenAI-compatible chat-completion SSE stream."""
 
     payload = openai_chat_completion(result)
@@ -112,8 +186,6 @@ def _openai_stream_events(result: Any):
     content = payload["choices"][0]["message"]["content"]
 
     def event(data: dict[str, Any]) -> str:
-        import json
-
         return "data: " + json.dumps(
             data,
             ensure_ascii=False,
@@ -142,11 +214,13 @@ def _openai_stream_events(result: Any):
     # Chunking here is transport compatibility for OpenAI clients such as
     # Alpaca; it is intentionally not token-level generation streaming.
     chunk_size = 64
+    emitted_chunks = 0
     for offset in range(
         0,
         len(content),
         chunk_size,
     ):
+        emitted_chunks += 1
         yield event(
             {
                 "id": response_id,
@@ -184,6 +258,12 @@ def _openai_stream_events(result: Any):
         }
     )
     yield "data: [DONE]\n\n"
+    if trace:
+        print(
+            f"[cortex-gateway:{result.session_id}] "
+            f"sse:done ({len(content)} chars, {emitted_chunks} content chunks)",
+            flush=True,
+        )
 
 
 def create_app(
@@ -272,6 +352,53 @@ def create_app(
             user_text = _last_user_text(
                 payload.get("messages")
             )
+
+            if _alpaca_title_request(
+                user_text
+            ):
+                title = _alpaca_title_text(
+                    user_text
+                )
+                response_format = payload.get(
+                    "response_format"
+                )
+                if isinstance(
+                    response_format,
+                    dict,
+                ):
+                    utility_content = json.dumps(
+                        {
+                            "title": title,
+                            "emoji": "",
+                        },
+                        separators=(",", ":"),
+                    )
+                else:
+                    utility_content = title
+                if bool(
+                    getattr(
+                        gateway.config,
+                        "trace_stages",
+                        False,
+                    )
+                ):
+                    print(
+                        "[cortex-gateway:utility] "
+                        f"title:bypass ({len(utility_content)} chars)",
+                        flush=True,
+                    )
+                return JSONResponse(
+                    _utility_chat_completion(
+                        model=str(
+                            payload.get(
+                                "model",
+                                public_model_name,
+                            )
+                        ),
+                        content=utility_content,
+                    )
+                )
+
             session_id = (
                 x_cortex_session
                 or str(
@@ -304,10 +431,26 @@ def create_app(
                 detail=str(exc),
             ) from exc
 
+        trace_http = bool(
+            getattr(
+                gateway.config,
+                "trace_stages",
+                False,
+            )
+        )
+        if trace_http:
+            print(
+                f"[cortex-gateway:{result.session_id}] "
+                f"response:ready ({len(result.content)} chars, "
+                f"stream={bool(payload.get('stream', False))})",
+                flush=True,
+            )
+
         if payload.get("stream", False):
             return StreamingResponse(
                 _openai_stream_events(
-                    result
+                    result,
+                    trace=trace_http,
                 ),
                 media_type="text/event-stream",
                 headers={
