@@ -1,6 +1,6 @@
 # Cortex v1.20-R — Lazy Distance Materialization
 
-Status: **frozen protocol / development passed / official campaign untouched**.
+Status: **frozen protocol / official campaign passed**.
 
 Protocol ID: **lazy-distance-materialization-v1.20-R**.
 
@@ -78,7 +78,7 @@ Anchor counts: **72, 144, 288**.
 
 Development seeds: **0..7**.
 
-Reserved untouched official seeds: **900..904**.
+Official seeds: **900..904**.
 
 ## Development validity gates
 
@@ -142,3 +142,19 @@ development margin. An isolated refresh improvement is not sufficient for
 promotion.
 
 No mechanism or threshold may change before official evaluation.
+
+## Official outcome
+
+The untouched official campaign passed every frozen validity and performance gate.
+
+At 288 anchors:
+
+- refresh speedup: **1.132×**;
+- fused-step speedup: **1.025×**;
+- explicit distance access: **780 µs**;
+- all numerical/state discrepancies: **0**;
+- hot-path distance materializations: **0**.
+
+The lazy cache is promoted to the default research fused controller.
+
+See [LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md](LAZY_DISTANCE_MATERIALIZATION_V1_20_RESULT.md).
