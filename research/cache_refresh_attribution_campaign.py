@@ -21,6 +21,8 @@ from support_sparse_prediction import (
 )
 
 OUTCOMES = 3
+DEVELOPMENT_SEEDS = (0, 1, 2)
+OFFICIAL_SEEDS = (100, 101, 102)
 SUBSTAGES = (
     "features",
     "probabilities",
@@ -551,11 +553,11 @@ def _median(rows, key):
     )
 
 
-def campaign(seeds: int, output: Path) -> dict:
+def campaign(seed_values: tuple[int, ...], output: Path) -> dict:
     rows = [
         run_case(seed, anchors)
         for anchors in ANCHOR_CASES
-        for seed in range(seeds)
+        for seed in seed_values
     ]
     output.write_text(
         "".join(
@@ -640,7 +642,7 @@ def campaign(seeds: int, output: Path) -> dict:
 
     summary = {
         "protocol": "cache-refresh-attribution-v1.15-R",
-        "seeds": seeds,
+        "seeds": list(seed_values),
         "anchor_cases": list(ANCHOR_CASES),
         "cases": cases,
         "max_candidate_error": max(
@@ -682,7 +684,9 @@ def campaign(seeds: int, output: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--seeds", type=int, default=3)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--development", action="store_true")
+    group.add_argument("--official", action="store_true")
     parser.add_argument(
         "--output",
         type=Path,
@@ -691,7 +695,12 @@ def main() -> None:
         ),
     )
     args = parser.parse_args()
-    campaign(args.seeds, args.output)
+    seeds = (
+        OFFICIAL_SEEDS
+        if args.official
+        else DEVELOPMENT_SEEDS
+    )
+    campaign(seeds, args.output)
 
 
 if __name__ == "__main__":
