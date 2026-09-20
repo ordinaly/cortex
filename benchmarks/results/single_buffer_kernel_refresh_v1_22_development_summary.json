@@ -1,0 +1,69 @@
+{
+  "protocol": "single-buffer-kernel-refresh-v1.22-R",
+  "status": "development_rejected",
+  "official_campaign": "not_run",
+  "official_reason": "development performance gates failed",
+  "development_seeds": [
+    30,
+    31,
+    32,
+    33,
+    34,
+    35
+  ],
+  "anchor_cases": [
+    72,
+    144,
+    288
+  ],
+  "exactness": {
+    "max_candidate_error": 0,
+    "max_local_error": 0,
+    "max_outcome_count_error": 0,
+    "max_feature_error": 0,
+    "max_probability_error": 0,
+    "max_kernel_error": 0,
+    "max_distance_error_after_access": 0,
+    "dirty_disagreements": 0,
+    "structural_disagreements": 0
+  },
+  "cases": {
+    "72": {
+      "refresh_speedup": 0.9627452248743726,
+      "fused_speedup": 0.9886981001506321,
+      "fused_win_fraction": 0,
+      "reference_refresh_us_per_step": 152.27998518518518,
+      "candidate_refresh_us_per_step": 157.97676481481483,
+      "reference_fused_us_per_step": 519.0590277777777,
+      "candidate_fused_us_per_step": 522.9913462962963,
+      "max_scratch_bytes": 41472
+    },
+    "144": {
+      "refresh_speedup": 0.9694484189882748,
+      "fused_speedup": 0.9907346977402554,
+      "fused_win_fraction": 0.16666666666666666,
+      "reference_refresh_us_per_step": 346.8682074074074,
+      "candidate_refresh_us_per_step": 356.7807148148148,
+      "reference_fused_us_per_step": 1200.231622222222,
+      "candidate_fused_us_per_step": 1209.9720462962964,
+      "max_scratch_bytes": 82944
+    },
+    "288": {
+      "refresh_speedup": 0.9898811211631322,
+      "fused_speedup": 0.9877379236276838,
+      "fused_win_fraction": 0,
+      "reference_refresh_us_per_step": 665.6349629629628,
+      "candidate_refresh_us_per_step": 672.5789759259259,
+      "reference_fused_us_per_step": 2497.4705833333337,
+      "candidate_fused_us_per_step": 2534.857161111111,
+      "max_scratch_bytes": 331776
+    }
+  },
+  "frozen_gates": {
+    "small_scale_min_fused_speedup": 0.98,
+    "large_scale_min_refresh_speedup": 1.02,
+    "large_scale_min_fused_speedup": 1.01,
+    "large_scale_min_fused_win_fraction": 0.6
+  },
+  "decision": "do_not_promote"
+}

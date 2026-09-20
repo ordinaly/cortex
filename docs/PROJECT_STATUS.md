@@ -1,6 +1,6 @@
 # Cortex project status
 
-Last consolidated research frontier: **v1.21-R**  
+Last consolidated research frontier: **v1.22-R**  
 Software/runtime: **v1.0.0-rc.2**  
 Executable specification: **spec-v0.9.5**
 
@@ -30,7 +30,7 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
 
-The current research frontier is `v1.21-R`.
+The current research frontier is `v1.22-R`.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 
@@ -43,6 +43,8 @@ v1.19-R then re-profiled the fused research path with one timed stage per fresh 
 v1.20-R validated lazy distance materialization. At 288 anchors, cache refresh became **1.132× faster** and the complete fused step **1.025× faster**, with **0 numerical/state discrepancies** and zero hot-path distance materializations. The public distance view reconstructs exactly on access and the validated lazy cache is now the default research fused-cache implementation.
 
 v1.21-R repeated the low-overhead independent-replay profiler after that promotion. On untouched official seeds at 288 anchors, cache refresh remains the largest coarse stage at **35.55%**, followed by candidate readout at **21.21%**, hysteresis/state scan at **19.09%**, and complexity refresh at **13.94%**. Prediction-checksum discrepancy remained **0**.
+
+v1.22-R then tested single-buffer kernel refresh / allocation elision. The candidate preserved exact predictions, state, kernels, dirty masks, and lazy distance behavior across all development cases, but it was slower rather than faster. At 288 anchors, median refresh speedup was **0.990×** and median complete fused-step speedup **0.988×**, with zero fused-step wins across six development seeds. The candidate was not promoted. Because development failed the frozen performance gates, official seeds 1200–1204 were not run.
 
 ## Strongest validated engineering results
 
@@ -107,13 +109,23 @@ Reusing one perceptual-responsibility pass throughout the prequential step produ
 
 Support truncation was behaviorally safe but much less economically useful. Even retaining only 99% responsibility mass kept roughly 64% of anchors at 288 anchors and produced only about **1.05x** additional speedup.
 
-### Current bottleneck
+### Current performance frontier
 
-v1.14-R implemented the exact optimization identified by the v1.13-R profiler. At 288 anchors, focused perceptual computation became **48.26× faster** and its profiled share fell from about **48.9%** to **2.2%**, with zero structural disagreements.
+v1.21-R remains the authoritative coarse profile of the promoted research path:
+at 288 anchors, cache refresh is **35.55%**, candidate readout **21.21%**,
+hysteresis/state scan **19.09%**, and complexity refresh **13.94%**.
 
-The new dominant stage is **cache refresh**, about **45.5%** of the 288-anchor fused research step. Candidate readout is second at about **21%**.
+v1.22-R tested whether the remaining cache cost could be reduced by replacing
+the temporary resolution-by-dirty-row-by-anchor kernel block with a reusable
+two-dimensional buffer. The implementation was exact but development rejected
+it economically: refresh was **0.990×** and the full fused step **0.988×** the
+reference speed at 288 anchors.
 
-The next research engineering step is therefore **cache-refresh attribution/decomposition** before choosing another optimization.
+The validated v1.20 lazy cache therefore remains the default. Another
+layout-only cache rewrite is not currently justified. If optimization work
+continues, candidate readout is the next-largest measured coarse stage.
+
+See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
 
 ### Hybrid semantic grounding
 

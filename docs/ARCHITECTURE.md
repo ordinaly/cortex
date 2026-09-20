@@ -4,7 +4,7 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.21-R`
+> **Research frontier:** `v1.22-R`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -72,7 +72,7 @@ Cortex currently has three version coordinates because they serve different purp
 |---|---|---|
 | Software release | The packaged Rust/Python implementation | `v1.0.0-rc.2` |
 | Executable specification | The frozen behavioral oracle | `spec-v0.9.5` |
-| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.21-R` |
+| Research frontier | Experimental mechanisms not yet promoted into the runtime contract | `v1.22-R` |
 
 This separation is architectural, not administrative.
 
@@ -80,7 +80,7 @@ The stable native runtime implements the current published behavioral contract. 
 
 ```mermaid
 flowchart LR
-    R["Research prototypes<br/>v1.1-R ... v1.21-R"]
+    R["Research prototypes<br/>v1.1-R ... v1.22-R"]
     G["Validation gates<br/>differential tests<br/>frozen campaigns<br/>negative results retained"]
     S["New executable spec<br/>future spec-vX"]
     N["Native Rust implementation"]
@@ -96,7 +96,7 @@ flowchart LR
 
 The current `spec-v0.9.5` is immutable. Research does not silently mutate it.
 
-The current predictive-geometry engineering frontier is **v1.21-R**.
+The current predictive-geometry engineering frontier is **v1.22-R**.
 
 v1.15-R first decomposed cache refresh and found that, at 288 anchors,
 distance-row recomputation plus kernel regeneration accounted for about
@@ -166,9 +166,19 @@ v1.21-R repeated the same low-overhead independent-replay profiler after that pr
 - complexity refresh: **13.94%**;
 - prediction-checksum discrepancy: **0**.
 
-Cache refresh is less dominant than before v1.20-R but remains the largest coarse stage. The next engineering candidate is v1.22-R single-buffer kernel refresh: eliminate the `resolutions × dirty_rows × anchors` temporary by computing one resolution at a time into a reusable two-dimensional buffer, with promotion contingent on a paired full-step gain.
+v1.22-R then tested single-buffer kernel refresh: the temporary
+`resolutions × dirty_rows × anchors` kernel block was replaced by a reusable
+two-dimensional buffer evaluated one resolution at a time. The candidate
+preserved exact numerical and structural behavior, but development performance
+rejected promotion. At 288 anchors, median refresh speedup was **0.990×** and
+the complete fused-step speedup **0.988×**, with zero fused-step wins across
+six seeds.
 
-See [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md).
+The validated v1.20 lazy cache therefore remains the active research default.
+The official v1.22 seeds were not run because the frozen development gates
+failed.
+
+See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md) and [POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md](POST_LAZY_STAGE_PROFILE_V1_21_RESULT.md).
 
 ---
 

@@ -479,6 +479,156 @@ class LazyDistanceSemanticGeometryPredictiveCache(
         self.rows_refreshed += int(np.sum(dirty))
         return dirty.copy()
 
+
+class SingleBufferKernelRefreshPredictiveCache(
+    LazyDistanceSemanticGeometryPredictiveCache
+):
+    """v1.22-R candidate using one reusable 2-D kernel scratch buffer.
+
+    The promoted v1.20 lazy cache computes all candidate-resolution rows in
+    one temporary array shaped roughly resolutions x dirty_rows x anchors.
+    This candidate instead evaluates one resolution at a time into a reusable
+    two-dimensional scratch buffer, then copies that slice into the persistent
+    kernel bank.
+
+    The scratch bank starts at 25% of the anchor count (comfortably above the
+    ~13% dirty-row fraction measured in v1.17) and grows geometrically only if
+    a later refresh requires more rows. Numerical kernel semantics, symmetric
+    writes, and lazy public-distance materialization are unchanged.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        anchors = len(self.features)
+        initial_rows = min(
+            anchors,
+            max(1, (anchors + 3) // 4),
+        )
+        self._kernel_scratch = np.empty(
+            (initial_rows, anchors),
+            dtype=float,
+        )
+        self.scratch_reallocations = 0
+        self.single_buffer_refreshes = 0
+
+    @property
+    def scratch_capacity_rows(self) -> int:
+        return int(self._kernel_scratch.shape[0])
+
+    @property
+    def scratch_bytes(self) -> int:
+        return int(self._kernel_scratch.nbytes)
+
+    def _scratch_rows(self, rows: int) -> np.ndarray:
+        if rows <= 0:
+            raise ValueError("rows must be positive")
+        anchors = len(self.features)
+        if rows > self._kernel_scratch.shape[0]:
+            capacity = min(
+                anchors,
+                max(
+                    rows,
+                    2 * self._kernel_scratch.shape[0],
+                ),
+            )
+            self._kernel_scratch = np.empty(
+                (capacity, anchors),
+                dtype=float,
+            )
+            self.scratch_reallocations += 1
+        return self._kernel_scratch[:rows, :]
+
+    def _write_kernel_rows_single_buffer(
+        self,
+        distance_squared: np.ndarray,
+        dirty: np.ndarray,
+        *,
+        full_rebuild: bool,
+    ) -> None:
+        rows = int(distance_squared.shape[0])
+        scratch = self._scratch_rows(rows)
+
+        for index, inverse_scale in enumerate(
+            self._inverse_two_resolution_sq
+        ):
+            np.multiply(
+                distance_squared,
+                -float(inverse_scale),
+                out=scratch,
+            )
+            np.exp(scratch, out=scratch)
+
+            kernel = self.kernels[index]
+            if full_rebuild:
+                kernel[...] = scratch
+            else:
+                kernel[dirty, :] = scratch
+                kernel[:, dirty] = scratch.T
+
+        self.single_buffer_refreshes += 1
+
+    def refresh(self) -> np.ndarray:
+        current_features = self.field.features()
+        self.probabilities = (
+            self.field.outcome_probabilities()
+        )
+        anchors = len(self.field.anchors)
+        self.refresh_events += 1
+
+        if self.feature_tolerance == 0.0:
+            self.features = current_features
+            distance_squared = self._distance_squared_rows(
+                self.features,
+                source_indices=np.arange(
+                    anchors,
+                    dtype=int,
+                ),
+            )
+            dirty = np.ones(
+                anchors,
+                dtype=bool,
+            )
+            self._write_kernel_rows_single_buffer(
+                distance_squared,
+                dirty,
+                full_rebuild=True,
+            )
+            self._distance_stale = True
+            self.last_dirty_mask = dirty
+            self.kernel_revision += 1
+            self.full_rebuilds += 1
+            self.rows_refreshed += anchors
+            return dirty.copy()
+
+        drift = np.linalg.norm(
+            current_features - self.features,
+            axis=1,
+        )
+        dirty = drift >= self.feature_tolerance
+        self.last_dirty_mask = dirty
+
+        if not np.any(dirty):
+            return dirty.copy()
+
+        self.features[dirty] = current_features[dirty]
+        dirty_indices = np.flatnonzero(dirty)
+        distance_squared = self._distance_squared_rows(
+            self.features[dirty],
+            source_indices=dirty_indices,
+        )
+        self._write_kernel_rows_single_buffer(
+            distance_squared,
+            dirty,
+            full_rebuild=False,
+        )
+
+        self._distance_stale = True
+        self.kernel_revision += 1
+        self.partial_refreshes += 1
+        self.rows_refreshed += int(np.sum(dirty))
+        return dirty.copy()
+
+
 class KernelLadderSemanticGeometryPredictiveCache(
     ExactSemanticGeometryPredictiveCache
 ):
