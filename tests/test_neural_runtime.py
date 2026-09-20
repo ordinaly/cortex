@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from cortex.neural_runtime import (
     NeuralCapabilities,
+    NeuralRequest,
     NeuralResponse,
+    NeuralSession,
     OllamaNeuralRuntime,
     RuntimeClientAdapter,
 )
@@ -186,3 +188,138 @@ def test_ollama_runtime_returns_instrumented_response(monkeypatch):
         ]
         == 123
     )
+
+
+
+def test_neural_session_owns_per_exchange_call_trace():
+    runtime = FakeRuntime()
+    session = NeuralSession(
+        session_id="s1",
+        runtime=runtime,
+    )
+    session.begin_exchange(
+        "exchange-1"
+    )
+
+    response = session.execute(
+        NeuralRequest(
+            stage="answer",
+            model="test",
+            messages=[
+                {
+                    "role": "user",
+                    "content": "hello",
+                }
+            ],
+            schema={
+                "type": "object",
+            },
+            cache_policy=(
+                "reuse_if_supported"
+            ),
+        )
+    )
+
+    assert response.text == "ok"
+    packet = session.packet()
+    assert (
+        packet[
+            "active_exchange_id"
+        ]
+        == "exchange-1"
+    )
+    assert (
+        packet[
+            "neural_call_count"
+        ]
+        == 1
+    )
+    call = packet[
+        "neural_calls"
+    ][0]
+    assert (
+        call["stage"]
+        == "answer"
+    )
+    assert (
+        call["exchange_id"]
+        == "exchange-1"
+    )
+    assert (
+        call["cache_policy"]
+        == "reuse_if_supported"
+    )
+
+
+def test_neural_session_resets_trace_for_new_exchange():
+    runtime = FakeRuntime()
+    session = NeuralSession(
+        session_id="s1",
+        runtime=runtime,
+    )
+    session.begin_exchange(
+        "one"
+    )
+    session.execute(
+        NeuralRequest(
+            stage="first",
+            model="test",
+            messages=[],
+        )
+    )
+    session.begin_exchange(
+        "two"
+    )
+
+    assert (
+        session.packet()[
+            "neural_call_count"
+        ]
+        == 0
+    )
+    assert (
+        session.packet()[
+            "active_exchange_id"
+        ]
+        == "two"
+    )
+
+
+def test_neural_session_rejects_unsupported_structured_generation():
+    class LimitedRuntime(
+        FakeRuntime
+    ):
+        @property
+        def capabilities(self):
+            return NeuralCapabilities(
+                generate=True,
+                structured_generate=False,
+            )
+
+    session = NeuralSession(
+        session_id="s1",
+        runtime=LimitedRuntime(),
+    )
+
+    try:
+        session.execute(
+            NeuralRequest(
+                stage="structured",
+                model="test",
+                messages=[],
+                schema={
+                    "type": "object",
+                },
+            )
+        )
+    except RuntimeError as exc:
+        assert (
+            "structured generation"
+            in str(
+                exc
+            )
+        )
+    else:
+        raise AssertionError(
+            "unsupported structured generation must fail"
+        )
