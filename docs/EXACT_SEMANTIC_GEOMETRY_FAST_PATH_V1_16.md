@@ -1,6 +1,6 @@
 # Cortex v1.16-R — Exact Semantic-Geometry Fast Path
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen protocol / development passed / official campaign untouched**.
 
 Protocol ID: **exact-semantic-geometry-fast-path-v1.16-R**.
 
@@ -124,7 +124,7 @@ Development seeds: **0, 1, 2**.
 
 Reserved untouched official seeds: **300, 301, 302**.
 
-## Development validity gates
+## Frozen official gates
 
 Before any official run:
 
@@ -139,9 +139,14 @@ Before any official run:
 9. fused-stage timing accounting >= **0.90**;
 10. all reported metrics are finite and the declared seeds/scales are exact.
 
-These are validity gates only. The development campaign determines a reasonable
-performance gate, which must then be frozen before the official seeds are
-opened.
+The final frozen gates additionally require, at **288 anchors**:
+
+11. median cache-refresh speedup >= **1.30×**;
+12. median complete fused-step speedup >= **1.08×**;
+13. median cache-refresh stage share <= **0.35** after optimization.
+
+These thresholds were frozen after development and before the official seeds
+were opened.
 
 ## Interpretation rule
 
@@ -159,3 +164,38 @@ Python/NumPy predictive-geometry research path.
 
 It would not imply the same speedup for Rust, different feature dimensionality,
 other BLAS implementations, or external workloads.
+
+## Development history before freeze
+
+The first implementation used the unit-norm dot-product identity directly.
+It was fast, but near-zero cached distances suffered cancellation after the
+square root. Development measured:
+
+- cache-refresh speedup at 288 anchors: **1.65×**;
+- full fused-step speedup: **1.20×**;
+- maximum distance-cache error: **2.33e-9**;
+- maximum kernel error: **2.16e-13**;
+- structural disagreements: **0**.
+
+The distance error violated the stricter parity gate, so that implementation
+was rejected rather than weakening the threshold.
+
+The accepted development implementation instead accumulates squared feature
+differences one feature dimension at a time into a 2-D dirty-row matrix. This
+avoids the 3-D difference tensor while preserving the legacy Euclidean
+arithmetic much more closely. The squared-distance matrix is still reused for
+all candidate-resolution kernels.
+
+Final development result at 288 anchors:
+
+- cache-refresh speedup: **1.5688×**;
+- complete fused-step speedup: **1.1338×**;
+- cache-refresh stage share: **0.2603**;
+- candidate-readout stage share: **0.3656**;
+- maximum distance error: **5.55e-17**;
+- maximum kernel error: **3.33e-16**;
+- candidate-prediction error: **2.22e-16**;
+- structural disagreements: **0**.
+
+No implementation, threshold, or official seed may now be changed without
+creating a new protocol version.
