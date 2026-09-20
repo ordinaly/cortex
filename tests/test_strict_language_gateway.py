@@ -176,6 +176,15 @@ class StrictFakeClient:
                     '"query_operation":"introspection","query_subject":"",'
                     '"query_predicate":"","query_object":""}'
                 )
+            if text == "Hello Cortex. What do you know?":
+                # Deliberately model a plausible parser mistake:
+                # self-recall with an undeclared surface reference.
+                return (
+                    '{"language":"en","speech_act":"question",'
+                    '"entities":[],"observations":[],'
+                    '"query_operation":"entity_recall","query_subject":"Cortex",'
+                    '"query_predicate":"knowledge","query_object":""}'
+                )
             raise AssertionError(
                 f"unexpected parser input: {text}"
             )
@@ -860,3 +869,134 @@ def test_promptir_unknown_surface_reference_still_fails_closed():
             },
             source_text="Tell me about Alice.",
         )
+
+
+def test_introspection_ignores_undeclared_cortex_self_reference():
+    prompt_ir = parse_prompt_ir_payload(
+        {
+            "language": "en",
+            "speech_act": "question",
+            "entities": [],
+            "observations": [],
+            "query_operation": "introspection",
+            "query_subject": "Cortex",
+            "query_predicate": "knowledge",
+            "query_object": "",
+        },
+        source_text=(
+            "Hello Cortex. What do you know?"
+        ),
+    )
+
+    assert (
+        prompt_ir.query_operation
+        == "introspection"
+    )
+    assert (
+        prompt_ir.query_subject
+        == ""
+    )
+    assert (
+        prompt_ir.query_object
+        == ""
+    )
+
+
+def test_self_entity_recall_is_normalized_to_introspection():
+    prompt_ir = parse_prompt_ir_payload(
+        {
+            "language": "en",
+            "speech_act": "question",
+            "entities": [],
+            "observations": [],
+            "query_operation": "entity_recall",
+            "query_subject": "Cortex",
+            "query_predicate": "knowledge",
+            "query_object": "",
+        },
+        source_text=(
+            "Hello Cortex. What do you know?"
+        ),
+    )
+
+    assert (
+        prompt_ir.query_operation
+        == "introspection"
+    )
+    assert (
+        prompt_ir.query_subject
+        == ""
+    )
+
+
+def test_what_do_you_know_returns_cortex_stored_relations():
+    gateway, _client = make_gateway(
+        explain_responses=True,
+    )
+
+    gateway.chat(
+        "knowledge",
+        "Alice works with Bob.",
+    )
+    result = gateway.chat(
+        "knowledge",
+        "Hello Cortex. What do you know?",
+    )
+
+    answer_ir = (
+        result.cortex_context[
+            "answer_ir"
+        ]
+    )
+    assert (
+        answer_ir["status"]
+        == "resolved"
+    )
+    assert len(
+        answer_ir["claims"]
+    ) == 1
+    claim = (
+        answer_ir["claims"][0]
+    )
+    assert (
+        claim["subject"]
+        == "Alice"
+    )
+    assert (
+        claim["predicate"]
+        == "works_with"
+    )
+    assert (
+        claim["object"]
+        == "Bob"
+    )
+    assert (
+        "Alice works with Bob."
+        in result.content
+    )
+    assert (
+        "Query: introspection"
+        in result.content
+    )
+
+
+def test_empty_knowledge_introspection_returns_unknown_not_validation_error():
+    gateway, _client = make_gateway(
+        explain_responses=True,
+    )
+
+    result = gateway.chat(
+        "empty-knowledge",
+        "Hello Cortex. What do you know?",
+    )
+
+    assert (
+        result.cortex_context[
+            "answer_ir"
+        ]["status"]
+        == "unknown"
+    )
+    assert (
+        "Decision: unknown"
+        in result.content
+    )
