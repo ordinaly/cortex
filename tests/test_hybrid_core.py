@@ -786,6 +786,14 @@ def test_neural_direct_policy_uses_one_neural_call():
         ]
         == 1
     )
+    assert (
+        result.cortex_context[
+            "diagnosis"
+        ][
+            "status"
+        ]
+        == "neural_only"
+    )
     exchange = result.cortex_context[
         "hybrid_exchange"
     ]
@@ -952,3 +960,4 @@ def test_server_factory_exposes_named_hybrid_policy(
     )
     assert not plan.parse_user
     assert not plan.inject_cortex
+    assert not plan.assess_candidate
