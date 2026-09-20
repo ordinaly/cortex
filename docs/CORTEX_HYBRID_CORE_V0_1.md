@@ -26,6 +26,113 @@ runtime and a smaller number of neural inference passes.
 Cortex does not depend on Qwen or Ollama directly. It depends on the
 `NeuralRuntime` contract.
 
+## Orchestration interface
+
+Hybrid Core now separates three internal contracts:
+
+```text
+HybridCoreSession
+      |
+      +--> OrchestrationPolicy
+      |       chooses the per-turn plan
+      |
+      +--> HybridExchange
+      |       typed shared cognitive state
+      |
+      +--> NeuralSession
+              model-local execution/session state
+                  |
+                  v
+              NeuralRuntime
+                  |
+                  v
+              backend/provider
+```
+
+### HybridExchange
+
+`HybridExchange` is the cognitive exchange object for one turn. It contains:
+
+- the user signal;
+- the explicit orchestration plan;
+- normalized PromptIR when parsing is enabled;
+- the Cortex contribution;
+- the neural proposal;
+- Cortex diagnosis;
+- revision count;
+- an ordered, inspectable event trace.
+
+The exchange is backend-independent.
+
+A text-only backend such as Ollama currently receives a serialized projection
+through `TextHybridExchangeAdapter`. The JSON/system-prompt representation is
+therefore an adapter implementation, not the cognitive architecture.
+
+A future in-process backend can consume the same exchange through a different
+adapter such as soft conditioning, adapter gates, cache state, or activation
+interfaces.
+
+### NeuralSession
+
+`NeuralSession` sits between Hybrid Core and `NeuralRuntime`.
+
+It owns:
+
+- the active exchange ID;
+- per-exchange neural call trace;
+- stage labels;
+- cache policy requests;
+- future adapter selection;
+- backend capability validation.
+
+The current implementation delegates execution to `NeuralRuntime`. A future
+backend can keep KV caches, adapters, or other model-local state behind the
+same session boundary.
+
+### OrchestrationPolicy
+
+Each turn has an explicit `OrchestrationPlan` controlling:
+
+- whether semantic parsing runs;
+- whether the turn is observed by Cortex;
+- whether Cortex context is injected before neural generation;
+- whether a claim sidecar is required;
+- revision budget;
+- Cortex context limits;
+- bootstrap-context limits.
+
+The default `full` policy preserves the validated Hybrid Core behavior.
+
+Controlled ablation policies are also available:
+
+```text
+full
+neural-direct
+no-revision
+no-cortex-context
+```
+
+Examples:
+
+```bash
+# Full two-way hybrid route
+cortex-gateway --hybrid-runtime --hybrid-policy full ...
+
+# One neural generation, no PromptIR/Cortex pre-pass
+cortex-gateway --hybrid-runtime --hybrid-policy neural-direct ...
+
+# Cortex observes and contributes context, but cannot request a revision
+cortex-gateway --hybrid-runtime --hybrid-policy no-revision ...
+
+# Cortex observes and assesses after generation, but its state is withheld
+# from pre-generation neural conditioning
+cortex-gateway --hybrid-runtime --hybrid-policy no-cortex-context ...
+```
+
+These modes are primarily experimental controls. They let the same Hybrid Core
+measure the marginal effect of Cortex parsing, pre-generation guidance, and
+revision without implementing separate pipelines.
+
 ## NeuralRuntime capabilities
 
 Backends advertise capabilities explicitly:
@@ -330,11 +437,14 @@ The CI workflow is
 
 ## Next experiments
 
-1. Compare Gateway v0.3 and Hybrid Core v0.1 on the same local Qwen model.
-2. Measure normal-turn and conflict-turn latency.
-3. Measure bootstrap cold-start benefits on a controlled knowledge domain.
-4. Test neural/Cortex divergence with synthetic worlds.
-5. Add a second `NeuralRuntime` backend.
-6. Only then investigate hidden-state/KV-cache access and trainable adapters.
+1. Compare the `neural-direct`, `no-cortex-context`, `no-revision`, and
+   `full` orchestration policies on the same live Qwen scenarios.
+2. Compare Gateway v0.3 and Hybrid Core v0.1 on the same local Qwen model.
+3. Measure normal-turn and conflict-turn latency.
+4. Measure bootstrap cold-start benefits on a controlled knowledge domain.
+5. Test relation-schema plasticity without hard predicate cardinalities.
+6. Add a second, preferably in-process, `NeuralRuntime` backend.
+7. Use `NeuralSession` to evaluate KV-cache reuse and adapter activation.
+8. Only then investigate trainable adapters or deeper activation interfaces.
 
 Base-model weight mutation is outside Hybrid Core v0.1.
