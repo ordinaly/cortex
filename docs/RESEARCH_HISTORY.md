@@ -451,3 +451,41 @@ This is proof dependency management, not unrestricted theorem proving or
 inference-rule discovery.
 
 See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
+
+
+## planning-replanning-v1 — local plan repair with temporal support
+
+This Reasoning Map campaign connected explicit dependency tracking to finite
+deterministic action planning.
+
+Untouched official seeds 1400–1419 across seven structural families produced
+**140 cases**, including **80** local-repair cases.
+
+Every frozen gate passed.
+
+Key results:
+
+- repair-mode accuracy: **1.000**;
+- first-impact localization: **1.000**;
+- optimal-cost agreement with full replanning: **1.000**;
+- local repair / immediate rejoin: **1.000 / 1.000**;
+- prefix / suffix preservation: **1.000 / 1.000**;
+- cost adaptation: **1.000**;
+- reversible state restoration: **1.000**;
+- irrelevant-change stability: **1.000**;
+- global fallback: **1.000**;
+- infeasible detection: **1.000**.
+
+On local-change cases, the repair search expanded **2.425 states on average**
+versus **27.5** for exact full replanning, giving a mean expansion ratio of
+**0.08745** while preserving the same minimum plan cost.
+
+Interpretation: in the declared finite fixtures, Cortex can reuse unaffected
+plan structure instead of restarting planning after a local model change,
+while still falling back to global search when the old trajectory cannot be
+rejoined.
+
+The expansion reduction is specific to these fixtures and is not a general
+planning-complexity theorem.
+
+See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
