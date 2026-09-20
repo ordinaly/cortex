@@ -53,6 +53,90 @@ def _last_user_text(messages: Any) -> str:
     raise ValueError("a string user message is required")
 
 
+def _openai_stream_events(result: Any):
+    """Emit a minimal OpenAI-compatible chat-completion SSE stream."""
+
+    payload = openai_chat_completion(result)
+    response_id = payload["id"]
+    created = payload["created"]
+    model = payload["model"]
+    content = payload["choices"][0]["message"]["content"]
+
+    def event(data: dict[str, Any]) -> str:
+        import json
+
+        return "data: " + json.dumps(
+            data,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ) + "\n\n"
+
+    yield event(
+        {
+            "id": response_id,
+            "object": "chat.completion.chunk",
+            "created": created,
+            "model": model,
+            "choices": [
+                {
+                    "index": 0,
+                    "delta": {
+                        "role": "assistant",
+                    },
+                    "finish_reason": None,
+                }
+            ],
+        }
+    )
+
+    # Cortex currently computes the answer before HTTP streaming begins.
+    # Chunking here is transport compatibility for OpenAI clients such as
+    # Alpaca; it is intentionally not token-level generation streaming.
+    chunk_size = 64
+    for offset in range(
+        0,
+        len(content),
+        chunk_size,
+    ):
+        yield event(
+            {
+                "id": response_id,
+                "object": "chat.completion.chunk",
+                "created": created,
+                "model": model,
+                "choices": [
+                    {
+                        "index": 0,
+                        "delta": {
+                            "content": content[
+                                offset : offset
+                                + chunk_size
+                            ],
+                        },
+                        "finish_reason": None,
+                    }
+                ],
+            }
+        )
+
+    yield event(
+        {
+            "id": response_id,
+            "object": "chat.completion.chunk",
+            "created": created,
+            "model": model,
+            "choices": [
+                {
+                    "index": 0,
+                    "delta": {},
+                    "finish_reason": "stop",
+                }
+            ],
+        }
+    )
+    yield "data: [DONE]\n\n"
+
+
 def create_app(
     gateway: Any,
     *,
@@ -60,7 +144,7 @@ def create_app(
 ):
     try:
         from fastapi import Body, FastAPI, Header, HTTPException
-        from fastapi.responses import JSONResponse
+        from fastapi.responses import JSONResponse, StreamingResponse
     except ImportError as exc:  # pragma: no cover - optional runtime dependency
         raise RuntimeError(
             "Gateway HTTP dependencies are not installed. "
@@ -128,12 +212,6 @@ def create_app(
             alias="X-Cortex-Diagnostics",
         ),
     ):
-        if payload.get("stream", False):
-            raise HTTPException(
-                status_code=400,
-                detail="streaming is not supported in gateway v0.1",
-            )
-
         try:
             user_text = _last_user_text(
                 payload.get("messages")
@@ -169,6 +247,18 @@ def create_app(
                 status_code=502,
                 detail=str(exc),
             ) from exc
+
+        if payload.get("stream", False):
+            return StreamingResponse(
+                _openai_stream_events(
+                    result
+                ),
+                media_type="text/event-stream",
+                headers={
+                    "Cache-Control": "no-cache",
+                    "X-Accel-Buffering": "no",
+                },
+            )
 
         return JSONResponse(
             openai_chat_completion(result)
