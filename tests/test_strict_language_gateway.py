@@ -249,6 +249,7 @@ def fake_runtime(monkeypatch):
 def make_gateway(
     *,
     persistence_dir=None,
+    explain_responses=False,
 ):
     client = StrictFakeClient()
     gateway = (
@@ -264,6 +265,9 @@ def make_gateway(
                     else str(
                         persistence_dir
                     )
+                ),
+                explain_responses=(
+                    explain_responses
                 ),
             ),
             client=client,
@@ -562,3 +566,148 @@ def test_server_factory_builds_strict_gateway_mode(tmp_path):
         == "sha256-symbolic-v1"
     )
     assert gateway.config.feature_dim == 64
+
+
+def test_reasoning_report_is_always_available_in_context():
+    gateway, _client = make_gateway()
+
+    gateway.chat(
+        "report",
+        "Alice works with Bob.",
+    )
+    result = gateway.chat(
+        "report",
+        "Does Alice work with Bob?",
+    )
+
+    report = result.cortex_context[
+        "reasoning_report"
+    ]
+    assert (
+        report["query"]["operation"]
+        == "relation_lookup"
+    )
+    assert (
+        report["query"]["subject"]
+        == "Alice"
+    )
+    assert (
+        report["query"]["predicate"]
+        == "works_with"
+    )
+    assert (
+        report["query"]["object"]
+        == "Bob"
+    )
+    assert (
+        report["result"]["status"]
+        == "resolved"
+    )
+    assert len(
+        report["result"]["claims"]
+    ) == 1
+    assert {
+        "parser",
+        "cortex",
+        "renderer",
+    }.issubset(
+        report["timings"]
+    )
+
+
+def test_explain_responses_appends_deterministic_cortex_report():
+    gateway, _client = make_gateway(
+        explain_responses=True,
+    )
+
+    result = gateway.chat(
+        "explain",
+        "Alice works with Bob.",
+    )
+
+    assert "Cortex report" in (
+        result.content
+    )
+    assert (
+        "Gathered entities: Alice (person), Bob (person)"
+        in result.content
+    )
+    assert (
+        "Accepted observations:"
+        in result.content
+    )
+    assert (
+        "Alice works_with Bob"
+        in result.content
+    )
+    assert (
+        "Cortex bindings:"
+        in result.content
+    )
+    assert (
+        "Decision: acknowledged"
+        in result.content
+    )
+    assert (
+        "Processing:"
+        in result.content
+    )
+
+
+def test_explain_unknown_query_reports_missing_support_without_renderer_leak():
+    gateway, client = make_gateway(
+        explain_responses=True,
+    )
+
+    result = gateway.chat(
+        "unknown-explain",
+        "What is the capital of Mongolia?",
+    )
+
+    renderer_raw = (
+        client.renderer_messages[-1][-1][
+            "content"
+        ]
+    )
+    assert "Mongolia" not in renderer_raw
+    assert "capital" not in renderer_raw
+
+    assert "Cortex report" in (
+        result.content
+    )
+    assert (
+        "Query: relation_lookup [Mongolia capital]"
+        in result.content
+    )
+    assert (
+        "Decision: unknown"
+        in result.content
+    )
+    assert (
+        "Cortex found no sufficient stored support"
+        in result.content
+    )
+    assert "Ulaanbaatar" not in (
+        result.content
+    )
+
+
+def test_server_factory_enables_explain_responses(tmp_path):
+    gateway = build_gateway_from_env(
+        chat_model="base-model",
+        strict_neural_boundary=True,
+        parser_model="parser-model",
+        renderer_model="renderer-model",
+        persistence_dir=str(tmp_path),
+        feature_dim=64,
+        explain_responses=True,
+    )
+
+    assert isinstance(
+        gateway,
+        StrictCortexLanguageGateway,
+    )
+    assert (
+        gateway.config.explain_responses
+        is True
+    )

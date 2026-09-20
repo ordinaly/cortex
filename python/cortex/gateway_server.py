@@ -234,6 +234,13 @@ def create_app(
                 "renderer_model",
                 None,
             ),
+            "explain_responses": bool(
+                getattr(
+                    gateway.config,
+                    "explain_responses",
+                    False,
+                )
+            ),
         }
 
     @app.get("/v1/models")
@@ -459,6 +466,7 @@ def build_gateway_from_env(
     renderer_model: str | None = None,
     feature_dim: int = 128,
     trace_stages: bool = False,
+    explain_responses: bool = False,
 ) -> Any:
     model = (
         chat_model
@@ -534,6 +542,9 @@ def build_gateway_from_env(
             trace_stages=bool(
                 trace_stages
             ),
+            explain_responses=bool(
+                explain_responses
+            ),
         )
         return StrictCortexLanguageGateway(
             strict_config
@@ -607,6 +618,14 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--explain-responses",
+        action="store_true",
+        help=(
+            "Append a deterministic Cortex report describing parsed "
+            "information, accepted evidence, bindings, decision, and runtime state."
+        ),
+    )
+    parser.add_argument(
         "--ollama-url",
         default=None,
     )
@@ -656,6 +675,9 @@ def main() -> None:
         feature_dim=args.feature_dim,
         trace_stages=(
             args.trace_stages
+        ),
+        explain_responses=(
+            args.explain_responses
         ),
     )
     app = create_app(gateway)
