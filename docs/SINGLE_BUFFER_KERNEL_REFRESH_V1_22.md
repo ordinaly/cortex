@@ -1,6 +1,6 @@
 # Cortex v1.22-R — Single-Buffer Kernel Refresh
 
-Status: **frozen protocol / candidate not promoted**.
+Status: **frozen protocol / development rejected / candidate not promoted**.
 
 Protocol ID: **single-buffer-kernel-refresh-v1.22-R**.
 
@@ -121,3 +121,7 @@ No threshold is weakened after seeing official results.
 This experiment evaluates one Python/NumPy cache implementation on the frozen
 synthetic predictive-geometry traces. It makes no claim about the stable Rust
 runtime or external workloads.
+
+## Development outcome
+
+The frozen development campaign rejected the candidate on performance while preserving exact behavior. The official seeds were therefore not run. See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
