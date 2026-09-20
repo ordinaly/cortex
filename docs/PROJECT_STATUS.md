@@ -309,6 +309,30 @@ adversarial novelty.
 
 See [OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
 
+### Novelty-aware replanning
+
+The `novelty-aware-replanning-v1` campaign now composes open-world novelty
+attribution with planning dependency localization.
+
+Across **160 untouched official cases**:
+
+- attribution accuracy: **1.000**;
+- novelty-to-plan decision accuracy: **1.000**;
+- model-component locality: **1.000**;
+- repair optimality: **1.000**;
+- exact plan preservation and zero-search rate on irrelevant novelty:
+  **1.000 / 1.000**;
+- local impact localization: **1.000**;
+- local prefix/suffix preservation: **1.000 / 1.000**;
+- mean local/full expansion ratio: **0.03846**;
+- regime-global correctness: **1.000**;
+- unresolved deferral safety: **1.000**.
+
+The integration now supports four explicit responses to surprise: preserve,
+local repair, global replan, or defer.
+
+See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -332,8 +356,8 @@ semantic vocabulary, correct adversarial label correction, unresolved naming
 for a real but unnamed concept, and correct semantic lineage through concept
 split, merge, and retraction.
 
-Open-world novelty attribution has now passed. The next integration milestone
-is **Novelty-Aware Replanning v1**. A natural semantic follow-up remains
+Novelty-aware replanning has now passed. The next scientific milestone is
+**Open-World Robustness v1**. A natural semantic follow-up remains
 hierarchical grounding/inheritance together with temporal semantic revision
 across concept lineage.
 
