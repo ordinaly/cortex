@@ -10,6 +10,7 @@ from noisy_semantic_revision_campaign import (
     run_case,
 )
 from semantic_revision import CortexSemanticRevision
+from semantic_grounding import NeuralLabelEvidence
 from semantic_grounding_campaign import RELATIONS, build_world
 from noisy_semantic_revision_campaign import noisy_neural, noisy_structure
 
@@ -71,3 +72,67 @@ def test_noisy_campaign_has_nontrivial_neural_errors():
     row = run_case("asymmetric-chain", 6)
     assert row["neural_top_accuracy"] < 0.95
     assert row["neural_top_accuracy"] > 0.50
+
+
+def test_current_perceptual_conflict_suspends_trust_before_revision():
+    concepts, labels, _edges, semantic_edges, truth = build_world(
+        "asymmetric-chain",
+        8,
+    )
+    concepts = list(concepts)
+    labels = list(labels)
+    model = CortexSemanticRevision(
+        concepts,
+        labels,
+        RELATIONS,
+        semantic_edges,
+        challenge_patience=3,
+    )
+
+    for epoch in range(3):
+        neural, _ = noisy_neural(
+            concepts,
+            labels,
+            truth,
+            seed=8,
+            family="asymmetric-chain",
+            epoch=epoch,
+            error_rate=0.0,
+            missing_rate=0.0,
+        )
+        structural = noisy_structure(
+            concepts,
+            truth,
+            semantic_edges,
+            seed=8,
+            family="asymmetric-chain",
+            epoch=epoch,
+            observation_rate=1.0,
+            flip_rate=0.0,
+        )
+        model.advance(epoch, neural=neural, structural=structural)
+
+    target = concepts[0]
+    incumbent = model.read(target).accepted_label
+    assert incumbent == truth[target]
+
+    wrong = next(label for label in labels if label != incumbent)
+    rest = 0.05 / (len(labels) - 1)
+    probabilities = {label: rest for label in labels}
+    probabilities[wrong] = 0.95
+
+    model.advance(
+        3,
+        neural=[
+            NeuralLabelEvidence(
+                concept=target,
+                probabilities=probabilities,
+                reliability=1.0,
+            )
+        ],
+    )
+
+    read = model.read(target)
+    assert read.accepted_label == incumbent
+    assert read.perceptual_conflict
+    assert not read.trusted
