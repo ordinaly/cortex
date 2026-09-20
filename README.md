@@ -175,7 +175,18 @@ nearest-known-type and global-reset baselines reached **0.375** and **0.125**
 exact attribution accuracy. See
 [docs/OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md](docs/OPEN_WORLD_NOVELTY_ATTRIBUTION_V1.md).
 
-The next integration milestone is **Novelty-Aware Replanning v1**.
+The first multi-axis integration campaign,
+**novelty-aware-replanning-v1**, composes novelty attribution with explicit
+planning dependencies. Across **160 untouched official cases**, attribution,
+revision-scope decisions, model locality, and repair optimality were all
+**1.000**. Noise and irrelevant structural novelty caused zero planning search;
+relevant instance/relation/type novelty triggered local repair; regime change
+triggered global replanning; unresolved novelty deferred execution without
+model mutation. Local repairs used a mean **0.03846×** the state expansions of
+full replanning while preserving the same minimum cost. See
+[docs/NOVELTY_AWARE_REPLANNING_V1.md](docs/NOVELTY_AWARE_REPLANNING_V1.md).
+
+The next scientific milestone is **Open-World Robustness v1**.
 
 ## Hybrid neural/Cortex path
 
