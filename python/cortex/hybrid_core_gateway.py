@@ -237,6 +237,11 @@ def _session_packet(
         for record
         in session.bootstrap_records.values()
     ]
+    packet[
+        "relation_provenance"
+    ] = dict(
+        session.relation_provenance
+    )
     return packet
 
 
@@ -258,6 +263,23 @@ def _restore_session_packet(
         raise ValueError(
             "Hybrid Core bootstrap records must be an array"
         )
+    raw_provenance = payload.get(
+        "relation_provenance",
+        {},
+    )
+    if not isinstance(
+        raw_provenance,
+        dict,
+    ):
+        raise ValueError(
+            "Hybrid Core relation provenance must be an object"
+        )
+    session.relation_provenance = {
+        str(key): str(value)
+        for key, value
+        in raw_provenance.items()
+    }
+
     session.bootstrap_records.clear()
     for item in raw_records:
         if not isinstance(
