@@ -20,7 +20,7 @@ where its explicit unresolved state provides useful epistemic restraint.
 | belief revision under contradiction | `belief-revision-v1` | passed | retraction 7/14/21 batches for prior strengths 1/2/3; exact locality |
 | structural analogy / isomorphism | `structural-analogy-v1` | passed | 0.9718 coverage with 12/90 facts; exact ambiguity preservation |
 | latent concept induction | `latent-concept-induction-v1` | passed | exact recovery, ambiguity preservation, predictive gain, reversible lifecycle |
-| explicit proof dependency | planned | later | — |
+| explicit proof dependency | `explicit-proof-dependency-v1` | passed | all frozen gates passed across 120 cases; exact alternate-support handling |
 | planning / replanning | planned | later | — |
 | open-world novelty attribution | planned | later | — |
 
@@ -47,7 +47,9 @@ $$
 \quad
 \text{analogy},
 \quad
-\text{latent abstraction}.
+\text{latent abstraction},
+\quad
+\text{proof dependency}.
 $$
 
 Each benchmark should isolate one or two primitives before later campaigns
@@ -175,7 +177,33 @@ Across 80 untouched official cases:
 
 See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md).
 
-The next independent reasoning-map axis is **explicit proof dependency**.
+## Completed axis: explicit proof dependency
+
+`explicit-proof-dependency-v1` replaces one-path provenance with an explicit
+finite proof/dependency DAG.
+
+Across 120 untouched official cases:
+
+- active proof-DAG validity: **1.000**;
+- provenance validity: **1.000**;
+- shortest selected-proof correctness: **1.000**;
+- independent alternate-proof survival: **1.000**;
+- deeper-proof takeover after shortest-proof damage: **1.000**;
+- shared-root invalidation correctness: **1.000**;
+- contradictory-proof conflict handling: **1.000**;
+- nested partial invalidation correctness: **1.000**;
+- irrelevant-premise locality: **1.000**;
+- exact explanation restoration: **1.000**.
+
+A baseline that commits to only one proof failed every designated
+alternate-support case.
+
+The result establishes proof dependency management over supplied finite acyclic
+rules, not unrestricted theorem proving.
+
+See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
+
+The next independent reasoning-map axis is **planning / replanning**.
 
 ## Common evaluation axes
 

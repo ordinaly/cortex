@@ -25,11 +25,12 @@ The tracks should remain distinct. A successful research prototype is not automa
   - structural counterfactual reasoning;
   - belief revision under contradiction;
   - structural analogy / isomorphism;
-  - latent concept induction.
+  - latent concept induction;
+  - explicit proof dependency.
 
-The next independent Reasoning Map axis is **explicit proof dependency**.
-Before that, a near-term integration milestone should connect internally
-discovered concept identities to semantic grounding and semantic revision.
+The next independent Reasoning Map axis is **planning / replanning**.
+Concept-to-semantics integration is already complete; hierarchy/inheritance and
+temporal semantic lineage remain separate semantic follow-ups.
 
 ---
 
@@ -196,20 +197,28 @@ The goal is to determine whether `unresolved` activates **before** errors domina
 
 ---
 
-## A4. Explicit proof dependency v1
+## A4. Explicit proof dependency v1 — passed
 
-Move from carrying one valid path to maintaining a proof/dependency DAG.
+The official campaign passed every frozen gate across **120** untouched cases.
 
-Test:
+Cortex now maintains explicit finite proof/dependency DAGs with:
 
-- multiple independent proofs;
-- removal of one premise;
-- proof invalidation;
-- redundant support;
-- contradictory proof paths;
-- shortest versus merely valid derivations.
+- multiple simultaneous proof alternatives;
+- transitive fact and rule dependencies;
+- shortest-proof selection without deleting longer derivations;
+- exact invalidation under premise removal;
+- explicit positive/negative proof conflict;
+- stable proof IDs for unaffected derivations;
+- exact explanation restoration after premise restoration.
 
-A conclusion should survive removal of one proof when another independent proof remains.
+Measured rates were **1.000** for redundant-proof survival, deeper-proof
+takeover, shared-root invalidation, conflict handling, nested partial
+invalidation, irrelevant-premise locality, provenance validity, and exact
+restoration.
+
+The single-proof baseline failed every alternate-support discrimination case.
+
+See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
 
 ---
 
@@ -621,6 +630,8 @@ A2\ \text{latent concepts}
 C3\text{-A}\ \text{concept/semantic integration}
 \rightarrow
 A4\ \text{proof dependency}
+\rightarrow
+A5\ \text{planning/replanning}
 }
 $$
 

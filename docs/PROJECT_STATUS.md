@@ -240,6 +240,30 @@ when its concept is retracted.
 
 See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md).
 
+### Explicit proof dependency
+
+The `explicit-proof-dependency-v1` campaign now upgrades reasoning provenance
+from one valid path to an explicit finite proof/dependency DAG.
+
+Across **120 untouched official cases**, every frozen gate passed:
+
+- proof-DAG and provenance validity: **1.000 / 1.000**;
+- shortest-proof selection: **1.000**;
+- redundant alternate-proof survival: **1.000**;
+- deeper-proof takeover: **1.000**;
+- shared-root invalidation: **1.000**;
+- contradictory-proof conflict handling: **1.000**;
+- nested partial invalidation: **1.000**;
+- irrelevant-premise locality: **1.000**;
+- exact restoration: **1.000**.
+
+The single-proof baseline failed all designated alternate-support cases.
+
+This remains a finite supplied-rule benchmark, not unrestricted theorem
+discovery.
+
+See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
+
 ## Next milestones
 
 ### 1. v1.14-R — exact perceptual fast path — passed
@@ -263,9 +287,10 @@ semantic vocabulary, correct adversarial label correction, unresolved naming
 for a real but unnamed concept, and correct semantic lineage through concept
 split, merge, and retraction.
 
-The next independent Reasoning Map axis is **explicit proof dependency**. A
-natural semantic follow-up is hierarchical grounding/inheritance together with
-temporal semantic revision across concept lineage.
+Explicit proof dependency has now passed. The next independent Reasoning Map
+axis is **planning / replanning**. A natural semantic follow-up remains
+hierarchical grounding/inheritance together with temporal semantic revision
+across concept lineage.
 
 See [CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md)
 and [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
