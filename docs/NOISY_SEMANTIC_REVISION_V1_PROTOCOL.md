@@ -143,17 +143,33 @@ Report:
 The same finite 12-epoch evidence horizon from semantic revision v1 remains in
 force. Neural and structural history sizes are checked directly.
 
-The clean semantic-revision controller uses two consecutive resolved conflicts
-before withdrawing an incumbent. The noisy v1 profile intentionally raises
-this to **four accumulated resolved conflicts**. In addition, each increment
-must be backed by direct current-epoch neural support for the same challenger
-with top-label confidence at least **0.62**. Missing or ambiguous direct
-evidence pauses the counter; sufficiently confident direct support for the
-incumbent resets it.
+The clean semantic-revision controller accepts an initially resolved label
+immediately. Under stochastic evidence that proved too eager: an early noisy
+mapping can be accepted and later corrected, which looks like a semantic
+revision even though the real regime never changed.
 
-This creates a locality gate: global relational consistency may propose a
-semantic change, but an individual concept is not withdrawn solely because
-other concepts make a different global permutation attractive.
+The noisy v1 profile therefore requires **three consecutive resolved epochs for
+the same candidate before initial acceptance**.
+
+After establishment, revision remains responsive. The noisy profile keeps the
+two-conflict persistence of the clean controller, but a withdrawal counter
+advances only when the long-horizon grounding posterior resolves to a concrete
+competing label. Mere ambiguity can challenge trust without withdrawing the
+incumbent.
+
+Separately, a sufficiently strong current-epoch neural disagreement can suspend
+the `trusted` flag immediately while the accepted label remains in memory.
+This separates:
+
+$
+\text{stop trusting}
+$
+
+from
+
+$
+\text{change the accepted label}.
+$
 
 These are robustness parameters for the noisy experiment, not retroactive
 changes to the already published clean semantic-revision-v1 protocol.
