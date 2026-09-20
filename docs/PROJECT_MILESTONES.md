@@ -16,7 +16,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
-- predictive-geometry research frontier: `v1.18-R`;
+- predictive-geometry research frontier: `v1.19-R`;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -366,31 +366,46 @@ See [KERNEL_LADDER_FAST_PATH_V1_18_RESULT.md](KERNEL_LADDER_FAST_PATH_V1_18_RESU
 
 ---
 
-## B6. v1.19-R — low-overhead fused-stage crossover profile
+## B6. v1.19-R — low-overhead fused-stage crossover profile — passed
 
-Run a wider-seed stage profile with coarse timers on the current optimized
-research implementation.
+The untouched official profile reproduced development with zero checksum
+discrepancy.
 
-Required stages:
+At 288 anchors:
 
-- cache refresh;
-- candidate readout;
-- local readout;
-- hysteresis/state scan;
-- complexity refresh;
-- tracker and field updates;
-- perceptual computation and unattributed remainder.
+- cache refresh: **37.22%**;
+- candidate readout: **21.80%**;
+- hysteresis/state scan: **17.60%**;
+- complexity refresh: **13.41%**.
 
-The goal is to determine whether cache refresh is still the real end-to-end
-bottleneck after v1.16, or whether candidate readout should become the next
-optimization target.
+The coarse stage ordering is therefore stable enough to justify another cache
+experiment, while the v1.18 negative result warns against choosing that
+experiment from fine-grained internal timers alone.
 
-Do not choose another cache micro-optimization from fine-grained internal
-timings alone.
+See [LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md](LOW_OVERHEAD_STAGE_PROFILE_V1_19_RESULT.md).
 
 ---
 
-## B7. Freeze the next executable research specification
+## B7. v1.20-R — lazy distance materialization / write elision
+
+The hot predictive path uses kernels directly; the full cached distance matrix
+is not required by candidate readout, local readout, or complexity evaluation.
+
+Test a cache variant that:
+
+- computes dirty-row squared geometry as today for exact kernel refresh;
+- does not eagerly mirror dirty rows into the full symmetric distance matrix;
+- marks the distance view stale;
+- materializes a fully synchronized distance matrix only on explicit access;
+- preserves the existing public distance API and exact diagnostic values;
+- falls back to the eager path if laziness cannot be made transparent.
+
+Evaluate focused refresh speed, full fused-step speed, memory traffic, and
+explicit distance-view access cost. Keep the current eager cache as the oracle.
+
+---
+
+## B8. Freeze the next executable research specification
 
 
 
@@ -409,7 +424,7 @@ This is the boundary between successful research and promotable architecture.
 
 ---
 
-## B8. Promote accepted mechanisms to Rust
+## B9. Promote accepted mechanisms to Rust
 
 Only mechanisms included in the new frozen specification should move into the native runtime.
 
