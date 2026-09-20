@@ -54,7 +54,7 @@ $$
 \text{planning/replanning},
 \quad
 \text{novelty attribution}.
-$
+$$
 
 Each benchmark should isolate one or two primitives before later campaigns
 combine them.
