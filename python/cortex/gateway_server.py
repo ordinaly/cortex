@@ -441,21 +441,24 @@ def _ollama_stream_events(
     emitted_thinking = 0
 
     if thinking:
-        for offset in range(0, len(thinking), chunk_size):
-            emitted_thinking += 1
-            yield (
-                json.dumps(
-                    _ollama_chat_payload(
-                        model=model,
-                        content="",
-                        thinking=thinking[offset : offset + chunk_size],
-                        done=False,
-                    ),
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                )
-                + "\n"
+        # Alpaca schedules Thinking-block insertion through GLib.idle_add.
+        # Multiple rapid thinking chunks can therefore each create a new
+        # block before the previous one becomes attached. Emit the Cortex
+        # diagnosis atomically as one thinking event.
+        emitted_thinking = 1
+        yield (
+            json.dumps(
+                _ollama_chat_payload(
+                    model=model,
+                    content="",
+                    thinking=thinking,
+                    done=False,
+                ),
+                ensure_ascii=False,
+                separators=(",", ":"),
             )
+            + "\n"
+        )
 
     for offset in range(0, len(content), chunk_size):
         emitted_content += 1
