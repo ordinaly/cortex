@@ -892,9 +892,7 @@ def test_no_cortex_context_policy_observes_but_withholds_pre_generation_state():
 
     answer_call = runtime.calls[-1]
     system = answer_call[
-        "messages"
-    ][0][
-        "content"
+        "system"
     ]
     payload = json.loads(
         system.split(
