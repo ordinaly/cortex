@@ -21,7 +21,7 @@ where its explicit unresolved state provides useful epistemic restraint.
 | structural analogy / isomorphism | `structural-analogy-v1` | passed | 0.9718 coverage with 12/90 facts; exact ambiguity preservation |
 | latent concept induction | `latent-concept-induction-v1` | passed | exact recovery, ambiguity preservation, predictive gain, reversible lifecycle |
 | explicit proof dependency | `explicit-proof-dependency-v1` | passed | all frozen gates passed across 120 cases; exact alternate-support handling |
-| planning / replanning | planned | later | — |
+| planning / replanning | `planning-replanning-v1` | passed | optimal local repair with 0.0875 mean expansion ratio vs full replanning |
 | open-world novelty attribution | planned | later | — |
 
 All passed entries are research fixtures, not stable runtime semantics unless
@@ -49,8 +49,10 @@ $$
 \quad
 \text{latent abstraction},
 \quad
-\text{proof dependency}.
-$$
+\text{proof dependency},
+\quad
+\text{planning/replanning}.
+$
 
 Each benchmark should isolate one or two primitives before later campaigns
 combine them.
@@ -203,7 +205,34 @@ rules, not unrestricted theorem proving.
 
 See [PROOF_DEPENDENCY_V1.md](PROOF_DEPENDENCY_V1.md).
 
-The next independent reasoning-map axis is **planning / replanning**.
+## Completed axis: planning / replanning
+
+`planning-replanning-v1` adds deterministic action costs, add/delete effects,
+temporal support provenance, local repair, global fallback, and explicit
+infeasibility.
+
+Across 140 untouched official cases:
+
+- repair-mode accuracy: **1.000**;
+- first-impact localization: **1.000**;
+- feasible optimal-cost agreement with full replanning: **1.000**;
+- local-repair rate on local-change cases: **1.000**;
+- exact unaffected-prefix preservation: **1.000**;
+- suffix preservation: **1.000**;
+- irrelevant-change stability: **1.000**;
+- global-fallback correctness: **1.000**;
+- infeasible detection: **1.000**.
+
+On the 80 local-repair cases, Cortex expanded **2.425 states on average**
+versus **27.5** for full replanning, a mean ratio of **0.08745**, while matching
+the full-search optimum.
+
+The result is finite deterministic planning over a supplied action model, not a
+general planning-complexity result.
+
+See [PLANNING_REPLANNING_V1.md](PLANNING_REPLANNING_V1.md).
+
+The next independent reasoning-map axis is **open-world novelty attribution**.
 
 ## Common evaluation axes
 
