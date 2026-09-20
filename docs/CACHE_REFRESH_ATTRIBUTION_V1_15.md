@@ -1,6 +1,6 @@
 # Cortex v1.15-R — Cache-Refresh Attribution
 
-Status: **development protocol / official campaign unopened**.
+Status: **frozen attribution protocol / development passed / official campaign untouched**.
 
 Protocol ID: **cache-refresh-attribution-v1.15-R**.
 
@@ -93,7 +93,7 @@ mean dirty-row fraction on dirty events, and attribution accounting fraction.
 
 The raw finer substages are also retained.
 
-## Frozen-intent validity gates
+## Frozen official validity gates
 
 Before official evaluation, the development implementation must satisfy:
 
@@ -133,3 +133,26 @@ A passing campaign supports only an engineering attribution claim about the
 current Python/NumPy research cache-refresh path.
 
 It does not establish a universal Cortex bottleneck or a production runtime limit.
+
+## Development outcome before freeze
+
+The 9-case development campaign passed every validity gate with **zero**
+numerical discrepancies and **zero** structural disagreements.
+
+At 288 anchors, median cache-refresh attribution was:
+
+- distance-row recomputation: **39.73%**;
+- kernel regeneration: **35.14%**;
+- writes/bookkeeping: **17.87%**;
+- semantic features: **2.66%**;
+- dirty detection: **1.66%**;
+- outcome probabilities: **1.47%**.
+
+The median accounting fraction was **0.9862**.
+
+Every refresh event was dirty under this trace, but only about **13.30%** of
+anchor rows were refreshed per event at 288 anchors.
+
+No gate or mechanism may now be changed before the untouched official
+evaluation. Any change after opening official seeds requires a new protocol
+version and fresh seeds.
