@@ -290,6 +290,16 @@ def _ollama_created_at() -> str:
     )
 
 
+def _ollama_visible_content(
+    result: Any,
+) -> str:
+    context = getattr(result, "cortex_context", None)
+    if isinstance(context, dict):
+        neural_answer = context.get("neural_answer")
+        if isinstance(neural_answer, str) and neural_answer.strip():
+            return neural_answer
+    return str(getattr(result, "content", ""))
+
 def _cortex_thinking_text(
     result: Any,
 ) -> str:
@@ -423,7 +433,7 @@ def _ollama_stream_events(
     model: str,
     trace: bool = False,
 ):
-    content = result.content
+    content = _ollama_visible_content(result)
     thinking = _cortex_thinking_text(result)
     metrics = _ollama_timing_metadata(result)
     chunk_size = 64
@@ -792,7 +802,7 @@ def create_app(
         return JSONResponse(
             _ollama_chat_payload(
                 model=model_name,
-                content=result.content,
+                content=_ollama_visible_content(result),
                 thinking=_cortex_thinking_text(result),
                 done=True,
                 metrics=_ollama_timing_metadata(result),
