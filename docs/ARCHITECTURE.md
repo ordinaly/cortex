@@ -1506,13 +1506,49 @@ This creates an explicit architectural distinction between:
 - a latent concept, whose membership must earn predictive compression;
 - a semantic label, which is attached later and remains revisable.
 
-The next integration target is therefore to feed internally discovered concept
-IDs into the semantic-grounding/revision stack. The next independent Reasoning
-Map axis is explicit proof dependency.
+The follow-up `concept-semantic-integration-v1` now feeds internally
+discovered concept IDs into semantic grounding. Semantic vocabulary is strictly
+downstream of concept induction: replacing the entire label vocabulary leaves
+the latent member blocks and concept IDs unchanged.
+
+The semantic mapping is injective rather than necessarily bijective, so the
+candidate vocabulary may contain unused labels. This enables the explicit state
+
+$
+Z_{mathrm{new}}	ext{ exists},
+qquad
+operatorname{label}(Z_{mathrm{new}})=	exttt{unresolved}.
+$
+
+Across 80 untouched official cases, latent concept recovery, semantic
+correction, label-causal isolation, split/merge semantic lineage, and
+retraction invalidation all measured **1.000**. Raw adversarial neural naming
+was **0.3333**, while Cortex semantic accuracy and coverage were **1.000**.
+
+The resulting research hierarchy is now:
+
+$
+oxed{
+	ext{entity}
+ightarrow
+	ext{latent concept}
+ightarrow
+	ext{semantic label}
+}
+$
+
+where each layer has its own identity and revision semantics. A concept split
+or merge creates new concept identity with explicit lineage; a retracted
+concept cannot retain an orphaned semantic belief.
+
+The next independent Reasoning Map axis is explicit proof dependency. Semantic
+follow-up work should study hierarchy/inheritance and temporal revision across
+concept lineage.
 
 See [BELIEF_REVISION_V1.md](BELIEF_REVISION_V1.md),
 [STRUCTURAL_ANALOGY_V1.md](STRUCTURAL_ANALOGY_V1.md),
-[LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md), and
+[LATENT_CONCEPT_INDUCTION_V1.md](LATENT_CONCEPT_INDUCTION_V1.md),
+[CONCEPT_SEMANTIC_INTEGRATION_V1.md](CONCEPT_SEMANTIC_INTEGRATION_V1.md), and
 [REASONING_MAP_V1.md](REASONING_MAP_V1.md).
 
 These capabilities are currently **research modules**, not part of the stable native runtime.
