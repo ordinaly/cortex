@@ -59,7 +59,7 @@ def create_app(
     public_model_name: str = "cortex",
 ):
     try:
-        from fastapi import FastAPI, Header, HTTPException, Request
+        from fastapi import Body, FastAPI, Header, HTTPException
         from fastapi.responses import JSONResponse
     except ImportError as exc:  # pragma: no cover - optional runtime dependency
         raise RuntimeError(
@@ -118,7 +118,7 @@ def create_app(
 
     @app.post("/v1/chat/completions")
     async def chat_completions(
-        request: Request,
+        payload: dict[str, Any] = Body(...),
         x_cortex_session: str | None = Header(
             default=None,
             alias="X-Cortex-Session",
@@ -128,12 +128,6 @@ def create_app(
             alias="X-Cortex-Diagnostics",
         ),
     ):
-        payload = await request.json()
-        if not isinstance(payload, dict):
-            raise HTTPException(
-                status_code=400,
-                detail="request body must be an object",
-            )
         if payload.get("stream", False):
             raise HTTPException(
                 status_code=400,
@@ -276,14 +270,8 @@ def create_app(
     )
     async def set_diagnostics(
         session_id: str,
-        request: Request,
+        payload: dict[str, Any] = Body(...),
     ) -> dict[str, Any]:
-        payload = await request.json()
-        if not isinstance(payload, dict):
-            raise HTTPException(
-                status_code=400,
-                detail="request body must be an object",
-            )
         try:
             enabled = _bool_value(
                 payload.get("enabled")
