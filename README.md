@@ -156,6 +156,17 @@ The second Reasoning Map campaign, **belief-revision-v1**, tested cumulative con
 
 The third Reasoning Map campaign, **structural-analogy-v1**, independently renamed both entities and relation types across paired worlds. Cortex maintained a version space of consistent correspondences and resolved only invariant consequences shared by every survivor. On untouched seeds, held-out resolved accuracy was **1.000**; with only 12 of 90 target facts, mean coverage was **0.9718**, reaching **1.000** at 24 facts. Symmetric automorphisms remained genuinely ambiguous, while near-isomorphic and explicitly broken analogies were rejected in every case. See [docs/STRUCTURAL_ANALOGY_V1.md](docs/STRUCTURAL_ANALOGY_V1.md).
 
+The fourth Reasoning Map campaign, **latent-concept-induction-v1**, removes the
+assumption that every useful category is supplied in advance. Cortex evaluated
+all **203** partitions of six opaque entities under a predictive-description
+objective, recovered every planted two- and three-concept structure at
+**1.000 partition F1**, selected six singletons in every no-shared-concept
+control, preserved all deliberately ambiguous memberships, and passed a
+**create → split → merge → retract** concept lifecycle. Mean held-out gain over
+flat per-entity prediction was **0.0556 / 0.0288 nats per outcome** for the two
+grouped families. See
+[docs/LATENT_CONCEPT_INDUCTION_V1.md](docs/LATENT_CONCEPT_INDUCTION_V1.md).
+
 ## Hybrid neural/Cortex path
 
 Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
