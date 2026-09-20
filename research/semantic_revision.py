@@ -115,6 +115,7 @@ class CortexSemanticRevision:
         grounder_margin_threshold: float = 0.15,
         withdrawal_margin: float = 0.05,
         require_resolved_challenger: bool = False,
+        direct_challenger_threshold: float | None = None,
     ) -> None:
         self.concepts = tuple(concepts)
         self.labels = tuple(labels)
@@ -133,6 +134,13 @@ class CortexSemanticRevision:
             raise ValueError("revision_patience must be positive")
         if not 0.0 <= withdrawal_margin <= 1.0:
             raise ValueError("withdrawal_margin must be in [0, 1]")
+        if (
+            direct_challenger_threshold is not None
+            and not 0.0 <= direct_challenger_threshold <= 1.0
+        ):
+            raise ValueError(
+                "direct_challenger_threshold must be in [0, 1]"
+            )
 
         # Validate the declared grounding problem immediately.
         CortexSemanticGrounder(
@@ -154,6 +162,11 @@ class CortexSemanticRevision:
         self.withdrawal_margin = float(withdrawal_margin)
         self.require_resolved_challenger = bool(
             require_resolved_challenger
+        )
+        self.direct_challenger_threshold = (
+            None
+            if direct_challenger_threshold is None
+            else float(direct_challenger_threshold)
         )
 
         self.epoch = -1
@@ -265,6 +278,8 @@ class CortexSemanticRevision:
         self,
         concept: Concept,
         read: SemanticRead,
+        current_neural_label: Label | None = None,
+        current_neural_confidence: float = 0.0,
     ) -> None:
         state = self._states[concept]
         posterior_candidate = self._posterior_candidate(read)
@@ -341,12 +356,39 @@ class CortexSemanticRevision:
                 else (resolved_challenger or margin_challenger)
             )
             was_challenged = state.phase == "challenged"
+            previous_candidate = state.candidate_label
             state.phase = "challenged"
             state.candidate_label = challenger
-            if strong_conflict:
-                state.conflict_streak += 1
+
+            if self.direct_challenger_threshold is None:
+                if strong_conflict:
+                    state.conflict_streak += 1
+                else:
+                    state.conflict_streak = 0
             else:
-                state.conflict_streak = 0
+                threshold = self.direct_challenger_threshold
+                direct_support = (
+                    strong_conflict
+                    and challenger is not None
+                    and current_neural_label == challenger
+                    and current_neural_confidence >= threshold
+                )
+                direct_refutation = (
+                    current_neural_label == incumbent
+                    and current_neural_confidence >= threshold
+                )
+
+                if (
+                    challenger is not None
+                    and previous_candidate is not None
+                    and challenger != previous_candidate
+                ):
+                    state.conflict_streak = 0
+
+                if direct_support:
+                    state.conflict_streak += 1
+                elif direct_refutation:
+                    state.conflict_streak = 0
 
             if not was_challenged:
                 self._emit(
@@ -469,8 +511,6 @@ class CortexSemanticRevision:
             concept: instantaneous.read(concept)
             for concept in self.concepts
         }
-        for concept in self.concepts:
-            self._advance_state(concept, grounding_reads[concept])
 
         current_neural: dict[Concept, tuple[Label | None, float]] = {}
         for concept in self.concepts:
@@ -492,6 +532,15 @@ class CortexSemanticRevision:
             current_neural[concept] = max(
                 averaged.items(),
                 key=lambda item: item[1],
+            )
+
+        for concept in self.concepts:
+            current_label, current_confidence = current_neural[concept]
+            self._advance_state(
+                concept,
+                grounding_reads[concept],
+                current_neural_label=current_label,
+                current_neural_confidence=current_confidence,
             )
 
         self._reads = {}
