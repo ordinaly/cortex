@@ -154,3 +154,38 @@ def test_local_knowledge_articulation_decodes_sparse_properties():
         if row.property == "capital"
     }
     assert capitals == {"Pretoria", "Cape Town", "Bloemfontein"}
+
+
+def test_local_articulation_contains_relational_hypergeometry():
+    runtime = make_knowledge_runtime(
+        CortexRuntime,
+        feature_dim=64,
+        max_entities=512,
+        budget=32,
+    )
+    report = feed_knowledge(runtime, _statements())
+    view = KnowledgeGraphView(
+        report.snapshot_json,
+        report.symbol_bindings,
+        runtime.config_json(),
+    )
+
+    capital = view.local_articulation("capital", resolution=0.5)
+    neighbors = {row.basin for row in capital.hypergeometry.adjacent_basins}
+    assert {"France", "Paris", "Germany", "Berlin"} <= neighbors
+
+    south_africa = view.local_articulation("South Africa", resolution=0.5)
+    transports = [
+        row
+        for row in south_africa.hypergeometry.directions
+        if row.relation == "capital" and row.orientation == "forward"
+    ]
+    assert {row.target for row in transports} == {
+        "Pretoria",
+        "Cape Town",
+        "Bloemfontein",
+    }
+    assert all(
+        abs(row.normalized_support - 1.0 / 3.0) < 1.0e-12
+        for row in transports
+    )
