@@ -84,6 +84,7 @@ jobs:
           tests/test_hypergraph_lpu.py
           tests/test_articulation_controller.py
           tests/test_controller_calibration.py
+          tests/test_regime_plasticity.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
@@ -141,6 +142,12 @@ jobs:
         run: >-
           python benchmarks/benchmark_plasticity_frontier_v1.py
           --seeds 7
+      - name: Run regime-plasticity-pareto-v0.1
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_regime_plasticity_v0_1.py
+          --noise-seeds 8
+          --noise-steps 300
 
   wheel:
     runs-on: ubuntu-latest

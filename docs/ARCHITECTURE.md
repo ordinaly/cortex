@@ -4,7 +4,8 @@
 >
 > **Software/runtime:** `v1.0.0-rc.2`  
 > **Frozen executable specification:** `spec-v0.9.5`  
-> **Research frontier:** `v1.22-R`
+> **Predictive-geometry research frontier:** `v1.22-R`  
+> **Autonomy/plasticity research default:** `Relational Regime Plasticity v0.1`
 
 Cortex is an experimental architecture for **resource-bounded continual structural reasoning**.
 
@@ -96,7 +97,7 @@ flowchart LR
 
 The current `spec-v0.9.5` is immutable. Research does not silently mutate it.
 
-The current predictive-geometry engineering frontier is **v1.22-R**.
+The current predictive-geometry engineering frontier is **v1.22-R**. In parallel, the autonomous relational-learning track has frozen **Relational Regime Plasticity v0.1** as its research default after Pareto calibration. These coordinates are independent: neither changes the immutable `spec-v0.9.5` contract.
 
 v1.15-R first decomposed cache refresh and found that, at 288 anchors,
 distance-row recomputation plus kernel regeneration accounted for about
@@ -318,6 +319,99 @@ v0.1 uses transparent thresholds and a discrete resolution ladder. These are
 research policy parameters, not frozen ontology or universal constants.
 
 See [ARTICULATION_CONTROLLER_V0_1.md](ARTICULATION_CONTROLLER_V0_1.md).
+
+### Learned articulation calibration v0.2
+
+The fixed v0.1 thresholds have an auditable learned follow-up. v0.2 fits small
+monotone surfaces over structural evidence only; relation names and semantic
+labels are never calibration features.
+
+The learned controller separates four decisions:
+
+- whether a relation is safe to execute;
+- whether incompatible relation evidence is strong enough to mark conflict;
+- whether weak structural support should remain unresolved;
+- whether an admitted exact articulation should execute through native Cortex
+  traversal or the LPU.
+
+On its held-out calibration, the three-state controller deliberately favored
+abstention over premature execution. The measured dangerous false-execution
+rate was **0.0125**. On a separate native Cortex holdout, all **40 clean
+executions were correct**, memory isolation was exact, and the learned
+resolution was consistently **epsilon = 0.65**.
+
+The v0.2 surfaces are now frozen as the execution-risk oracle used by the
+relational plasticity work below. Plasticity does not weaken this boundary; it
+changes which evidence represents the **current regime** before asking the same
+controller whether exact execution is warranted.
+
+See
+[ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md](ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md).
+
+### Relational regime plasticity v0.1
+
+The first dedicated plasticity characterization exposed a specific failure:
+cumulative relation evidence detected contradiction quickly, but replacement
+execution scaled almost linearly with lifetime history. In the declared
+composition fixture, a new regime required approximately **17.8 times the prior
+evidence mass** before it could execute.
+
+The accepted research mechanism separates three roles:
+
+```text
+chronological relation observations
+        |
+        +----> durable historical evidence
+        |          exact / auditable / never decayed
+        |
+        +----> fast current-regime evidence
+        |          recency-sensitive replacement articulation
+        |
+        +----> contradiction pressure
+                   hysteretic suspension + confirmation
+```
+
+This produces an explicit transition:
+
+```text
+stable incumbent
+    -> change suspected
+    -> UNRESOLVED
+    -> confirmed replacement
+    -> EXECUTE
+```
+
+The Pareto sweep tested **270 policies**; **105** were feasible and **2** were
+Pareto-optimal. The frozen research knee is:
+
+```text
+fast_decay         = 0.50
+pressure_decay     = 0.90
+suspicion_ratio    = 0.05
+confirmation_steps = 5
+maturity_cap       = 64
+```
+
+Across prior evidence masses 4 / 8 / 16 / 32 / 64, clean replacement execution
+is now bounded at **9 observations** instead of 72 / 143 / 285 / 570 / 1139.
+The original v0.2 contradiction-detection lags **1 / 1 / 1 / 2 / 4** are
+preserved exactly. Declared transient bursts and stationary 10%/20% noise
+produced **zero false regime switches**, reversal took 9 observations in both
+directions, disjoint structure remained unchanged, and historical evidence was
+retained exactly.
+
+The maturity cap bounds **decision inertia**, not historical storage. Durable
+history remains inspectable, while lifetime age cannot create unbounded
+plasticity debt. For a fixed relation vocabulary, the tested regime state also
+remained bounded over 10,000 additional observations.
+
+This mechanism is still research-only and does not modify `spec-v0.9.5`. The
+next integration target is **Autonomy Robustness & Temporal Plasticity v1**,
+where reliability, missing/corrupted evidence, broader relational structures,
+memory pressure, and downstream reasoning effects are tested together.
+
+See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
+[RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
 ---
 
@@ -1532,7 +1626,7 @@ It is not uniformly increased across the whole model.
 
 ## 35. Relational reasoning research
 
-Cortex now has two complementary relation-reasoning research tracks.
+Cortex now has several complementary relation-reasoning research tracks.
 
 ### Prospective multi-hop relational inference
 
@@ -2066,13 +2160,21 @@ flowchart TB
         LR["Hysteretic local resolution"]
         RI["Multi-hop relation inference"]
         KA["Typed relation algebra"]
+        HG["Soft relational hypergeometry"]
+        AC["Calibrated articulation controller"]
+        RP["Dual-timescale regime plasticity"]
+        LPU["Stateless exact LPU"]
 
         PF --> RD --> LR
         RI --> KA
+        HG --> AC
+        AC --> RP
+        AC --> LPU
     end
 
     Z -. "research prototypes" .-> PF
     RG -. "research prototypes" .-> RI
+    RG -. "relational articulation" .-> HG
 ```
 
 ---
@@ -2130,9 +2232,13 @@ For the research lineage:
 
 - [RESEARCH_HISTORY.md](RESEARCH_HISTORY.md)
 
-For autonomous ingestion and exact local computation:
+For autonomous ingestion, articulation, and temporal plasticity:
 
 - [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md)
+- [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md)
+- [ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md](ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md)
+- [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md)
+- [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md)
 
 For software/specification/protocol versioning:
 

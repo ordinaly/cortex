@@ -44,11 +44,14 @@ that v0.2 detects contradiction early but replacement execution has a severe
 historical inertia: roughly **17.8x** new evidence per unit of accumulated old
 evidence on the declared composition fixture.
 
-The immediate plasticity milestone is now **Relational Regime Plasticity
-v0.1**: preserve durable historical evidence while adding a fast local
-time-sensitive regime articulation with explicit hysteresis. The candidate must
-reduce regime-switch lag without increasing false switches under stationary
-noise or erasing old regimes.
+**Relational Regime Plasticity v0.1 has passed Pareto calibration and CI; its selected knee is frozen as the research default.** The selected research default preserves the exact v0.2
+change-detection lags, bounds clean replacement execution at **9 observations**
+across prior masses 4 / 8 / 16 / 32 / 64, produces no declared false switches,
+preserves exact history and locality, and supports 9-observation reversal.
+
+The selected point is `fast_decay=0.50`, `pressure_decay=0.90`,
+`suspicion_ratio=0.05`, `confirmation_steps=5`, `maturity_cap=64`.
+See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
 **Autonomy Robustness & Temporal Plasticity v1** remains the broader campaign
 that will consume the successful mechanism and then add missing/corrupted

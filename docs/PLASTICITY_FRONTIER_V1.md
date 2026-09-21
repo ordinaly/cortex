@@ -1,6 +1,6 @@
 # Plasticity Frontier v1
 
-Status: **active characterization campaign**.
+Status: **completed baseline characterization**.
 
 Plasticity is a core Cortex requirement, but it is not one scalar property.
 This campaign decomposes it into measurable behaviors before introducing a new
@@ -204,3 +204,19 @@ A candidate should improve all of the following simultaneously:
 
 The benchmark should reject a mechanism that gains plasticity only by making
 Cortex generally less stable.
+
+
+## Follow-up — Relational Regime Plasticity v0.1
+
+The dual-timescale follow-up has now passed its Pareto calibration and CI, and its selected knee is frozen as the research default.
+It preserves the exact v0.2 contradiction-detection lags while bounding the
+replacement switch to **9 observations** across all tested prior masses
+4 / 8 / 16 / 32 / 64, rather than 72 / 143 / 285 / 570 / 1139.
+
+The selected research policy retains exact historical evidence, uses a fast
+recency-sensitive regime channel, and adds explicit hysteretic suspicion and
+confirmation. It produced zero declared false switches under transient bursts
+and stationary-noise controls, reversed OLD -> NEW -> OLD in 9 observations per
+switch, and kept fixed-vocabulary regime state bounded with stream length.
+
+See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).

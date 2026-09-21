@@ -16,9 +16,10 @@ Cortex currently has three independent provenance coordinates:
 |---|---|
 | software/runtime | **v1.0.0-rc.2** |
 | frozen executable specification | **spec-v0.9.5** |
-| research frontier | **v1.22-R** |
+| predictive-geometry research frontier | **v1.22-R** |
+| autonomy/plasticity research default | **Relational Regime Plasticity v0.1** |
 
-The stable runtime and the research frontier are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. The active project focus is the **v1.22-R research frontier**.
+The stable runtime and the research frontiers are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. Predictive-geometry engineering remains at **v1.22-R**; the autonomous relational-learning track has frozen **Relational Regime Plasticity v0.1** as its current research default. The immediate cross-track milestone is **Autonomy Robustness & Temporal Plasticity v1**.
 
 For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
@@ -186,7 +187,7 @@ model mutation. Local repairs used a mean **0.03846×** the state expansions of
 full replanning while preserving the same minimum cost. See
 [docs/NOVELTY_AWARE_REPLANNING_V1.md](docs/NOVELTY_AWARE_REPLANNING_V1.md).
 
-The next scientific milestone is **Open-World Robustness v1**.
+Within the Reasoning Map, the next scientific milestone is **Open-World Robustness v1**. In parallel, the immediate autonomous-learning milestone is **Autonomy Robustness & Temporal Plasticity v1**.
 
 ## Autonomous Cortex path
 
@@ -226,6 +227,24 @@ active package surface.
 
 See
 [docs/AUTONOMOUS_CORE_LPU_V0_1.md](docs/AUTONOMOUS_CORE_LPU_V0_1.md).
+
+### Relational regime plasticity
+
+The first dedicated plasticity sweep showed that cumulative relation evidence
+could detect contradiction early while still requiring roughly **17.8x prior
+history** to re-execute a genuine replacement relation. The accepted
+dual-timescale mechanism keeps durable history exact, adds fast current-regime
+evidence, and uses explicit hysteretic contradiction pressure.
+
+Its 270-policy Pareto calibration selected a research default that switches a
+clean OLD -> NEW regime in **9 observations** for every tested prior mass
+4 / 8 / 16 / 32 / 64, preserves the original v0.2 contradiction-detection
+latency, produces zero declared false switches under transient and stationary
+noise controls, reverses in 9 observations, preserves unrelated relations, and
+retains historical counts exactly.
+
+This is a research mechanism, not a change to `spec-v0.9.5`. See
+[docs/RELATIONAL_REGIME_PLASTICITY_V0_1.md](docs/RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
 ## Repository layout
 

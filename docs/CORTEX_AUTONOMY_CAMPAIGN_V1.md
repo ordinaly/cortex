@@ -254,3 +254,26 @@ evidence, preserved unrelated memory, and used the LPU without semantic drift.
 
 The result does not establish raw-perception autonomy, natural-language
 understanding, general world modeling, or autonomous goal formation.
+
+
+## Plasticity follow-up
+
+The high recovery cost identified here was subsequently isolated by
+**Plasticity Frontier v1**. Under cumulative evidence, replacement execution
+scaled at roughly **17.8x accumulated prior evidence** on the declared
+composition fixture.
+
+**Relational Regime Plasticity v0.1** now supplies the research follow-up. Its
+Pareto-calibrated dual-timescale mechanism preserves exact historical evidence
+and the v0.2 contradiction-detection contract while bounding clean regime
+replacement at **9 observations** for all tested prior masses. It also passed
+the declared transient-noise, stationary-noise, reversal, locality, and bounded
+fixed-vocabulary state gates.
+
+The next integration milestone is **Autonomy Robustness & Temporal Plasticity
+v1**, which will test whether those gains survive the full autonomous stream
+under reliability variation, missing/corrupted evidence, broader relation
+structures, downstream reasoning, and memory pressure.
+
+See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
+[RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
