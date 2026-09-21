@@ -73,6 +73,7 @@ from .controller_calibration import (
     epistemic_execute_features,
     epistemic_unresolved_features,
     fit_logistic_surface,
+    select_f1_threshold,
     select_precision_threshold,
 )
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
@@ -148,6 +149,7 @@ __all__ = [
     "FeatureCoordinate",
     "EntitySupport",
     "CausalCoordinate",
+    "select_f1_threshold",
     "select_precision_threshold",
     "fit_logistic_surface",
     "epistemic_unresolved_features",
