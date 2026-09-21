@@ -63,6 +63,7 @@ def build(statements):
         report.snapshot_json,
         report.symbol_bindings,
         runtime.config_json(),
+        report.statement_incidence,
     )
     return runtime, report, view, HypergraphGeometry(view.hyperedges())
 
