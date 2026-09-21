@@ -12,9 +12,11 @@ from cortex import CortexRuntime
 from cortex.knowledge import (
     KnowledgeGraphView,
     KnowledgeStatement,
+    KnowledgeSymbolEncoder,
     feed_knowledge,
     make_knowledge_runtime,
 )
+from cortex.topology import TopologyView
 
 
 PROTOCOL = "general-knowledge-feed-v0.1"
@@ -84,7 +86,11 @@ def run_once(statements):
     start = time.perf_counter()
     report = feed_knowledge(runtime, statements)
     elapsed = time.perf_counter() - start
-    view = KnowledgeGraphView(report.snapshot_json, report.symbol_bindings)
+    view = KnowledgeGraphView(
+        report.snapshot_json,
+        report.symbol_bindings,
+        runtime.config_json(),
+    )
 
     results = {
         f"{subject}|{property_name}": list(view.objects(subject, property_name))
@@ -95,6 +101,30 @@ def run_once(statements):
         for (subject, property_name), expected in EXPECTED.items()
     )
     false_query = view.objects("France", "orbits")
+
+    local_france = view.local_articulation("France", top_k=6)
+    france_properties = {
+        f"{row.property}|{row.value}": row.structural_support
+        for row in local_france.properties
+    }
+
+    encoder = KnowledgeSymbolEncoder(feature_dim=64)
+    france_vector = encoder.vector("France")
+    paris_vector = encoder.vector("Paris")
+    midpoint = tuple(
+        (left + right) / 2.0
+        for left, right in zip(france_vector, paris_vector)
+    )
+    labels = {value: key for key, value in report.symbol_bindings.items()}
+    ambiguous = TopologyView.from_runtime(runtime, labels).at_vector(
+        midpoint,
+        top_k=6,
+    )
+    ambiguous_support = {
+        row.label: row.support
+        for row in ambiguous.entities
+        if row.label is not None
+    }
 
     snapshot = json.loads(report.snapshot_json)
     active_relations = sum(
@@ -115,6 +145,21 @@ def run_once(statements):
             view.objects("Canada", "official language")
             == ("English", "French")
         ),
+        "local_articulation": {
+            "top_entity": (
+                local_france.topology.top_entity.label
+                if local_france.topology.top_entity is not None
+                else None
+            ),
+            "top_support": (
+                local_france.topology.top_entity.support
+                if local_france.topology.top_entity is not None
+                else 0.0
+            ),
+            "entity_entropy": local_france.topology.entity_entropy,
+            "properties": france_properties,
+        },
+        "ambiguous_midpoint_support": ambiguous_support,
         "results": results,
         "elapsed_s": elapsed,
     }
@@ -139,6 +184,20 @@ def campaign():
         "identity_is_injective": (
             baseline["symbols"] == baseline["cortex_entities"]
             and reordered["symbols"] == reordered["cortex_entities"]
+        ),
+        "local_articulation": (
+            baseline["local_articulation"]["top_entity"] == "France"
+            and baseline["local_articulation"]["top_support"] > 0.99
+            and "capital|Paris" in baseline["local_articulation"]["properties"]
+            and "continent|Europe" in baseline["local_articulation"]["properties"]
+        ),
+        "ambiguous_membership": (
+            "France" in baseline["ambiguous_midpoint_support"]
+            and "Paris" in baseline["ambiguous_midpoint_support"]
+            and abs(
+                baseline["ambiguous_midpoint_support"]["France"]
+                - baseline["ambiguous_midpoint_support"]["Paris"]
+            ) < 1.0e-12
         ),
     }
 
