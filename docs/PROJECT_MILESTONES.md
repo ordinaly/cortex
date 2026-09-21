@@ -18,6 +18,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 - frozen executable specification: `spec-v0.9.5`;
 - predictive-geometry research frontier: `v1.22-R`;
 - active architecture pivot: **Autonomous Core + LPU v0.1**;
+- metacognitive execution frontier: **Articulation Controller Calibration v0.2**;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -32,7 +33,13 @@ The tracks should remain distinct. A successful research prototype is not automa
   - open-world novelty attribution;
   - novelty-aware replanning integration.
 
-The immediate cross-track milestone is now **Cortex Autonomy Campaign v1**.
+The immediate cross-track milestone is now **Cortex Autonomy Campaign v1**,
+using the calibrated articulation controller as an experimental policy layer.
+The campaign should test whether the learned `EXPLORE / EXECUTE / UNRESOLVED`
+boundary stays calibrated under genuine chronological learning, revision,
+novelty, memory pressure, and changed-world exceptions rather than only the
+declared calibration fixtures.
+
 **Open-World Robustness v1** remains the next robustness-focused Reasoning Map
 campaign rather than being discarded. Concept-to-semantics integration is
 already complete; hierarchy/inheritance and temporal semantic lineage remain
