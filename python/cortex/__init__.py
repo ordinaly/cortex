@@ -80,6 +80,13 @@ from .controller_calibration import (
     select_precision_threshold,
 )
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
+from .autonomy_campaign import (
+    KnowledgeTimeline,
+    PolicyExecution,
+    PolicyMode,
+    TimelineReport,
+    execute_policy,
+)
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
 from .hypergraph_lpu import (
     EnumeratingRuleExecutor,
@@ -133,6 +140,11 @@ __all__ = [
     "LPUStep",
     "LogicalProcessingUnit",
     "KnowledgeFeedReport",
+    "execute_policy",
+    "TimelineReport",
+    "PolicyMode",
+    "PolicyExecution",
+    "KnowledgeTimeline",
     "RelationalHyperedge",
     "RelationalDirection",
     "Hyperpath",
