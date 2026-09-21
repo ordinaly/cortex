@@ -412,9 +412,16 @@ integration keeps the frozen policy unchanged and instantiates one local regime
 tracker per opaque relation signature. Missing observations are explicit
 no-evidence events, source reliability is recorded but deliberately not yet
 consumed, and the harness measures safe execution, unsafe stale execution, and
-abstention under temporal perturbation. This lets new reliability or elapsed-
-time mechanisms be justified by observed failures rather than introduced by
-assumption.
+abstention under temporal perturbation.
+
+The first 12-seed Phase A run passed all non-regression gates but diagnosed two
+separable weaknesses. Missingness leaves memory intact yet can prolong stale
+`EXECUTE` permission in wall time, motivating an execution-freshness layer
+rather than memory decay. A high-reliability minority / low-reliability
+raw-count-majority fixture retained the old regime in 12/12 runs even though
+reliability-weighted support favored the new regime, motivating explicit
+source-aware fusion. These mechanisms remain Phase B research targets rather
+than changes to the frozen local policy.
 
 See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md),
 [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md),

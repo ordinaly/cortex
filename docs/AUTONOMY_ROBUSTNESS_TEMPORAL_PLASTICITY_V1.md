@@ -175,3 +175,121 @@ world modeling.
 
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md)
 and [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
+
+
+## Phase A development result
+
+The first 12-seed development run passed every frozen Phase A non-regression
+gate.
+
+### Clean abrupt change
+
+The frozen policy switched in exactly **9 observed events** on every seed.
+
+Because the prior-32 v0.2 contradiction detector intentionally does not suspend
+execution until the second contradictory event, the clean stream spent one of
+the nine pre-switch events executing the stale incumbent. Mean unsafe-execution
+rate over the pre-switch window was therefore **0.1111**.
+
+### Missing observations
+
+Missingness did not alter evidence-count latency:
+
+| missing rate | mean observed switch | mean wall switch | p95 wall switch | mean unsafe-execute rate |
+|---:|---:|---:|---:|---:|
+| 30% | 9 | 13.33 | 16 | 0.1626 |
+| 60% | 9 | 23.83 | 30 | 0.1860 |
+
+This validates the declared event-time semantics but exposes an important
+downstream limitation: a long observation gap leaves the previous
+`EXECUTE` permission intact. Memory is not being corrupted, but exact
+execution can remain stale for longer in wall time.
+
+The next phase should therefore distinguish **memory persistence** from
+**execution freshness**. Missing data need not erase or decay historical
+evidence, while a separate freshness gate may still suspend exact execution
+after sufficient unobserved time.
+
+### Corrupted genuine shifts
+
+Both declared corruption levels switched on every seed:
+
+| corruption | mean observed switch | p95 observed switch | failures | mean unsafe-execute rate |
+|---:|---:|---:|---:|---:|
+| 10% | 15.75 | 26 | 0 | 0.0924 |
+| 20% | 27.33 | 58 | 0 | 0.0758 |
+
+The increasing switch latency is expected under conflicting observations. The
+controller spends more of the interval abstaining rather than executing a stale
+regime.
+
+### Stationary contradictory noise
+
+Across 300 steps per seed:
+
+- 10% noise: **0 false switches**, mean abstention **0.0142**, unsafe exact
+  execution **0**;
+- 20% noise: **0 false switches**, mean abstention **0.1286**, unsafe exact
+  execution **0**.
+
+This preserves the stability side of the previously calibrated frontier.
+
+### Gradual change
+
+For a 40-step OLD -> NEW probability ramp:
+
+- mean switch wall step: **38.67**;
+- p95 switch wall step: **43**;
+- mean abstention: **0.1453**;
+- mean unsafe exact execution: **0.00573**.
+
+The frozen mechanism therefore handles this gradual fixture conservatively:
+uncertainty rises before the final re-articulation and stale exact execution is
+rare.
+
+### Source-reliability diagnostic
+
+The preregistered source-quality trap produced the clearest new failure.
+
+Each cycle contains a high-reliability minority supporting NEW and a
+low-reliability raw-count majority supporting OLD. Cumulative
+reliability-weighted support favors NEW.
+
+The frozen Phase A policy does not consume reliability metadata:
+
+- reliability-weighted oracle: **NEW**;
+- final accepted NEW: **0 / 12**;
+- final accepted OLD: **12 / 12**.
+
+This establishes a concrete source-reliability blind spot. Phase B is therefore
+justified in testing source-aware evidence rather than adding it by assumption.
+
+### Locality and bounded state
+
+The simultaneous shift / stable / reversal context fixture preserved locality
+on every seed.
+
+For the fixed-vocabulary memory test, **48 contexts** occupied **192 regime
+cells** before a further 6,000 observations and **192 cells** afterward.
+State therefore remained bounded in stream length for the fixed declared
+context/relation vocabulary.
+
+## Phase B target
+
+Phase B should attack two measured limitations while leaving the successful
+parts of Phase A untouched:
+
+1. **source-aware evidence fusion** — reliable observations should influence
+   current-regime articulation more than weak observations without rewriting
+   raw historical audit evidence;
+2. **execution freshness** — missing evidence may age permission to execute
+   without deleting or contradicting the accepted historical regime.
+
+Candidate mechanisms should be compared rather than assumed. At minimum, test
+linear reliability weighting against an unweighted control and calibrate a
+freshness/abstention boundary separately from regime-memory decay.
+
+Promotion requires improvement on the source-quality and missingness safety
+diagnostics while preserving the clean 9-event switch, stationary-noise
+stability, corrupted-shift success, locality, reversal, and fixed-vocabulary
+bounded-state properties.

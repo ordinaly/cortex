@@ -203,9 +203,22 @@ independent regimes, fixed-vocabulary state growth, and downstream unsafe exact
 execution.
 
 Source reliability is recorded but intentionally ignored by the Phase A
-policy. A trusted-minority / weak-majority fixture is preregistered as a
+policy. A trusted-minority / weak-majority fixture was preregistered as a
 diagnostic rather than silently tuning reliability weights before the baseline
-is known.
+was known.
+
+The first 12-seed Phase A run passed every frozen non-regression gate. Clean
+replacement remained 9 observed events; 10%/20% corrupted genuine shifts had
+zero failures; stationary 10%/20% contradiction produced zero false switches;
+locality held; and 48 fixed-vocabulary contexts remained at 192 regime cells
+across 6,000 additional observations.
+
+Two limitations are now measured. At 30%/60% missingness, observed switch
+latency remains 9 but mean wall latency rises to 13.33 / 23.83 and stale
+execution risk persists during gaps. In the source-quality trap, the
+reliability-weighted oracle favors NEW while **12/12 frozen-policy runs retain
+OLD**. Phase B will therefore test source-aware evidence fusion and a separate
+execution-freshness gate without decaying durable history.
 
 See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).

@@ -53,12 +53,18 @@ The selected point is `fast_decay=0.50`, `pressure_decay=0.90`,
 `suspicion_ratio=0.05`, `confirmation_steps=5`, `maturity_cap=64`.
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
-**Autonomy Robustness & Temporal Plasticity v1 is active.** Phase A freezes the
-successful regime policy and first characterizes it under missing/corrupted
-observations, gradual temporal change, source-quality conflict, concurrent
-independent relation contexts, fixed-vocabulary chronology, and downstream
-unsafe-execution risk. Source reliability is recorded but not yet used so that
-any reliability mechanism must be justified by a measured baseline failure.
+**Autonomy Robustness & Temporal Plasticity v1 is active; Phase A passed.**
+The unchanged frozen regime policy preserved all preregistered non-regression
+gates across 12 development seeds: clean 9-event switching, corrupted-shift
+success, stationary-noise stability, context locality, and fixed-vocabulary
+bounded state.
+
+Phase A also exposed the next two targets. Missingness preserves evidence-count
+latency but extends stale execution in wall time. More decisively, the
+trusted-minority / weak-majority source fixture ends on OLD in **12/12** runs
+although reliability-weighted support favors NEW. Phase B will compare
+source-aware fusion and execution-freshness candidates while preserving durable
+raw history and the frozen controller safety boundary.
 
 See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
