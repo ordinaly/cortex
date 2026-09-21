@@ -191,6 +191,25 @@ mass**, with zero declared false switches and exact historical retention.
 See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
 [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
+## Autonomy Robustness & Temporal Plasticity v1
+
+The next autonomous program is now active.
+
+Phase A deliberately keeps the frozen Relational Regime Plasticity v0.1 policy
+unchanged and composes it across opaque relation-signature contexts. The first
+campaign measures clean shifts, missing observations, corrupted evidence,
+stationary noise, gradual drift, source-reliability conflict, simultaneous
+independent regimes, fixed-vocabulary state growth, and downstream unsafe exact
+execution.
+
+Source reliability is recorded but intentionally ignored by the Phase A
+policy. A trusted-minority / weak-majority fixture is preregistered as a
+diagnostic rather than silently tuning reliability weights before the baseline
+is known.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
+
 ## What is stable today
 
 ### Native runtime
@@ -215,7 +234,7 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics along multiple independent tracks. Predictive semantic geometry and adaptive representational resolution remain at `v1.22-R`, while autonomous relational learning now uses **Relational Regime Plasticity v0.1** as its frozen research default.
 
-The immediate cross-track integration milestone is **Autonomy Robustness & Temporal Plasticity v1**.
+The immediate cross-track integration milestone, **Autonomy Robustness & Temporal Plasticity v1**, is now active in Phase A baseline characterization.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 

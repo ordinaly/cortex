@@ -53,10 +53,15 @@ The selected point is `fast_decay=0.50`, `pressure_decay=0.90`,
 `suspicion_ratio=0.05`, `confirmation_steps=5`, `maturity_cap=64`.
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
-**Autonomy Robustness & Temporal Plasticity v1** remains the broader campaign
-that will consume the successful mechanism and then add missing/corrupted
-observations, source reliability differences, out-of-distribution relation
-structures, and sustained memory pressure.
+**Autonomy Robustness & Temporal Plasticity v1 is active.** Phase A freezes the
+successful regime policy and first characterizes it under missing/corrupted
+observations, gradual temporal change, source-quality conflict, concurrent
+independent relation contexts, fixed-vocabulary chronology, and downstream
+unsafe-execution risk. Source reliability is recorded but not yet used so that
+any reliability mechanism must be justified by a measured baseline failure.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 **Open-World Robustness v1** remains the next robustness-focused Reasoning Map
 campaign rather than being discarded. Concept-to-semantics integration is

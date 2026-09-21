@@ -238,6 +238,11 @@ class RelationalRegimeTracker:
     def fast_evidence(self) -> Mapping[str, float]:
         return dict(self._fast)
 
+    @property
+    def snapshot(self) -> RegimeSnapshot:
+        """Return the current immutable regime read without consuming evidence."""
+        return self._snapshot()
+
     def _threshold(self) -> float:
         if self._accepted is None:
             return 1.0
