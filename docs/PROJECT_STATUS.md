@@ -33,6 +33,39 @@ reasoning?
 
 See [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md).
 
+## General Knowledge Feed v0.1
+
+A neutral structured-knowledge boundary is now under validation in PR #80.
+External properties are represented as ordinary data entities inside a reified
+statement grammar rather than as fixed Cortex predicates.
+
+The first 22-statement smoke campaign passed all storage/retrieval gates:
+**129/129 unique symbols bound injectively, 0 binding conflicts, 12/12 exact
+retrieval queries, preserved multi-value relations, and identical query answers
+after statement-order permutation**.
+
+The Wikidata adapter preserves multiple values, qualifiers, ranks, reference
+hashes, and typed literal payloads in the external Knowledge Packet. Rank,
+references, and provenance are not yet mapped into Cortex confidence.
+
+See [GENERAL_KNOWLEDGE_FEED_V0_1.md](GENERAL_KNOWLEDGE_FEED_V0_1.md).
+
+## Relational Hypergeometry v0.1
+
+PR #80 now includes a read-only soft hypergraph geometry over Cortex concept
+basins. Subject, relation, and object remain ordinary fuzzy concepts; one
+statement becomes a weighted higher-order edge joining all three.
+
+The geometry provides relation-conditioned local directions, maximum-bottleneck
+connectivity, a resolution distance $d_R = 1 - \kappa$, and reversible
+H0-style components controlled by evidence resolution. Multi-valued relations
+remain explicitly supported.
+
+This mechanism is **research-only** and does not modify the frozen runtime
+semantics or native entity binding.
+
+See [RELATIONAL_HYPERGEOMETRY_V0_1.md](RELATIONAL_HYPERGEOMETRY_V0_1.md).
+
 ## What is stable today
 
 ### Native runtime
