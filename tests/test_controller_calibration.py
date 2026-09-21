@@ -11,6 +11,7 @@ from cortex.controller_calibration import (
     LinearProbabilitySurface,
     SurfaceObservation,
     fit_logistic_surface,
+    frozen_calibration_v0_2,
     select_precision_threshold,
 )
 from cortex.hypergraph_geometry import HypergraphGeometry, RelationalHyperedge
@@ -214,3 +215,15 @@ def test_structural_weakness_has_distinct_unresolved_reason():
     )
     assert decision.state is ArticulationState.UNRESOLVED
     assert decision.reasons == ("learned-structural-weakness",)
+
+
+def test_frozen_v0_2_bundle_matches_validated_surface():
+    bundle = frozen_calibration_v0_2()
+    assert bundle.version == "controller-calibration-v0.2"
+    assert bundle.execute_surface.threshold == 0.7064854281125331
+    assert bundle.conflict_surface.threshold == 0.6243756839395693
+    assert bundle.structural_surface.threshold == 0.5568984750920496
+    assert bundle.backend_surface.threshold == 0.46380374742365243
+    assert bundle.execute_surface.weights[2] == 2.447555880561244
+    assert bundle.conflict_surface.weights[2] == 3.541879831825144
+    assert bundle.structural_surface.weights[1] == 5.539576306549586
