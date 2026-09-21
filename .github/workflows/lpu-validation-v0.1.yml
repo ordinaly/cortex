@@ -1,0 +1,40 @@
+name: cortex-lpu-validation-v0.1
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "python/cortex/lpu.py"
+      - "python/cortex/__init__.py"
+      - "benchmarks/benchmark_lpu_validation.py"
+      - "tests/test_lpu_validation.py"
+      - "docs/LPU_VALIDATION_V0_1.md"
+      - ".github/workflows/lpu-validation-v0.1.yml"
+
+jobs:
+  lpu-validation:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" pytest
+      - run: python -m pip install -e .
+      - name: Unit and boundary tests
+        run: pytest tests/test_lpu.py tests/test_lpu_validation.py -q
+      - name: Run LPU Validation v0.1
+        run: >-
+          python benchmarks/benchmark_lpu_validation.py
+          --output lpu-validation-v0.1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cortex-lpu-validation-v0.1
+          path: lpu-validation-v0.1.json

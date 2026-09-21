@@ -17,6 +17,7 @@ The tracks should remain distinct. A successful research prototype is not automa
 - software/runtime: `v1.0.0-rc.2`;
 - frozen executable specification: `spec-v0.9.5`;
 - predictive-geometry research frontier: `v1.22-R`;
+- active architecture pivot: **Autonomous Core + LPU v0.1**;
 - Reasoning Map completed axes:
   - recursive typed composition;
   - candidate-law induction;
@@ -31,9 +32,67 @@ The tracks should remain distinct. A successful research prototype is not automa
   - open-world novelty attribution;
   - novelty-aware replanning integration.
 
-The next scientific milestone is **Open-World Robustness v1**.
-Concept-to-semantics integration is already complete; hierarchy/inheritance and
-temporal semantic lineage remain separate semantic follow-ups.
+The immediate cross-track milestone is now **Cortex Autonomy Campaign v1**.
+**Open-World Robustness v1** remains the next robustness-focused Reasoning Map
+campaign rather than being discarded. Concept-to-semantics integration is
+already complete; hierarchy/inheritance and temporal semantic lineage remain
+separate semantic follow-ups.
+
+---
+
+## Immediate cross-track milestone — Cortex Autonomy Campaign v1
+
+### Question
+
+After Cortex is exposed to a finite chronological learning stream and every
+teacher/model-specific adapter is detached, what can Cortex itself retain,
+infer, revise, and transfer from its own persistent memory?
+
+### Protocol direction
+
+The first campaign should use structured observations so language/perception
+quality does not confound the cognitive test. It should separate:
+
+- a chronological learning stream;
+- held-out queries whose answers were never directly supplied;
+- composition problems requiring multiple stored relations;
+- contradictory updates and later recovery;
+- novel entities/relations after the initial learning period;
+- changed-world cases in which previously strong regularities acquire genuine
+  exceptions;
+- memory-pressure sweeps;
+- LPU-enabled and LPU-disabled exact-computation ablations.
+
+The evaluation phase must not call a neural model or hidden teacher.
+
+### Primary metrics
+
+Report at least:
+
+- teacher-free held-out accuracy and coverage;
+- compositional depth/generalization;
+- revision latency and locality;
+- unaffected-memory preservation;
+- confidence/calibration and unresolved precision;
+- memory growth and runtime cost;
+- transfer to renamed or structurally related worlds;
+- LPU invocation rate and marginal benefit;
+- exact witness validity for LPU-assisted conclusions.
+
+### Essential controls
+
+Include direct-memory and supplied-rule symbolic baselines where appropriate.
+The campaign must distinguish facts Cortex was directly shown from conclusions
+it generated through its own structure. LPU results must be attributed
+separately from memory retrieval and structural discovery.
+
+### Passing claim boundary
+
+A successful campaign would support a narrow claim of **teacher-free structural
+autonomy on the declared fixtures**. It would not establish natural-language
+understanding, unrestricted theorem proving, or general intelligence.
+
+See [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md).
 
 ---
 

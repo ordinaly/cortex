@@ -12,7 +12,7 @@ The shortest useful description is:
 
 > Cortex turns a chronological stream of structured observations into a bounded, revisable model of **what persists, what relates, what recurs, what changes, what should split, what can merge again, and what remains unresolved**.
 
-It is not a foundation model and it is not a raw perception model. It can consume vectors produced by a neural encoder, but the stable native runtime is designed to operate **after perception**, where the main problem is no longer "what pixels are present?" but rather:
+It is not a foundation model and it is not a raw perception model. The stable native runtime consumes structured numeric observations supplied by the caller and is designed to operate **after perception**, where the main problem is no longer "what pixels are present?" but rather:
 
 - Is this the same entity as before?
 - Which transformations should count as irrelevant nuisance variation?
@@ -275,7 +275,7 @@ Cortex must decide whether each detection corresponds to:
 
 At the same time it learns which feature dimensions are trustworthy and which nuisance transformations are consistently supported by evidence.
 
-The stable implementation uses **cyclic coordinate shifts** as its native nuisance group. This is deliberately a simple, auditable transformation family. For generic neural embeddings the hybrid adapter normally disables this mechanism and uses the identity transformation only.
+The stable implementation uses **cyclic coordinate shifts** as its native nuisance group. This is deliberately a simple, auditable transformation family. External adapters should only expose transformation families whose semantics are justified by the observations; identity-only matching is the conservative default for arbitrary latent coordinates.
 
 ---
 
@@ -1221,126 +1221,85 @@ This makes optimization safer: performance work can be rejected if it silently c
 
 ---
 
-# Part IX — Hybrid neural/Cortex architecture
+# Part IX — Autonomous core and exact local computation
 
-## 30. Cortex does not require hand-engineered input features
+## 30. Direct dataset learning
 
-Stage-I Hybrid Cortex places a frozen neural encoder in front of the unchanged native runtime.
+The primary Cortex architecture no longer includes a neural model in its
+cognitive loop. Chronological structured observations can be presented directly
+to the native runtime through the Python research interface.
+
+The first neutral ingestion contract is
+`cortex.autonomy.ObservationFrame`:
 
 ```mermaid
 flowchart LR
-    X["Raw observation<br/>image / signal / other modality"]
-    N["Frozen neural encoder"]
-    Z["Embedding z"]
-    A["Metric adapter"]
+    D["Structured dataset<br/>chronological frames"]
+    A["Autonomy adapter<br/>no learned parameters"]
     C["Native Cortex runtime"]
-    O["Persistent structure"]
+    M["Persistent Cortex memory"]
+    S["Restorable snapshot"]
 
-    X --> N --> Z --> A --> C --> O
+    D --> A --> C --> M --> S
 ```
 
-For a $d$-dimensional embedding $z$, the adapter uses
+This is continual exposure rather than gradient training. There is no loss
+backpropagated into a neural model. Each frame updates Cortex's own persistent
+state, and later evidence remains free to revise earlier structure.
 
-```math
-x
-=
-\sqrt{\frac d2}
-\frac{z}{\|z\|_2}.
-```
-
-For two adapted embeddings $x_a,x_b$, ordinary unweighted MSE becomes exactly cosine distance between the original embeddings:
-
-```math
-\mathrm{MSE}(x_a,x_b)
-=
-1-\cos(a,b).
-```
-
-This gives Cortex's existing metric thresholds a defined interpretation instead of allowing arbitrary neural embedding magnitudes to control identity decisions.
-
-Generic embeddings use a fixed identity nuisance group because cyclic shifts of latent coordinates generally have no semantic meaning.
+The ingestion layer deliberately does not assign semantic authority to dataset
+field names or provenance. They are transport metadata, not ontology.
 
 ---
 
-## 31. Why the encoder is frozen in Stage I
+## 31. Logical Processing Unit v0.1
 
-The one-way boundary is deliberate:
+Cortex now exposes a small **Logical Processing Unit (LPU)** for exact local
+computation over temporary articulated values and relations.
 
-```math
-\text{encoder}
-\rightarrow
-\text{Cortex}.
+```mermaid
+flowchart LR
+    C["Cortex<br/>fuzzy + revisable world model"]
+    T["Temporary articulation"]
+    L["Stateless LPU<br/>exact operation"]
+    R["Result + witness"]
+
+    C --> T --> L --> R
+    R -. "Cortex decides whether it matters" .-> C
 ```
 
-If both systems learned simultaneously, it would be difficult to determine whether a performance gain came from:
+The LPU is intentionally not a second world model. It owns:
 
-- better neural features;
-- Cortex structural reasoning;
-- or feedback between them.
+- no persistent facts;
+- no learned ontology;
+- no permanent predicates;
+- no confidence model;
+- no authority to write results into Cortex memory.
 
-Stage I isolates the question:
+Its v0.1 instruction set is deliberately small: equality/inequality, Boolean
+logic, exact comparisons, exact rational arithmetic, and directed reachability
+with a deterministic witness path.
 
-> Given a fixed representation, does Cortex add useful persistent structural reasoning?
-
-Only after that is established should a Stage II experiment consider
-
-```math
-\text{encoder}
-\leftrightarrow
-\text{Cortex}.
-```
-
-### 31.1 Stage II-A semantic grounding and temporal revision
-
-The first bidirectional research step keeps the neural encoder frozen and lets
-perception and structural reasoning exchange **semantic evidence** rather than
-gradients.
-
-Neural perception proposes a distribution over candidate labels for each
-persistent concept. Cortex combines those proposals with typed relational
-structure and maintains support over complete concept-to-label mappings.
-
-The central invariant is:
+Conceptually,
 
 ```math
-\text{concept identity}
-\neq
-\text{current semantic label}.
+L(S_t,q)\rightarrow(r,\pi),
 ```
 
-A concept may therefore remain stable while its human-readable label becomes
-challenged, unresolved, revised, or recovered.
+where $S_t$ is a temporary articulated state, $q$ is the requested exact
+operation, $r$ is the result, and $\pi$ is a witness trace.
 
-The passed semantic-grounding campaign demonstrated that structural evidence
-can demote high-confidence but inconsistent neural labels while preserving
-genuine mapping ambiguity. The passed temporal semantic-revision campaign then
-separated the instantaneous grounding posterior from the accepted belief state:
+The architectural asymmetry is deliberate:
 
-```math
-\text{stable}
-\rightarrow
-\text{challenged}
-\rightarrow
-\text{unresolved}
-\rightarrow
-\text{revised stable}.
+```text
+Cortex = fuzzy, learned, revisable structure
+LPU    = exact, local, stateless computation
 ```
 
-The subsequent noisy-confidence campaign extends this boundary with missing
-observations, stochastic neural errors, corrupted relational evidence, changing
-reliability, and explicit trust suspension before an accepted label is
-withdrawn. The frozen official campaign passed all gates: raw neural top-label
-accuracy was **0.8061**, Cortex top-label accuracy **0.9639**, trusted
-accepted-label accuracy **0.9980** at **0.7807 coverage**, false certainty
-**0.00195**, and unaffected-concept preservation **1.000**.
+This prevents symbolic convenience from becoming a constraint on what reality
+is allowed to look like.
 
-These mechanisms remain **research-only**. They do not modify the frozen native
-runtime or train neural encoder parameters.
-
-See [HYBRID_SEMANTIC_GROUNDING_V1.md](HYBRID_SEMANTIC_GROUNDING_V1.md),
-[SEMANTIC_REVISION_V1.md](SEMANTIC_REVISION_V1.md),
-[NOISY_SEMANTIC_REVISION_V1.md](NOISY_SEMANTIC_REVISION_V1.md), and
-[NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md](NOISY_SEMANTIC_REVISION_V1_PROTOCOL.md).
+See [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md).
 
 ---
 
@@ -1652,7 +1611,7 @@ On the declared 1,400-frame benchmark:
 | Execution mode | Mean step | Peak RSS |
 |---|---:|---:|
 | Frozen Python | 10,315.3 µs | 87.43 MiB |
-| Hybrid | 10,141.9 µs | 86.93 MiB |
+| Historical Stage-I adapter | 10,141.9 µs | 86.93 MiB |
 | Fully native | **78.66 µs** | **21.99 MiB** |
 
 On that workload this corresponds to roughly:
@@ -1817,8 +1776,11 @@ crates/
       PyO3 boundary for research and Python callers
 
 python/cortex/
-  hybrid.py
-      Frozen-neural-encoder adapter
+  autonomy.py
+      Direct chronological dataset ingestion
+
+  lpu.py
+      Stateless exact logical/arithmetic coprocessor
 
 research/
       Experimental predictive geometry,
@@ -1836,7 +1798,7 @@ benchmarks/results/
       Committed aggregate benchmark summaries
 
 tests/
-      Unit, differential, migration, hybrid, and research tests
+      Unit, differential, migration, autonomous-core, LPU, and research tests
 ```
 
 ---
@@ -1876,14 +1838,13 @@ What is implemented and supported by evidence is narrower:
 ```mermaid
 flowchart TB
     subgraph Input["Observation layer"]
-        RAW["Raw modality<br/>(optional)"]
-        NN["Frozen neural encoder<br/>(Hybrid Stage I)"]
+        DATA["Chronological structured dataset"]
         DET["Structured detection vectors"]
         REL["Relation observations"]
         INT["Intervention + outcomes"]
         Y["Optional scalar predictive outcome"]
 
-        RAW --> NN --> DET
+        DATA --> DET
     end
 
     subgraph Art["Articulation"]
@@ -2030,9 +1991,9 @@ For the research lineage:
 
 - [RESEARCH_HISTORY.md](RESEARCH_HISTORY.md)
 
-For neural/Cortex integration:
+For autonomous ingestion and exact local computation:
 
-- [HYBRID_STAGE_I.md](HYBRID_STAGE_I.md)
+- [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md)
 
 For software/specification/protocol versioning:
 

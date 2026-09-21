@@ -1,6 +1,8 @@
 # Hybrid Cortex Stage I — frozen neural perception + structural inference
 
-Status: implemented research interface.
+> **Historical research report.** The active Stage-I adapter and hybrid benchmark were removed from the main package path by the Autonomous Core + LPU v0.1 pivot. The original implementation remains recoverable from Git history.
+
+Status: historical / retained for research provenance.
 
 This document specifies the first hybrid neural/Cortex boundary without changing
 the frozen Cortex executable specification or the native reasoning semantics.
@@ -123,7 +125,7 @@ frameworks remain optional research dependencies.
 
 ## First reference neural adapter
 
-benchmarks/benchmark_hybrid_caviar.py uses an ImageNet-pretrained ResNet-18 as
+The historical `benchmark_hybrid_caviar.py` campaign used an ImageNet-pretrained ResNet-18 as
 a frozen generic visual encoder. Its classifier head is replaced by identity,
 yielding the 512-dimensional penultimate representation. The official weight
 preprocessing is used. Manual CAVIAR boxes remain an oracle detector so the

@@ -6,6 +6,33 @@ Executable specification: **spec-v0.9.5**
 
 This document is the canonical human-readable status page for the active repository. For the detailed system design, data flow, state boundaries, and reasoning mechanics, see [ARCHITECTURE.md](ARCHITECTURE.md). Historical experiment details remain reproducible from Git history, research code, and committed benchmark summaries. The prioritized cross-track roadmap is maintained in [PROJECT_MILESTONES.md](PROJECT_MILESTONES.md).
 
+## Active architecture direction — Autonomous Core + LPU v0.1
+
+The main Cortex path is now being simplified around **Cortex-owned persistent
+memory and autonomous structural reasoning**. A neural language model is no
+longer part of the active cognitive loop.
+
+The first implementation of this pivot adds:
+
+- direct chronological structured-dataset exposure through
+  `ObservationFrame` and `train_dataset(...)`;
+- a small stateless **Logical Processing Unit (LPU)** for exact local Boolean,
+  comparison, rational-arithmetic, and reachability operations;
+- an explicit boundary in which the LPU cannot own facts, predicates, ontology,
+  confidence, or persistent memory.
+
+The former Ollama/Qwen language gateway, active hybrid runtime, and hybrid
+benchmark workflow have been removed from the active package path. Their Git
+history and selected research reports/results are retained as experimental
+provenance.
+
+The immediate scientific question is now **teacher-free autonomy**: after a
+chronological learning stream ends, what can Cortex itself retain, compose,
+revise, transfer, and keep calibrated without a neural model participating in
+reasoning?
+
+See [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md).
+
 ## What is stable today
 
 ### Native runtime
@@ -127,9 +154,9 @@ continues, candidate readout is the next-largest measured coarse stage.
 
 See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md).
 
-### Hybrid semantic grounding
+### Historical experiment — hybrid semantic grounding
 
-The isolated `hybrid-semantic-grounding-v1` Stage II-A campaign has passed its
+This result is retained as experimental provenance and is **not part of the active autonomous architecture**. The isolated `hybrid-semantic-grounding-v1` Stage II-A campaign passed its
 frozen official gates. This research module keeps concept identity separate
 from semantic labels and combines neural candidate-label distributions with
 persistent typed relational structure.
