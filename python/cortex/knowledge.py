@@ -12,6 +12,11 @@ import json
 from typing import Iterable, Mapping
 
 from .autonomy import ObservationFrame
+from .hypergraph_geometry import (
+    HypergraphGeometry,
+    HypergraphLocalGeometry,
+    RelationalHyperedge,
+)
 from .topology import LocalArticulation, TopologyView
 
 
@@ -80,6 +85,7 @@ class PropertyValueCoordinate:
 class KnowledgeLocalArticulation:
     topology: LocalArticulation
     properties: tuple[PropertyValueCoordinate, ...]
+    hypergeometry: HypergraphLocalGeometry
 
 
 @dataclass(frozen=True, slots=True)
@@ -304,10 +310,10 @@ class KnowledgeGraphView:
         self.bindings = {str(k): int(v) for k, v in symbol_bindings.items()}
         self.reverse = {value: key for key, value in self.bindings.items()}
         self.adjacency: dict[int, set[int]] = {}
+        self.soft_adjacency: dict[int, set[int]] = {}
         self.edge_posterior: dict[tuple[int, int], float] = {}
+        self.edge_state: dict[tuple[int, int], int] = {}
         for entry in snapshot["graph"]["relations"]:
-            if int(entry["evidence"]["state"]) != 1:
-                continue
             a = int(entry["a"])
             b = int(entry["b"])
             evidence = entry["evidence"]
@@ -315,14 +321,21 @@ class KnowledgeGraphView:
             beta = float(evidence["b"])
             key = (min(a, b), max(a, b))
             self.edge_posterior[key] = alpha / max(1.0e-12, alpha + beta)
-            self.adjacency.setdefault(a, set()).add(b)
-            self.adjacency.setdefault(b, set()).add(a)
+            self.edge_state[key] = int(evidence["state"])
+            self.soft_adjacency.setdefault(a, set()).add(b)
+            self.soft_adjacency.setdefault(b, set()).add(a)
+            if int(evidence["state"]) == 1:
+                self.adjacency.setdefault(a, set()).add(b)
+                self.adjacency.setdefault(b, set()).add(a)
 
     def _id(self, symbol: str) -> int | None:
         return self.bindings.get(symbol)
 
     def _neighbors(self, node: int) -> set[int]:
         return self.adjacency.get(node, set())
+
+    def _soft_neighbors(self, node: int) -> set[int]:
+        return self.soft_adjacency.get(node, set())
 
     def objects(self, subject: str, property: str) -> tuple[str, ...]:
         subject_id = self._id(subject)
@@ -369,6 +382,130 @@ class KnowledgeGraphView:
             (min(left, right), max(left, right)),
             0.0,
         )
+
+    def hyperedges(self) -> tuple[RelationalHyperedge, ...]:
+        """Decode soft subject/property/object statement motifs from Cortex.
+
+        Unlike exact retrieval, this uses every represented structural edge.
+        Weak or unresolved evidence therefore remains available to the
+        resolution filtration instead of disappearing from the geometry.
+        """
+
+        role_subject = self._id(ROLE_SUBJECT)
+        role_property = self._id(ROLE_PROPERTY)
+        role_object = self._id(ROLE_OBJECT)
+        if None in (role_subject, role_property, role_object):
+            return ()
+
+        rows: list[RelationalHyperedge] = []
+        for statement_symbol, statement_id in sorted(self.bindings.items()):
+            if not statement_symbol.startswith("@statement:"):
+                continue
+            statement_key = statement_symbol[len("@statement:"):]
+
+            subject_slots = [
+                node
+                for node in self._soft_neighbors(statement_id)
+                if role_subject in self._soft_neighbors(node)
+            ]
+            property_slots = [
+                node
+                for node in self._soft_neighbors(statement_id)
+                if role_property in self._soft_neighbors(node)
+            ]
+            object_slots = [
+                node
+                for node in self._soft_neighbors(statement_id)
+                if role_object in self._soft_neighbors(node)
+            ]
+
+            combinations: list[tuple[int, int, int, int, int, int]] = []
+            for subject_slot in subject_slots:
+                subjects = [
+                    node
+                    for node in self._soft_neighbors(subject_slot)
+                    - {statement_id, role_subject}
+                    if (
+                        self.reverse.get(node) is not None
+                        and not self.reverse[node].startswith("@")
+                    )
+                ]
+                for property_slot in property_slots:
+                    properties = [
+                        node
+                        for node in self._soft_neighbors(property_slot)
+                        - {statement_id, role_property}
+                        if (
+                            self.reverse.get(node) is not None
+                            and not self.reverse[node].startswith("@")
+                        )
+                    ]
+                    for object_slot in object_slots:
+                        objects = [
+                            node
+                            for node in self._soft_neighbors(object_slot)
+                            - {statement_id, role_object}
+                            if (
+                                self.reverse.get(node) is not None
+                                and not self.reverse[node].startswith("@")
+                            )
+                        ]
+                        for subject_id in subjects:
+                            for property_id in properties:
+                                for object_id in objects:
+                                    combinations.append(
+                                        (
+                                            subject_slot,
+                                            property_slot,
+                                            object_slot,
+                                            subject_id,
+                                            property_id,
+                                            object_id,
+                                        )
+                                    )
+
+            for index, (
+                subject_slot,
+                property_slot,
+                object_slot,
+                subject_id,
+                property_id,
+                object_id,
+            ) in enumerate(combinations):
+                motif_edges = (
+                    (statement_id, subject_slot),
+                    (statement_id, property_slot),
+                    (statement_id, object_slot),
+                    (subject_slot, role_subject),
+                    (property_slot, role_property),
+                    (object_slot, role_object),
+                    (subject_slot, subject_id),
+                    (property_slot, property_id),
+                    (object_slot, object_id),
+                )
+                support = min(
+                    self._edge_support(left, right)
+                    for left, right in motif_edges
+                )
+                edge_id = (
+                    statement_key
+                    if len(combinations) == 1
+                    else f"{statement_key}:{index}"
+                )
+                rows.append(
+                    RelationalHyperedge(
+                        edge_id=edge_id,
+                        subject_id=subject_id,
+                        property_id=property_id,
+                        object_id=object_id,
+                        subject=self.reverse[subject_id],
+                        property=self.reverse[property_id],
+                        object=self.reverse[object_id],
+                        support=support,
+                    )
+                )
+
+        return tuple(sorted(rows, key=lambda row: row.edge_id))
 
     def property_coordinates(
         self,
@@ -455,6 +592,7 @@ class KnowledgeGraphView:
         *,
         top_k: int = 8,
         min_support: float = 1.0e-6,
+        resolution: float = 0.0,
     ) -> KnowledgeLocalArticulation:
         if self.config_json is None:
             raise ValueError(
@@ -472,9 +610,14 @@ class KnowledgeGraphView:
             top_k=top_k,
             min_support=min_support,
         )
+        hypergeometry = HypergraphGeometry(self.hyperedges()).local_geometry(
+            symbol,
+            resolution=resolution,
+        )
         return KnowledgeLocalArticulation(
             topology=topology,
             properties=self.property_coordinates(symbol),
+            hypergeometry=hypergeometry,
         )
 
 
