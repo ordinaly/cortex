@@ -80,6 +80,7 @@ jobs:
           tests/test_topology.py
           tests/test_hypergraph_geometry.py
           tests/test_hypergraph_inference.py
+          tests/test_hypergraph_lpu.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
@@ -110,6 +111,12 @@ jobs:
         run: >-
           python benchmarks/benchmark_hypergraph_heldout_inference.py
           --seeds 50
+      - name: Run hypergeometry-lpu-stress-v0.2
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_hypergraph_lpu_stress.py
+          --seeds 10
+          --width 8
 
   wheel:
     runs-on: ubuntu-latest

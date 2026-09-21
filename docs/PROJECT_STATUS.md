@@ -66,6 +66,23 @@ semantics or native entity binding.
 
 See [RELATIONAL_HYPERGEOMETRY_V0_1.md](RELATIONAL_HYPERGEOMETRY_V0_1.md).
 
+## Hypergeometry + LPU Stress v0.2
+
+A follow-up research campaign now validates the LPU as an exact execution layer
+for Cortex-articulated relational compositions.
+
+Across 40 clean depth-2 through depth-5 cases, Cortex-only and Cortex+LPU agreed
+on every answer. LPU witnesses were valid in every case and persistent Cortex
+memory was unchanged. At depth 5 / width 8, path enumeration represented 4096
+complete paths while the layered LPU graph required 211 edges; hosted-runner
+execution characterization was approximately 24.8 ms versus 0.676 ms.
+
+The LPU remained subordinate to Cortex confidence: 20% contradictory evidence
+was tolerated at learned confidence 0.8, while 40% contradiction caused Cortex
+to withhold the rule and no LPU call was issued.
+
+See [HYPERGEOMETRY_LPU_STRESS_V0_2.md](HYPERGEOMETRY_LPU_STRESS_V0_2.md).
+
 ## What is stable today
 
 ### Native runtime
