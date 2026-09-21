@@ -15,9 +15,9 @@ class CortexStepRuntime(Protocol):
     def step(
         self,
         detections: Sequence[Sequence[float]],
-        relation_obs: Sequence[tuple[int, int, bool]],
+        relation_obs: Sequence[tuple[int, int, int]],
         intervention_src_det: int | None,
-        outcomes: Sequence[bool] | None,
+        outcomes: Sequence[tuple[int, int]],
         outcome: float | None,
     ) -> Any: ...
 
@@ -27,9 +27,9 @@ class CortexStepRuntime(Protocol):
 @dataclass(frozen=True, slots=True)
 class ObservationFrame:
     detections: tuple[tuple[float, ...], ...]
-    relation_observations: tuple[tuple[int, int, bool], ...] = ()
+    relation_observations: tuple[tuple[int, int, int], ...] = ()
     intervention_source: int | None = None
-    target_outcomes: tuple[bool, ...] | None = None
+    target_outcomes: tuple[tuple[int, int], ...] = ()
     outcome: float | None = None
     provenance: str | None = None
 
@@ -48,14 +48,17 @@ class ObservationFrame:
         for source, target, present in self.relation_observations:
             if not 0 <= int(source) < count or not 0 <= int(target) < count:
                 raise ValueError("relation observation index is outside the frame")
-            if type(present) is not bool:
-                raise TypeError("relation observation state must be bool")
+            if int(present) not in (0, 1):
+                raise ValueError("relation observation state must be 0 or 1")
         if self.intervention_source is not None and not (
             0 <= int(self.intervention_source) < count
         ):
             raise ValueError("intervention source index is outside the frame")
-        if self.target_outcomes is not None and len(self.target_outcomes) != count:
-            raise ValueError("target_outcomes must align with detections")
+        for target, value in self.target_outcomes:
+            if not 0 <= int(target) < count:
+                raise ValueError("target outcome index is outside the frame")
+            if int(value) not in (0, 1):
+                raise ValueError("target outcome state must be 0 or 1")
         if self.outcome is not None and not math.isfinite(float(self.outcome)):
             raise ValueError("outcome must be finite")
 
@@ -85,11 +88,7 @@ def train_dataset(
             [list(vector) for vector in frame.detections],
             list(frame.relation_observations),
             frame.intervention_source,
-            (
-                list(frame.target_outcomes)
-                if frame.target_outcomes is not None
-                else None
-            ),
+            list(frame.target_outcomes),
             frame.outcome,
         )
         frame_count += 1
