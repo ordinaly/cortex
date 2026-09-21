@@ -7,14 +7,17 @@ on:
       - "python/cortex/knowledge.py"
       - "python/cortex/topology.py"
       - "python/cortex/hypergraph_geometry.py"
+      - "python/cortex/hypergraph_inference.py"
       - "python/cortex/wikidata.py"
       - "python/cortex/__init__.py"
       - "tests/test_knowledge.py"
       - "tests/test_topology.py"
       - "tests/test_hypergraph_geometry.py"
+      - "tests/test_hypergraph_inference.py"
       - "tests/test_wikidata.py"
       - "benchmarks/benchmark_general_knowledge_feed.py"
       - "benchmarks/benchmark_relational_hypergeometry.py"
+      - "benchmarks/benchmark_hypergraph_heldout_inference.py"
       - "scripts/prepare_wikidata_knowledge.py"
       - "docs/GENERAL_KNOWLEDGE_FEED_V0_1.md"
       - "docs/RELATIONAL_HYPERGEOMETRY_V0_1.md"
@@ -38,7 +41,7 @@ jobs:
       - run: python -m pip install "maturin==1.15.0" pytest
       - run: python -m pip install -e .
       - name: Knowledge packet and Wikidata adapter tests
-        run: pytest tests/test_knowledge.py tests/test_wikidata.py tests/test_topology.py tests/test_hypergraph_geometry.py -q
+        run: pytest tests/test_knowledge.py tests/test_wikidata.py tests/test_topology.py tests/test_hypergraph_geometry.py tests/test_hypergraph_inference.py -q
       - name: Run general-knowledge-feed-v0.1
         run: >-
           python benchmarks/benchmark_general_knowledge_feed.py
@@ -47,9 +50,15 @@ jobs:
         run: >-
           python benchmarks/benchmark_relational_hypergeometry.py
           --output relational-hypergeometry-v0.1.json
+      - name: Run hypergraph-heldout-inference-v0.1
+        run: >-
+          python benchmarks/benchmark_hypergraph_heldout_inference.py
+          --seeds 50
+          --output hypergraph-heldout-inference-v0.1.json
       - uses: actions/upload-artifact@v4
         with:
           name: cortex-general-knowledge-feed-v0.1
           path: |
             general-knowledge-feed-v0.1.json
             relational-hypergeometry-v0.1.json
+            hypergraph-heldout-inference-v0.1.json
