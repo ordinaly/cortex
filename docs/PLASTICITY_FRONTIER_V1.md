@@ -208,7 +208,7 @@ Cortex generally less stable.
 
 ## Follow-up — Relational Regime Plasticity v0.1
 
-The dual-timescale follow-up has now passed its development Pareto calibration.
+The dual-timescale follow-up has now passed its Pareto calibration and CI, and its selected knee is frozen as the research default.
 It preserves the exact v0.2 contradiction-detection lags while bounding the
 replacement switch to **9 observations** across all tested prior masses
 4 / 8 / 16 / 32 / 64, rather than 72 / 143 / 285 / 570 / 1139.

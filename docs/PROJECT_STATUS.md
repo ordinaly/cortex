@@ -180,8 +180,9 @@ also exposed asymmetric recovery cost: at 32 prior examples, bursts of
 1 / 2 / 4 / 8 required 0 / 4 / 40 / 111 later supporting observations to
 return to `EXECUTE`.
 
-The follow-up **Relational Regime Plasticity v0.1** development campaign swept
-270 policies; 105 were feasible and 2 were Pareto-optimal. The selected knee
+The follow-up **Relational Regime Plasticity v0.1** Pareto campaign swept
+270 policies; 105 were feasible and 2 were Pareto-optimal. The calibration and
+CI gates passed, and the selected knee is frozen as the research default. The selected knee
 uses fast decay 0.50, pressure decay 0.90, suspicion ratio 0.05, and a 5-step
 confirmation streak. It preserves the exact v0.2 change-detection lags while
 switching to the replacement regime in **9 observations for every tested prior
@@ -212,9 +213,9 @@ The current release candidate is `v1.0.0-rc.2`.
 
 ### Research runtime
 
-The research line has moved beyond the frozen runtime semantics. It currently studies predictive semantic geometry and adaptive representational resolution.
+The research line has moved beyond the frozen runtime semantics along multiple independent tracks. Predictive semantic geometry and adaptive representational resolution remain at `v1.22-R`, while autonomous relational learning now uses **Relational Regime Plasticity v0.1** as its frozen research default.
 
-The current research frontier is `v1.22-R`.
+The immediate cross-track integration milestone is **Autonomy Robustness & Temporal Plasticity v1**.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 

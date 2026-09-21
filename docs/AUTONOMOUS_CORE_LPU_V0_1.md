@@ -43,9 +43,9 @@ training:
 - later evidence remains free to revise earlier structure;
 - dataset provenance can be carried without being interpreted as ontology.
 
-The next benchmark should separate a training stream from held-out queries and
-measure retention, transfer, revision locality, uncertainty, and performance
-after all external teachers are detached.
+That teacher-detachment benchmark has now been completed by **Cortex Autonomy Campaign v1**. It established teacher-free held-out inference, post-detachment transfer, local contradiction handling, and LPU use on the declared structured fixtures. The subsequent **Plasticity Frontier v1** exposed lifetime-history inertia, and **Relational Regime Plasticity v0.1** removed that measured proportional re-articulation debt while retaining durable history. The current integration target is **Autonomy Robustness & Temporal Plasticity v1**.
+
+See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md), [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md), and [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
 ## Logical Processing Unit
 

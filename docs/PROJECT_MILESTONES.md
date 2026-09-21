@@ -44,8 +44,7 @@ that v0.2 detects contradiction early but replacement execution has a severe
 historical inertia: roughly **17.8x** new evidence per unit of accumulated old
 evidence on the declared composition fixture.
 
-**Relational Regime Plasticity v0.1 has passed development Pareto
-calibration.** The selected research default preserves the exact v0.2
+**Relational Regime Plasticity v0.1 has passed Pareto calibration and CI; its selected knee is frozen as the research default.** The selected research default preserves the exact v0.2
 change-detection lags, bounds clean replacement execution at **9 observations**
 across prior masses 4 / 8 / 16 / 32 / 64, produces no declared false switches,
 preserves exact history and locality, and supports 9-observation reversal.
