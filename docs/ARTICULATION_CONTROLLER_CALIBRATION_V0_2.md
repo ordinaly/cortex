@@ -1,113 +1,119 @@
 # Articulation Controller Calibration v0.2
 
-Status: **experimental learned metacognitive policy**.
+Status: **validated experimental learned metacognitive policy**.
 
 ## Goal
 
-Articulation Controller v0.1 uses transparent hand-selected thresholds. v0.2
-tests whether Cortex can replace those thresholds with small learned decision
-surfaces while preserving interpretability and epistemic safety.
+Articulation Controller v0.1 uses transparent fixed thresholds. v0.2 learns
+small decision surfaces from consequences while preserving an inspectable
+epistemic boundary.
 
-The learned controller still does **not** learn relation semantics. It learns
-only when a structural state is ready for exact execution, when conflict should
-cause abstention, and when the LPU is computationally preferable.
+The learned controller does **not** learn relation semantics. It learns only:
 
-## What remains a human policy choice
+- when current Cortex evidence is ready for exact execution;
+- whether rejected execution should remain open to exploration or be marked
+  unresolved for a specific reason;
+- whether native Cortex traversal or the LPU is the cheaper exact backend.
 
-Calibration cannot eliminate every normative choice.
+## Risk contract
 
-In particular, the system needs a declared execution-risk contract: how stable
-must future evidence be before exact execution is considered safe?
+Calibration cannot learn away the choice of acceptable execution risk. v0.2
+therefore declares its oracle contract explicitly:
 
-v0.2 makes that contract explicit and learns the decision boundary around it.
+- future dominant-relation reliability floor: **0.75**;
+- future source reliability floor: **0.80**;
+- future structural-support floor: **0.55**;
+- current Wilson bound uses **z = 1.0**;
+- current resolved-evidence floor: **0.60**;
+- execution threshold is selected for at least **0.93 validation precision**.
 
-The calibration oracle uses held-out future evidence with:
+Exact execution remains conditional on the premises. `EXECUTE` does not mean
+that a premise has become certain.
 
-- future relation reliability floor: 0.82;
-- future source reliability floor: 0.80;
-- future structural-support floor: 0.55;
-- current 95% Wilson lower-bound floor: 0.70.
+## Stratified future-evidence calibration
 
-These values define the experiment's risk tolerance. They are not learned
-facts about cognition.
+The synthetic calibration population is stratified across five regimes:
 
-## Future-evidence oracle
+1. mature stable structure;
+2. stable structure with sparse current evidence;
+3. persistent relational conflict;
+4. transient source ambiguity;
+5. persistent weak structural support.
 
-Random episodes draw latent relation reliability, source reliability, structural
-support, and current evidence counts.
-
-The controller only receives current structural features.
-
-The calibration oracle additionally receives a large future sample from the same
-latent regime.
-
-Labels are generated as follows:
-
-```text
-future regime safe + current evidence statistically resolved
-    -> EXECUTE
-
-future regime safe + current evidence not yet resolved
-    -> EXPLORE
-
-future regime unsafe + current evidence excludes the safe region
-    -> UNRESOLVED
-
-otherwise
-    -> EXPLORE
-```
-
-This prevents the learned surface from merely imitating v0.1's thresholds.
+A large held-out future sample exposes the latent regime to the oracle, while
+the learned controller receives only current Cortex-like evidence features.
+This prevents calibration from simply copying v0.1's thresholds.
 
 ## Learned surfaces
 
-v0.2 fits three deterministic monotone logistic surfaces.
+v0.2 uses four deterministic monotone logistic surfaces.
 
-### Execution surface
+### Execution readiness
 
 Features:
 
 ```text
 evidence maturity
 rule confidence
-rule margin
+positive rule margin
 mean structural support
-source/entity support
-source certainty = 1 - entropy
+source support
+source certainty
 ```
 
-All fitted weights are constrained non-negative. More evidence or certainty
-therefore cannot perversely reduce execution readiness.
+The threshold is selected on validation data under the explicit precision
+contract. On the held-out test split:
 
-The probability threshold is selected on a validation split to satisfy a high
-precision target before maximizing recall.
+- precision: **0.9405**;
+- recall: **0.4422**;
+- dangerous false-execute rate over all states: **0.0125**.
 
-### Conflict surface
+The controller is intentionally conservative: false execution is more costly
+than continued exploration.
 
-If execution is not admitted, a second surface distinguishes persistent
-conflict from continued exploration.
+### Relational conflict
+
+This surface asks whether evidence supports a persistent incompatibility between
+competing relation hypotheses.
 
 Features:
 
 ```text
 evidence maturity
 competitor confidence
-1 - positive margin
-1 - target confidence
+conflict strength
+low target confidence
 source certainty
 ```
 
-This captures the intended distinction:
+Held-out result:
+
+- accuracy: **0.9533**;
+- precision: **0.8508**;
+- recall: **0.9747**.
+
+### Structural weakness
+
+This is intentionally separate from relational contradiction.
+
+Features:
 
 ```text
-not enough information -> EXPLORE
-enough incompatible information -> UNRESOLVED
+evidence maturity
+low structural support
+source certainty
 ```
 
-### Backend surface
+Held-out result:
 
-The LPU-selection surface is calibrated independently from measured execution
-cost.
+- accuracy: **0.9864**;
+- precision: **0.9698**;
+- recall: **0.9912**.
+
+The separation is important. A single unresolved surface previously conflated
+moderate disagreement with persistent weak structure.
+
+### Backend selection
 
 Features:
 
@@ -116,43 +122,95 @@ path scale
 path-compression ratio
 ```
 
-Training labels come from repeated timings of the Cortex enumerating executor
-versus the layered LPU executor on relation-name-agnostic lattices.
+Training labels come from measured native Cortex-enumerator versus layered-LPU
+execution cost on opaque relation lattices. The validation threshold minimizes
+runtime regret.
 
-The backend probability threshold is selected to minimize measured validation
-runtime regret, not merely classification error.
+In the successful CI run the held-out backend set achieved:
 
-An explicit exact-witness request remains a hard LPU override.
+- accuracy: **1.000**;
+- mean runtime regret: **1.000x**;
+- median runtime regret: **1.000x**;
+- maximum runtime regret: **1.000x**.
 
-## Train / validation / test discipline
+These timing-derived results are environment-specific; the learned structural
+surface, not the absolute timings, is the artifact of interest.
 
-Epistemic calibration episodes and backend structures are split before
-threshold selection.
+## Three-state holdout
 
-The final learned bundle is then tested again on native Cortex worlds with new
-random seeds and opaque relation names.
+On 1,200 held-out future-evidence episodes:
 
-The native validation is separate from the synthetic future-evidence oracle.
+- three-state accuracy: **0.7075**;
+- dangerous false execution: **0.0125**.
 
-## Safety invariants retained
+The confusion is intentionally asymmetric: many safe-but-not-yet-admitted
+episodes remain `EXPLORE` rather than being executed prematurely.
 
-Learning the surface does not grant the controller new semantic authority.
+## Native Cortex holdout
 
-The following remain architectural invariants:
+The learned bundle was then tested on new native Cortex worlds, separate from
+the synthetic calibration episodes.
 
-- relation names are absent from calibration features;
-- LPU cannot influence epistemic confidence;
-- exact execution cannot occur without a learned execute admission;
-- multi-valued targets remain valid;
-- execution is read-only with respect to Cortex memory;
-- an exact-witness request may choose LPU only after epistemic admission;
-- resolution filtering remains upstream of exact execution.
+Across **40 clean cases**:
 
-## Why monotone linear surfaces first
+- execution rate: **1.000**;
+- answer accuracy: **1.000**;
+- memory isolation: **1.000**;
+- binding conflicts: **0**;
+- selected knowledge resolution: **epsilon = 0.65** in all cases.
 
-A neural metacontroller would be more expressive but would make the execution
-boundary harder to audit.
+The learned backend selected Cortex for 10 cases and LPU for 30 cases in this
+run. Unlike v0.1's fixed heuristic, this boundary is learned from measured
+execution cost.
 
-The first learned controller therefore uses low-capacity monotone surfaces.
-If these fail on broader regimes, additional expressivity should be introduced
-only alongside explicit calibration and monotonicity tests.
+Epistemic controls:
+
+```text
+clean evidence      -> EXECUTE
+20% contradiction   -> EXPLORE
+40% contradiction   -> UNRESOLVED
+ambiguous source    -> EXPLORE
+```
+
+At 20% contradiction the learned conflict probability was about **0.217**;
+at 40% it rose to about **0.708**. Thus moderate disagreement remains open
+rather than being prematurely frozen, while strong conflict is explicitly
+recognized.
+
+## Architectural invariants
+
+Calibration does not grant the controller semantic authority:
+
+- relation names are absent from all learned features;
+- LPU output cannot increase premise confidence;
+- no exact execution occurs without execution admission;
+- conflict and structural weakness are distinguished rather than collapsed;
+- multiple legitimate targets remain valid;
+- execution remains read-only with respect to Cortex memory;
+- exact-witness requests can choose LPU only after epistemic admission;
+- evidence-resolution filtering remains upstream of exact execution.
+
+## Interpretation
+
+v0.2 supports a learned metacognitive boundary:
+
+```text
+Cortex evidence
+      |
+      v
+learned execution surface
+  | admitted
+  +------------------> exact execution
+  |
+  | rejected
+  v
+relational-conflict surface ----+
+                                 +--> UNRESOLVED
+structural-weakness surface ----+
+  |
+  +-- neither --> EXPLORE
+```
+
+The result is deliberately low-capacity and auditable. More expressive
+controllers should be considered only if future domains demonstrate a failure
+that cannot be represented by cause-specific monotone surfaces.
