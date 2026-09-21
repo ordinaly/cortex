@@ -125,7 +125,7 @@ frameworks remain optional research dependencies.
 
 ## First reference neural adapter
 
-benchmarks/benchmark_hybrid_caviar.py uses an ImageNet-pretrained ResNet-18 as
+The historical `benchmark_hybrid_caviar.py` campaign used an ImageNet-pretrained ResNet-18 as
 a frozen generic visual encoder. Its classifier head is replaced by identity,
 yielding the 512-dimensional penultimate representation. The official weight
 preprocessing is used. Manual CAVIAR boxes remain an oracle detector so the
