@@ -49,6 +49,14 @@ except ImportError as exc:  # source-tree use before maturin build
 
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
+from .hypergraph_geometry import (
+    BasinAdjacency,
+    HypergraphGeometry,
+    HypergraphLocalGeometry,
+    Hyperpath,
+    RelationalDirection,
+    RelationalHyperedge,
+)
 from .topology import (
     CausalCoordinate,
     EntitySupport,
@@ -85,6 +93,12 @@ __all__ = [
     "LPUStep",
     "LogicalProcessingUnit",
     "KnowledgeFeedReport",
+    "RelationalHyperedge",
+    "RelationalDirection",
+    "Hyperpath",
+    "HypergraphLocalGeometry",
+    "HypergraphGeometry",
+    "BasinAdjacency",
     "PropertyValueCoordinate",
     "KnowledgeLocalArticulation",
     "TopologyView",
