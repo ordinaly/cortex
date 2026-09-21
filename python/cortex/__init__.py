@@ -47,7 +47,8 @@ except ImportError as exc:  # source-tree use before maturin build
     def native_version() -> str:
         return "unavailable"
 
-from .hybrid import FrozenEncoder, HybridCortexRuntime, NeuralObservation, cosine_mse_embedding
+from .autonomy import ObservationFrame, TrainingReport, train_dataset
+from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
 
 __all__ = [
     "Articulation",
@@ -57,16 +58,18 @@ __all__ = [
     "CortexRuntime",
     "CortexRuntimeRead",
     "CortexRuntimeStageTimings",
-    "FrozenEncoder",
     "FuzzyMemory",
     "FuzzyMemoryRead",
     "GraphEvidence",
     "GraphEvidenceRead",
-    "HybridCortexRuntime",
+    "LPUResult",
+    "LPUStep",
+    "LogicalProcessingUnit",
     "NATIVE_AVAILABLE",
-    "NeuralObservation",
+    "ObservationFrame",
+    "TrainingReport",
     "__spec_version__",
     "__version__",
-    "cosine_mse_embedding",
     "native_version",
+    "train_dataset",
 ]
