@@ -20,10 +20,23 @@ ROLE_OBJECT = "@syntax:object"
 ROLE_QUALIFIER = "@syntax:qualifier"
 
 
+def _validate_world_symbol(name: str, value: str) -> None:
+    if not value:
+        raise ValueError(f"{name} must be non-empty")
+    if value.startswith("@"):
+        raise ValueError(
+            f"{name} cannot use reserved Cortex knowledge syntax namespace '@'"
+        )
+
+
 @dataclass(frozen=True, slots=True)
 class KnowledgeQualifier:
     property: str
     value: str
+
+    def __post_init__(self) -> None:
+        _validate_world_symbol("qualifier property", self.property)
+        _validate_world_symbol("qualifier value", self.value)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,14 +51,14 @@ class KnowledgeStatement:
     provenance: str | None = None
 
     def __post_init__(self) -> None:
+        if not self.statement_id:
+            raise ValueError("statement_id must be non-empty")
         for name, value in (
-            ("statement_id", self.statement_id),
             ("subject", self.subject),
             ("property", self.property),
             ("value", self.value),
         ):
-            if not value:
-                raise ValueError(f"{name} must be non-empty")
+            _validate_world_symbol(name, value)
 
 
 @dataclass(frozen=True, slots=True)
