@@ -5,6 +5,7 @@ from cortex.hypergraph_geometry import HypergraphGeometry, RelationalHyperedge
 from cortex.knowledge import (
     KnowledgeGraphView,
     KnowledgeStatement,
+    KnowledgeStatementIncidence,
     feed_knowledge,
     make_knowledge_runtime,
 )
@@ -177,3 +178,69 @@ def test_local_geometry_is_order_invariant():
     assert left.adjacent_basins == right.adjacent_basins
     assert left.directions == right.directions
     assert left.articulated_component == right.articulated_component
+
+
+def test_hyperedge_identity_survives_support_revision():
+    import json
+
+    motif = (
+        (10, 11),
+        (10, 12),
+        (10, 13),
+        (11, 20),
+        (12, 21),
+        (13, 22),
+        (11, 1),
+        (12, 2),
+        (13, 3),
+    )
+    incidence = (
+        KnowledgeStatementIncidence(
+            statement_id="stable-id",
+            subject="France",
+            property="capital",
+            value="Paris",
+            subject_id=1,
+            property_id=2,
+            object_id=3,
+            motif_edges=motif,
+        ),
+    )
+
+    def snapshot(weaken=False):
+        rows = []
+        for index, (a, b) in enumerate(motif):
+            alpha, beta = (2.0, 1.0)
+            if weaken and index == 0:
+                alpha, beta = (1.0, 4.0)
+            rows.append(
+                {
+                    "a": a,
+                    "b": b,
+                    "evidence": {
+                        "a": alpha,
+                        "b": beta,
+                        "exposure": 1,
+                        "state": 1 if alpha > beta else 0,
+                        "last_updated": 1,
+                    },
+                }
+            )
+        return json.dumps({"graph": {"relations": rows}})
+
+    before = KnowledgeGraphView(
+        snapshot(False),
+        {},
+        statement_incidence=incidence,
+    ).hyperedges()
+    after = KnowledgeGraphView(
+        snapshot(True),
+        {},
+        statement_incidence=incidence,
+    ).hyperedges()
+
+    assert len(before) == len(after) == 1
+    assert before[0].edge_id == after[0].edge_id == "stable-id"
+    assert before[0].participants == after[0].participants
+    assert before[0].support == 2.0 / 3.0
+    assert after[0].support == 0.2
