@@ -83,6 +83,7 @@ jobs:
           tests/test_hypergraph_inference.py
           tests/test_hypergraph_lpu.py
           tests/test_articulation_controller.py
+          tests/test_graph_sandwich_routing.py
           tests/test_controller_calibration.py
           tests/test_regime_plasticity.py
           tests/test_autonomy_robustness.py
@@ -134,6 +135,11 @@ jobs:
         run: >-
           python benchmarks/benchmark_articulation_controller_calibration.py
           --native-seeds 10
+      - name: Run graph-sandwich-routing-v0.1
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_graph_sandwich_routing_v0_1.py
+          --repeats 5
       - name: Run cortex-autonomy-campaign-v1
         if: matrix.python-version == '3.13'
         run: >-
