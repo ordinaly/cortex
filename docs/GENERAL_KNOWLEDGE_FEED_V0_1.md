@@ -128,5 +128,27 @@ Hard gates:
 
 This is a **storage/retrieval test**, not yet a learning or inference claim.
 
+## Pilot result
+
+The first CI campaign passed every frozen gate:
+
+- 22 statements presented once each;
+- 129 unique packet symbols;
+- 129 Cortex entities;
+- 198 active structural relations;
+- symbol-binding conflicts: **0**;
+- exact retrieval: **12/12 (1.000)**;
+- negative-control query: **empty**;
+- multi-valued relation preservation: **passed**;
+- shuffled-presentation query equivalence: **passed**.
+
+The two feed orders completed in approximately 12.7 ms and 11.6 ms on the
+hosted runner. These timings are descriptive only and are not performance
+claims.
+
+The result establishes that the reified grammar can survive Cortex articulation
+and be read back from Cortex's own relation snapshot. It does not establish
+held-out inference, source-trust reasoning, or large-scale knowledge ingestion.
+
 The next experiment should hold statements out and ask whether Cortex can infer
 new relational structure from what it was shown.
