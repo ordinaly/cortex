@@ -31,15 +31,20 @@ NEW = "NEW"
 CTX = ("R0:forward", "R1:forward")
 
 
-def _bootstrap(memory: AutonomyTemporalMemory, context=CTX, prior=32):
+def _bootstrap(
+    memory: AutonomyTemporalMemory,
+    context=CTX,
+    prior=32,
+    relation=OLD,
+):
     for _ in range(prior):
         memory.observe(
             TemporalObservation(
                 context=context,
-                relation=OLD,
+                relation=relation,
                 source="childhood",
                 source_reliability=1.0,
-                true_relation=OLD,
+                true_relation=relation,
                 bootstrap=True,
             )
         )
@@ -260,14 +265,7 @@ def compound_locality(seed: int):
     stable = ("B0", "B1", "B2", "B3")
     reverse = ("C0", "C1", "C2", "C3", "C4", "C5")
     for context, relation in ((shifted, OLD), (stable, "KEEP"), (reverse, OLD)):
-        _bootstrap(memory, context=context, prior=32)
-        if relation != OLD:
-            # Replace the bootstrap label for the stable context.
-            local = AutonomyTemporalMemory()
-            for _ in range(32):
-                local.observe(TemporalObservation(context, relation, bootstrap=True))
-            # Feed stable context into the shared bank directly from scratch.
-            memory._trackers[context] = local._trackers[context]
+        _bootstrap(memory, context=context, prior=32, relation=relation)
 
     for step in range(64):
         memory.observe(TemporalObservation(shifted, NEW, true_relation=NEW))
@@ -432,8 +430,9 @@ def campaign(seeds: int, stationary_steps: int):
         "source_reliability_trap": {
             "weighted_oracle": source[0]["weighted_oracle"],
             "final_acceptance_counts": {
-                relation: sum(row["final_accepted"] == relation for row in source)
-                for relation in (OLD, NEW, None)
+                OLD: sum(row["final_accepted"] == OLD for row in source),
+                NEW: sum(row["final_accepted"] == NEW for row in source),
+                "none": sum(row["final_accepted"] is None for row in source),
             },
             "mean_unsafe_execute_rate": _mean(
                 source, "unsafe_execute_rate"
