@@ -147,6 +147,10 @@ jobs:
         run: >-
           python benchmarks/benchmark_relational_regime_plasticity_v0_1.py
           --seeds 7
+      - name: Run regime-plasticity-calibration-v0.2
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_regime_plasticity_calibration_v0_2.py
 
   wheel:
     runs-on: ubuntu-latest
