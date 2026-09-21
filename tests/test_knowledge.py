@@ -110,3 +110,12 @@ def test_every_encoded_positive_edge_is_active_in_cortex_snapshot():
                 )
             )
             assert pair in active
+
+
+def test_external_symbols_cannot_impersonate_syntax_nodes():
+    import pytest
+
+    with pytest.raises(ValueError, match="reserved"):
+        KnowledgeStatement("bad", "@syntax:subject", "relation", "value")
+    with pytest.raises(ValueError, match="reserved"):
+        KnowledgeQualifier("relation", "@syntax:object")
