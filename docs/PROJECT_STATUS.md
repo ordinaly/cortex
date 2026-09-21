@@ -158,6 +158,34 @@ boundary remains open.
 
 See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
 
+## Plasticity Frontier v1
+
+The first dedicated plasticity characterization quantifies a large
+re-articulation dead zone in the frozen cumulative-evidence + calibrated-v0.2
+stack.
+
+Across seven randomized worlds, replacing a learned composition required about
+**17.8x as many NEW observations as accumulated OLD observations** before the
+replacement relation could reach `EXECUTE`. Prior masses
+4 / 8 / 16 / 32 / 64 required approximately
+72 / 143 / 285 / 570 / 1139 new examples.
+
+The controller detected change much earlier: the old relation left
+`EXECUTE` after only 1 / 1 / 1 / 2 / 4 contradictory examples and became
+`UNRESOLVED` after 3 / 5 / 9 / 18 / 36. Thus the dominant weakness is not
+novelty detection but slow **re-articulation after a genuine regime shift**.
+
+A disjoint control relation remained fully stable. Short contradictory bursts
+also exposed asymmetric recovery cost: at 32 prior examples, bursts of
+1 / 2 / 4 / 8 required 0 / 4 / 40 / 111 later supporting observations to
+return to `EXECUTE`.
+
+The next candidate is a dual-timescale relational regime mechanism: durable
+historical evidence plus fast local regime evidence with explicit hysteresis,
+without deleting old topology or weakening the v0.2 execution-risk contract.
+
+See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md).
+
 ## What is stable today
 
 ### Native runtime

@@ -39,10 +39,21 @@ teacher-free held-out inference and novelty transfer, followed the reversible
 evidence, preserved an unrelated control relation, and selected the LPU for a
 deep branching query without semantic drift.
 
-The immediate cross-track milestone is now **Autonomy Robustness & Temporal
-Plasticity v1**. It should test whether the autonomy result survives noisy and
-missing observations, source reliability differences, temporal regime changes,
-broader out-of-distribution relation structures, and sustained memory pressure.
+The first **Plasticity Frontier v1** characterization is complete. It found
+that v0.2 detects contradiction early but replacement execution has a severe
+historical inertia: roughly **17.8x** new evidence per unit of accumulated old
+evidence on the declared composition fixture.
+
+The immediate plasticity milestone is now **Relational Regime Plasticity
+v0.1**: preserve durable historical evidence while adding a fast local
+time-sensitive regime articulation with explicit hysteresis. The candidate must
+reduce regime-switch lag without increasing false switches under stationary
+noise or erasing old regimes.
+
+**Autonomy Robustness & Temporal Plasticity v1** remains the broader campaign
+that will consume the successful mechanism and then add missing/corrupted
+observations, source reliability differences, out-of-distribution relation
+structures, and sustained memory pressure.
 
 **Open-World Robustness v1** remains the next robustness-focused Reasoning Map
 campaign rather than being discarded. Concept-to-semantics integration is
