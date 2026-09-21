@@ -147,33 +147,35 @@ See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
 
 ---
 
-## Immediate cross-track milestone — Autonomy Robustness & Temporal Plasticity v1
+## Completed cross-track milestone — Autonomy Robustness & Temporal Plasticity v1
 
-### Question
+### Result
 
-Does the autonomous loop remain calibrated and plastic when evidence is noisy,
-time-dependent, source-dependent, partially missing, and memory-constrained?
+The declared two-phase program is complete.
 
-### Priority experiments
+Phase A characterized the frozen relational-regime policy under missingness,
+corruption, drift, source conflict, compound contexts, and long fixed-vocabulary
+streams. It preserved the existing plasticity frontier while exposing two
+measured failures: stale exact execution during observation gaps and blindness
+to source reliability.
 
-- replace deterministic post-detachment observations with stochastic missing and
-  corrupted evidence;
-- attach explicit source reliability and provenance to evidence rather than
-  collapsing them into one confidence value;
-- introduce temporal regime/context variables so newer world states can revise
-  old regularities without requiring overwhelming raw observation counts;
-- sweep memory pressure through the failure boundary and require graceful
-  `EXPLORE` / `UNRESOLVED` behavior instead of exceptions;
-- broaden held-out relation signatures and path depths beyond the calibration
-  distribution;
-- measure controller Brier score, false execution, recovery latency, locality,
-  LPU invocation rate, and memory/runtime growth throughout the stream.
+Phase B addressed those failures without rewriting durable history:
 
-### Key promotion condition
+- bounded odds-relative source weighting resolved the original source conflict
+  and an independent holdout in **12/12** runs each;
+- frequent weak contradictory evidence caused **0 false switches**;
+- a one-missing-event execution-freshness grace reduced stale unsafe execution
+  to **0.1458 / 0.1082** at 30% / 60% missingness;
+- clean switching remained **9 observed events**;
+- full-trust corruption/noise behavior, locality, exact audit history, and
+  fixed-vocabulary bounded state were preserved.
 
-Do not enable online self-recalibration of the controller until a frozen v0.2
-policy has been measured under these distribution shifts. Otherwise the
-controller could adapt to its own errors and hide calibration drift.
+The mechanism remains research-only. Source reliability is externally supplied
+rather than learned, and freshness is defined only for explicit missing events
+in the declared structured stream.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 ---
 
