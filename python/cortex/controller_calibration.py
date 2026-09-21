@@ -170,6 +170,74 @@ class CalibrationBundle:
         )
 
 
+def frozen_calibration_v0_2() -> CalibrationBundle:
+    """Return the calibration bundle frozen by the v0.2 campaign.
+
+    The constants come from the successful held-out calibration run merged in
+    commit 097e5565. Keeping them in code makes downstream autonomy experiments
+    independent of re-fitting on their own evaluation data.
+    """
+
+    return CalibrationBundle(
+        version="controller-calibration-v0.2",
+        execute_surface=LinearProbabilitySurface(
+            feature_names=EXECUTE_FEATURE_NAMES,
+            weights=(
+                0.0,
+                0.0,
+                2.447555880561244,
+                1.094845603397744,
+                0.0,
+                1.4851363136408169,
+            ),
+            intercept=-3.523623066755419,
+            threshold=0.7064854281125331,
+        ),
+        conflict_surface=LinearProbabilitySurface(
+            feature_names=CONFLICT_FEATURE_NAMES,
+            weights=(
+                0.3116177691467303,
+                1.8880749549680074,
+                3.541879831825144,
+                1.8880749549680074,
+                0.0,
+            ),
+            intercept=-3.6704784595887574,
+            threshold=0.6243756839395693,
+        ),
+        structural_surface=LinearProbabilitySurface(
+            feature_names=STRUCTURAL_FEATURE_NAMES,
+            weights=(
+                0.43487181644686035,
+                5.539576306549586,
+                0.0665663733857082,
+            ),
+            intercept=-2.488507637421211,
+            threshold=0.5568984750920496,
+        ),
+        backend_surface=LinearProbabilitySurface(
+            feature_names=BACKEND_FEATURE_NAMES,
+            weights=(
+                3.6372805169220603,
+                4.4495893775823,
+            ),
+            intercept=-3.3075335079582495,
+            threshold=0.46380374742365243,
+        ),
+        minimum_resolution=0.50,
+        resolution_levels=(
+            0.80,
+            0.75,
+            0.70,
+            0.65,
+            0.60,
+            0.55,
+            0.50,
+        ),
+        risk_contract="future-evidence-oracle-v0.1",
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class CalibratedRuleAssessment:
     rule: CompositionRule
