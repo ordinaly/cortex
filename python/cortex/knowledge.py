@@ -89,6 +89,18 @@ class KnowledgeLocalArticulation:
 
 
 @dataclass(frozen=True, slots=True)
+class KnowledgeStatementIncidence:
+    statement_id: str
+    subject: str
+    property: str
+    value: str
+    subject_id: int
+    property_id: int
+    object_id: int
+    motif_edges: tuple[tuple[int, int], ...]
+
+
+@dataclass(frozen=True, slots=True)
 class KnowledgeFeedReport:
     statements: int
     frames: int
@@ -96,6 +108,7 @@ class KnowledgeFeedReport:
     cortex_entities: int
     binding_conflicts: int
     symbol_bindings: Mapping[str, int]
+    statement_incidence: tuple[KnowledgeStatementIncidence, ...]
     snapshot_json: str
 
 
@@ -262,6 +275,7 @@ def feed_knowledge(
     conflicts = 0
     frame_count = 0
     statement_count = 0
+    incidence: list[KnowledgeStatementIncidence] = []
 
     for statement in statements:
         encoded = encoder.encode(statement)
@@ -274,11 +288,34 @@ def feed_knowledge(
         )
         if len(read.bindings) != len(encoded.symbols):
             raise RuntimeError("Cortex binding count does not match encoded symbols")
-        for symbol, binding in zip(encoded.symbols, read.bindings):
+        frame_bindings = {
+            symbol: int(binding)
+            for symbol, binding in zip(encoded.symbols, read.bindings)
+        }
+        for symbol, binding in frame_bindings.items():
             previous = bindings.get(symbol)
-            if previous is not None and previous != int(binding):
+            if previous is not None and previous != binding:
                 conflicts += 1
-            bindings[symbol] = int(binding)
+            bindings[symbol] = binding
+
+        incidence.append(
+            KnowledgeStatementIncidence(
+                statement_id=statement.statement_id,
+                subject=statement.subject,
+                property=statement.property,
+                value=statement.value,
+                subject_id=frame_bindings[statement.subject],
+                property_id=frame_bindings[statement.property],
+                object_id=frame_bindings[statement.value],
+                motif_edges=tuple(
+                    (
+                        frame_bindings[left],
+                        frame_bindings[right],
+                    )
+                    for left, right in encoded.positive_pairs[:9]
+                ),
+            )
+        )
         frame_count += 1
         statement_count += 1
 
@@ -291,6 +328,7 @@ def feed_knowledge(
         cortex_entities=int(snapshot["articulation"]["active_entities"]),
         binding_conflicts=conflicts,
         symbol_bindings=dict(bindings),
+        statement_incidence=tuple(incidence),
         snapshot_json=snapshot_json,
     )
 
@@ -303,14 +341,15 @@ class KnowledgeGraphView:
         snapshot_json: str,
         symbol_bindings: Mapping[str, int],
         config_json: str | None = None,
+        statement_incidence: Iterable[KnowledgeStatementIncidence] = (),
     ):
         snapshot = json.loads(snapshot_json)
         self.snapshot_json = snapshot_json
         self.config_json = config_json
+        self.statement_incidence = tuple(statement_incidence)
         self.bindings = {str(k): int(v) for k, v in symbol_bindings.items()}
         self.reverse = {value: key for key, value in self.bindings.items()}
         self.adjacency: dict[int, set[int]] = {}
-        self.soft_adjacency: dict[int, set[int]] = {}
         self.edge_posterior: dict[tuple[int, int], float] = {}
         self.edge_state: dict[tuple[int, int], int] = {}
         for entry in snapshot["graph"]["relations"]:
@@ -322,8 +361,6 @@ class KnowledgeGraphView:
             key = (min(a, b), max(a, b))
             self.edge_posterior[key] = alpha / max(1.0e-12, alpha + beta)
             self.edge_state[key] = int(evidence["state"])
-            self.soft_adjacency.setdefault(a, set()).add(b)
-            self.soft_adjacency.setdefault(b, set()).add(a)
             if int(evidence["state"]) == 1:
                 self.adjacency.setdefault(a, set()).add(b)
                 self.adjacency.setdefault(b, set()).add(a)
@@ -333,9 +370,6 @@ class KnowledgeGraphView:
 
     def _neighbors(self, node: int) -> set[int]:
         return self.adjacency.get(node, set())
-
-    def _soft_neighbors(self, node: int) -> set[int]:
-        return self.soft_adjacency.get(node, set())
 
     def objects(self, subject: str, property: str) -> tuple[str, ...]:
         subject_id = self._id(subject)
@@ -384,127 +418,31 @@ class KnowledgeGraphView:
         )
 
     def hyperedges(self) -> tuple[RelationalHyperedge, ...]:
-        """Decode soft subject/property/object statement motifs from Cortex.
+        """Project explicit statement incidence through current Cortex evidence.
 
-        Unlike exact retrieval, this uses every represented structural edge.
-        Weak or unresolved evidence therefore remains available to the
-        resolution filtration instead of disappearing from the geometry.
+        Incidence says which basins constitute one higher-order statement.
+        Support is recomputed from Cortex's current pairwise evidence every
+        time, so revision changes geometry without changing hyperedge identity.
         """
 
-        role_subject = self._id(ROLE_SUBJECT)
-        role_property = self._id(ROLE_PROPERTY)
-        role_object = self._id(ROLE_OBJECT)
-        if None in (role_subject, role_property, role_object):
-            return ()
-
         rows: list[RelationalHyperedge] = []
-        for statement_symbol, statement_id in sorted(self.bindings.items()):
-            if not statement_symbol.startswith("@statement:"):
-                continue
-            statement_key = statement_symbol[len("@statement:"):]
-
-            subject_slots = [
-                node
-                for node in self._soft_neighbors(statement_id)
-                if role_subject in self._soft_neighbors(node)
-            ]
-            property_slots = [
-                node
-                for node in self._soft_neighbors(statement_id)
-                if role_property in self._soft_neighbors(node)
-            ]
-            object_slots = [
-                node
-                for node in self._soft_neighbors(statement_id)
-                if role_object in self._soft_neighbors(node)
-            ]
-
-            combinations: list[tuple[int, int, int, int, int, int]] = []
-            for subject_slot in subject_slots:
-                subjects = [
-                    node
-                    for node in self._soft_neighbors(subject_slot)
-                    - {statement_id, role_subject}
-                    if (
-                        self.reverse.get(node) is not None
-                        and not self.reverse[node].startswith("@")
-                    )
-                ]
-                for property_slot in property_slots:
-                    properties = [
-                        node
-                        for node in self._soft_neighbors(property_slot)
-                        - {statement_id, role_property}
-                        if (
-                            self.reverse.get(node) is not None
-                            and not self.reverse[node].startswith("@")
-                        )
-                    ]
-                    for object_slot in object_slots:
-                        objects = [
-                            node
-                            for node in self._soft_neighbors(object_slot)
-                            - {statement_id, role_object}
-                            if (
-                                self.reverse.get(node) is not None
-                                and not self.reverse[node].startswith("@")
-                            )
-                        ]
-                        for subject_id in subjects:
-                            for property_id in properties:
-                                for object_id in objects:
-                                    combinations.append(
-                                        (
-                                            subject_slot,
-                                            property_slot,
-                                            object_slot,
-                                            subject_id,
-                                            property_id,
-                                            object_id,
-                                        )
-                                    )
-
-            for index, (
-                subject_slot,
-                property_slot,
-                object_slot,
-                subject_id,
-                property_id,
-                object_id,
-            ) in enumerate(combinations):
-                motif_edges = (
-                    (statement_id, subject_slot),
-                    (statement_id, property_slot),
-                    (statement_id, object_slot),
-                    (subject_slot, role_subject),
-                    (property_slot, role_property),
-                    (object_slot, role_object),
-                    (subject_slot, subject_id),
-                    (property_slot, property_id),
-                    (object_slot, object_id),
+        for incidence in self.statement_incidence:
+            support = min(
+                self._edge_support(left, right)
+                for left, right in incidence.motif_edges
+            )
+            rows.append(
+                RelationalHyperedge(
+                    edge_id=incidence.statement_id,
+                    subject_id=incidence.subject_id,
+                    property_id=incidence.property_id,
+                    object_id=incidence.object_id,
+                    subject=incidence.subject,
+                    property=incidence.property,
+                    object=incidence.value,
+                    support=support,
                 )
-                support = min(
-                    self._edge_support(left, right)
-                    for left, right in motif_edges
-                )
-                edge_id = (
-                    statement_key
-                    if len(combinations) == 1
-                    else f"{statement_key}:{index}"
-                )
-                rows.append(
-                    RelationalHyperedge(
-                        edge_id=edge_id,
-                        subject_id=subject_id,
-                        property_id=property_id,
-                        object_id=object_id,
-                        subject=self.reverse[subject_id],
-                        property=self.reverse[property_id],
-                        object=self.reverse[object_id],
-                        support=support,
-                    )
-                )
-
+            )
         return tuple(sorted(rows, key=lambda row: row.edge_id))
 
     def property_coordinates(
