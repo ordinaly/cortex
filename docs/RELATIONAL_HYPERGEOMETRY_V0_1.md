@@ -62,6 +62,32 @@ among the structural edges required to recover the statement. This is a
 conservative bottleneck composition: a statement is no stronger than its
 weakest structural dependency.
 
+## Incidence identity versus belief
+
+A genuine hypergraph needs persistent incidence identity. Cortex therefore
+records the structural identity of each knowledge statement token:
+
+```text
+statement-id -> (subject basin, relation basin, object basin)
+```
+
+This incidence record does **not** assert that the statement is true. Its
+current geometric support is recomputed from Cortex's live evidence over the
+motif dependencies.
+
+Consequently, evidence revision changes the hyperedge weight while preserving
+the identity of the relation instance:
+
+```text
+same incidence
+    support 0.67 -> 0.20
+```
+
+This separation prevents the geometry from reconstructing statement identity
+from arbitrary weak pairwise co-observation edges, and it preserves revision:
+the topology can weaken, disappear at a chosen resolution, and later return
+without inventing a new semantic object.
+
 ## Relation basin as local direction field
 
 The relation basin also induces role-aware local directions.
