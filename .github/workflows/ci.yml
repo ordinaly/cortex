@@ -74,6 +74,7 @@ jobs:
           tests/test_native_runtime.py
           tests/test_autonomy.py
           tests/test_autonomy_campaign.py
+          tests/test_regime_plasticity.py
           tests/test_lpu.py
           tests/test_lpu_validation.py
           tests/test_knowledge.py
@@ -140,6 +141,11 @@ jobs:
         if: matrix.python-version == '3.13'
         run: >-
           python benchmarks/benchmark_plasticity_frontier_v1.py
+          --seeds 7
+      - name: Run relational-regime-plasticity-v0.1
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_relational_regime_plasticity_v0_1.py
           --seeds 7
 
   wheel:
