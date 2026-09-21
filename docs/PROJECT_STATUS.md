@@ -101,6 +101,35 @@ remained in exploration.
 
 See [ARTICULATION_CONTROLLER_V0_1.md](ARTICULATION_CONTROLLER_V0_1.md).
 
+## Articulation Controller Calibration v0.2
+
+The fixed v0.1 articulation policy now has a learned, auditable follow-up.
+v0.2 fits small monotone decision surfaces from held-out consequences rather
+than copying hand-selected controller thresholds.
+
+The calibrated policy separates four questions:
+
+- is current evidence ready for exact execution?
+- is rejected execution caused by persistent relational conflict?
+- is it caused by persistent structural weakness?
+- if execution is admitted, is native traversal or the LPU the cheaper exact
+  backend?
+
+On 1,200 held-out future-evidence episodes, execution precision was **0.9405**
+with a **0.0125 dangerous false-execute rate**. The relational-conflict surface
+reached **0.9747 recall** and the structural-weakness surface **0.9912 recall**.
+Overall three-state accuracy was **0.7075**, with errors intentionally biased
+toward continued exploration rather than premature execution.
+
+A separate native Cortex holdout produced **40/40 correct clean executions**,
+100% memory isolation, zero binding conflicts, and learned knowledge resolution
+**epsilon = 0.65** in every clean case. Moderate 20% contradiction remained
+open as `EXPLORE`, while 40% contradiction became `UNRESOLVED`. The
+measured backend calibration selected Cortex for 10 clean cases and LPU for 30
+in the successful CI run.
+
+See [ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md](ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md).
+
 ## What is stable today
 
 ### Native runtime
