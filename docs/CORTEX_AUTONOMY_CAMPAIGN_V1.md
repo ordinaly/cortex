@@ -158,3 +158,99 @@ It does not establish natural-language autonomy, unrestricted world modeling,
 or autonomous goal formation. The structured identity adapter still supplies
 opaque basin identity, and the current changed-world test concerns learned
 relational compositions rather than arbitrary temporal semantics.
+
+
+## Validation result
+
+The first native-runtime campaign ran **5 randomized seeds** and passed every
+preregistered gate.
+
+Each seed detached the teacher after **76 chronological statements**. Cortex
+held **399 active entities at detachment** and reached **1883 active entities**
+after the full autonomous novelty, conflict, and recovery stream.
+
+### Teacher-free inference
+
+After detachment:
+
+- teacher/model calls: **0**;
+- direct held-out answer leaks: **0**;
+- held-out-source outcome leaks: **0**;
+- binding conflicts: **0**;
+- initial calibrated coverage / accuracy: **1.000 / 1.000**;
+- post-detachment novel-entity coverage / accuracy: **1.000 / 1.000**.
+
+Thus the tested conclusions were generated from stored structure rather than
+direct answer retrieval.
+
+### Plasticity
+
+The legitimate multi-value expansion was preserved on every seed.
+
+The calibrated v0.2 controller followed the intended trajectory on every seed:
+
+    EXECUTE -> EXPLORE -> UNRESOLVED -> EXECUTE
+
+The fixed v0.1 controller followed:
+
+    EXECUTE -> EXECUTE -> UNRESOLVED -> EXECUTE
+
+The no-controller ablation remained in EXECUTE throughout, including the
+strong-conflict phase.
+
+Contradictory observations were retained during recovery; they were not
+deleted. Recovery required 80 additional independent supporting solved
+outcomes in this protocol, taking the target composition from 6/4 evidence
+after strong conflict to 86/4.
+
+This is successful reversibility, but the amount of recovery evidence is also a
+limitation: the current evidence model has no explicit temporal-regime or
+source-reliability mechanism that can make genuinely newer evidence count
+differently from old history.
+
+### Locality
+
+The disjoint control relation remained correct and executable before, during,
+and after conflict on every seed. Revision was therefore local in this fixture.
+
+### Deep composition and LPU
+
+The post-detachment depth-four, width-four query was correct on every seed.
+The calibrated controller selected the LPU on every seed and every LPU
+execution returned an exact witness.
+
+Hosted-runner characterization:
+
+- 64 valid relation-conditioned paths;
+- median Cortex-only / Cortex+LPU execution ratio: **1.717x**.
+
+This timing is descriptive rather than a universal performance claim.
+
+Disabling the LPU did not change semantic answers.
+
+### Memory pressure
+
+A separate capacity sweep produced:
+
+| max entities | active entities | result |
+|---:|---:|---|
+| 256 | n/a | **ValueError before query** |
+| 512 | 408 | query retained and correct |
+| 1024 | 408 | query retained and correct |
+
+The 256 case is intentionally retained as a negative result. The current
+structured-knowledge ingestion path does not yet degrade gracefully when this
+hard capacity is exceeded.
+
+## Supported claim
+
+The campaign supports a narrow claim of **teacher-free structural autonomy on
+the declared structured fixtures**:
+
+Cortex retained reusable relational structure after teacher removal, inferred
+unseen consequences, transferred it to novel entities, preserved multi-valued
+world changes, detected strong contradiction, recovered after further
+evidence, preserved unrelated memory, and used the LPU without semantic drift.
+
+The result does not establish raw-perception autonomy, natural-language
+understanding, general world modeling, or autonomous goal formation.
