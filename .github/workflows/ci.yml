@@ -82,6 +82,7 @@ jobs:
           tests/test_hypergraph_inference.py
           tests/test_hypergraph_lpu.py
           tests/test_articulation_controller.py
+          tests/test_controller_calibration.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
@@ -124,6 +125,11 @@ jobs:
           python benchmarks/benchmark_articulation_controller.py
           --seeds 10
           --width 8
+      - name: Run articulation-controller-calibration-v0.2
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_articulation_controller_calibration.py
+          --native-seeds 10
 
   wheel:
     runs-on: ubuntu-latest
