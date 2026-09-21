@@ -1,0 +1,132 @@
+# General Knowledge Feed v0.1
+
+Status: **experimental autonomous-learning input path**.
+
+## Goal
+
+Give Cortex persistent general knowledge without making a neural language model
+part of the reasoning loop and without turning an external knowledge graph's
+properties into hard Cortex predicates.
+
+The first source adapter targets **Wikibase JSON**, with Wikidata as the initial
+dataset. Wikidata's full JSON representation is preferred over its truthy RDF
+projection because the full statements preserve multiple values, qualifiers,
+rank, and references.
+
+## Knowledge Packet
+
+The neutral packet is:
+
+```text
+statement id
+subject symbol
+property symbol
+value symbol
+qualifiers[]
+rank
+references[]
+provenance
+```
+
+Only the statement structure is interpreted by the adapter. Symbols such as
+`wd:P36` or `capital` remain opaque identities.
+
+## Statement grammar
+
+Cortex's current native relation evidence is generic and undirected. Direction
+and role are therefore represented by a small reified graph motif:
+
+```text
+                       @syntax:subject
+                              |
+subject --- subject-slot --- statement
+                              |
+property -- property-slot ----+
+          |                   |
+ @syntax:property             |
+                              |
+object ---- object-slot ------+
+          |
+   @syntax:object
+```
+
+The diagram is schematic: all three slots connect to the statement node.
+
+These role markers are **syntax, not ontology**. They are analogous to field
+positions in a record. Cortex is never told that a particular world property
+must be functional, transitive, immutable, or otherwise constrained.
+
+Qualifiers are represented as nested qualifier motifs attached to the statement.
+
+## Identity encoding
+
+The current adapter maps opaque symbols to deterministic 64-dimensional signed
+hash vectors. The vector contains no lexical embedding and no pretrained
+semantic similarity. Equal symbols yield identical observations; distinct
+symbols are deliberately far apart under Cortex's MSE matching metric.
+
+For structured claims, nuisance transforms are disabled with the identity group.
+
+## Distilled-claim evidence mode
+
+The native sensory graph normally waits for repeated observations before
+resolving a relation. A knowledge packet is already a distilled discrete claim;
+replaying it eight times would falsely pretend there were eight independent
+observations.
+
+The knowledge runtime therefore uses a separate graph configuration:
+
+- relation minimum exposure: 1;
+- active threshold: 0.65;
+- absent threshold: 0.35;
+- fixed nuisance group: identity only.
+
+This changes how structural punctuation is admitted, not the meaning of the
+world property itself.
+
+## What is preserved outside the Cortex graph in v0.1
+
+Rank, reference hashes, and provenance are retained in the Knowledge Packet but
+are not yet used by Cortex's confidence model.
+
+This is intentional. Source trust should become a separate epistemic mechanism
+rather than being smuggled into relation strength.
+
+## Wikidata adapter
+
+`cortex.wikidata` parses Wikibase JSON claims into Knowledge Statements. It
+preserves:
+
+- multiple values for one property;
+- qualifiers;
+- normal/preferred rank;
+- reference hashes;
+- entity-valued claims;
+- time, quantity, coordinate, monolingual-text and generic literal values;
+- explicit `novalue` / `somevalue` states.
+
+Deprecated statements are skipped by default but can be retained for revision
+experiments.
+
+`scripts/prepare_wikidata_knowledge.py` streams plain, gzip, or bzip2 Wikidata
+JSON-array dumps and writes normalized JSONL packets without loading the dump
+into memory.
+
+## Pilot validation
+
+The repository smoke campaign feeds 22 general-knowledge statements spanning
+geography, astronomy, chemistry and a deliberately multi-valued language fact.
+
+Hard gates:
+
+- zero symbol-binding conflicts;
+- exact retrieval of held-in-memory facts;
+- empty negative-control query;
+- both values of a multi-valued property survive;
+- query results are invariant to statement presentation order;
+- one Cortex entity per unique packet symbol.
+
+This is a **storage/retrieval test**, not yet a learning or inference claim.
+
+The next experiment should hold statements out and ask whether Cortex can infer
+new relational structure from what it was shown.
