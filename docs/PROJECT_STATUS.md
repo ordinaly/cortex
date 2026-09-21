@@ -193,32 +193,33 @@ See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
 
 ## Autonomy Robustness & Temporal Plasticity v1
 
-The next autonomous program is now active.
+**Phase B passed; the declared research program is complete.**
 
-Phase A deliberately keeps the frozen Relational Regime Plasticity v0.1 policy
-unchanged and composes it across opaque relation-signature contexts. The first
-campaign measures clean shifts, missing observations, corrupted evidence,
-stationary noise, gradual drift, source-reliability conflict, simultaneous
-independent regimes, fixed-vocabulary state growth, and downstream unsafe exact
-execution.
+Phase A preserved the frozen Relational Regime Plasticity v0.1 behavior and
+measured two weaknesses: stale exact execution under missingness and complete
+source-reliability blindness in a trusted-minority / weak-majority fixture.
 
-Source reliability is recorded but intentionally ignored by the Phase A
-policy. A trusted-minority / weak-majority fixture was preregistered as a
-diagnostic rather than silently tuning reliability weights before the baseline
-was known.
+Phase B keeps durable historical evidence exact while adding:
 
-The first 12-seed Phase A run passed every frozen non-regression gate. Clean
-replacement remained 9 observed events; 10%/20% corrupted genuine shifts had
-zero failures; stationary 10%/20% contradiction produced zero false switches;
-locality held; and 48 fixed-vocabulary contexts remained at 192 regime cells
-across 6,000 additional observations.
+- bounded odds-relative weighting for the fast/current evidence channel;
+- reliability-scaled effective evidence time and contradiction pressure;
+- a read-only execution-freshness boundary with one missing-event grace.
 
-Two limitations are now measured. At 30%/60% missingness, observed switch
-latency remains 9 but mean wall latency rises to 13.33 / 23.83 and stale
-execution risk persists during gaps. In the source-quality trap, the
-reliability-weighted oracle favors NEW while **12/12 frozen-policy runs retain
-OLD**. Phase B will therefore test source-aware evidence fusion and a separate
-execution-freshness gate without decaying durable history.
+Across 12 seeds, the selected source policy resolved the original source trap
+to NEW in **12/12** runs with mean switch step **15**; unweighted and linear
+controls remained on OLD in **12/12**. A separate source holdout also resolved
+NEW in **12/12**, while frequent weak contradictory noise caused **0 false
+switches**.
+
+The selected freshness boundary preserves the clean **9 observed-event** switch.
+At 30% missingness, unsafe exact execution fell from **0.1626 to 0.1458**; at
+60% missingness it fell from **0.1860 to 0.1082**. Stable-world safe-execution
+coverage remained **0.9114 / 0.6422** at 30% / 60% missingness.
+
+All full-trust non-regression gates passed: corrupted-shift p95 remained
+**26 / 58** at 10% / 20% corruption, stationary noise produced zero false
+switches, compound locality held, raw source history remained exact, and 48
+fixed-vocabulary contexts remained at 192 regime cells.
 
 See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
@@ -247,7 +248,7 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics along multiple independent tracks. Predictive semantic geometry and adaptive representational resolution remain at `v1.22-R`, while autonomous relational learning now uses **Relational Regime Plasticity v0.1** as its frozen research default.
 
-The immediate cross-track integration milestone, **Autonomy Robustness & Temporal Plasticity v1**, is now active in Phase A baseline characterization.
+The **Autonomy Robustness & Temporal Plasticity v1** cross-track milestone has completed Phase B and passed its declared research gates.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 
