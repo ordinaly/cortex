@@ -280,8 +280,19 @@ class RelationalRegimeTracker:
         relation: str,
         *,
         bootstrap: bool = False,
+        current_weight: float = 1.0,
     ) -> RegimeSnapshot:
         """Consume one solved relation outcome.
+
+        current_weight affects only the recency-sensitive articulation channel
+        and contradiction pressure. Durable historical evidence still records
+        one raw observation exactly. The default value 1.0 reproduces the
+        frozen Relational Regime Plasticity v0.1 semantics.
+
+        Phase-B autonomy experiments use weights below one for weak sources:
+        weak evidence contributes less current support and advances effective
+        evidence time more slowly, so it cannot erase trusted recent evidence
+        merely by arriving more frequently.
 
         bootstrap=True is reserved for establishing an already trusted initial
         regime in calibration fixtures. Normal online updates should leave it
@@ -290,12 +301,26 @@ class RelationalRegimeTracker:
         relation = str(relation)
         if not relation:
             raise ValueError("relation must be non-empty")
+        current_weight = float(current_weight)
+        if (
+            not isfinite(current_weight)
+            or not 0.0 <= current_weight <= 1.0
+        ):
+            raise ValueError("current_weight must be finite and in [0,1]")
 
+        fast_decay = (
+            1.0
+            if current_weight <= EPS
+            else self.policy.fast_decay ** current_weight
+        )
         for key in tuple(self._fast):
-            self._fast[key] *= self.policy.fast_decay
+            self._fast[key] *= fast_decay
             if self._fast[key] <= EPS:
                 self._fast[key] = 0.0
-        self._fast[relation] = self._fast.get(relation, 0.0) + 1.0
+        self._fast[relation] = (
+            self._fast.get(relation, 0.0) + current_weight
+        )
+        # Raw history is an audit trail: reliability never rewrites counts.
         self._history[relation] = self._history.get(relation, 0) + 1
 
         if self._accepted is None or bootstrap:
@@ -307,11 +332,16 @@ class RelationalRegimeTracker:
             self._pressure = 0.0
             return self._snapshot()
 
+        pressure_decay = (
+            1.0
+            if current_weight <= EPS
+            else self.policy.pressure_decay ** current_weight
+        )
         if relation == self._accepted:
-            self._pressure *= self.policy.pressure_decay
+            self._pressure *= pressure_decay
         else:
             self._pressure = (
-                self._pressure * self.policy.pressure_decay + 1.0
+                self._pressure * pressure_decay + current_weight
             )
 
         if (
