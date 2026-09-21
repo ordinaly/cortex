@@ -44,7 +44,8 @@ def test_dataset_training_preserves_chronological_order_and_snapshots():
     frames = (
         ObservationFrame(
             detections=((1.0, 0.0), (0.0, 1.0)),
-            relation_observations=((0, 1, True),),
+            relation_observations=((0, 1, 1),),
+            target_outcomes=((1, 1),),
             provenance="dataset:train:0",
         ),
         ObservationFrame(
@@ -61,7 +62,9 @@ def test_dataset_training_preserves_chronological_order_and_snapshots():
     assert report.relation_observations == 1
     assert report.unresolved_reads == 1
     assert json.loads(report.snapshot_json) == {"frames": 2}
-    assert runtime.calls[0]["relation_obs"] == [(0, 1, True)]
+    assert runtime.calls[0]["relation_obs"] == [(0, 1, 1)]
+    assert runtime.calls[0]["outcomes"] == [(1, 1)]
+    assert runtime.calls[1]["outcomes"] == []
     assert runtime.calls[1]["outcome"] == 0.75
 
 
@@ -69,7 +72,7 @@ def test_frame_rejects_out_of_range_relations():
     with pytest.raises(ValueError, match="outside the frame"):
         ObservationFrame(
             detections=((1.0,),),
-            relation_observations=((0, 1, True),),
+            relation_observations=((0, 1, 1),),
         )
 
 
