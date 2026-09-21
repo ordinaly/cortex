@@ -147,10 +147,10 @@ def test_local_knowledge_articulation_decodes_sparse_properties():
     assert ("continent", "Europe") in coordinates
     assert coordinates[("capital", "Paris")] > 0.5
 
-    canada = view.local_articulation("Canada")
-    languages = {
+    south_africa = view.local_articulation("South Africa")
+    capitals = {
         row.value
-        for row in canada.properties
-        if row.property == "official language"
+        for row in south_africa.properties
+        if row.property == "capital"
     }
-    assert languages == set()
+    assert capitals == {"Pretoria", "Cape Town", "Bloemfontein"}
