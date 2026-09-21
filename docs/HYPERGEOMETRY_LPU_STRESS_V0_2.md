@@ -111,3 +111,89 @@ Evidence for a useful boundary is instead:
   larger depth.
 
 This keeps epistemic authority in Cortex and computational exactness in the LPU.
+
+
+## Results
+
+The CI campaign used 10 seeds, depths 2 through 5, and branching width 8.
+All preregistered gates passed.
+
+### Semantic equivalence
+
+Across 40 clean cases:
+
+- Cortex enumerating executor accuracy: **1.000**;
+- Cortex + LPU accuracy: **1.000**;
+- executor agreement: **1.000**;
+- exact LPU witness validity: **1.000**;
+- Cortex memory unchanged by LPU execution: **1.000**.
+
+Raw relation-agnostic LPU reachability was ambiguous in **100%** of cases:
+the intended target and all three decoys were reachable. Exact reachability
+alone therefore did not recover the semantic answer.
+
+### Contradiction and uncertainty
+
+With 20% contradictory solved examples, the learned target composition retained
+mean confidence **0.8** and held-out accuracy remained **1.000**.
+
+With 40% contradictory examples, the target composition fell below the
+acceptance threshold in **100%** of cases. Cortex returned unresolved and the
+LPU received no semantic execution request.
+
+This is the intended authority boundary: the LPU cannot turn uncertain Cortex
+structure into a fact.
+
+### Branching depth
+
+At depth 5 and width 8, the relation-conditioned lattice contains:
+
+```text
+4096 complete matching paths
+211 materialized layered edges
+```
+
+The enumerating Cortex reference executor must represent the 4096 completed
+paths. The Cortex + LPU formulation collapses equivalent intermediate states
+before exact reachability.
+
+Hosted-runner timing characterization at depth 5:
+
+```text
+enumerating executor median: 24.758 ms
+Cortex + LPU median:          0.676 ms
+ratio:                       36.95x
+```
+
+These timings are environment-specific characterization, not a universal
+performance claim. The stronger algorithmic observation is the reduction in
+represented path multiplicity.
+
+### Plasticity controls
+
+- multi-valued relation result preserved: **passed**;
+- lowering one required relation below the articulation resolution removed the
+  inference before LPU invocation: **passed**;
+- zero binding conflicts across all native-runtime worlds: **passed**.
+
+## Architectural conclusion
+
+The experiment supports the following separation:
+
+```text
+Cortex:
+    discover basins
+    learn relational hypergeometry
+    estimate confidence
+    choose resolution
+    articulate a relation signature
+
+LPU:
+    receive a temporary articulated graph
+    perform exact local computation
+    return a deterministic witness
+    forget the temporary graph
+```
+
+The LPU is therefore useful as an exact coprocessor **after articulation**, not
+as an ontology, knowledge store, or independent reasoner.
