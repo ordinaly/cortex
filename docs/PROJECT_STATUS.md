@@ -83,6 +83,24 @@ to withhold the rule and no LPU call was issued.
 
 See [HYPERGEOMETRY_LPU_STRESS_V0_2.md](HYPERGEOMETRY_LPU_STRESS_V0_2.md).
 
+## Articulation Controller v0.1
+
+The research stack now includes an epistemic controller between Cortex's fuzzy
+relational hypergeometry and exact execution.
+
+Its top-level states are `EXPLORE`, `EXECUTE`, and `UNRESOLVED`. An
+`EXECUTE` decision independently chooses native Cortex traversal or the LPU
+from structural path-compression estimates and exact-witness requirements.
+
+Native-runtime validation across 10 randomized seeds / 40 clean depth-2 through
+depth-5 cases achieved 100% correct execution and 100% backend-policy
+agreement. Depths 2-3 remained native; depths 4-5 routed to the LPU. Moderate
+20% contradiction remained executable at confidence 0.8, while 40%
+contradiction was unresolved on every seed. Ambiguous source articulation
+remained in exploration.
+
+See [ARTICULATION_CONTROLLER_V0_1.md](ARTICULATION_CONTROLLER_V0_1.md).
+
 ## What is stable today
 
 ### Native runtime

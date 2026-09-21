@@ -275,6 +275,52 @@ See [HYPERGEOMETRY_LPU_STRESS_V0_2.md](HYPERGEOMETRY_LPU_STRESS_V0_2.md).
 
 ---
 
+### Articulation controller
+
+The research architecture now places an explicit controller between fuzzy
+relational articulation and exact execution:
+
+```text
+local basin articulation
+    |
+relational hypotheses + evidence
+    |
+resolution selection
+    |
+Articulation Controller
+    |
+    +-- EXPLORE
+    +-- UNRESOLVED
+    +-- EXECUTE
+            |
+            +-- native Cortex
+            +-- LPU
+```
+
+The epistemic decision and computational backend decision are separate.
+
+The controller considers:
+
+- local entity support and articulation entropy;
+- solved-example count;
+- relation-composition confidence;
+- margin over competing compositions;
+- highest viable evidence resolution;
+- path multiplicity;
+- number of unique layered transitions;
+- whether an exact witness is explicitly required.
+
+The controller does not treat multiple valid outputs as ambiguity. Multi-valued
+relations remain admissible. Ambiguity refers to unstable source identity or
+competing explanatory relation structure.
+
+v0.1 uses transparent thresholds and a discrete resolution ladder. These are
+research policy parameters, not frozen ontology or universal constants.
+
+See [ARTICULATION_CONTROLLER_V0_1.md](ARTICULATION_CONTROLLER_V0_1.md).
+
+---
+
 ## 3. One frame through Cortex
 
 The native top-level object is `NativeCortexRuntime` in `cortex-runtime`.
