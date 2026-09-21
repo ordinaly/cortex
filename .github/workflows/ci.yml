@@ -96,6 +96,9 @@ jobs:
           tests/test_single_buffer_kernel_refresh.py
           tests/test_versioning.py
           -q
+      - name: Run general-knowledge-feed-v0.1
+        if: matrix.python-version == '3.13'
+        run: python benchmarks/benchmark_general_knowledge_feed.py
 
   wheel:
     runs-on: ubuntu-latest
