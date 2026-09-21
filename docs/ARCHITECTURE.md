@@ -182,6 +182,59 @@ See [SINGLE_BUFFER_KERNEL_REFRESH_V1_22_RESULT.md](SINGLE_BUFFER_KERNEL_REFRESH_
 
 ---
 
+### Research overlay — soft relational hypergeometry
+
+The autonomous knowledge work introduces an experimental geometric read layer
+over the stable runtime. It does **not** change `spec-v0.9.5`.
+
+Each learned concept remains a basin in the ordinary articulation geometry.
+A stored subject/property/object statement is additionally interpreted as one
+soft higher-order hyperedge joining all three basins:
+
+```text
+             relation
+              /    \
+             /      \
+        subject --- object
+```
+
+The relation therefore remains a concept basin rather than becoming a fixed
+predicate label. Repeated statements through the same relation basin form a
+local role-aware transport field.
+
+The relational geometry uses maximum-bottleneck connectivity. If a hyperpath
+connects basins $a$ and $b$, its strength is the weakest supported hyperedge on
+that path. The strongest such path defines $\kappa(a,b)$, and the research
+resolution distance is:
+
+```math
+d_R(a,b) = 1 - \kappa(a,b).
+```
+
+At resolution $\epsilon$, only hyperedges whose support is at least
+$\epsilon$ participate in the visible connected component. Changing the
+resolution changes articulation only; it does not delete lower-support
+evidence.
+
+This gives the research layer:
+
+- fuzzy concept basins;
+- higher-order relation incidence;
+- role-aware local relational directions;
+- reversible H0-style resolution filtration;
+- bottleneck/ultrametric relational distance;
+- no global fixed semantic coordinate such as "dimension 17 = capital";
+- no assumption that a relation is single-valued or immutable.
+
+The first implementation is deliberately read-only. Relational hypergeometry
+does not yet alter native entity binding or prototype updates. Promotion into
+the native update loop requires separate evidence that it improves held-out
+reasoning or representation economy without reducing plasticity.
+
+See [RELATIONAL_HYPERGEOMETRY_V0_1.md](RELATIONAL_HYPERGEOMETRY_V0_1.md).
+
+---
+
 ## 3. One frame through Cortex
 
 The native top-level object is `NativeCortexRuntime` in `cortex-runtime`.
