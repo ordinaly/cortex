@@ -90,6 +90,7 @@ def run_once(statements):
         report.snapshot_json,
         report.symbol_bindings,
         runtime.config_json(),
+        report.statement_incidence,
     )
 
     results = {
