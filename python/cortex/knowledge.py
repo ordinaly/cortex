@@ -12,6 +12,7 @@ import json
 from typing import Iterable, Mapping
 
 from .autonomy import ObservationFrame
+from .topology import LocalArticulation, TopologyView
 
 
 ROLE_SUBJECT = "@syntax:subject"
@@ -66,6 +67,19 @@ class EncodedKnowledgeFrame:
     frame: ObservationFrame
     symbols: tuple[str, ...]
     positive_pairs: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True, slots=True)
+class PropertyValueCoordinate:
+    property: str
+    value: str
+    structural_support: float
+
+
+@dataclass(frozen=True, slots=True)
+class KnowledgeLocalArticulation:
+    topology: LocalArticulation
+    properties: tuple[PropertyValueCoordinate, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -278,16 +292,29 @@ def feed_knowledge(
 class KnowledgeGraphView:
     """Read statement motifs back from a Cortex runtime snapshot."""
 
-    def __init__(self, snapshot_json: str, symbol_bindings: Mapping[str, int]):
+    def __init__(
+        self,
+        snapshot_json: str,
+        symbol_bindings: Mapping[str, int],
+        config_json: str | None = None,
+    ):
         snapshot = json.loads(snapshot_json)
+        self.snapshot_json = snapshot_json
+        self.config_json = config_json
         self.bindings = {str(k): int(v) for k, v in symbol_bindings.items()}
         self.reverse = {value: key for key, value in self.bindings.items()}
         self.adjacency: dict[int, set[int]] = {}
+        self.edge_posterior: dict[tuple[int, int], float] = {}
         for entry in snapshot["graph"]["relations"]:
             if int(entry["evidence"]["state"]) != 1:
                 continue
             a = int(entry["a"])
             b = int(entry["b"])
+            evidence = entry["evidence"]
+            alpha = float(evidence["a"])
+            beta = float(evidence["b"])
+            key = (min(a, b), max(a, b))
+            self.edge_posterior[key] = alpha / max(1.0e-12, alpha + beta)
             self.adjacency.setdefault(a, set()).add(b)
             self.adjacency.setdefault(b, set()).add(a)
 
@@ -336,6 +363,119 @@ class KnowledgeGraphView:
                         if symbol is not None and not symbol.startswith("@"):
                             out.add(symbol)
         return tuple(sorted(out))
+
+    def _edge_support(self, left: int, right: int) -> float:
+        return self.edge_posterior.get(
+            (min(left, right), max(left, right)),
+            0.0,
+        )
+
+    def property_coordinates(
+        self,
+        subject: str,
+    ) -> tuple[PropertyValueCoordinate, ...]:
+        subject_id = self._id(subject)
+        role_subject = self._id(ROLE_SUBJECT)
+        role_property = self._id(ROLE_PROPERTY)
+        role_object = self._id(ROLE_OBJECT)
+        if None in (subject_id, role_subject, role_property, role_object):
+            return ()
+
+        rows: dict[tuple[str, str], float] = {}
+        subject_slots = self._neighbors(subject_id) & self._neighbors(role_subject)
+        for subject_slot in subject_slots:
+            for statement in self._neighbors(subject_slot) - {
+                subject_id,
+                role_subject,
+            }:
+                property_slots = {
+                    node
+                    for node in self._neighbors(statement)
+                    if role_property in self._neighbors(node)
+                }
+                object_slots = {
+                    node
+                    for node in self._neighbors(statement)
+                    if role_object in self._neighbors(node)
+                }
+                for property_slot in property_slots:
+                    property_candidates = [
+                        node
+                        for node in self._neighbors(property_slot)
+                        - {statement, role_property}
+                        if (
+                            self.reverse.get(node) is not None
+                            and not self.reverse[node].startswith("@")
+                        )
+                    ]
+                    for object_slot in object_slots:
+                        object_candidates = [
+                            node
+                            for node in self._neighbors(object_slot)
+                            - {statement, role_object}
+                            if (
+                                self.reverse.get(node) is not None
+                                and not self.reverse[node].startswith("@")
+                            )
+                        ]
+                        for property_id in property_candidates:
+                            for object_id in object_candidates:
+                                property_name = self.reverse[property_id]
+                                value_name = self.reverse[object_id]
+                                edges = (
+                                    (subject_id, subject_slot),
+                                    (subject_slot, role_subject),
+                                    (subject_slot, statement),
+                                    (statement, property_slot),
+                                    (property_slot, role_property),
+                                    (property_slot, property_id),
+                                    (statement, object_slot),
+                                    (object_slot, role_object),
+                                    (object_slot, object_id),
+                                )
+                                support = min(
+                                    self._edge_support(left, right)
+                                    for left, right in edges
+                                )
+                                key = (property_name, value_name)
+                                rows[key] = max(rows.get(key, 0.0), support)
+
+        return tuple(
+            PropertyValueCoordinate(
+                property=property_name,
+                value=value,
+                structural_support=support,
+            )
+            for (property_name, value), support in sorted(rows.items())
+        )
+
+    def local_articulation(
+        self,
+        symbol: str,
+        *,
+        top_k: int = 8,
+        min_support: float = 1.0e-6,
+    ) -> KnowledgeLocalArticulation:
+        if self.config_json is None:
+            raise ValueError(
+                "config_json is required for local topology articulation"
+            )
+        entity_id = self._id(symbol)
+        if entity_id is None:
+            raise KeyError(symbol)
+        topology = TopologyView(
+            self.snapshot_json,
+            self.config_json,
+            labels=self.reverse,
+        ).at_entity(
+            entity_id,
+            top_k=top_k,
+            min_support=min_support,
+        )
+        return KnowledgeLocalArticulation(
+            topology=topology,
+            properties=self.property_coordinates(symbol),
+        )
 
 
 def statement_to_json(statement: KnowledgeStatement) -> dict:
