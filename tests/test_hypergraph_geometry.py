@@ -29,6 +29,7 @@ def _knowledge_geometry():
         report.snapshot_json,
         report.symbol_bindings,
         runtime.config_json(),
+        report.statement_incidence,
     )
     return view, HypergraphGeometry(view.hyperedges())
 
