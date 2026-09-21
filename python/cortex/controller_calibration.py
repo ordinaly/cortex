@@ -264,6 +264,52 @@ def fit_logistic_surface(
     )
 
 
+def select_f1_threshold(
+    surface: LinearProbabilitySurface,
+    observations: Sequence[SurfaceObservation],
+) -> LinearProbabilitySurface:
+    """Choose a held-out threshold that maximizes weighted F1."""
+
+    scored = tuple(
+        (
+            surface.probability(row.features),
+            bool(row.label),
+            row.weight,
+        )
+        for row in observations
+    )
+    candidates = sorted(
+        {0.0, 0.5, 1.0, *(score for score, _label, _weight in scored)}
+    )
+    best: tuple[float, float, float] | None = None
+    best_threshold = 0.5
+    for threshold in candidates:
+        tp = fp = fn = tn = 0.0
+        for score, label, weight in scored:
+            prediction = score + EPS >= threshold
+            if label and prediction:
+                tp += weight
+            elif label:
+                fn += weight
+            elif prediction:
+                fp += weight
+            else:
+                tn += weight
+        precision = tp / max(EPS, tp + fp)
+        recall = tp / max(EPS, tp + fn)
+        f1 = (
+            2.0 * precision * recall / max(EPS, precision + recall)
+            if tp > 0.0
+            else 0.0
+        )
+        accuracy = (tp + tn) / max(EPS, tp + tn + fp + fn)
+        key = (f1, accuracy, -threshold)
+        if best is None or key > best:
+            best = key
+            best_threshold = threshold
+    return surface.with_threshold(best_threshold)
+
+
 def select_precision_threshold(
     surface: LinearProbabilitySurface,
     observations: Sequence[SurfaceObservation],
@@ -350,6 +396,7 @@ def epistemic_unresolved_features(
     confidence: float,
     competitor_confidence: float,
     margin: float,
+    mean_support: float,
     source_entropy: float,
 ) -> tuple[float, ...]:
     return (
@@ -357,6 +404,7 @@ def epistemic_unresolved_features(
         _clamp01(competitor_confidence),
         _clamp01(1.0 - max(0.0, margin)),
         _clamp01(1.0 - confidence),
+        _clamp01(1.0 - mean_support),
         _clamp01(1.0 - source_entropy),
     )
 
@@ -366,6 +414,7 @@ UNRESOLVED_FEATURE_NAMES = (
     "competitor_confidence",
     "conflict",
     "low_target_confidence",
+    "low_structural_support",
     "source_certainty",
 )
 
@@ -461,6 +510,7 @@ class CalibratedArticulationController:
                 confidence=rule.confidence,
                 competitor_confidence=competitor_confidence,
                 margin=margin,
+                mean_support=rule.mean_support,
                 source_entropy=source_entropy,
             )
             out.append(
