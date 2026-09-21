@@ -6,10 +6,12 @@ on:
     paths:
       - "python/cortex/knowledge.py"
       - "python/cortex/topology.py"
+      - "python/cortex/hypergraph_geometry.py"
       - "python/cortex/wikidata.py"
       - "python/cortex/__init__.py"
       - "tests/test_knowledge.py"
       - "tests/test_topology.py"
+      - "tests/test_hypergraph_geometry.py"
       - "tests/test_wikidata.py"
       - "benchmarks/benchmark_general_knowledge_feed.py"
       - "scripts/prepare_wikidata_knowledge.py"
@@ -34,7 +36,7 @@ jobs:
       - run: python -m pip install "maturin==1.15.0" pytest
       - run: python -m pip install -e .
       - name: Knowledge packet and Wikidata adapter tests
-        run: pytest tests/test_knowledge.py tests/test_wikidata.py tests/test_topology.py -q
+        run: pytest tests/test_knowledge.py tests/test_wikidata.py tests/test_topology.py tests/test_hypergraph_geometry.py -q
       - name: Run general-knowledge-feed-v0.1
         run: >-
           python benchmarks/benchmark_general_knowledge_feed.py
