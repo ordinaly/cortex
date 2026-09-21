@@ -30,8 +30,8 @@ def _bundle():
         version="test",
         execute_surface=_surface(
             EXECUTE_FEATURE_NAMES,
-            (1.0, 3.0, 2.0, 1.0, 2.0, 2.0),
-            -6.0,
+            (0.5, 1.5, 1.0, 0.5, 4.0, 4.0),
+            -6.5,
             0.5,
         ),
         unresolved_surface=_surface(
