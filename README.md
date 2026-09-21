@@ -188,185 +188,44 @@ full replanning while preserving the same minimum cost. See
 
 The next scientific milestone is **Open-World Robustness v1**.
 
-## Experimental Ollama chatbot gateway
+## Autonomous Cortex path
 
-The research branch now includes **Cortex Language Gateway v0.1**, an
-experimental Ollama-backed chatbot integration that keeps language generation
-separate from Cortex structural state.
+The primary architecture now treats Cortex as an **autonomous structural
+learner with Cortex-owned persistent memory**. A neural model is not part of
+the main cognitive loop.
 
-The gateway:
+Structured chronological datasets can be presented directly through
+`cortex.autonomy.ObservationFrame` and `train_dataset(...)`. This is
+continual exposure rather than gradient training: observations update Cortex
+state directly, later evidence may revise earlier structure, and the resulting
+snapshot can be restored without a teacher model.
 
-- uses Ollama structured outputs to extract entities and explicit relations;
-- requires verbatim source-evidence anchors before an extracted item can reach
-  Cortex;
-- embeds extracted entities through Ollama and feeds those vectors into the
-  native `CortexRuntime`;
-- maintains persistent Cortex sessions and a bounded semantic entity/relation
-  ledger;
-- auto-saves validated semantic frames and their exact embedding vectors to a
-  versioned file-backed session store;
-- reconstructs the native runtime after restart by deterministic event replay,
-  without re-calling the extractor or embedding model;
-- exposes an OpenAI-compatible `/v1/chat/completions` endpoint;
-- provides an opt-in diagnostics switch that reports Cortex's internal runtime
-  state without feeding self-reports back into world observations.
+Cortex also has an experimental **Logical Processing Unit (LPU) v0.1**. The LPU
+is a stateless exact-computation coprocessor for temporary articulated values
+and relations. It currently supports Boolean operations, equality/comparison,
+exact rational arithmetic, and directed reachability with a witness path.
 
-Install the optional gateway dependencies and start it with:
+The architectural boundary is intentional:
 
-```bash
-python -m pip install -e '.[gateway]'
-cortex-gateway \
-  --chat-model qwen3:8b \
-  --embedding-model embeddinggemma \
-  --state-dir ~/.cortex/gateway
+```text
+structured observations
+        |
+        v
+   Cortex memory
+        |
+        +----> structural learning / revision / abstraction
+        |
+        +----> temporary articulation ----> stateless LPU
 ```
 
-Persistence is enabled by default. Use `--no-persistence` for an ephemeral
-session store.
+The LPU does not own facts, predicates, ontology, or persistent memory, and its
+results are not automatically written back into Cortex. Historical
+neural/Cortex experiments remain available in Git history and research reports,
+but the former Ollama/Qwen gateway and hybrid runtime are no longer part of the
+active package surface.
 
 See
-[docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_1.md)
-for the architecture, HTTP/session API, diagnostics behavior, and current
-limitations.
-
-This gateway is an experimental orchestration layer and is **not** part of the
-frozen executable Cortex specification.
-
-### Hybrid cognition mode (recommended for chat)
-
-Gateway v0.3 restores the neural model's normal role as a conversational
-language model and broad pretrained knowledge base, while Cortex acts as a
-separate structural/metacognitive layer:
-
-```text
-user -> neural answer
-          |
-          +-> candidate claims
-user -> PromptIR
-          |
-          v
-        Cortex -> diagnosis
-          |
-          v
-neural answer + Cortex diagnosis
-```
-
-In hybrid mode:
-
-- the neural model can answer ordinary factual questions from pretrained
-  knowledge;
-- neural factual claims are tagged as `neural_prior` and are **not** written
-  to Cortex memory;
-- only explicit user observations may update Cortex structural state;
-- Cortex can corroborate, conflict with, or remain neutral toward the neural
-  answer;
-- Cortex parsing/diagnosis failures never suppress a valid neural response;
-- Cortex diagnoses are shown to the user but are never fed back into the neural
-  model's own conversation history;
-- Cortex uses the deterministic `sha256-symbolic-v1` encoder rather than a
-  neural embedding model.
-
-Run:
-
-```bash
-ollama create cortex-parser -f examples/ollama/Modelfile.parser
-
-cortex-gateway \
-  --hybrid-cognition \
-  --chat-model qwen3:8b \
-  --parser-model cortex-parser \
-  --state-dir ~/.cortex/gateway \
-  --trace-stages
-```
-
-No embedding model or strict renderer model is required.
-
-For **Alpaca**, prefer its native **Ollama (External)** instance type rather
-than the generic OpenAI-compatible path:
-
-```text
-Instance type: Ollama (External)
-URL: http://127.0.0.1:11435
-Model: cortex:latest
-```
-
-The Cortex gateway exposes the small Ollama surface Alpaca needs:
-`/api/tags`, `/api/show`, `/api/ps`, and `/api/chat` with NDJSON
-streaming. Alpaca title generation is handled as a utility request and does
-not enter Cortex memory.
-
-See
-[docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_3_HYBRID_COGNITION.md).
-
-### Strict neural-boundary mode
-
-Gateway v0.2 is retained as a knowledge-isolation/benchmark configuration in which Ollama is used only for
-language translation:
-
-```text
-text -> Ollama parser -> PromptIR -> Cortex -> AnswerIR -> Ollama renderer -> text
-```
-
-In strict mode:
-
-- the parser sees only the current user message;
-- the renderer never receives the original prompt or chat history;
-- the gateway makes no neural embedding calls;
-- Cortex observations use the deterministic `sha256-symbolic-v1` encoder;
-- Cortex/gateway code constructs the substantive answer before rendering;
-- unknown queries are semantically redacted before reaching the renderer.
-
-Example:
-
-```bash
-ollama create cortex-parser -f examples/ollama/Modelfile.parser
-ollama create cortex-renderer -f examples/ollama/Modelfile.renderer
-
-cortex-gateway \
-  --strict-neural-boundary \
-  --parser-model cortex-parser \
-  --renderer-model cortex-renderer \
-  --state-dir ~/.cortex/gateway \
-  --trace-stages \
-  --explain-responses
-```
-
-No Ollama embedding model is needed in this mode.
-
-See
-[docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md](docs/CORTEX_LANGUAGE_GATEWAY_V0_2_STRICT_BOUNDARY.md).
-
-## Hybrid neural/Cortex path
-
-Hybrid Cortex Stage I feeds frozen neural embeddings into the unchanged native reasoning runtime:
-
-```text
-raw data → frozen neural encoder → metric-calibrated embeddings → Cortex
-```
-
-The encoder remains frozen so experiments can ask whether Cortex adds persistent structural inference beyond the representation itself before introducing feedback learning.
-
-A separate research-only **Stage II-A semantic grounding** campaign now tests inference-time mutual reinforcement without changing encoder weights. Neural perception proposes candidate labels while Cortex adjudicates them against persistent relational structure. On the untouched `hybrid-semantic-grounding-v1` campaign, one adversarial swapped label pair improved from **0.600 neural accuracy to 0.9933 Cortex resolved accuracy** at 0.9933 coverage; with two swapped pairs, **0.200 neural accuracy became 0.960 resolved accuracy at full coverage**. False reinspection of neural-correct concepts remained zero, and exact structural symmetries remained unresolved.
-
-The follow-up `semantic-revision-v1` experiment adds temporal hysteresis:
-a transient neural contradiction does not rewrite the accepted label, while
-persistent neural + structural disagreement moves through
-`challenged → unresolved → revised`. All 60 untouched official cases revised
-and recovered correctly, unaffected concepts were preserved, and maximum shift
-or recovery latency was 4 epochs.
-
-The next `noisy-semantic-revision-v1` campaign stress-tested that loop with
-neural dropout/errors, sparse corrupted structural evidence, and changing
-reliability. On 60 untouched cases, raw neural top-label accuracy was **0.8061**
-versus **0.9639** for Cortex; trusted accepted-label accuracy reached **0.9980**
-at **0.7807 coverage**, with **0.00195 false certainty**, no false pre-shift
-revisions, complete shift/recovery success, and complete preservation of
-unaffected concepts.
-
-See [docs/HYBRID_STAGE_I.md](docs/HYBRID_STAGE_I.md),
-[docs/HYBRID_SEMANTIC_GROUNDING_V1.md](docs/HYBRID_SEMANTIC_GROUNDING_V1.md),
-[docs/SEMANTIC_REVISION_V1.md](docs/SEMANTIC_REVISION_V1.md), and
-[docs/NOISY_SEMANTIC_REVISION_V1.md](docs/NOISY_SEMANTIC_REVISION_V1.md).
+[docs/AUTONOMOUS_CORE_LPU_V0_1.md](docs/AUTONOMOUS_CORE_LPU_V0_1.md).
 
 ## Repository layout
 
