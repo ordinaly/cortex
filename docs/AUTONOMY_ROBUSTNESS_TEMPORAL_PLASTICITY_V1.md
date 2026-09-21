@@ -1,6 +1,6 @@
 # Autonomy Robustness & Temporal Plasticity v1
 
-Status: **Phase A baseline campaign active / preregistered**.
+Status: **Phase B passed / declared research program complete**.
 
 This program integrates the frozen **Relational Regime Plasticity v0.1**
 mechanism into a broader autonomous-stream setting before any further
@@ -165,13 +165,16 @@ Any Phase B candidate must:
 
 ## Claim boundary
 
-Passing Phase A will establish only that the frozen local plasticity mechanism
-survives the declared robustness perturbations when composed across opaque
-relation contexts.
-
-It will not establish source-aware reasoning, arbitrary temporal semantics,
+Passing Phase B establishes source-aware **current-regime articulation** and a
+separate execution-freshness boundary on the declared structured fixtures. It
+does not establish learned source trust, arbitrary temporal semantics,
 native memory-pressure robustness, natural-language autonomy, or unrestricted
 world modeling.
+
+The source reliabilities are supplied by the environment in this campaign; the
+selected transform determines how those declared reliabilities influence the
+current channel. Durable history remains a raw audit record rather than a
+reliability-weighted rewrite.
 
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md)
 and [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
@@ -293,3 +296,83 @@ Promotion requires improvement on the source-quality and missingness safety
 diagnostics while preserving the clean 9-event switch, stationary-noise
 stability, corrupted-shift success, locality, reversal, and fixed-vocabulary
 bounded-state properties.
+
+
+## Phase B development result
+
+The 12-seed Phase B campaign passed every promotion gate.
+
+### Mechanism 1 — source-aware current evidence
+
+Phase B leaves the durable historical count untouched and extends only the
+recency-sensitive channel. For an observation with current weight (w), fast
+support and contradiction pressure advance by (w), while their decay clocks
+advance by the same effective-evidence amount. At (w=1), the implementation
+is exactly equivalent to the frozen Relational Regime Plasticity v0.1 path.
+
+Three source transforms were compared on the Phase-A failure fixture:
+
+| source weighting | final NEW | final OLD | mean switch step |
+|---|---:|---:|---:|
+| unweighted | 0 / 12 | 12 / 12 | n/a |
+| linear | 0 / 12 | 12 / 12 | n/a |
+| bounded odds-relative | **12 / 12** | **0 / 12** | **15** |
+
+The selected transform is bounded odds-relative weighting with
+`full_trust_reliability = 0.95`. Reliability below the full-trust reference
+attenuates positive evidence; it is never inverted into negative evidence.
+
+A second source pattern, not used by the Phase-A diagnostic, also resolved NEW
+in **12 / 12** runs. A control with frequent weak contradictory observations
+produced **0 false switches**.
+
+Raw historical evidence remained exact in both source campaigns.
+
+### Mechanism 2 — execution freshness
+
+Freshness is intentionally separate from memory. Missing observations do not
+decay, contradict, confirm, or erase the accepted regime. Instead, the read
+surface may suspend exact execution while the stored tracker snapshot remains
+unchanged.
+
+Freshness grace values 0, 1, 2 and 4 were compared. The selected policy allows
+one missing event before a stale `EXECUTE` read is downgraded to `EXPLORE`.
+
+| missing rate | Phase A unsafe execute | Phase B unsafe execute | observed switch | stable-world safe coverage |
+|---:|---:|---:|---:|---:|
+| 30% | 0.1626 | **0.1458** | 9 | **0.9114** |
+| 60% | 0.1860 | **0.1082** | 9 | **0.6422** |
+
+The selected boundary therefore reduces stale unsafe execution by about
+**10.3%** at 30% missingness and **41.8%** at 60% missingness while preserving
+the evidence-count switch latency.
+
+Immediate suspension (grace 0) is safer still on the declared change fixture,
+but discards substantially more stable-world execution coverage. The one-event
+grace is retained as the development knee rather than maximizing abstention.
+
+### Full-trust non-regression
+
+All existing full-trust behavior remained unchanged:
+
+- clean OLD -> NEW switch: **9 observed events**;
+- 10% corruption p95 switch latency: **26**;
+- 20% corruption p95 switch latency: **58**;
+- stationary 10% / 20% contradiction: **0 false switches**;
+- compound context locality: **passed**;
+- fixed-vocabulary memory: **192 -> 192 cells** across the declared stream;
+- raw historical source counts: **exact**.
+
+The implementation therefore changes how Cortex discounts weak current
+evidence and when it is allowed to execute stale information, without changing
+the underlying durable evidence semantics.
+
+## Selected Phase B research default
+
+```text
+source_weighting          = odds-relative
+full_trust_reliability    = 0.95
+freshness_missing_grace   = 1
+```
+
+This remains research-only and does not modify `spec-v0.9.5`.
