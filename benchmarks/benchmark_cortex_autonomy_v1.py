@@ -668,14 +668,6 @@ def run_seed(seed: int) -> dict:
             + (control_query, multi_query, deep_query)
         )
     }
-    post_detach_statements = (
-        novelty_rows
-        + [
-            row
-            for row in timeline.view().statement_incidence
-            if False
-        ]
-    )
     # Direct leakage is checked from Cortex memory. This explicit counter also
     # verifies no post-detach world-outcome statement used a held-out source.
     heldout_source_outcome_leaks = sum(
