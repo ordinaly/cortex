@@ -205,6 +205,12 @@ def test_structural_weakness_has_distinct_unresolved_reason():
         mean_support=0.2,
     )
     controller = CalibratedArticulationController(_geometry(), _bundle())
-    decision = controller.decide("A", "RT", (rule,))
+    decision = controller.decide(
+        "A",
+        "RT",
+        (rule,),
+        source_support=0.5,
+        source_entropy=0.8,
+    )
     assert decision.state is ArticulationState.UNRESOLVED
     assert decision.reasons == ("learned-structural-weakness",)
