@@ -119,3 +119,38 @@ def test_external_symbols_cannot_impersonate_syntax_nodes():
         KnowledgeStatement("bad", "@syntax:subject", "relation", "value")
     with pytest.raises(ValueError, match="reserved"):
         KnowledgeQualifier("relation", "@syntax:object")
+
+
+def test_local_knowledge_articulation_decodes_sparse_properties():
+    runtime = make_knowledge_runtime(
+        CortexRuntime,
+        feature_dim=64,
+        max_entities=512,
+        budget=32,
+    )
+    report = feed_knowledge(runtime, _statements())
+    view = KnowledgeGraphView(
+        report.snapshot_json,
+        report.symbol_bindings,
+        runtime.config_json(),
+    )
+
+    local = view.local_articulation("France", top_k=6)
+    assert local.topology.top_entity is not None
+    assert local.topology.top_entity.label == "France"
+
+    coordinates = {
+        (row.property, row.value): row.structural_support
+        for row in local.properties
+    }
+    assert ("capital", "Paris") in coordinates
+    assert ("continent", "Europe") in coordinates
+    assert coordinates[("capital", "Paris")] > 0.5
+
+    canada = view.local_articulation("Canada")
+    languages = {
+        row.value
+        for row in canada.properties
+        if row.property == "official language"
+    }
+    assert languages == set()
