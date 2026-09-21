@@ -47,6 +47,17 @@ except ImportError as exc:  # source-tree use before maturin build
     def native_version() -> str:
         return "unavailable"
 
+from .articulation_controller import (
+    ArticulationController,
+    ArticulationDecision,
+    ArticulationProfile,
+    ArticulationState,
+    ControlledExecution,
+    ControllerPolicy,
+    ExecutionBackend,
+    RuleAssessment,
+    profile_rules,
+)
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
 from .hypergraph_lpu import (
@@ -120,6 +131,15 @@ __all__ = [
     "FeatureCoordinate",
     "EntitySupport",
     "CausalCoordinate",
+    "profile_rules",
+    "RuleAssessment",
+    "ExecutionBackend",
+    "ControllerPolicy",
+    "ControlledExecution",
+    "ArticulationState",
+    "ArticulationProfile",
+    "ArticulationDecision",
+    "ArticulationController",
     "KnowledgeGraphView",
     "KnowledgeQualifier",
     "KnowledgeStatement",
