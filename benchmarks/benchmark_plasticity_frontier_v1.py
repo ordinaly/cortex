@@ -20,7 +20,11 @@ from cortex.controller_calibration import (
     frozen_calibration_v0_2,
 )
 from cortex.hypergraph_geometry import HypergraphGeometry, RelationalHyperedge
-from cortex.hypergraph_inference import HypergraphCompositionLearner
+from cortex.hypergraph_inference import (
+    CompositionRule,
+    HypergraphCompositionLearner,
+    RelationStep,
+)
 
 
 PROTOCOL = "plasticity-frontier-v1"
@@ -117,6 +121,74 @@ def _rule_row(rules, relation):
     return max(candidates, key=lambda row: (row.confidence, row.examples))
 
 
+def _count_rules(
+    *,
+    r0: str,
+    r1: str,
+    old_relation: str,
+    old_count: int,
+    new_relation: str,
+    new_count: int,
+    c0: str | None = None,
+    c1: str | None = None,
+    control_relation: str | None = None,
+    control_count: int = 0,
+):
+    """Exact count-level representation of HypergraphCompositionLearner.
+
+    The current learner assigns confidence as examples for one target relation
+    divided by total examples observed for the path signature. Constructing the
+    resulting rules directly lets the frontier sweep thousands of evidence
+    counts without repeatedly rebuilding an equivalent hypergraph.
+    """
+
+    total = old_count + new_count
+    signature = (
+        RelationStep(r0, "forward"),
+        RelationStep(r1, "forward"),
+    )
+    rows = []
+    if old_count > 0:
+        rows.append(
+            CompositionRule(
+                signature=signature,
+                target_relation=old_relation,
+                examples=old_count,
+                confidence=old_count / total,
+                mean_support=2.0 / 3.0,
+            )
+        )
+    if new_count > 0:
+        rows.append(
+            CompositionRule(
+                signature=signature,
+                target_relation=new_relation,
+                examples=new_count,
+                confidence=new_count / total,
+                mean_support=2.0 / 3.0,
+            )
+        )
+    if (
+        c0 is not None
+        and c1 is not None
+        and control_relation is not None
+        and control_count > 0
+    ):
+        rows.append(
+            CompositionRule(
+                signature=(
+                    RelationStep(c0, "forward"),
+                    RelationStep(c1, "forward"),
+                ),
+                target_relation=control_relation,
+                examples=control_count,
+                confidence=1.0,
+                mean_support=2.0 / 3.0,
+            )
+        )
+    return tuple(rows)
+
+
 def _state(geometry, rules, source, relation, *, calibrated):
     if calibrated:
         controller = CalibratedArticulationController(
@@ -146,65 +218,41 @@ def _shift_curve(seed: int, prior_mass: int) -> dict:
     c1 = _token(rng, "C1", 0)
     control_relation = _token(rng, "CONTROL", 0)
 
-    edges = []
-    serial = 0
-    for _ in range(prior_mass):
-        edges.extend(
-            _triangle(
-                rng,
-                serial=serial,
-                r0=r0,
-                r1=r1,
-                outcome_relation=old_relation,
-            )
-        )
-        serial += 1
-
-    # A disjoint control law must not move while the target regime changes.
-    for _ in range(8):
-        edges.extend(
-            _triangle(
-                rng,
-                serial=serial,
-                r0=c0,
-                r1=c1,
-                outcome_relation=control_relation,
-            )
-        )
-        serial += 1
-
     query_edges, query_source = _query_triangle(
         rng,
-        serial=serial,
+        serial=100000 + seed,
         r0=r0,
         r1=r1,
     )
-    edges.extend(query_edges)
-    serial += 1
-
     control_edges, control_source = _query_triangle(
         rng,
-        serial=serial,
+        serial=200000 + seed,
         r0=c0,
         r1=c1,
     )
-    edges.extend(control_edges)
-    serial += 1
+    geometry = HypergraphGeometry(query_edges + control_edges)
 
-    # Continue until the new regime executes, or until 4x prior evidence has
-    # arrived. This makes linear-in-history adaptation visible.
     trace = []
-    max_new = max(24, 4 * prior_mass)
+    max_new = 24 * prior_mass
     for new_examples in range(max_new + 1):
-        geometry, rules = _fit(tuple(edges))
+        rules = _count_rules(
+            r0=r0,
+            r1=r1,
+            old_relation=old_relation,
+            old_count=prior_mass,
+            new_relation=new_relation,
+            new_count=new_examples,
+            c0=c0,
+            c1=c1,
+            control_relation=control_relation,
+            control_count=8,
+        )
         old_rule = _rule_row(rules, old_relation)
         new_rule = _rule_row(rules, new_relation)
         control_rule = _rule_row(rules, control_relation)
         row = {
             "new_examples": new_examples,
-            "old_confidence": (
-                old_rule.confidence if old_rule is not None else 0.0
-            ),
+            "old_confidence": old_rule.confidence,
             "new_confidence": (
                 new_rule.confidence if new_rule is not None else 0.0
             ),
@@ -236,9 +284,7 @@ def _shift_curve(seed: int, prior_mass: int) -> dict:
                 new_relation,
                 calibrated=False,
             ),
-            "control_confidence": (
-                control_rule.confidence if control_rule is not None else 0.0
-            ),
+            "control_confidence": control_rule.confidence,
             "control_state": _state(
                 geometry,
                 rules,
@@ -248,70 +294,12 @@ def _shift_curve(seed: int, prior_mass: int) -> dict:
             ),
         }
         trace.append(row)
-
         if (
             new_examples > 0
             and row["new_state_calibrated"] == "execute"
             and row["old_state_calibrated"] != "execute"
         ):
-            # Keep one extra point after crossover for inspectability.
-            if new_examples < max_new:
-                edges.extend(
-                    _triangle(
-                        rng,
-                        serial=serial,
-                        r0=r0,
-                        r1=r1,
-                        outcome_relation=new_relation,
-                    )
-                )
-                serial += 1
-                geometry, rules = _fit(tuple(edges))
-                old_rule = _rule_row(rules, old_relation)
-                new_rule = _rule_row(rules, new_relation)
-                trace.append(
-                    {
-                        "new_examples": new_examples + 1,
-                        "old_confidence": old_rule.confidence,
-                        "new_confidence": new_rule.confidence,
-                        "old_state_calibrated": _state(
-                            geometry, rules, query_source, old_relation,
-                            calibrated=True,
-                        ),
-                        "new_state_calibrated": _state(
-                            geometry, rules, query_source, new_relation,
-                            calibrated=True,
-                        ),
-                        "old_state_fixed": _state(
-                            geometry, rules, query_source, old_relation,
-                            calibrated=False,
-                        ),
-                        "new_state_fixed": _state(
-                            geometry, rules, query_source, new_relation,
-                            calibrated=False,
-                        ),
-                        "control_confidence": _rule_row(
-                            rules, control_relation
-                        ).confidence,
-                        "control_state": _state(
-                            geometry, rules, control_source, control_relation,
-                            calibrated=True,
-                        ),
-                    }
-                )
             break
-
-        if new_examples < max_new:
-            edges.extend(
-                _triangle(
-                    rng,
-                    serial=serial,
-                    r0=r0,
-                    r1=r1,
-                    outcome_relation=new_relation,
-                )
-            )
-            serial += 1
 
     old_exit = _first(
         trace,
@@ -351,41 +339,24 @@ def _noise_burst(seed: int, prior_mass: int, burst: int) -> dict:
     r1 = _token(rng, "R1", 0)
     old_relation = _token(rng, "OLD", 0)
     new_relation = _token(rng, "NOISE", 0)
-    edges = []
-    serial = 0
-    for _ in range(prior_mass):
-        edges.extend(
-            _triangle(
-                rng,
-                serial=serial,
-                r0=r0,
-                r1=r1,
-                outcome_relation=old_relation,
-            )
-        )
-        serial += 1
     query_edges, query_source = _query_triangle(
         rng,
-        serial=serial,
+        serial=300000 + seed,
         r0=r0,
         r1=r1,
     )
-    edges.extend(query_edges)
-    serial += 1
+    geometry = HypergraphGeometry(query_edges)
 
     states = []
-    for _ in range(burst):
-        edges.extend(
-            _triangle(
-                rng,
-                serial=serial,
-                r0=r0,
-                r1=r1,
-                outcome_relation=new_relation,
-            )
+    for new_count in range(1, burst + 1):
+        rules = _count_rules(
+            r0=r0,
+            r1=r1,
+            old_relation=old_relation,
+            old_count=prior_mass,
+            new_relation=new_relation,
+            new_count=new_count,
         )
-        serial += 1
-        geometry, rules = _fit(tuple(edges))
         states.append(
             _state(
                 geometry,
@@ -397,23 +368,29 @@ def _noise_burst(seed: int, prior_mass: int, burst: int) -> dict:
         )
 
     support_needed = 0
-    geometry, rules = _fit(tuple(edges))
+    old_count = prior_mass
+    rules = _count_rules(
+        r0=r0,
+        r1=r1,
+        old_relation=old_relation,
+        old_count=old_count,
+        new_relation=new_relation,
+        new_count=burst,
+    )
     current = _state(
         geometry, rules, query_source, old_relation, calibrated=True
     )
-    while current != "execute" and support_needed <= 4 * max(1, burst):
-        edges.extend(
-            _triangle(
-                rng,
-                serial=serial,
-                r0=r0,
-                r1=r1,
-                outcome_relation=old_relation,
-            )
-        )
-        serial += 1
+    while current != "execute" and support_needed <= 32 * max(1, burst):
+        old_count += 1
         support_needed += 1
-        geometry, rules = _fit(tuple(edges))
+        rules = _count_rules(
+            r0=r0,
+            r1=r1,
+            old_relation=old_relation,
+            old_count=old_count,
+            new_relation=new_relation,
+            new_count=burst,
+        )
         current = _state(
             geometry, rules, query_source, old_relation, calibrated=True
         )
@@ -432,6 +409,69 @@ def _noise_burst(seed: int, prior_mass: int, burst: int) -> dict:
         "recovery_support_needed": support_needed,
         "recovered": current == "execute",
     }
+
+
+def _learner_count_parity(seed: int) -> bool:
+    rng = Random(610019 + seed)
+    r0 = _token(rng, "R0", 0)
+    r1 = _token(rng, "R1", 0)
+    old_relation = _token(rng, "OLD", 0)
+    new_relation = _token(rng, "NEW", 0)
+    edges = []
+    serial = 0
+    for _ in range(8):
+        edges.extend(
+            _triangle(
+                rng,
+                serial=serial,
+                r0=r0,
+                r1=r1,
+                outcome_relation=old_relation,
+            )
+        )
+        serial += 1
+    for _ in range(3):
+        edges.extend(
+            _triangle(
+                rng,
+                serial=serial,
+                r0=r0,
+                r1=r1,
+                outcome_relation=new_relation,
+            )
+        )
+        serial += 1
+    geometry, fitted = _fit(tuple(edges))
+    manual = _count_rules(
+        r0=r0,
+        r1=r1,
+        old_relation=old_relation,
+        old_count=8,
+        new_relation=new_relation,
+        new_count=3,
+    )
+    fitted_map = {
+        row.target_relation: (row.examples, row.confidence)
+        for row in fitted
+    }
+    manual_map = {
+        row.target_relation: (row.examples, row.confidence)
+        for row in manual
+    }
+    return (
+        geometry is not None
+        and fitted_map.keys() == manual_map.keys()
+        and all(
+            fitted_map[key][0] == manual_map[key][0]
+            and math.isclose(
+                fitted_map[key][1],
+                manual_map[key][1],
+                rel_tol=0.0,
+                abs_tol=1.0e-12,
+            )
+            for key in manual_map
+        )
+    )
 
 
 def campaign(seeds: int) -> dict:
@@ -498,7 +538,10 @@ def campaign(seeds: int) -> dict:
             "all_recovered": all(row["recovered"] for row in rows),
         }
 
+    learner_parity = all(_learner_count_parity(seed) for seed in range(seeds))
+
     gates = {
+        "count_sweep_matches_learner": learner_parity,
         "baseline_executes": all(
             row["trace"][0]["old_state_calibrated"] == "execute"
             for row in curves
@@ -518,6 +561,7 @@ def campaign(seeds: int) -> dict:
         "prior_masses": list(PRIOR_MASSES),
         "grouped": grouped,
         "historical_inertia_detected": historical_inertia,
+        "count_sweep_matches_learner": learner_parity,
         "adaptation_ratio_spread": ratio_spread,
         "noise": noise_summary,
         "gates": gates,
