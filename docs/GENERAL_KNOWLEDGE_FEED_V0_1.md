@@ -152,3 +152,50 @@ held-out inference, source-trust reasoning, or large-scale knowledge ingestion.
 
 The next experiment should hold statements out and ask whether Cortex can infer
 new relational structure from what it was shown.
+
+
+## Local informational articulation
+
+The knowledge feed now exposes the same stored Cortex state through a sparse
+local articulation rather than only exact graph lookup.
+
+For a query point (x), entity support is derived from the native articulation
+metric:
+
+```math
+d_i(x) = min_g weighted_mse(x, g p_i; w_i)
+```
+
+and normalized locally as:
+
+```math
+s_i(x) = exp(-beta d_i(x)) / sum_j exp(-beta d_j(x)).
+```
+
+These values are called **supports**, not calibrated probabilities.
+
+A `LocalArticulation` contains:
+
+- the strongest local entity supports;
+- per-feature prototype value, reliability, and noise state;
+- adjacent active/unresolved relation evidence with Beta posterior mean;
+- adjacent causal evidence;
+- normalized entity-support entropy;
+- residual support outside the returned sparse top-k set.
+
+For a knowledge symbol, `KnowledgeGraphView.local_articulation(...)` adds
+decoded `(property, value, structural_support)` coordinates obtained from the
+same reified statement motifs already stored in Cortex. No second semantic fact
+store is created.
+
+This makes the intended readout explicit:
+
+```text
+topological point
+  -> fuzzy entity support
+  -> local feature reliability
+  -> local relation/causal evidence
+  -> optional decoded knowledge coordinates
+```
+
+The readout is strictly non-mutating.
