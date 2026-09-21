@@ -13,6 +13,17 @@ def _bootstrap(prior: int, policy: RegimePlasticityPolicy | None = None):
     return tracker
 
 
+
+def test_default_policy_is_frozen_to_pareto_knee():
+    policy = RegimePlasticityPolicy()
+
+    assert policy.fast_decay == 0.50
+    assert policy.pressure_decay == 0.90
+    assert policy.suspicion_ratio == 0.05
+    assert policy.confirmation_steps == 5
+    assert policy.maturity_cap == 64
+
+
 def test_fast_assessment_uses_frozen_execution_surface():
     strong = assess_fast_evidence("OLD", {"OLD": 32.0})
     conflicted = assess_fast_evidence("OLD", {"OLD": 16.0, "NEW": 16.0})
