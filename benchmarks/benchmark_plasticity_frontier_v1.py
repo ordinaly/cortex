@@ -450,13 +450,23 @@ def _learner_count_parity(seed: int) -> bool:
         new_relation=new_relation,
         new_count=3,
     )
+    target_signature = (
+        RelationStep(r0, "forward"),
+        RelationStep(r1, "forward"),
+    )
+    relevant = {old_relation, new_relation}
     fitted_map = {
         row.target_relation: (row.examples, row.confidence)
         for row in fitted
+        if (
+            row.signature == target_signature
+            and row.target_relation in relevant
+        )
     }
     manual_map = {
         row.target_relation: (row.examples, row.confidence)
         for row in manual
+        if row.target_relation in relevant
     }
     return (
         geometry is not None
