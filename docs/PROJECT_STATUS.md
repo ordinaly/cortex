@@ -191,6 +191,39 @@ mass**, with zero declared false switches and exact historical retention.
 See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
 [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
+## Autonomy Robustness & Temporal Plasticity v1
+
+**Phase B passed; the declared research program is complete.**
+
+Phase A preserved the frozen Relational Regime Plasticity v0.1 behavior and
+measured two weaknesses: stale exact execution under missingness and complete
+source-reliability blindness in a trusted-minority / weak-majority fixture.
+
+Phase B keeps durable historical evidence exact while adding:
+
+- bounded odds-relative weighting for the fast/current evidence channel;
+- reliability-scaled effective evidence time and contradiction pressure;
+- a read-only execution-freshness boundary with one missing-event grace.
+
+Across 12 seeds, the selected source policy resolved the original source trap
+to NEW in **12/12** runs with mean switch step **15**; unweighted and linear
+controls remained on OLD in **12/12**. A separate source holdout also resolved
+NEW in **12/12**, while frequent weak contradictory noise caused **0 false
+switches**.
+
+The selected freshness boundary preserves the clean **9 observed-event** switch.
+At 30% missingness, unsafe exact execution fell from **0.1626 to 0.1458**; at
+60% missingness it fell from **0.1860 to 0.1082**. Stable-world safe-execution
+coverage remained **0.9114 / 0.6422** at 30% / 60% missingness.
+
+All full-trust non-regression gates passed: corrupted-shift p95 remained
+**26 / 58** at 10% / 20% corruption, stationary noise produced zero false
+switches, compound locality held, raw source history remained exact, and 48
+fixed-vocabulary contexts remained at 192 regime cells.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
+
 ## What is stable today
 
 ### Native runtime
@@ -215,7 +248,7 @@ The current release candidate is `v1.0.0-rc.2`.
 
 The research line has moved beyond the frozen runtime semantics along multiple independent tracks. Predictive semantic geometry and adaptive representational resolution remain at `v1.22-R`, while autonomous relational learning now uses **Relational Regime Plasticity v0.1** as its frozen research default.
 
-The immediate cross-track integration milestone is **Autonomy Robustness & Temporal Plasticity v1**.
+The **Autonomy Robustness & Temporal Plasticity v1** cross-track milestone has completed Phase B and passed its declared research gates.
 
 v1.16-R implements an exact streamed semantic-geometry cache path selected by the v1.15-R attribution campaign. On untouched official seeds at 288 anchors, cache refresh became **1.52× faster** and the complete fused step **1.17× faster**, with maximum cached-distance error **5.55e-17**, maximum kernel error **3.33e-16**, and **0 structural disagreements**. The frozen milestone nevertheless did not pass every gate: cache refresh remained **36.79%** of the profiled step, above the preregistered **35%** bottleneck-shift ceiling.
 

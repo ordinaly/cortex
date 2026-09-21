@@ -85,6 +85,8 @@ jobs:
           tests/test_articulation_controller.py
           tests/test_controller_calibration.py
           tests/test_regime_plasticity.py
+          tests/test_autonomy_robustness.py
+          tests/test_autonomy_temporal_phase_b.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
@@ -148,6 +150,18 @@ jobs:
           python benchmarks/benchmark_regime_plasticity_v0_1.py
           --noise-seeds 8
           --noise-steps 300
+      - name: Run autonomy-robustness-temporal-plasticity-v1-phase-a
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_autonomy_robustness_temporal_plasticity_v1.py
+          --seeds 12
+          --stationary-steps 300
+      - name: Run autonomy-robustness-temporal-plasticity-v1-phase-b
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_autonomy_robustness_temporal_plasticity_phase_b.py
+          --seeds 12
+          --stationary-steps 300
 
   wheel:
     runs-on: ubuntu-latest

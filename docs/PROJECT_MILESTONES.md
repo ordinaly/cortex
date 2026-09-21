@@ -53,10 +53,25 @@ The selected point is `fast_decay=0.50`, `pressure_decay=0.90`,
 `suspicion_ratio=0.05`, `confirmation_steps=5`, `maturity_cap=64`.
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
-**Autonomy Robustness & Temporal Plasticity v1** remains the broader campaign
-that will consume the successful mechanism and then add missing/corrupted
-observations, source reliability differences, out-of-distribution relation
-structures, and sustained memory pressure.
+**Autonomy Robustness & Temporal Plasticity v1 — Phase B passed.**
+The program now preserves the frozen full-trust plasticity path while adding a
+source-aware current channel and a separate read-only execution-freshness
+boundary.
+
+The selected bounded odds-relative source weighting resolves the original
+trusted-minority / weak-majority failure to NEW in **12/12** runs (mean switch
+step **15**) and passes a second source holdout in **12/12**, with zero false
+switches under frequent weak contradictory noise. Unweighted and linear
+controls remain on OLD in **12/12** on the original trap.
+
+A one-missing-event freshness grace preserves the clean **9 observed-event**
+switch while reducing unsafe exact execution from **0.1626 -> 0.1458** at 30%
+missingness and **0.1860 -> 0.1082** at 60%. Raw historical counts remain exact,
+compound locality passes, full-trust corrupted/noisy behavior is unchanged,
+and fixed-vocabulary state remains bounded.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 **Open-World Robustness v1** remains the next robustness-focused Reasoning Map
 campaign rather than being discarded. Concept-to-semantics integration is
@@ -132,33 +147,35 @@ See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
 
 ---
 
-## Immediate cross-track milestone — Autonomy Robustness & Temporal Plasticity v1
+## Completed cross-track milestone — Autonomy Robustness & Temporal Plasticity v1
 
-### Question
+### Result
 
-Does the autonomous loop remain calibrated and plastic when evidence is noisy,
-time-dependent, source-dependent, partially missing, and memory-constrained?
+The declared two-phase program is complete.
 
-### Priority experiments
+Phase A characterized the frozen relational-regime policy under missingness,
+corruption, drift, source conflict, compound contexts, and long fixed-vocabulary
+streams. It preserved the existing plasticity frontier while exposing two
+measured failures: stale exact execution during observation gaps and blindness
+to source reliability.
 
-- replace deterministic post-detachment observations with stochastic missing and
-  corrupted evidence;
-- attach explicit source reliability and provenance to evidence rather than
-  collapsing them into one confidence value;
-- introduce temporal regime/context variables so newer world states can revise
-  old regularities without requiring overwhelming raw observation counts;
-- sweep memory pressure through the failure boundary and require graceful
-  `EXPLORE` / `UNRESOLVED` behavior instead of exceptions;
-- broaden held-out relation signatures and path depths beyond the calibration
-  distribution;
-- measure controller Brier score, false execution, recovery latency, locality,
-  LPU invocation rate, and memory/runtime growth throughout the stream.
+Phase B addressed those failures without rewriting durable history:
 
-### Key promotion condition
+- bounded odds-relative source weighting resolved the original source conflict
+  and an independent holdout in **12/12** runs each;
+- frequent weak contradictory evidence caused **0 false switches**;
+- a one-missing-event execution-freshness grace reduced stale unsafe execution
+  to **0.1458 / 0.1082** at 30% / 60% missingness;
+- clean switching remained **9 observed events**;
+- full-trust corruption/noise behavior, locality, exact audit history, and
+  fixed-vocabulary bounded state were preserved.
 
-Do not enable online self-recalibration of the controller until a frozen v0.2
-policy has been measured under these distribution shifts. Otherwise the
-controller could adapt to its own errors and hide calibration drift.
+The mechanism remains research-only. Source reliability is externally supplied
+rather than learned, and freshness is defined only for explicit missing events
+in the declared structured stream.
+
+See
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 ---
 

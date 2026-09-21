@@ -19,7 +19,7 @@ Cortex currently has three independent provenance coordinates:
 | predictive-geometry research frontier | **v1.22-R** |
 | autonomy/plasticity research default | **Relational Regime Plasticity v0.1** |
 
-The stable runtime and the research frontiers are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. Predictive-geometry engineering remains at **v1.22-R**; the autonomous relational-learning track has frozen **Relational Regime Plasticity v0.1** as its current research default. The immediate cross-track milestone is **Autonomy Robustness & Temporal Plasticity v1**.
+The stable runtime and the research frontiers are intentionally separate. The frozen executable specification remains the behavioral oracle, while experimental mechanisms advance independently until they have earned promotion through explicit validation. Predictive-geometry engineering remains at **v1.22-R**; the autonomous relational-learning track has frozen **Relational Regime Plasticity v0.1** as its current research default. **Autonomy Robustness & Temporal Plasticity v1** has completed Phase B; source-aware current evidence and execution freshness passed their declared research gates.
 
 For a detailed explanation of how Cortex works, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). For the live project summary, see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md); the consolidated milestone ladder is [docs/PROJECT_MILESTONES.md](docs/PROJECT_MILESTONES.md).
 
@@ -187,7 +187,7 @@ model mutation. Local repairs used a mean **0.03846×** the state expansions of
 full replanning while preserving the same minimum cost. See
 [docs/NOVELTY_AWARE_REPLANNING_V1.md](docs/NOVELTY_AWARE_REPLANNING_V1.md).
 
-Within the Reasoning Map, the next scientific milestone is **Open-World Robustness v1**. In parallel, the immediate autonomous-learning milestone is **Autonomy Robustness & Temporal Plasticity v1**.
+Within the Reasoning Map, the next scientific milestone is **Open-World Robustness v1**. The autonomous-learning **Autonomy Robustness & Temporal Plasticity v1** milestone has completed Phase B.
 
 ## Autonomous Cortex path
 

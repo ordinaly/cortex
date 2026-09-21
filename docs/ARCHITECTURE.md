@@ -405,13 +405,38 @@ history remains inspectable, while lifetime age cannot create unbounded
 plasticity debt. For a fixed relation vocabulary, the tested regime state also
 remained bounded over 10,000 additional observations.
 
-This mechanism is still research-only and does not modify `spec-v0.9.5`. The
-next integration target is **Autonomy Robustness & Temporal Plasticity v1**,
-where reliability, missing/corrupted evidence, broader relational structures,
-memory pressure, and downstream reasoning effects are tested together.
+This mechanism is still research-only and does not modify `spec-v0.9.5`.
 
-See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
-[RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
+**Autonomy Robustness & Temporal Plasticity v1** has completed its Phase B
+research campaign. Phase A first kept the frozen local policy unchanged and
+diagnosed two separable weaknesses: source-reliability blindness and stale
+exact-execution permission during missing observations.
+
+Phase B adds two read-compatible mechanisms without changing durable history.
+Source reliability attenuates only the fast/current evidence channel and
+contradiction-pressure clock; weight 1.0 exactly preserves the frozen v0.1
+tracker path. A separate freshness boundary may temporarily downgrade
+`EXECUTE` to `EXPLORE` after missing observations while leaving the accepted
+regime and its audit evidence untouched.
+
+The selected source transform is bounded odds-relative weighting with 0.95 as
+the full-trust reference. In the Phase-A trusted-minority / weak-majority trap,
+unweighted and linear candidates retained OLD in 12/12 runs, while the selected
+transform switched to NEW in 12/12 with mean switch step 15. A second source
+pattern also resolved NEW in 12/12, and a weak-contradiction control produced
+zero false switches.
+
+The selected freshness policy allows one missing event before suspending exact
+execution. At 30% / 60% missingness it preserves the 9-observed-event regime
+switch while reducing mean unsafe-execution rate from 0.1626 -> 0.1458 and
+0.1860 -> 0.1082 respectively. Stable-world safe-execution coverage remains
+0.9114 / 0.6422. Raw history, locality, corrupted-shift behavior, stationary
+noise behavior, and fixed-vocabulary bounded state all passed their gates.
+
+See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md),
+[RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md),
+and
+[AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 ---
 
@@ -2239,6 +2264,7 @@ For autonomous ingestion, articulation, and temporal plasticity:
 - [ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md](ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md)
 - [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md)
 - [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md)
+- [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md)
 
 For software/specification/protocol versioning:
 
