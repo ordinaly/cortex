@@ -33,12 +33,16 @@ The tracks should remain distinct. A successful research prototype is not automa
   - open-world novelty attribution;
   - novelty-aware replanning integration.
 
-The immediate cross-track milestone is now **Cortex Autonomy Campaign v1**,
-using the calibrated articulation controller as an experimental policy layer.
-The campaign should test whether the learned `EXPLORE / EXECUTE / UNRESOLVED`
-boundary stays calibrated under genuine chronological learning, revision,
-novelty, memory pressure, and changed-world exceptions rather than only the
-declared calibration fixtures.
+**Cortex Autonomy Campaign v1 has passed.** The calibrated controller preserved
+teacher-free held-out inference and novelty transfer, followed the reversible
+`EXECUTE -> EXPLORE -> UNRESOLVED -> EXECUTE` trajectory under changed-world
+evidence, preserved an unrelated control relation, and selected the LPU for a
+deep branching query without semantic drift.
+
+The immediate cross-track milestone is now **Autonomy Robustness & Temporal
+Plasticity v1**. It should test whether the autonomy result survives noisy and
+missing observations, source reliability differences, temporal regime changes,
+broader out-of-distribution relation structures, and sustained memory pressure.
 
 **Open-World Robustness v1** remains the next robustness-focused Reasoning Map
 campaign rather than being discarded. Concept-to-semantics integration is
@@ -47,7 +51,7 @@ separate semantic follow-ups.
 
 ---
 
-## Immediate cross-track milestone — Cortex Autonomy Campaign v1
+## Completed cross-track milestone — Cortex Autonomy Campaign v1
 
 ### Question
 
@@ -93,13 +97,54 @@ The campaign must distinguish facts Cortex was directly shown from conclusions
 it generated through its own structure. LPU results must be attributed
 separately from memory retrieval and structural discovery.
 
-### Passing claim boundary
+### Result — passed
 
-A successful campaign would support a narrow claim of **teacher-free structural
-autonomy on the declared fixtures**. It would not establish natural-language
-understanding, unrestricted theorem proving, or general intelligence.
+The native campaign passed every frozen gate across five randomized seeds:
+teacher/model calls after detachment were zero, direct answer leakage was zero,
+held-out and novel-entity inference both achieved 1.000 coverage / accuracy,
+multi-valued changes were preserved, unrelated memory survived conflict, and
+the calibrated state trajectory was
+`EXECUTE -> EXPLORE -> UNRESOLVED -> EXECUTE`.
 
-See [AUTONOMOUS_CORE_LPU_V0_1.md](AUTONOMOUS_CORE_LPU_V0_1.md).
+The depth-four branching task selected the LPU with exact witnesses and no
+semantic change when the LPU was disabled. The memory-pressure control exposed
+a hard failure at 256 maximum entities while 512 and 1024 retained the query.
+
+The supported claim remains **teacher-free structural autonomy on the declared
+structured fixtures**, not natural-language understanding, unrestricted theorem
+proving, or general intelligence.
+
+See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
+
+---
+
+## Immediate cross-track milestone — Autonomy Robustness & Temporal Plasticity v1
+
+### Question
+
+Does the autonomous loop remain calibrated and plastic when evidence is noisy,
+time-dependent, source-dependent, partially missing, and memory-constrained?
+
+### Priority experiments
+
+- replace deterministic post-detachment observations with stochastic missing and
+  corrupted evidence;
+- attach explicit source reliability and provenance to evidence rather than
+  collapsing them into one confidence value;
+- introduce temporal regime/context variables so newer world states can revise
+  old regularities without requiring overwhelming raw observation counts;
+- sweep memory pressure through the failure boundary and require graceful
+  `EXPLORE` / `UNRESOLVED` behavior instead of exceptions;
+- broaden held-out relation signatures and path depths beyond the calibration
+  distribution;
+- measure controller Brier score, false execution, recovery latency, locality,
+  LPU invocation rate, and memory/runtime growth throughout the stream.
+
+### Key promotion condition
+
+Do not enable online self-recalibration of the controller until a frozen v0.2
+policy has been measured under these distribution shifts. Otherwise the
+controller could adapt to its own errors and hide calibration drift.
 
 ---
 

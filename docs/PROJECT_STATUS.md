@@ -130,6 +130,34 @@ in the successful CI run.
 
 See [ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md](ARTICULATION_CONTROLLER_CALIBRATION_V0_2.md).
 
+## Cortex Autonomy Campaign v1
+
+The first teacher-removal campaign passed every preregistered gate across five
+randomized native-runtime worlds.
+
+The teacher was detached after 76 chronological statements per world. After
+detachment there were **0 model calls, 0 held-out answer leaks, and 0 binding
+conflicts**. Calibrated Cortex achieved **1.000 coverage / 1.000 accuracy** on
+both childhood-held-out queries and entirely new post-detachment entities.
+Legitimate multi-value changes were preserved.
+
+Under changed-world evidence, the learned controller followed
+`EXECUTE -> EXPLORE -> UNRESOLVED -> EXECUTE` on every seed while the
+no-controller ablation never abstained. A disjoint relation family remained
+correct throughout, demonstrating local revision on this fixture.
+
+A depth-four / width-four autonomous query was correct on every seed. The
+learned controller selected the LPU in every case, exact witnesses were valid,
+and hosted-runner execution was **1.717x faster at the median** than forcing the
+same articulation through the Cortex enumerating executor.
+
+The memory-pressure sweep exposed one negative result: a 256-entity runtime hit
+a `ValueError`, while 512 and 1024 entity capacities retained the query with
+408 active entities. Graceful pressure handling at the structured-knowledge
+boundary remains open.
+
+See [CORTEX_AUTONOMY_CAMPAIGN_V1.md](CORTEX_AUTONOMY_CAMPAIGN_V1.md).
+
 ## What is stable today
 
 ### Native runtime

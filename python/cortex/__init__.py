@@ -75,10 +75,18 @@ from .controller_calibration import (
     epistemic_execute_features,
     epistemic_structural_features,
     fit_logistic_surface,
+    frozen_calibration_v0_2,
     select_f1_threshold,
     select_precision_threshold,
 )
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
+from .autonomy_campaign import (
+    KnowledgeTimeline,
+    PolicyExecution,
+    PolicyMode,
+    TimelineReport,
+    execute_policy,
+)
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
 from .hypergraph_lpu import (
     EnumeratingRuleExecutor,
@@ -132,6 +140,11 @@ __all__ = [
     "LPUStep",
     "LogicalProcessingUnit",
     "KnowledgeFeedReport",
+    "execute_policy",
+    "TimelineReport",
+    "PolicyMode",
+    "PolicyExecution",
+    "KnowledgeTimeline",
     "RelationalHyperedge",
     "RelationalDirection",
     "Hyperpath",
@@ -154,6 +167,7 @@ __all__ = [
     "select_f1_threshold",
     "select_precision_threshold",
     "fit_logistic_surface",
+    "frozen_calibration_v0_2",
     "epistemic_structural_features",
     "epistemic_execute_features",
     "epistemic_conflict_features",

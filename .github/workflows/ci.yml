@@ -73,6 +73,7 @@ jobs:
           tests/test_native_graph.py
           tests/test_native_runtime.py
           tests/test_autonomy.py
+          tests/test_autonomy_campaign.py
           tests/test_lpu.py
           tests/test_lpu_validation.py
           tests/test_knowledge.py
@@ -130,6 +131,11 @@ jobs:
         run: >-
           python benchmarks/benchmark_articulation_controller_calibration.py
           --native-seeds 10
+      - name: Run cortex-autonomy-campaign-v1
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_cortex_autonomy_v1.py
+          --seeds 5
 
   wheel:
     runs-on: ubuntu-latest
