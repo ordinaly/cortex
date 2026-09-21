@@ -87,6 +87,15 @@ from .autonomy_campaign import (
     TimelineReport,
     execute_policy,
 )
+from .regime_plasticity import (
+    RegimeArchive,
+    RegimeArticulationDecision,
+    RegimeConfig,
+    RegimePhase,
+    RegimeRead,
+    RelationalRegimeMemory,
+    decide_with_regime,
+)
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
 from .hypergraph_lpu import (
     EnumeratingRuleExecutor,
@@ -140,6 +149,13 @@ __all__ = [
     "LPUStep",
     "LogicalProcessingUnit",
     "KnowledgeFeedReport",
+    "decide_with_regime",
+    "RelationalRegimeMemory",
+    "RegimeRead",
+    "RegimePhase",
+    "RegimeConfig",
+    "RegimeArticulationDecision",
+    "RegimeArchive",
     "execute_policy",
     "TimelineReport",
     "PolicyMode",
