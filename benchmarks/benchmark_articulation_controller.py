@@ -19,17 +19,6 @@ import benchmark_hypergraph_lpu_stress as stress
 PROTOCOL = "articulation-controller-v0.1"
 
 
-def _permissive_rules(training, depth):
-    return HypergraphCompositionLearner(
-        training,
-        path_length=depth,
-        minimum_examples=1,
-        confidence_threshold=0.0,
-        margin_threshold=0.0 if False else 0.0,
-        resolution=0.5,
-    ).fit()
-
-
 def _rules(training, depth):
     # HypergraphCompositionLearner currently has no separate margin gate; a
     # zero confidence threshold preserves competing relation hypotheses so the
