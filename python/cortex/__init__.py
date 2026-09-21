@@ -49,6 +49,15 @@ except ImportError as exc:  # source-tree use before maturin build
 
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
 from .lpu import LPUResult, LPUStep, LogicalProcessingUnit
+from .knowledge import (
+    KnowledgeFeedReport,
+    KnowledgeGraphView,
+    KnowledgeQualifier,
+    KnowledgeStatement,
+    KnowledgeSymbolEncoder,
+    feed_knowledge,
+    make_knowledge_runtime,
+)
 
 __all__ = [
     "Articulation",
@@ -65,11 +74,18 @@ __all__ = [
     "LPUResult",
     "LPUStep",
     "LogicalProcessingUnit",
+    "KnowledgeFeedReport",
+    "KnowledgeGraphView",
+    "KnowledgeQualifier",
+    "KnowledgeStatement",
+    "KnowledgeSymbolEncoder",
     "NATIVE_AVAILABLE",
     "ObservationFrame",
     "TrainingReport",
     "__spec_version__",
     "__version__",
+    "feed_knowledge",
+    "make_knowledge_runtime",
     "native_version",
     "train_dataset",
 ]
