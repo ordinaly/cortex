@@ -53,18 +53,22 @@ The selected point is `fast_decay=0.50`, `pressure_decay=0.90`,
 `suspicion_ratio=0.05`, `confirmation_steps=5`, `maturity_cap=64`.
 See [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
-**Autonomy Robustness & Temporal Plasticity v1 is active; Phase A passed.**
-The unchanged frozen regime policy preserved all preregistered non-regression
-gates across 12 development seeds: clean 9-event switching, corrupted-shift
-success, stationary-noise stability, context locality, and fixed-vocabulary
-bounded state.
+**Autonomy Robustness & Temporal Plasticity v1 — Phase B passed.**
+The program now preserves the frozen full-trust plasticity path while adding a
+source-aware current channel and a separate read-only execution-freshness
+boundary.
 
-Phase A also exposed the next two targets. Missingness preserves evidence-count
-latency but extends stale execution in wall time. More decisively, the
-trusted-minority / weak-majority source fixture ends on OLD in **12/12** runs
-although reliability-weighted support favors NEW. Phase B will compare
-source-aware fusion and execution-freshness candidates while preserving durable
-raw history and the frozen controller safety boundary.
+The selected bounded odds-relative source weighting resolves the original
+trusted-minority / weak-majority failure to NEW in **12/12** runs (mean switch
+step **15**) and passes a second source holdout in **12/12**, with zero false
+switches under frequent weak contradictory noise. Unweighted and linear
+controls remain on OLD in **12/12** on the original trap.
+
+A one-missing-event freshness grace preserves the clean **9 observed-event**
+switch while reducing unsafe exact execution from **0.1626 -> 0.1458** at 30%
+missingness and **0.1860 -> 0.1082** at 60%. Raw historical counts remain exact,
+compound locality passes, full-trust corrupted/noisy behavior is unchanged,
+and fixed-vocabulary state remains bounded.
 
 See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
