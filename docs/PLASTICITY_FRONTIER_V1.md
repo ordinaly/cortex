@@ -95,3 +95,112 @@ yet alter Cortex semantics.
 A temporal or regime-aware mechanism should only be introduced after this
 baseline demonstrates a concrete failure mode and gives us a metric it must
 improve without increasing catastrophic forgetting.
+
+
+## First characterization result
+
+The first seven-seed sweep exposed a strong and highly regular historical
+inertia in the frozen v0.2 policy.
+
+| prior OLD examples | leave OLD EXECUTE | OLD UNRESOLVED | NEW reaches EXECUTE | NEW / prior |
+|---:|---:|---:|---:|---:|
+| 4 | 1 | 3 | 72 | 18.000 |
+| 8 | 1 | 5 | 143 | 17.875 |
+| 16 | 1 | 9 | 285 | 17.813 |
+| 32 | 2 | 18 | 570 | 17.813 |
+| 64 | 4 | 36 | 1139 | 17.797 |
+
+The replacement cost therefore scales almost exactly with accumulated history:
+
+    replacement evidence ~= 17.8 * prior evidence
+
+This is not merely failure to detect novelty. The calibrated controller notices
+change quickly: OLD leaves EXECUTE after only about 5-6% contradictory evidence.
+The long delay occurs between detecting that the old articulation is unsafe and
+admitting the replacement articulation.
+
+The result is a large **re-articulation dead zone**.
+
+### Transient contradiction
+
+With a mature 32-example relation:
+
+| contradictory burst | deepest state | supporting observations to EXECUTE |
+|---:|---|---:|
+| 1 | EXECUTE | 0 |
+| 2 | EXPLORE | 4 |
+| 4 | EXPLORE | 40 |
+| 8 | EXPLORE | 111 |
+
+The controller therefore has useful resistance to a single contradictory event,
+but recovery cost rises sharply once a short burst moves the confidence margin
+away from the very conservative execution boundary.
+
+### Locality
+
+The disjoint control composition remained at confidence 1.0 and state EXECUTE
+throughout every regime-shift trajectory. The observed rigidity is local rather
+than catastrophic forgetting of unrelated structure.
+
+## Diagnosis
+
+Two mechanisms combine to produce the measured frontier.
+
+1. Composition evidence is cumulative and gives every historical example
+   permanent equal weight.
+2. The calibrated v0.2 execution surface requires a very large positive relation
+   margin before exact execution is admitted.
+
+This combination has a desirable property: Cortex stops making an exact claim
+early when evidence starts to disagree.
+
+But it has an undesirable property: once a genuine regime change has occurred,
+the new regime must numerically overwhelm the entire old history before Cortex
+will articulate it exactly.
+
+The next experiment should therefore **not delete old evidence and should not
+simply lower the execution threshold**. Either change would sacrifice the
+stability that the controller is successfully providing.
+
+## Candidate direction — dual-timescale regime evidence
+
+The next prototype should maintain two distinguishable quantities for each
+learned relational pattern:
+
+- **historical evidence**: slow, durable, provenance-preserving memory;
+- **current-regime evidence**: fast, recency-sensitive evidence used to detect
+  and characterize a possible world change.
+
+A regime transition should be explicit and hysteretic:
+
+    stable articulation
+        -> change suspected
+        -> conflict / unresolved
+        -> new stable articulation
+
+Old evidence remains available as historical structure rather than being
+overwritten.
+
+This is closer to online change-point reasoning than naive forgetting. A simple
+exponential-decay rule will still be benchmarked as a baseline, but it should
+not be promoted merely because it adapts quickly: it must also resist stationary
+noise and preserve recoverable history.
+
+## Promotion criteria for a plasticity mechanism
+
+A candidate should improve all of the following simultaneously:
+
+- replacement lag should be bounded rather than proportional to total lifetime
+  evidence;
+- one-off and low-rate contradictory noise should not cause false regime
+  switches;
+- persistent change should move through an explicit uncertainty state before
+  re-execution;
+- switching back should be possible without reconstructing erased history;
+- unrelated relations should remain unchanged;
+- old regimes should remain inspectable as historical evidence;
+- controller false-execution risk must not exceed the frozen v0.2 contract;
+- memory/runtime growth must remain bounded.
+
+The benchmark should reject a mechanism that gains plasticity only by making
+Cortex generally less stable.
