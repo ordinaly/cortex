@@ -74,6 +74,7 @@ jobs:
           tests/test_native_runtime.py
           tests/test_autonomy.py
           tests/test_lpu.py
+          tests/test_lpu_validation.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
