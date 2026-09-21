@@ -1,6 +1,8 @@
 # Hybrid Cortex Stage I — frozen neural perception + structural inference
 
-Status: implemented research interface.
+> **Historical research report.** The active Stage-I adapter and hybrid benchmark were removed from the main package path by the Autonomous Core + LPU v0.1 pivot. The original implementation remains recoverable from Git history.
+
+Status: historical / retained for research provenance.
 
 This document specifies the first hybrid neural/Cortex boundary without changing
 the frozen Cortex executable specification or the native reasoning semantics.
