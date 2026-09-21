@@ -180,11 +180,15 @@ also exposed asymmetric recovery cost: at 32 prior examples, bursts of
 1 / 2 / 4 / 8 required 0 / 4 / 40 / 111 later supporting observations to
 return to `EXECUTE`.
 
-The next candidate is a dual-timescale relational regime mechanism: durable
-historical evidence plus fast local regime evidence with explicit hysteresis,
-without deleting old topology or weakening the v0.2 execution-risk contract.
+The follow-up **Relational Regime Plasticity v0.1** development campaign swept
+270 policies; 105 were feasible and 2 were Pareto-optimal. The selected knee
+uses fast decay 0.50, pressure decay 0.90, suspicion ratio 0.05, and a 5-step
+confirmation streak. It preserves the exact v0.2 change-detection lags while
+switching to the replacement regime in **9 observations for every tested prior
+mass**, with zero declared false switches and exact historical retention.
 
-See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md).
+See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md) and
+[RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md).
 
 ## What is stable today
 
