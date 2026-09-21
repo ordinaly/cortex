@@ -168,3 +168,86 @@ A fuzzy informational state remains in exploration until a sufficiently stable
 articulation exists. Exact logic is applied only inside that temporary
 articulated structure. Returning to a finer or revised informational state is
 always allowed.
+
+
+## Validation result
+
+The native-runtime campaign used 10 randomized seeds, width 8, and clean
+composition depths 2 through 5.
+
+All preregistered gates passed.
+
+### Clean execution
+
+Across 40 clean cases:
+
+- execution rate: **1.000**;
+- answer accuracy: **1.000**;
+- backend-policy match: **1.000**;
+- persistent-memory isolation: **1.000**;
+- binding conflicts: **0**.
+
+The controller selected:
+
+```text
+depth 2: Cortex   8 paths / 17 materialized edges
+depth 3: Cortex  64 paths / 83 materialized edges
+depth 4: LPU    512 paths / 147 materialized edges
+depth 5: LPU   4096 paths / 211 materialized edges
+```
+
+For the structured knowledge evidence in this campaign, the highest viable
+resolution was consistently:
+
+```text
+epsilon = 0.65
+```
+
+rather than the policy floor of 0.50.
+
+### Epistemic controls
+
+With 20% contradictory solved examples:
+
+- controller state: **EXECUTE** in 100% of seeds;
+- mean target-rule confidence: **0.8**.
+
+With 40% contradictory examples:
+
+- controller state: **UNRESOLVED** in 100% of seeds;
+- reason: `conflicting-composition-evidence`.
+
+With an intentionally ambiguous source articulation:
+
+- controller state: **EXPLORE** in 100% of seeds.
+
+### Exactness request
+
+On otherwise inexpensive depth-2 cases, requesting an exact witness routed to
+the LPU in **100%** of seeds and produced a valid witness.
+
+This confirms that LPU selection is not purely a performance heuristic:
+explicit exact-proof requirements can request it even when native Cortex
+execution would otherwise be sufficient.
+
+## Interpretation
+
+v0.1 supports a three-state epistemic controller with a separate execution
+backend decision:
+
+```text
+EXPLORE
+    representation/evidence not stable enough yet
+
+EXECUTE
+    articulation stable
+    -> Cortex when local exact traversal is cheap
+    -> LPU when layered execution is advantageous or a witness is required
+
+UNRESOLVED
+    substantial incompatible evidence or no admissible exact articulation
+```
+
+This gives Cortex an explicit boundary between fuzzy cognition and exact local
+computation without requiring semantic predicates or a neural orchestration
+model.
