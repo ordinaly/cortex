@@ -30,10 +30,10 @@ EPS = 1.0e-12
 class RegimePlasticityPolicy:
     """Parameters for dual-timescale regime articulation."""
 
-    fast_decay: float = 0.70
+    fast_decay: float = 0.50
     pressure_decay: float = 0.90
     suspicion_ratio: float = 0.05
-    confirmation_steps: int = 1
+    confirmation_steps: int = 5
     maturity_cap: int = 64
     mean_support: float = 2.0 / 3.0
     source_support: float = 1.0
