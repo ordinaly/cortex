@@ -133,6 +133,7 @@ def test_local_knowledge_articulation_decodes_sparse_properties():
         report.snapshot_json,
         report.symbol_bindings,
         runtime.config_json(),
+        report.statement_incidence,
     )
 
     local = view.local_articulation("France", top_k=6)
@@ -168,6 +169,7 @@ def test_local_articulation_contains_relational_hypergeometry():
         report.snapshot_json,
         report.symbol_bindings,
         runtime.config_json(),
+        report.statement_incidence,
     )
 
     capital = view.local_articulation("capital", resolution=0.5)
