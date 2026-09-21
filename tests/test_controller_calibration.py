@@ -36,7 +36,7 @@ def _bundle():
         ),
         unresolved_surface=_surface(
             UNRESOLVED_FEATURE_NAMES,
-            (2.0, 3.0, 2.0, 2.0, 1.0),
+            (2.0, 3.0, 2.0, 2.0, 2.0, 1.0),
             -5.0,
             0.5,
         ),
