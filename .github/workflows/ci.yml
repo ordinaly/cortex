@@ -79,6 +79,7 @@ jobs:
           tests/test_wikidata.py
           tests/test_topology.py
           tests/test_hypergraph_geometry.py
+          tests/test_hypergraph_inference.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
@@ -104,6 +105,11 @@ jobs:
       - name: Run relational-hypergeometry-v0.1
         if: matrix.python-version == '3.13'
         run: python benchmarks/benchmark_relational_hypergeometry.py
+      - name: Run hypergraph-heldout-inference-v0.1
+        if: matrix.python-version == '3.13'
+        run: >-
+          python benchmarks/benchmark_hypergraph_heldout_inference.py
+          --seeds 50
 
   wheel:
     runs-on: ubuntu-latest
