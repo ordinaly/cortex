@@ -1286,8 +1286,8 @@ Conceptually,
 L(S_t,q)\rightarrow(r,\pi),
 ```
 
-where (S_t) is a temporary articulated state, (q) is the requested exact
-operation, (r) is the result, and (pi) is a witness trace.
+where $S_t$ is a temporary articulated state, $q$ is the requested exact
+operation, $r$ is the result, and $\pi$ is a witness trace.
 
 The architectural asymmetry is deliberate:
 
