@@ -235,6 +235,46 @@ See [RELATIONAL_HYPERGEOMETRY_V0_1.md](RELATIONAL_HYPERGEOMETRY_V0_1.md).
 
 ---
 
+### LPU as articulated exact executor
+
+The relational-hypergeometry experiments refine the LPU boundary.
+
+Cortex may articulate a temporary exact subproblem from fuzzy learned state.
+For a learned relation signature of depth $k$, Cortex constructs a layered
+graph whose nodes are pairs:
+
+```text
+(depth, concept basin)
+```
+
+Only relation/orientation transitions admitted at the current evidence
+resolution are materialized. The stateless LPU then executes exact reachability
+on that temporary graph and returns a witness.
+
+The authority ordering is:
+
+```text
+evidence -> Cortex geometry -> articulation -> LPU -> exact witness
+```
+
+not:
+
+```text
+LPU -> ontology or belief
+```
+
+If Cortex does not resolve a composition, no LPU invocation is made. An LPU
+result is exact conditional on the articulated premises and does not increase
+their epistemic confidence.
+
+On reconverging relation graphs, this formulation can also avoid explicit
+enumeration of exponentially many equivalent paths by merging identical
+layered states.
+
+See [HYPERGEOMETRY_LPU_STRESS_V0_2.md](HYPERGEOMETRY_LPU_STRESS_V0_2.md).
+
+---
+
 ## 3. One frame through Cortex
 
 The native top-level object is `NativeCortexRuntime` in `cortex-runtime`.
