@@ -407,21 +407,31 @@ remained bounded over 10,000 additional observations.
 
 This mechanism is still research-only and does not modify `spec-v0.9.5`.
 
-**Autonomy Robustness & Temporal Plasticity v1** is now active. Its Phase A
-integration keeps the frozen policy unchanged and instantiates one local regime
-tracker per opaque relation signature. Missing observations are explicit
-no-evidence events, source reliability is recorded but deliberately not yet
-consumed, and the harness measures safe execution, unsafe stale execution, and
-abstention under temporal perturbation.
+**Autonomy Robustness & Temporal Plasticity v1** has completed its Phase B
+research campaign. Phase A first kept the frozen local policy unchanged and
+diagnosed two separable weaknesses: source-reliability blindness and stale
+exact-execution permission during missing observations.
 
-The first 12-seed Phase A run passed all non-regression gates but diagnosed two
-separable weaknesses. Missingness leaves memory intact yet can prolong stale
-`EXECUTE` permission in wall time, motivating an execution-freshness layer
-rather than memory decay. A high-reliability minority / low-reliability
-raw-count-majority fixture retained the old regime in 12/12 runs even though
-reliability-weighted support favored the new regime, motivating explicit
-source-aware fusion. These mechanisms remain Phase B research targets rather
-than changes to the frozen local policy.
+Phase B adds two read-compatible mechanisms without changing durable history.
+Source reliability attenuates only the fast/current evidence channel and
+contradiction-pressure clock; weight 1.0 exactly preserves the frozen v0.1
+tracker path. A separate freshness boundary may temporarily downgrade
+`EXECUTE` to `EXPLORE` after missing observations while leaving the accepted
+regime and its audit evidence untouched.
+
+The selected source transform is bounded odds-relative weighting with 0.95 as
+the full-trust reference. In the Phase-A trusted-minority / weak-majority trap,
+unweighted and linear candidates retained OLD in 12/12 runs, while the selected
+transform switched to NEW in 12/12 with mean switch step 15. A second source
+pattern also resolved NEW in 12/12, and a weak-contradiction control produced
+zero false switches.
+
+The selected freshness policy allows one missing event before suspending exact
+execution. At 30% / 60% missingness it preserves the 9-observed-event regime
+switch while reducing mean unsafe-execution rate from 0.1626 -> 0.1458 and
+0.1860 -> 0.1082 respectively. Stable-world safe-execution coverage remains
+0.9114 / 0.6422. Raw history, locality, corrupted-shift behavior, stationary
+noise behavior, and fixed-vocabulary bounded state all passed their gates.
 
 See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md),
 [RELATIONAL_REGIME_PLASTICITY_V0_1.md](RELATIONAL_REGIME_PLASTICITY_V0_1.md),
