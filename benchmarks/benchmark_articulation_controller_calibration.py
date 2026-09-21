@@ -29,6 +29,7 @@ from cortex.controller_calibration import (
     epistemic_execute_features,
     epistemic_unresolved_features,
     fit_logistic_surface,
+    select_f1_threshold,
     select_precision_threshold,
 )
 from cortex.hypergraph_geometry import HypergraphGeometry, RelationalHyperedge
@@ -126,13 +127,13 @@ def generate_epistemic_episodes(
         regime = index % 5
 
         if regime == 0:  # mature stable
-            latent_relation = 0.84 + 0.15 * rng.random()
+            latent_relation = 0.76 + 0.23 * rng.random()
             latent_source = 0.86 + 0.13 * rng.random()
             latent_support = 0.62 + 0.34 * rng.random()
             relation_trials = rng.randint(9, 28)
             source_trials = rng.randint(9, 20)
         elif regime == 1:  # stable but sparse
-            latent_relation = 0.84 + 0.15 * rng.random()
+            latent_relation = 0.76 + 0.23 * rng.random()
             latent_source = 0.86 + 0.13 * rng.random()
             latent_support = 0.62 + 0.34 * rng.random()
             relation_trials = rng.randint(2, 7)
@@ -246,6 +247,7 @@ def generate_epistemic_episodes(
                     confidence=confidence,
                     competitor_confidence=competitor,
                     margin=margin,
+                    mean_support=observed_support,
                     source_entropy=source_entropy,
                 ),
                 label=label,
@@ -345,10 +347,9 @@ def calibrate_epistemic():
         UNRESOLVED_FEATURE_NAMES,
         epochs=1250,
     )
-    unresolved = select_precision_threshold(
+    unresolved = select_f1_threshold(
         unresolved,
         unresolved_validation,
-        minimum_precision=0.92,
     )
 
     execute_metrics = _classification_metrics(
