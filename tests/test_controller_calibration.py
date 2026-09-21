@@ -3,8 +3,9 @@ from __future__ import annotations
 from cortex.articulation_controller import ArticulationState, ExecutionBackend
 from cortex.controller_calibration import (
     BACKEND_FEATURE_NAMES,
+    CONFLICT_FEATURE_NAMES,
     EXECUTE_FEATURE_NAMES,
-    UNRESOLVED_FEATURE_NAMES,
+    STRUCTURAL_FEATURE_NAMES,
     CalibrationBundle,
     CalibratedArticulationController,
     LinearProbabilitySurface,
@@ -34,9 +35,15 @@ def _bundle():
             -10.0,
             0.5,
         ),
-        unresolved_surface=_surface(
-            UNRESOLVED_FEATURE_NAMES,
-            (2.0, 3.0, 2.0, 2.0, 2.0, 1.0),
+        conflict_surface=_surface(
+            CONFLICT_FEATURE_NAMES,
+            (2.0, 4.0, 3.0, 3.0, 1.0),
+            -6.0,
+            0.5,
+        ),
+        structural_surface=_surface(
+            STRUCTURAL_FEATURE_NAMES,
+            (2.0, 5.0, 1.0),
             -5.0,
             0.5,
         ),
@@ -165,7 +172,8 @@ def test_exact_witness_still_overrides_backend_surface():
     bundle = CalibrationBundle(
         version="test",
         execute_surface=_bundle().execute_surface,
-        unresolved_surface=_bundle().unresolved_surface,
+        conflict_surface=_bundle().conflict_surface,
+        structural_surface=_bundle().structural_surface,
         backend_surface=_surface(
             BACKEND_FEATURE_NAMES,
             (0.0, 0.0),
