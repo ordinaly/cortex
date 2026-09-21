@@ -191,3 +191,20 @@ def test_exact_witness_still_overrides_backend_surface():
     assert read.decision.backend is ExecutionBackend.LPU
     assert read.execution is not None
     assert read.execution.witnesses
+
+
+def test_structural_weakness_has_distinct_unresolved_reason():
+    rule = CompositionRule(
+        signature=(
+            RelationStep("R0", "forward"),
+            RelationStep("R1", "forward"),
+        ),
+        target_relation="RT",
+        examples=8,
+        confidence=1.0,
+        mean_support=0.2,
+    )
+    controller = CalibratedArticulationController(_geometry(), _bundle())
+    decision = controller.decide("A", "RT", (rule,))
+    assert decision.state is ArticulationState.UNRESOLVED
+    assert decision.reasons == ("learned-structural-weakness",)
