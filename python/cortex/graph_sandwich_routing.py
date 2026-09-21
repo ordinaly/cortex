@@ -166,7 +166,19 @@ def probe_rules(
 
             ordered = tuple(sorted(set(current)))
             truncated = len(ordered) > policy.max_states_per_layer
-            sample = ordered[: policy.max_states_per_layer]
+            if len(ordered) <= policy.max_states_per_layer:
+                sample = ordered
+            elif policy.max_states_per_layer == 1:
+                sample = (ordered[len(ordered) // 2],)
+            else:
+                # Deterministic spread sampling avoids systematically probing
+                # only one lexical/cluster prefix of a wide frontier.
+                last = len(ordered) - 1
+                indexes = tuple(
+                    round(index * last / (policy.max_states_per_layer - 1))
+                    for index in range(policy.max_states_per_layer)
+                )
+                sample = tuple(ordered[index] for index in indexes)
             degree_targets = tuple(
                 _matching_targets(
                     geometry,
