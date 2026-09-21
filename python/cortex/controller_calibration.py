@@ -97,7 +97,8 @@ class LinearProbabilitySurface:
 class CalibrationBundle:
     version: str
     execute_surface: LinearProbabilitySurface
-    unresolved_surface: LinearProbabilitySurface
+    conflict_surface: LinearProbabilitySurface
+    structural_surface: LinearProbabilitySurface
     backend_surface: LinearProbabilitySurface
     minimum_resolution: float = 0.50
     resolution_levels: tuple[float, ...] = (
@@ -130,15 +131,26 @@ class CalibrationBundle:
                     raw["execute_surface"]["monotone_positive"]
                 ),
             ),
-            unresolved_surface=LinearProbabilitySurface(
+            conflict_surface=LinearProbabilitySurface(
                 feature_names=tuple(
-                    raw["unresolved_surface"]["feature_names"]
+                    raw["conflict_surface"]["feature_names"]
                 ),
-                weights=tuple(raw["unresolved_surface"]["weights"]),
-                intercept=float(raw["unresolved_surface"]["intercept"]),
-                threshold=float(raw["unresolved_surface"]["threshold"]),
+                weights=tuple(raw["conflict_surface"]["weights"]),
+                intercept=float(raw["conflict_surface"]["intercept"]),
+                threshold=float(raw["conflict_surface"]["threshold"]),
                 monotone_positive=bool(
-                    raw["unresolved_surface"]["monotone_positive"]
+                    raw["conflict_surface"]["monotone_positive"]
+                ),
+            ),
+            structural_surface=LinearProbabilitySurface(
+                feature_names=tuple(
+                    raw["structural_surface"]["feature_names"]
+                ),
+                weights=tuple(raw["structural_surface"]["weights"]),
+                intercept=float(raw["structural_surface"]["intercept"]),
+                threshold=float(raw["structural_surface"]["threshold"]),
+                monotone_positive=bool(
+                    raw["structural_surface"]["monotone_positive"]
                 ),
             ),
             backend_surface=LinearProbabilitySurface(
@@ -166,7 +178,8 @@ class CalibratedRuleAssessment:
     total_examples: int
     confidence_margin: float
     execute_probability: float
-    unresolved_probability: float
+    conflict_probability: float
+    structural_probability: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -390,13 +403,12 @@ EXECUTE_FEATURE_NAMES = (
 )
 
 
-def epistemic_unresolved_features(
+def epistemic_conflict_features(
     *,
     total_examples: int,
     confidence: float,
     competitor_confidence: float,
     margin: float,
-    mean_support: float,
     source_entropy: float,
 ) -> tuple[float, ...]:
     return (
@@ -404,16 +416,34 @@ def epistemic_unresolved_features(
         _clamp01(competitor_confidence),
         _clamp01(1.0 - max(0.0, margin)),
         _clamp01(1.0 - confidence),
+        _clamp01(1.0 - source_entropy),
+    )
+
+
+CONFLICT_FEATURE_NAMES = (
+    "evidence",
+    "competitor_confidence",
+    "conflict",
+    "low_target_confidence",
+    "source_certainty",
+)
+
+
+def epistemic_structural_features(
+    *,
+    total_examples: int,
+    mean_support: float,
+    source_entropy: float,
+) -> tuple[float, ...]:
+    return (
+        _evidence_scale(total_examples),
         _clamp01(1.0 - mean_support),
         _clamp01(1.0 - source_entropy),
     )
 
 
-UNRESOLVED_FEATURE_NAMES = (
+STRUCTURAL_FEATURE_NAMES = (
     "evidence",
-    "competitor_confidence",
-    "conflict",
-    "low_target_confidence",
     "low_structural_support",
     "source_certainty",
 )
@@ -505,11 +535,15 @@ class CalibratedArticulationController:
                 source_support=source_support,
                 source_entropy=source_entropy,
             )
-            unresolved_features = epistemic_unresolved_features(
+            conflict_features = epistemic_conflict_features(
                 total_examples=total_examples,
                 confidence=rule.confidence,
                 competitor_confidence=competitor_confidence,
                 margin=margin,
+                source_entropy=source_entropy,
+            )
+            structural_features = epistemic_structural_features(
+                total_examples=total_examples,
                 mean_support=rule.mean_support,
                 source_entropy=source_entropy,
             )
@@ -525,9 +559,14 @@ class CalibratedArticulationController:
                             execute_features
                         )
                     ),
-                    unresolved_probability=(
-                        self.calibration.unresolved_surface.probability(
-                            unresolved_features
+                    conflict_probability=(
+                        self.calibration.conflict_surface.probability(
+                            conflict_features
+                        )
+                    ),
+                    structural_probability=(
+                        self.calibration.structural_surface.probability(
+                            structural_features
                         )
                     ),
                 )
@@ -593,15 +632,26 @@ class CalibratedArticulationController:
         )
 
         if not selected:
-            strongest_unresolved = max(
-                row.unresolved_probability for row in assessments
+            strongest_conflict = max(
+                row.conflict_probability for row in assessments
             )
-            if (
-                strongest_unresolved + EPS
-                >= self.calibration.unresolved_surface.threshold
-            ):
+            strongest_structural = max(
+                row.structural_probability for row in assessments
+            )
+            conflict = (
+                strongest_conflict + EPS
+                >= self.calibration.conflict_surface.threshold
+            )
+            structural = (
+                strongest_structural + EPS
+                >= self.calibration.structural_surface.threshold
+            )
+            if conflict:
                 state = ArticulationState.UNRESOLVED
-                reason = "learned-conflict-surface"
+                reason = "learned-relational-conflict"
+            elif structural:
+                state = ArticulationState.UNRESOLVED
+                reason = "learned-structural-weakness"
             else:
                 state = ArticulationState.EXPLORE
                 reason = "learned-exploration-surface"
