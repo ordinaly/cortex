@@ -127,3 +127,36 @@ def test_multivalued_geometry_is_preserved():
     )
     assert {row.target for row in read.candidates} == {"C", "D"}
     assert {row.target for row in read.witnesses} == {"C", "D"}
+
+
+def test_relation_composition_allows_entity_revisits_and_backends_agree():
+    rule = CompositionRule(
+        signature=(
+            RelationStep("R0", "forward"),
+            RelationStep("R1", "forward"),
+        ),
+        target_relation="RT",
+        examples=8,
+        confidence=1.0,
+        mean_support=0.8,
+    )
+    geometry = HypergraphGeometry(
+        (
+            RelationalHyperedge("r0", 0, 10, 1, "A", "R0", "B", 0.8),
+            RelationalHyperedge("r1", 1, 11, 0, "B", "R1", "A", 0.8),
+        )
+    )
+
+    cortex = EnumeratingRuleExecutor(geometry, resolution=0.5).infer(
+        "A", "RT", (rule,)
+    )
+    lpu = LPURuleExecutor(geometry, resolution=0.5).infer(
+        "A", "RT", (rule,)
+    )
+
+    assert cortex.top is not None
+    assert lpu.top is not None
+    assert cortex.top.target == lpu.top.target == "A"
+    assert cortex.top.score == lpu.top.score
+    assert lpu.witnesses[0].layered_path == ((0, "A"), (1, "B"), (2, "A"))
+

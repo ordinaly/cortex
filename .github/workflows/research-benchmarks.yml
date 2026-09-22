@@ -2,27 +2,6 @@ name: cortex-research-benchmarks
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "VERSION"
-      - "SPEC_VERSION"
-      - "Cargo.toml"
-      - "Cargo.lock"
-      - "pyproject.toml"
-      - "benchmarks/*.py"
-      - "research/kinship_composition*.py"
-      - "tests/test_kinship_composition.py"
-      - "research/algebra_induction*.py"
-      - "tests/test_algebra_induction.py"
-      - "research/algebra_form_induction*.py"
-      - "tests/test_algebra_form_induction.py"
-      - "crates/cortex-articulation/**"
-      - "crates/cortex-runtime/**"
-      - "crates/cortex-python/src/lib.rs"
-      - "crates/cortex-python/src/runtime.rs"
-      - "python/cortex/__init__.py"
-      - "scripts/check_version_consistency.py"
-      - ".github/workflows/research-benchmarks.yml"
 
 jobs:
   stabilization:

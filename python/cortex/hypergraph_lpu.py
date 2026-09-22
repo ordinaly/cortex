@@ -112,10 +112,13 @@ class EnumeratingRuleExecutor:
         for rule in rules:
             if rule.target_relation != relation:
                 continue
-            frontier = [(source, 1.0, frozenset({source}))]
+            # Relation composition is defined over matching walks, not only
+            # simple paths. Re-visiting an entity at a later signature depth is
+            # therefore valid and must match the layered LPU executor.
+            frontier = [(source, 1.0)]
             for step in rule.signature:
                 next_frontier = []
-                for node, support, seen in frontier:
+                for node, support in frontier:
                     expanded_states += 1
                     for target, edge_support, _edge_id in _matching_edges(
                         self.geometry,
@@ -123,19 +126,13 @@ class EnumeratingRuleExecutor:
                         step,
                         resolution=self.resolution,
                     ):
-                        if target in seen:
-                            continue
                         next_frontier.append(
-                            (
-                                target,
-                                min(support, edge_support),
-                                seen | {target},
-                            )
+                            (target, min(support, edge_support))
                         )
                 frontier = next_frontier
 
             completed_paths += len(frontier)
-            for target, support, _seen in frontier:
+            for target, support in frontier:
                 candidate = _candidate(target, support, rule)
                 previous = best.get(target)
                 if previous is None or candidate.score > previous.score + EPS:

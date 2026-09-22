@@ -16,6 +16,7 @@ from .hypergraph_lpu import (
     EnumeratingRuleExecutor,
     LPURuleExecutor,
     RuleExecutionRead,
+    _matching_edges,
 )
 
 
@@ -130,28 +131,6 @@ class ControlledExecution:
     execution: RuleExecutionRead | None
 
 
-def _matching_targets(
-    geometry: HypergraphGeometry,
-    node: str,
-    step: RelationStep,
-    *,
-    resolution: float,
-) -> tuple[tuple[str, float, str], ...]:
-    rows: list[tuple[str, float, str]] = []
-    for edge in geometry.incident(node, resolution=resolution):
-        if edge.property != step.relation:
-            continue
-        if step.orientation == "forward" and edge.subject == node:
-            rows.append((edge.object, edge.support, edge.edge_id))
-        elif step.orientation == "reverse" and edge.object == node:
-            rows.append((edge.subject, edge.support, edge.edge_id))
-    return tuple(
-        sorted(
-            rows,
-            key=lambda row: (-row[1], row[0], row[2]),
-        )
-    )
-
 
 def profile_rules(
     geometry: HypergraphGeometry,
@@ -174,7 +153,7 @@ def profile_rules(
         for depth, step in enumerate(rule.signature):
             nxt: dict[str, int] = {}
             for node, count in current.items():
-                for target, _support, edge_id in _matching_targets(
+                for target, _support, edge_id in _matching_edges(
                     geometry,
                     node,
                     step,
