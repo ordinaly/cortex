@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""OWR-A development characterization: hidden source reliability.
+"""OWR-A development characterization: hidden source reliability/dependence.
 
-This campaign does not add source learning to Cortex. It measures the current
-source-blind temporal surface against simple baselines and an evaluator-only
-oracle reference on development worlds.
+No Cortex mechanism is added here. The campaign measures today's source-blind
+temporal surface against context-local baselines, a public-data dependence
+baseline, and an evaluator-only oracle reference.
 """
 from __future__ import annotations
 
@@ -23,12 +23,7 @@ from cortex.autonomy_temporal_phase_b import (
     PhaseBTemporalMemory,
     TemporalRobustnessPolicy,
 )
-from open_world_robustness_world import (
-    PROTOCOL,
-    HiddenWorld,
-    Query,
-    build_suite,
-)
+from open_world_robustness_world import PROTOCOL, HiddenWorld, build_suite
 
 PROTOCOL_A = "open-world-robustness-v1-owr-a-development"
 
@@ -40,6 +35,9 @@ def _score_rows(rows):
     wrong = len(resolved) - len(correct)
     return {
         "queries": len(answerable),
+        "resolved": len(resolved),
+        "correct": len(correct),
+        "wrong": wrong,
         "coverage": len(resolved) / max(1, len(answerable)),
         "resolved_accuracy": len(correct) / max(1, len(resolved)),
         "accuracy": len(correct) / max(1, len(answerable)),
@@ -47,36 +45,55 @@ def _score_rows(rows):
     }
 
 
-def _partition_metrics(rows):
-    result = {"all": _score_rows(rows)}
-    partitions = {
-        "pre": [row for row in rows if row["query_id"].startswith("AQP")],
-        "final": [row for row in rows if row["query_id"].startswith("AQF")],
-        "final_trap": [
-            row
-            for row in rows
-            if row["query_id"].startswith("AQF") and row["trap"]
+def _partition_rows(rows):
+    return {
+        "all": list(rows),
+        "calibration": [
+            row for row in rows if row["query_id"].startswith("AQC")
         ],
-        "final_control": [
+        "target": [
+            row for row in rows if row["query_id"].startswith("AQT")
+        ],
+        "target_trap": [
             row
             for row in rows
-            if row["query_id"].startswith("AQF") and not row["trap"]
+            if row["query_id"].startswith("AQT") and row["trap"]
+        ],
+        "target_control": [
+            row
+            for row in rows
+            if row["query_id"].startswith("AQT") and not row["trap"]
         ],
     }
-    for name, selected in partitions.items():
-        result[name] = _score_rows(selected)
-    return result
+
+
+def _partition_metrics(rows):
+    return {
+        name: _score_rows(selected)
+        for name, selected in _partition_rows(rows).items()
+    }
+
+
+def _row(world, query, answer, state):
+    trap_contexts = {tuple(value) for value in world.oracle["trap_contexts"]}
+    return {
+        "query_id": query.query_id,
+        "expected": query.expected_relation,
+        "answer": answer,
+        "state": state,
+        "trap": query.context in trap_contexts,
+    }
 
 
 def _current_cortex_rows(world: HiddenWorld):
-    policy = TemporalRobustnessPolicy(source_weighting="unweighted")
-    memory = PhaseBTemporalMemory(policy)
+    memory = PhaseBTemporalMemory(
+        TemporalRobustnessPolicy(source_weighting="unweighted")
+    )
     observations = sorted(
         world.observations,
-        key=lambda row: (row.arrival_time, row.event_time, row.event_id),
+        key=lambda value: (value.arrival_time, value.event_time, value.event_id),
     )
-    queries = sorted(world.queries, key=lambda row: (row.query_time, row.query_id))
-    trap_contexts = {tuple(row) for row in world.oracle["trap_contexts"]}
+    queries = sorted(world.queries, key=lambda value: (value.query_time, value.query_id))
     cursor = 0
     rows = []
 
@@ -90,8 +107,7 @@ def _current_cortex_rows(world: HiddenWorld):
                     context=observation.context,
                     relation=observation.observed_relation,
                     source=observation.source_id,
-                    # OWR-A hides reliability. Unit reliability intentionally
-                    # characterizes the current source-blind policy.
+                    # Hidden reliability must not leak into current Cortex.
                     source_reliability=1.0,
                     bootstrap=observation.bootstrap,
                 )
@@ -103,37 +119,25 @@ def _current_cortex_rows(world: HiddenWorld):
             snapshot is not None
             and snapshot.state is ArticulationState.EXECUTE
         )
-        answer = (
-            snapshot.accepted_relation
-            if executable and snapshot is not None
-            else None
+        answer = snapshot.accepted_relation if executable else None
+        state = (
+            snapshot.state.value
+            if snapshot is not None
+            else ArticulationState.EXPLORE.value
         )
-        rows.append(
-            {
-                "query_id": query.query_id,
-                "expected": query.expected_relation,
-                "answer": answer,
-                "state": (
-                    snapshot.state.value
-                    if snapshot is not None
-                    else ArticulationState.EXPLORE.value
-                ),
-                "trap": query.context in trap_contexts,
-            }
-        )
+        rows.append(_row(world, query, answer, state))
     return rows
 
 
 def _vote_rows(world: HiddenWorld, *, recent: int | None):
-    trap_contexts = {tuple(row) for row in world.oracle["trap_contexts"]}
     by_context = defaultdict(list)
     observations = sorted(
         world.observations,
-        key=lambda row: (row.arrival_time, row.event_time, row.event_id),
+        key=lambda value: (value.arrival_time, value.event_time, value.event_id),
     )
     rows = []
     cursor = 0
-    for query in sorted(world.queries, key=lambda row: (row.query_time, row.query_id)):
+    for query in sorted(world.queries, key=lambda value: (value.query_time, value.query_id)):
         while cursor < len(observations):
             observation = observations[cursor]
             if observation.arrival_time > query.query_time:
@@ -141,78 +145,195 @@ def _vote_rows(world: HiddenWorld, *, recent: int | None):
             if observation.observed_relation is not None:
                 by_context[observation.context].append(observation.observed_relation)
             cursor += 1
+
         values = by_context[query.context]
         selected = values if recent is None else values[-recent:]
         counts = Counter(selected)
         answer = None
         if counts:
-            top = counts.most_common()
-            best = top[0][1]
-            winners = sorted(value for value, count in top if count == best)
-            answer = winners[0] if len(winners) == 1 else None
-        rows.append(
-            {
-                "query_id": query.query_id,
-                "expected": query.expected_relation,
-                "answer": answer,
-                "state": "vote",
-                "trap": query.context in trap_contexts,
-            }
-        )
+            top_count = max(counts.values())
+            winners = sorted(
+                relation for relation, count in counts.items() if count == top_count
+            )
+            if len(winners) == 1:
+                answer = winners[0]
+        rows.append(_row(world, query, answer, "vote"))
+    return rows
+
+
+def _source_claim_sequences(world: HiddenWorld, query_time: int):
+    """Return chronological per-source claim sequences on calibration contexts."""
+    calibration = {
+        tuple(value) for value in world.oracle["calibration_contexts"]
+    }
+    sequences = defaultdict(list)
+    for observation in sorted(
+        world.observations,
+        key=lambda value: (value.arrival_time, value.event_time, value.event_id),
+    ):
+        if observation.arrival_time > query_time:
+            break
+        if (
+            observation.context in calibration
+            and observation.observed_relation is not None
+        ):
+            sequences[observation.source_id].append(observation.observed_relation)
+    return sequences
+
+
+def _dependency_groups(world: HiddenWorld, query_time: int, threshold: float = 0.91):
+    """Infer highly dependent source groups using public calibration agreement."""
+    sequences = _source_claim_sequences(world, query_time)
+    sources = sorted(sequences)
+    parent = {source: source for source in sources}
+
+    def find(source):
+        while parent[source] != source:
+            parent[source] = parent[parent[source]]
+            source = parent[source]
+        return source
+
+    def union(left, right):
+        left_root = find(left)
+        right_root = find(right)
+        if left_root != right_root:
+            parent[right_root] = left_root
+
+    for i, left in enumerate(sources):
+        for right in sources[i + 1 :]:
+            pairs = list(zip(sequences[left], sequences[right]))
+            if not pairs:
+                continue
+            agreement = sum(a == b for a, b in pairs) / len(pairs)
+            if agreement >= threshold:
+                union(left, right)
+
+    groups = defaultdict(list)
+    for source in sources:
+        groups[find(source)].append(source)
+    return tuple(tuple(sorted(group)) for group in groups.values())
+
+
+def _dependence_collapsed_rows(world: HiddenWorld):
+    """Public-data baseline: learn source dependence, then collapse copied votes.
+
+    This baseline receives no hidden reliability, truth labels, or copy graph.
+    It is intentionally simple: calibration agreement above a frozen development
+    threshold creates one vote group; each group contributes at most one target
+    vote after internally aggregating its member claims.
+    """
+    observations = sorted(
+        world.observations,
+        key=lambda value: (value.arrival_time, value.event_time, value.event_id),
+    )
+    rows = []
+    cursor = 0
+    claims = defaultdict(lambda: defaultdict(list))
+    groups = None
+
+    for query in sorted(world.queries, key=lambda value: (value.query_time, value.query_id)):
+        while cursor < len(observations):
+            observation = observations[cursor]
+            if observation.arrival_time > query.query_time:
+                break
+            if observation.observed_relation is not None:
+                claims[observation.context][observation.source_id].append(
+                    observation.observed_relation
+                )
+            cursor += 1
+
+        if groups is None:
+            groups = _dependency_groups(world, query.query_time)
+
+        group_votes = []
+        for group in groups:
+            member_votes = []
+            for source in group:
+                values = claims[query.context][source]
+                if not values:
+                    continue
+                counts = Counter(values)
+                best = max(counts.values())
+                winners = sorted(
+                    relation
+                    for relation, count in counts.items()
+                    if count == best
+                )
+                if len(winners) == 1:
+                    member_votes.append(winners[0])
+            if not member_votes:
+                continue
+            counts = Counter(member_votes)
+            best = max(counts.values())
+            winners = sorted(
+                relation for relation, count in counts.items() if count == best
+            )
+            if len(winners) == 1:
+                group_votes.append(winners[0])
+
+        answer = None
+        if group_votes:
+            counts = Counter(group_votes)
+            best = max(counts.values())
+            winners = sorted(
+                relation for relation, count in counts.items() if count == best
+            )
+            if len(winners) == 1:
+                answer = winners[0]
+        rows.append(_row(world, query, answer, "dependency-collapsed"))
     return rows
 
 
 def _oracle_reliability(world: HiddenWorld, observation) -> float:
-    source_profiles = world.oracle["source_profiles"]
-    context_key = "|".join(observation.context)
-    family = world.oracle["context_family"][context_key]
-    events_per_round = 12 * 5
-    round_index = observation.event_time // events_per_round
-    reliability = float(source_profiles[observation.source_id][family])
-
+    sources = world.oracle["source_profiles"]
     drift = world.oracle["drift"]
-    if (
-        observation.source_id == drift["source"]
-        and family == drift["family"]
-        and round_index >= int(drift["after_round"])
-    ):
-        reliability = float(drift["reliability"])
+    transfer = world.oracle["transfer_trap"]
+    root = transfer["root_source"]
 
-    trap = world.oracle["copied_majority_trap"]
-    trap_contexts = {tuple(row) for row in world.oracle["trap_contexts"]}
-    if (
-        observation.source_id == trap["root_source"]
-        and observation.context in trap_contexts
-        and round_index >= int(trap["after_round"])
-    ):
-        reliability = float(trap["root_reliability"])
+    if "transfer-trap" in observation.tags:
+        if observation.source_id == root:
+            return 0.02
+        # Copy children are omitted by the oracle dependence collapse.
+        profile = {
+            source: (0.96 if index == 0 else 0.94 if index == 4 else 0.55)
+            for index, source in enumerate(sorted(sources))
+        }
+        return float(profile.get(observation.source_id, 0.55))
+
+    if "transfer-control" in observation.tags:
+        # Exact values need not match the generator; these are evaluator-only
+        # reliability references sufficient to rank independent evidence.
+        if observation.source_id == root:
+            return 0.86
+        return 0.93
+
+    family = next(
+        tag for tag in observation.tags if tag in {"A", "B"}
+    )
+    reliability = float(sources[observation.source_id][family])
+    if "source-drift" in observation.tags and observation.source_id == drift["source"]:
+        reliability = float(drift["reliability"])
     return reliability
 
 
 def _oracle_independent_rows(world: HiddenWorld):
-    """Evaluator reference using hidden reliabilities and copy dependence.
-
-    Copy children are omitted; their root claim already represents that
-    dependency cluster. This is intentionally unavailable to Cortex.
-    """
+    """Evaluator-only ceiling using hidden reliability and copy dependence."""
     vocab = tuple(world.oracle["relation_vocab"])
     copy_parent = dict(world.oracle["copy_parent"])
-    roots = {source for source, parent in copy_parent.items() if source == parent}
     copied_children = {
         source
         for source, parent in copy_parent.items()
         if source != parent
     }
-    trap_contexts = {tuple(row) for row in world.oracle["trap_contexts"]}
     scores = defaultdict(lambda: defaultdict(float))
     observations = sorted(
         world.observations,
-        key=lambda row: (row.arrival_time, row.event_time, row.event_id),
+        key=lambda value: (value.arrival_time, value.event_time, value.event_id),
     )
-    cursor = 0
     rows = []
+    cursor = 0
 
-    for query in sorted(world.queries, key=lambda row: (row.query_time, row.query_id)):
+    for query in sorted(world.queries, key=lambda value: (value.query_time, value.query_id)):
         while cursor < len(observations):
             observation = observations[cursor]
             if observation.arrival_time > query.query_time:
@@ -231,23 +352,13 @@ def _oracle_independent_rows(world: HiddenWorld):
                     if observation.observed_relation == candidate
                     else incorrect
                 )
-                scores[observation.context][candidate] += log(max(likelihood, 1e-12))
+                scores[observation.context][candidate] += log(
+                    max(likelihood, 1.0e-12)
+                )
 
         context_scores = scores[query.context]
-        answer = (
-            max(context_scores, key=context_scores.get)
-            if context_scores
-            else None
-        )
-        rows.append(
-            {
-                "query_id": query.query_id,
-                "expected": query.expected_relation,
-                "answer": answer,
-                "state": "oracle-reference",
-                "trap": query.context in trap_contexts,
-            }
-        )
+        answer = max(context_scores, key=context_scores.get) if context_scores else None
+        rows.append(_row(world, query, answer, "oracle-reference"))
     return rows
 
 
@@ -258,6 +369,7 @@ def run_world(world: HiddenWorld):
         "current_cortex_source_blind": _current_cortex_rows(world),
         "global_majority": _vote_rows(world, recent=None),
         "recent_five_vote": _vote_rows(world, recent=5),
+        "public_dependency_collapsed_vote": _dependence_collapsed_rows(world),
         "oracle_independent_source_reference": _oracle_independent_rows(world),
     }
     return {
@@ -270,12 +382,20 @@ def run_world(world: HiddenWorld):
     }
 
 
-def _mean_world_metric(results, method, partition, metric):
-    values = [
-        row["metrics"][method][partition][metric]
-        for row in results
-    ]
-    return sum(values) / max(1, len(values))
+def _pooled_metric(results, method, partition):
+    counts = {
+        key: sum(
+            row["metrics"][method][partition][key] for row in results
+        )
+        for key in ("queries", "resolved", "correct", "wrong")
+    }
+    return {
+        **counts,
+        "coverage": counts["resolved"] / max(1, counts["queries"]),
+        "resolved_accuracy": counts["correct"] / max(1, counts["resolved"]),
+        "accuracy": counts["correct"] / max(1, counts["queries"]),
+        "selective_risk": counts["wrong"] / max(1, counts["resolved"]),
+    }
 
 
 def main() -> None:
@@ -283,7 +403,7 @@ def main() -> None:
     parser.add_argument("--worlds", type=int, default=12)
     parser.add_argument(
         "--material",
-        default="owr-a-development-characterization-v1",
+        default="owr-a-development-characterization-v2",
     )
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
@@ -296,25 +416,19 @@ def main() -> None:
     )
     results = [run_world(world) for world in worlds]
     methods = tuple(results[0]["metrics"])
-    aggregate = {}
-    for method in methods:
-        aggregate[method] = {}
-        for partition in ("all", "pre", "final", "final_trap", "final_control"):
-            aggregate[method][partition] = {
-                metric: _mean_world_metric(
-                    results, method, partition, metric
-                )
-                for metric in (
-                    "coverage",
-                    "resolved_accuracy",
-                    "accuracy",
-                    "selective_risk",
-                )
-            }
+    partitions = ("all", "calibration", "target", "target_trap", "target_control")
+    aggregate = {
+        method: {
+            partition: _pooled_metric(results, method, partition)
+            for partition in partitions
+        }
+        for method in methods
+    }
 
     payload = {
         "protocol": PROTOCOL_A,
         "parent_protocol": PROTOCOL,
+        "fixture_revision": "fresh-transfer-targets-v2",
         "mode": "development-characterization",
         "worlds": len(worlds),
         "source_reliability_supplied_to_cortex": False,
