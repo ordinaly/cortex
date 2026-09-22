@@ -70,12 +70,44 @@ Development fixture hardening before any official run:
 
 - source reporting order is randomized independently per context/round, so
   recency cannot privilege a fixed source position;
-- the first reliability drift begins only after 10 complete rounds of stable
-  history;
-- four target contexts enter a copied-majority trap after round 14, where one
-  weak root becomes strongly unreliable and two surface sources usually copy
-  it;
-- source reliability and source-dependence metadata remain evaluator-only.
+- source reliability and source-dependence metadata remain evaluator-only;
+- source drift occurs only after a genuine stable calibration period;
+- source-trust evaluation transfers from **eight calibration contexts** to
+  **six fresh target contexts** that have never appeared during calibration;
+- four fresh targets contain a coherent copied-majority trap: one weak root and
+  two strongly correlated copies oppose two independent strong sources;
+- two fresh targets are controls where the source ensemble remains compatible
+  with the truth.
+
+#### Rejected development fixture v0
+
+The first development fixture kept the same target contexts throughout a long
+stable history and introduced copied misinformation only late.
+
+Across 12 development worlds, the current source-blind Cortex remained
+conservative: final control coverage was about **0.708**, while copied-majority
+trap coverage fell to about **0.104**, with no pooled resolved errors. However,
+a cumulative context-local majority still reached **1.000 final trap accuracy**
+because old correct target history overwhelmed the later bad reports.
+
+That fixture therefore tested abstention/plasticity more than transferable
+source epistemics and is rejected before any official run.
+
+#### Development fixture v1
+
+The replacement removes that escape hatch. Cortex first observes source
+behavior on calibration contexts. Only then are fresh target contexts
+introduced. A target-local historical majority therefore has no earlier truth
+to reuse.
+
+The benchmark also includes a public-data dependence baseline that may infer
+strong source correlation from calibration agreement but receives no hidden
+truth labels, reliability values, or copy graph. This verifies that the
+dependence signal is present in learner-visible data rather than only in the
+oracle.
+
+Performance gates remain unfrozen until this revised development
+characterization is complete.
 
 ### OWR-B — Temporal Disorder
 
