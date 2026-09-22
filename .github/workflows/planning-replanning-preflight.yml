@@ -8,7 +8,6 @@ on:
       - "tests/test_planning_replanning.py"
       - "docs/PLANNING_REPLANNING_V1_PROTOCOL.md"
       - ".github/workflows/planning-replanning-preflight.yml"
-      - ".github/workflows/ci.yml"
 
 jobs:
   development:
