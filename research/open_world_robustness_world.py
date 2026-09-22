@@ -437,4 +437,137 @@ def _stage_d(seed: int, *, scale: str) -> HiddenWorld:
         if salient:
             context = rng.choice(salient_contexts)
             truth = stable_truth[context]
-            # One salient family temporarily changes then return
+            # One salient family temporarily changes then returns.
+            if context == salient_contexts[0] and length // 2 <= t < (3 * length) // 4:
+                truth = relation_vocab[4]
+            observed = truth if rng.random() < 0.96 else _flip_relation(
+                rng, truth, relation_vocab
+            )
+            tags = ("salient",)
+        else:
+            context = rng.choice(distractor_contexts)
+            observed = rng.choice(relation_vocab)
+            tags = ("distractor",)
+        observations.append(
+            Observation(
+                event_id=f"D{t:06d}",
+                event_time=t,
+                arrival_time=t,
+                source_id=source,
+                context=context,
+                observed_relation=observed,
+                tags=tags,
+            )
+        )
+
+    queries = []
+    for i, context in enumerate(salient_contexts):
+        expected = stable_truth[context]
+        queries.append(
+            Query(
+                query_id=f"DQ{i:03d}",
+                query_time=length - 1,
+                context=context,
+                expected_relation=expected,
+                kind="long-horizon-retention",
+                tags=("early-structure",),
+            )
+        )
+    # Explicit recurrence query for the temporarily changed salient context.
+    queries.append(
+        Query(
+            query_id="DQREC",
+            query_time=length - 1,
+            context=salient_contexts[0],
+            expected_relation=stable_truth[salient_contexts[0]],
+            kind="regime-reactivation",
+            tags=("recurrence",),
+        )
+    )
+    oracle = {
+        "stream_length": length,
+        "salient_probability": 0.035,
+        "salient_contexts": [list(c) for c in salient_contexts],
+        "distractor_context_count": len(distractor_contexts),
+        "stable_truth": {"|".join(k): v for k, v in stable_truth.items()},
+        "temporary_regime": {
+            "context": list(salient_contexts[0]),
+            "start": length // 2,
+            "end": (3 * length) // 4,
+            "relation": relation_vocab[4],
+        },
+    }
+    return HiddenWorld(PROTOCOL, "D", seed, tuple(observations), tuple(queries), oracle)
+
+
+def _stage_e(seed: int, *, scale: str) -> HiddenWorld:
+    """Composite hidden-physics world with opaque cyclic composition laws."""
+    rng = Random(seed)
+    order = 7
+    relation_tokens = list(_opaque_tokens(rng, "R", order))
+    rng.shuffle(relation_tokens)
+    # token_for_latent is the hidden name map. Surface tokens carry no meaning.
+    token_for_latent = {i: relation_tokens[i] for i in range(order)}
+    latent_for_token = {value: key for key, value in token_for_latent.items()}
+    sources = _opaque_tokens(rng, "S", 4)
+    base_reliability = {
+        sources[0]: 0.94,
+        sources[1]: 0.84,
+        sources[2]: 0.61,
+        sources[3]: 0.58,
+    }
+    copy_parent = {sources[3]: sources[2]}
+    offsets = (0, 2, 4, 0)
+    phase_len = 90 if scale == "development" else 220
+    total_time = phase_len * 4
+    regime_schedule = []
+    for phase, offset in enumerate(offsets):
+        start = phase * phase_len
+        end = (phase + 1) * phase_len - 1
+        regime_schedule.append((start, end, offset))
+
+    all_contexts = tuple(
+        (token_for_latent[a], token_for_latent[b])
+        for a in range(order)
+        for b in range(order)
+    )
+    # Hold out contexts from direct observation; they remain inferable from the
+    # cyclic law if the representation is discovered.
+    heldout = set(rng.sample(list(all_contexts), 8))
+    observations: list[Observation] = []
+    event_counter = 0
+
+    def truth_for(context: tuple[str, str], offset: int) -> str:
+        a = latent_for_token[context[0]]
+        b = latent_for_token[context[1]]
+        return token_for_latent[(a + b + offset) % order]
+
+    for t in range(total_time):
+        phase = min(3, t // phase_len)
+        offset = offsets[phase]
+        candidates = [c for c in all_contexts if c not in heldout]
+        context = rng.choice(candidates)
+        truth = truth_for(context, offset)
+        source = rng.choice(sources)
+        reliability = base_reliability[source]
+        if source == sources[3] and rng.random() < 0.80:
+            # Correlated source follows S2's reliability/error tendency.
+            reliability = base_reliability[sources[2]]
+        if phase == 1 and source == sources[0]:
+            reliability = 0.45  # trusted-source degradation
+        if rng.random() < 0.11:
+            observed = None
+        else:
+            observed = _report(rng, truth, tuple(relation_tokens), reliability)
+        delay = 0 if rng.random() < 0.72 else rng.randint(1, 7)
+        observations.append(
+            Observation(
+                event_id=f"E{event_counter:06d}",
+                event_time=t,
+                arrival_time=t + delay,
+                source_id=source,
+                context=context,
+                observed_relation=observed,
+                tags=(
+                    "hidden-physics",
+                    f"phase-{ph
