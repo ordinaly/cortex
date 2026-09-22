@@ -225,22 +225,31 @@ See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 
-## Open-World Robustness v1 — benchmark construction
+## Open-World Robustness v1 — development characterization
 
-The next autonomy milestone is now an integrated open-world robustness program.
+The next autonomy milestone is an integrated open-world robustness program with
+five stages: hidden source reliability/dependence (OWR-A), temporal disorder
+and recurrence (OWR-B), compound novelty (OWR-C), long-stream memory
+interference (OWR-D), and an untouched composite Hidden Physics exam (OWR-E).
 
-Phase 1 adds a benchmark-only harness with five stages: hidden source
-reliability and dependence (OWR-A), temporal disorder and recurrence (OWR-B),
-compound novelty (OWR-C), long-stream memory interference (OWR-D), and an
-untouched composite Hidden Physics exam (OWR-E).
+Phase 1 froze benchmark construction and learner/oracle information boundaries
+without changing Cortex.
 
-No Cortex behavior is changed in this phase. Learner-facing payloads exclude
-hidden source reliability, copying graphs, latent laws, regime schedules,
-expected answers, ambiguity labels, and harness tags. Development worlds are
-reproducible; official worlds will be derived from the frozen merge commit SHA
-only after Cortex adapters, metrics, and performance gates are preregistered.
+**OWR-A development characterization is now complete.** On 48 fresh
+copied-majority target queries, current source-blind Cortex resolved **0/48**:
+it abstained rather than executing the false numerical majority. Across all
+queries it did resolve, accuracy remained **1.000**. In contrast, context-local
+majority resolved all 48 traps incorrectly, while a public-data
+dependence-collapsed baseline and the evaluator-only oracle both achieved
+**48/48** correct. This isolates a missing transferable source-dependence
+mechanism while preserving Cortex's conservative safety behavior.
 
-See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md).
+No official seed has been generated and OWR-A performance gates remain
+unfrozen. The next step is current-system development characterization on
+OWR-B through OWR-D before adding new Cortex mechanisms.
+
+See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md)
+and [OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md).
 
 ## What is stable today
 

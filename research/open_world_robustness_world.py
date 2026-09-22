@@ -145,55 +145,97 @@ def _report(
 
 
 def _stage_a(seed: int) -> HiddenWorld:
-    """Hidden source reliability, copying, and source drift."""
+    """Hidden source trust with calibration-to-fresh-context transfer.
+
+    The learner first sees source behavior on calibration contexts. Fresh target
+    contexts are introduced only afterwards, so a context-local historical
+    majority cannot solve the target queries by reusing old target truth.
+    """
     rng = Random(seed)
     relations = _opaque_tokens(rng, "R", 3)
-    contexts = tuple((_opaque_tokens(rng, "C", 1)[0],) for _ in range(12))
+    calibration_contexts = tuple(
+        (_opaque_tokens(rng, "C", 1)[0],) for _ in range(8)
+    )
+    target_contexts = tuple(
+        (_opaque_tokens(rng, "X", 1)[0],) for _ in range(6)
+    )
     sources = _opaque_tokens(rng, "S", 5)
 
+    all_contexts = calibration_contexts + target_contexts
     truth_by_context = {
         context: relations[index % len(relations)]
-        for index, context in enumerate(contexts)
+        for index, context in enumerate(all_contexts)
     }
-    # Contextual reliability. S0/S4 are strong independent sources; S1-3 are a
-    # weak copied cluster. S0 later degrades on family B.
+    calibration_family = {
+        context: ("A" if index < 4 else "B")
+        for index, context in enumerate(calibration_contexts)
+    }
+    trap_contexts = set(target_contexts[:4])
+    control_contexts = set(target_contexts[4:])
+
+    # S0/S4 are strong independent sources. S1 is a weaker independent root;
+    # S2/S3 are surface identities that usually copy S1. Source reliability and
+    # dependence remain evaluator-only.
     reliabilities = {
         sources[0]: {"A": 0.95, "B": 0.93},
-        sources[1]: {"A": 0.62, "B": 0.58},
-        sources[2]: {"A": 0.60, "B": 0.56},
-        sources[3]: {"A": 0.57, "B": 0.54},
-        sources[4]: {"A": 0.88, "B": 0.91},
+        sources[1]: {"A": 0.64, "B": 0.60},
+        sources[2]: {"A": 0.61, "B": 0.58},
+        sources[3]: {"A": 0.59, "B": 0.56},
+        sources[4]: {"A": 0.90, "B": 0.92},
     }
     copy_parent = {
         sources[1]: sources[1],
         sources[2]: sources[1],
         sources[3]: sources[1],
     }
-    drift_step = 112
+    calibration_rounds = 12
+    target_rounds = 6
+    drift_after_round = 8
     observations: list[Observation] = []
     event_id = 0
-    for round_index in range(18):
-        for context_index, context in enumerate(contexts):
-            family = "A" if context_index < 6 else "B"
+
+    # Phase 1: source calibration. One strong source degrades late on family B,
+    # so source reputation cannot be treated as permanent.
+    for round_index in range(calibration_rounds):
+        for context in calibration_contexts:
+            family = calibration_family[context]
             truth = truth_by_context[context]
-            reports: dict[str, str] = {}
-            for source_index, source in enumerate(sources):
-                reliability = reliabilities[source][family]
-                if source == sources[0] and event_id >= drift_step and family == "B":
-                    reliability = 0.34
-                if source in (sources[2], sources[3]) and rng.random() < 0.82:
-                    parent = copy_parent[source]
-                    observed = reports.get(parent)
-                    if observed is None:
-                        observed = _report(
-                            rng,
-                            truth,
-                            relations,
-                            reliabilities[parent][family],
-                        )
+            source0_reliability = reliabilities[sources[0]][family]
+            if round_index >= drift_after_round and family == "B":
+                source0_reliability = 0.36
+
+            root_claim = _report(
+                rng,
+                truth,
+                relations,
+                reliabilities[sources[1]][family],
+            )
+            claims = {
+                sources[0]: _report(
+                    rng, truth, relations, source0_reliability
+                ),
+                sources[1]: root_claim,
+                sources[4]: _report(
+                    rng,
+                    truth,
+                    relations,
+                    reliabilities[sources[4]][family],
+                ),
+            }
+            for source in (sources[2], sources[3]):
+                if rng.random() < 0.90:
+                    claims[source] = root_claim
                 else:
-                    observed = _report(rng, truth, relations, reliability)
-                reports[source] = observed
+                    claims[source] = _report(
+                        rng,
+                        truth,
+                        relations,
+                        reliabilities[source][family],
+                    )
+
+            source_order = list(sources)
+            rng.shuffle(source_order)
+            for source in source_order:
                 observations.append(
                     Observation(
                         event_id=f"A{event_id:05d}",
@@ -201,39 +243,180 @@ def _stage_a(seed: int) -> HiddenWorld:
                         arrival_time=event_id,
                         source_id=source,
                         context=context,
-                        observed_relation=observed,
-                        tags=("source-discovery", family),
+                        observed_relation=claims[source],
+                        tags=(
+                            "source-calibration",
+                            family,
+                            "source-drift"
+                            if (
+                                source == sources[0]
+                                and family == "B"
+                                and round_index >= drift_after_round
+                            )
+                            else "stable-source",
+                        ),
                     )
                 )
                 event_id += 1
 
-    # Queries include deceptive contexts where copied majority can oppose truth.
-    queries = tuple(
-        Query(
-            query_id=f"AQ{i:03d}",
-            query_time=len(observations) - 1,
-            context=context,
-            expected_relation=truth_by_context[context],
-            kind="source-weighted-current-truth",
-            tags=("hidden-reliability",),
+    calibration_end = event_id - 1
+
+    # Phase 2: fresh transfer targets. Trap contexts never appeared above.
+    # The copied cluster reports one coherent wrong relation, creating a 3-vs-2
+    # surface majority. The two independent strong sources report the truth.
+    # A source-aware/dependence-aware learner can transfer what it learned
+    # across contexts; context-local majority cannot.
+    trap_wrong_relation = {
+        context: next(
+            relation
+            for relation in relations
+            if relation != truth_by_context[context]
         )
-        for i, context in enumerate(contexts)
-    )
+        for context in trap_contexts
+    }
+    for round_index in range(target_rounds):
+        for context in target_contexts:
+            truth = truth_by_context[context]
+            if context in trap_contexts:
+                root_claim = trap_wrong_relation[context]
+                claims = {
+                    sources[0]: (
+                        truth
+                        if rng.random() < 0.96
+                        else _flip_relation(rng, truth, relations)
+                    ),
+                    sources[1]: root_claim,
+                    sources[4]: (
+                        truth
+                        if rng.random() < 0.94
+                        else _flip_relation(rng, truth, relations)
+                    ),
+                }
+                for source in (sources[2], sources[3]):
+                    claims[source] = (
+                        root_claim
+                        if rng.random() < 0.96
+                        else _report(rng, truth, relations, 0.55)
+                    )
+                phase_tag = "transfer-trap"
+            else:
+                # Transfer controls remain easy and should not be harmed by a
+                # source model that learned to discount the copied cluster.
+                root_claim = truth if rng.random() < 0.86 else _flip_relation(
+                    rng, truth, relations
+                )
+                claims = {
+                    sources[0]: (
+                        truth
+                        if rng.random() < 0.95
+                        else _flip_relation(rng, truth, relations)
+                    ),
+                    sources[1]: root_claim,
+                    sources[4]: (
+                        truth
+                        if rng.random() < 0.92
+                        else _flip_relation(rng, truth, relations)
+                    ),
+                }
+                for source in (sources[2], sources[3]):
+                    claims[source] = (
+                        root_claim
+                        if rng.random() < 0.90
+                        else _report(rng, truth, relations, 0.60)
+                    )
+                phase_tag = "transfer-control"
+
+            source_order = list(sources)
+            rng.shuffle(source_order)
+            for source in source_order:
+                observations.append(
+                    Observation(
+                        event_id=f"A{event_id:05d}",
+                        event_time=event_id,
+                        arrival_time=event_id,
+                        source_id=source,
+                        context=context,
+                        observed_relation=claims[source],
+                        tags=("source-transfer", phase_tag),
+                    )
+                )
+                event_id += 1
+
+    final_time = event_id - 1
+    queries: list[Query] = []
+    for index, context in enumerate(calibration_contexts):
+        queries.append(
+            Query(
+                query_id=f"AQC{index:03d}",
+                query_time=calibration_end,
+                context=context,
+                expected_relation=truth_by_context[context],
+                kind="source-calibration-checkpoint",
+                tags=("calibration",),
+            )
+        )
+    for index, context in enumerate(target_contexts):
+        queries.append(
+            Query(
+                query_id=f"AQT{index:03d}",
+                query_time=final_time,
+                context=context,
+                expected_relation=truth_by_context[context],
+                kind="fresh-source-transfer",
+                tags=(
+                    "target",
+                    "trap" if context in trap_contexts else "control",
+                ),
+            )
+        )
+
     oracle = {
         "relation_vocab": relations,
-        "truth_by_context": {"|".join(k): v for k, v in truth_by_context.items()},
+        "truth_by_context": {
+            "|".join(k): v for k, v in truth_by_context.items()
+        },
+        "calibration_contexts": [
+            list(context) for context in calibration_contexts
+        ],
+        "target_contexts": [list(context) for context in target_contexts],
+        "calibration_family": {
+            "|".join(k): v for k, v in calibration_family.items()
+        },
+        "trap_contexts": [
+            list(context) for context in sorted(trap_contexts)
+        ],
+        "control_contexts": [
+            list(context) for context in sorted(control_contexts)
+        ],
         "source_profiles": reliabilities,
         "copy_parent": copy_parent,
         "drift": {
             "source": sources[0],
             "family": "B",
-            "after_event": drift_step,
-            "reliability": 0.34,
+            "after_round": drift_after_round,
+            "reliability": 0.36,
+        },
+        "transfer_trap": {
+            "root_source": sources[1],
+            "copy_probability": 0.96,
+            "target_rounds": target_rounds,
+            "systematic_wrong_relation_by_context": {
+                "|".join(context): relation
+                for context, relation in trap_wrong_relation.items()
+            },
         },
         "learner_receives_source_reliability": False,
+        "learner_receives_copy_graph": False,
+        "target_contexts_seen_during_calibration": False,
     }
-    return HiddenWorld(PROTOCOL, "A", seed, tuple(observations), queries, oracle)
-
+    return HiddenWorld(
+        PROTOCOL,
+        "A",
+        seed,
+        tuple(observations),
+        tuple(queries),
+        oracle,
+    )
 
 def _stage_b(seed: int) -> HiddenWorld:
     """Delayed, missing, duplicated, and recurrent temporal evidence."""
