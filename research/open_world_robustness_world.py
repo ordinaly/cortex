@@ -158,4 +158,139 @@ def _stage_a(seed: int) -> HiddenWorld:
     # Contextual reliability. S0/S4 are strong independent sources; S1-3 are a
     # weak copied cluster. S0 later degrades on family B.
     reliabilities = {
-        sources[0]: {"A": 0.95, "B"
+        sources[0]: {"A": 0.95, "B": 0.93},
+        sources[1]: {"A": 0.62, "B": 0.58},
+        sources[2]: {"A": 0.60, "B": 0.56},
+        sources[3]: {"A": 0.57, "B": 0.54},
+        sources[4]: {"A": 0.88, "B": 0.91},
+    }
+    copy_parent = {
+        sources[1]: sources[1],
+        sources[2]: sources[1],
+        sources[3]: sources[1],
+    }
+    drift_step = 112
+    observations: list[Observation] = []
+    event_id = 0
+    for round_index in range(18):
+        for context_index, context in enumerate(contexts):
+            family = "A" if context_index < 6 else "B"
+            truth = truth_by_context[context]
+            reports: dict[str, str] = {}
+            for source_index, source in enumerate(sources):
+                reliability = reliabilities[source][family]
+                if source == sources[0] and event_id >= drift_step and family == "B":
+                    reliability = 0.34
+                if source in (sources[2], sources[3]) and rng.random() < 0.82:
+                    parent = copy_parent[source]
+                    observed = reports.get(parent)
+                    if observed is None:
+                        observed = _report(
+                            rng,
+                            truth,
+                            relations,
+                            reliabilities[parent][family],
+                        )
+                else:
+                    observed = _report(rng, truth, relations, reliability)
+                reports[source] = observed
+                observations.append(
+                    Observation(
+                        event_id=f"A{event_id:05d}",
+                        event_time=event_id,
+                        arrival_time=event_id,
+                        source_id=source,
+                        context=context,
+                        observed_relation=observed,
+                        tags=("source-discovery", family),
+                    )
+                )
+                event_id += 1
+
+    # Queries include deceptive contexts where copied majority can oppose truth.
+    queries = tuple(
+        Query(
+            query_id=f"AQ{i:03d}",
+            query_time=len(observations) - 1,
+            context=context,
+            expected_relation=truth_by_context[context],
+            kind="source-weighted-current-truth",
+            tags=("hidden-reliability",),
+        )
+        for i, context in enumerate(contexts)
+    )
+    oracle = {
+        "relation_vocab": relations,
+        "truth_by_context": {"|".join(k): v for k, v in truth_by_context.items()},
+        "source_profiles": reliabilities,
+        "copy_parent": copy_parent,
+        "drift": {
+            "source": sources[0],
+            "family": "B",
+            "after_event": drift_step,
+            "reliability": 0.34,
+        },
+        "learner_receives_source_reliability": False,
+    }
+    return HiddenWorld(PROTOCOL, "A", seed, tuple(observations), queries, oracle)
+
+
+def _stage_b(seed: int) -> HiddenWorld:
+    """Delayed, missing, duplicated, and recurrent temporal evidence."""
+    rng = Random(seed)
+    relations = _opaque_tokens(rng, "R", 3)
+    contexts = tuple((_opaque_tokens(rng, "T", 1)[0],) for _ in range(8))
+    source = _opaque_tokens(rng, "S", 1)[0]
+    schedule = (
+        (0, 44, relations[0]),
+        (45, 84, relations[1]),
+        (85, 124, relations[2]),
+        (125, 169, relations[0]),
+    )
+    observations: list[Observation] = []
+    event_counter = 0
+    duplicates = 0
+    missing = 0
+    delayed = 0
+
+    def truth_at(t: int) -> str:
+        for start, end, relation in schedule:
+            if start <= t <= end:
+                return relation
+        raise AssertionError(t)
+
+    for event_time in range(170):
+        truth = truth_at(event_time)
+        for context in contexts:
+            eid = f"B{event_counter:05d}"
+            event_counter += 1
+            if rng.random() < 0.18:
+                observed = None
+                missing += 1
+            else:
+                observed = truth if rng.random() < 0.94 else _flip_relation(
+                    rng, truth, relations
+                )
+            delay = 0 if rng.random() < 0.57 else rng.randint(1, 9)
+            delayed += int(delay > 0)
+            arrival = event_time + delay
+            observations.append(
+                Observation(
+                    event_id=eid,
+                    event_time=event_time,
+                    arrival_time=arrival,
+                    source_id=source,
+                    context=context,
+                    observed_relation=observed,
+                    tags=("temporal-disorder",),
+                )
+            )
+            if observed is not None and rng.random() < 0.07:
+                duplicates += 1
+                observations.append(
+                    Observation(
+                        event_id=f"{eid}D",
+                        event_time=event_time,
+                        arrival_time=arrival + rng.randint(1, 4),
+                        source_id=source,
+                        con
