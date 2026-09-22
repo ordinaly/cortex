@@ -128,6 +128,7 @@ def test_multivalued_geometry_is_preserved():
     assert {row.target for row in read.candidates} == {"C", "D"}
     assert {row.target for row in read.witnesses} == {"C", "D"}
 
+
 def test_relation_composition_allows_entity_revisits_and_backends_agree():
     rule = CompositionRule(
         signature=(
