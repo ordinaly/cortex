@@ -65,6 +65,18 @@ The current Autonomy Phase-B policy is an important control because its source
 weights currently require externally supplied reliability. Running all sources
 at unit reliability should expose that limitation rather than hiding it.
 
+
+Development fixture hardening before any official run:
+
+- source reporting order is randomized independently per context/round, so
+  recency cannot privilege a fixed source position;
+- the first reliability drift begins only after 10 complete rounds of stable
+  history;
+- four target contexts enter a copied-majority trap after round 14, where one
+  weak root becomes strongly unreliable and two surface sources usually copy
+  it;
+- source reliability and source-dependence metadata remain evaluator-only.
+
 ### OWR-B — Temporal Disorder
 
 Question:
