@@ -1,0 +1,39 @@
+name: cortex-open-world-robustness-a-preflight
+
+on:
+  pull_request:
+    paths:
+      - "research/open_world_robustness_world.py"
+      - "research/open_world_robustness_a_campaign.py"
+      - "tests/test_open_world_robustness.py"
+      - "tests/test_open_world_robustness_a.py"
+      - ".github/workflows/open-world-robustness-a-preflight.yml"
+  workflow_dispatch:
+
+jobs:
+  development-characterization:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" pytest
+      - run: python -m pip install -e .
+      - name: OWR-A adapter tests
+        run: pytest tests/test_open_world_robustness_a.py -q
+      - name: OWR-A development characterization
+        run: >-
+          python research/open_world_robustness_a_campaign.py
+          --worlds 12
+          --output owr-a-development.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-owr-a-development
+          path: owr-a-development.json
