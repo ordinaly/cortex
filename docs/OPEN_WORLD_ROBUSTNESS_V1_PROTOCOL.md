@@ -145,6 +145,20 @@ reactivation latency < first-learning latency
 
 without increasing false switches.
 
+
+Development hardening before any official run:
+
+- queries are placed at regime boundaries and at +3, +10, and later stable
+  checkpoints, so generous recovery time cannot hide transition failures;
+- event time and arrival time remain distinct learner-visible fields;
+- duplicate provenance remains learner-visible;
+- the current Cortex temporal adapter is characterized both unchanged and with
+  a public-provenance deduplication ablation;
+- a public event-time recent-evidence baseline tests whether event timestamps
+  contain useful information the current arrival-order adapter leaves unused;
+- transition latency is reported separately for the two novel regime switches
+  and the later recurrence to the original relation.
+
 ### OWR-C — Compound Novelty
 
 Question:

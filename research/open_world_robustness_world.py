@@ -419,7 +419,7 @@ def _stage_a(seed: int) -> HiddenWorld:
     )
 
 def _stage_b(seed: int) -> HiddenWorld:
-    """Delayed, missing, duplicated, and recurrent temporal evidence."""
+    """Delayed, missing, duplicated, out-of-order, and recurrent evidence."""
     rng = Random(seed)
     relations = _opaque_tokens(rng, "R", 3)
     contexts = tuple((_opaque_tokens(rng, "T", 1)[0],) for _ in range(8))
@@ -451,8 +451,10 @@ def _stage_b(seed: int) -> HiddenWorld:
                 observed = None
                 missing += 1
             else:
-                observed = truth if rng.random() < 0.94 else _flip_relation(
-                    rng, truth, relations
+                observed = (
+                    truth
+                    if rng.random() < 0.94
+                    else _flip_relation(rng, truth, relations)
                 )
             delay = 0 if rng.random() < 0.57 else rng.randint(1, 9)
             delayed += int(delay > 0)
@@ -465,7 +467,7 @@ def _stage_b(seed: int) -> HiddenWorld:
                     source_id=source,
                     context=context,
                     observed_relation=observed,
-                    tags=("temporal-disorder",),
+                    tags=("temporal-disorder", "original"),
                 )
             )
             if observed is not None and rng.random() < 0.07:
@@ -482,8 +484,27 @@ def _stage_b(seed: int) -> HiddenWorld:
                         tags=("temporal-disorder", "duplicate"),
                     )
                 )
-    observations.sort(key=lambda row: (row.arrival_time, row.event_time, row.event_id))
-    checkpoints = (35, 70, 110, 160)
+
+    observations.sort(
+        key=lambda row: (row.arrival_time, row.event_time, row.event_id)
+    )
+
+    # Query close to each change rather than only after generous recovery time.
+    checkpoint_specs = (
+        (35, "stable"),
+        (45, "boundary"),
+        (48, "early"),
+        (55, "settled"),
+        (80, "stable"),
+        (85, "boundary"),
+        (88, "early"),
+        (95, "settled"),
+        (120, "stable"),
+        (125, "boundary"),
+        (128, "early"),
+        (135, "settled"),
+        (160, "stable"),
+    )
     queries = tuple(
         Query(
             query_id=f"BQ{q:03d}_{i}",
@@ -491,22 +512,34 @@ def _stage_b(seed: int) -> HiddenWorld:
             context=context,
             expected_relation=truth_at(q),
             kind="current-regime-under-temporal-disorder",
-            tags=("recurrence" if q == 160 else "temporal",),
+            tags=(
+                phase,
+                "recurrence" if q >= 125 else "novel-regime",
+            ),
         )
-        for q in checkpoints
+        for q, phase in checkpoint_specs
         for i, context in enumerate(contexts)
     )
     oracle = {
         "relation_vocab": relations,
         "regime_schedule": schedule,
+        "query_checkpoints": checkpoint_specs,
         "missing_events": missing,
         "delayed_events": delayed,
         "duplicate_events": duplicates,
         "event_time_distinct_from_arrival_time": True,
         "recurrence_relation": relations[0],
+        "learner_receives_event_time": True,
+        "learner_receives_duplicate_provenance": True,
     }
-    return HiddenWorld(PROTOCOL, "B", seed, tuple(observations), queries, oracle)
-
+    return HiddenWorld(
+        PROTOCOL,
+        "B",
+        seed,
+        tuple(observations),
+        queries,
+        oracle,
+    )
 
 def _stage_c(seed: int) -> HiddenWorld:
     """Compound structural novelty and deliberately ambiguous explanations."""
