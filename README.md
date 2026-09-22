@@ -61,8 +61,10 @@ The release-candidate contract is recorded in [docs/V1_CONTRACT.md](docs/V1_CONT
 ## Implementation and validation
 
 The stable runtime is differentially checked against the frozen executable
-specification where their contracts overlap. CI also protects the frozen
-reference, version consistency, packaging, and the active research fixtures.
+specification where their contracts overlap. Default pull-request CI protects
+the frozen reference, repository portability, version consistency, packaging,
+and the active correctness fixtures. Full research campaigns are opt-in and run
+through the dedicated research-benchmark workflow rather than on every change.
 
 Versioning and validation conventions are documented in
 [docs/VERSIONING.md](docs/VERSIONING.md). Historical implementation and
