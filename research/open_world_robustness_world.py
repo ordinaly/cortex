@@ -145,7 +145,7 @@ def _report(
 
 
 def _stage_a(seed: int) -> HiddenWorld:
-    """Hidden source reliability, copying, and source drift."""
+    """Hidden source reliability, copying, source drift, and a copied-majority trap."""
     rng = Random(seed)
     relations = _opaque_tokens(rng, "R", 3)
     contexts = tuple((_opaque_tokens(rng, "C", 1)[0],) for _ in range(12))
@@ -155,8 +155,15 @@ def _stage_a(seed: int) -> HiddenWorld:
         context: relations[index % len(relations)]
         for index, context in enumerate(contexts)
     }
-    # Contextual reliability. S0/S4 are strong independent sources; S1-3 are a
-    # weak copied cluster. S0 later degrades on family B.
+    context_family = {
+        context: ("A" if index < 6 else "B")
+        for index, context in enumerate(contexts)
+    }
+    trap_contexts = set(contexts[-4:])
+
+    # S0/S4 are strong independent sources. S1 is a weaker independent root;
+    # S2/S3 are usually copies of S1 and must not count as three independent
+    # witnesses merely because they have three surface identities.
     reliabilities = {
         sources[0]: {"A": 0.95, "B": 0.93},
         sources[1]: {"A": 0.62, "B": 0.58},
@@ -169,31 +176,57 @@ def _stage_a(seed: int) -> HiddenWorld:
         sources[2]: sources[1],
         sources[3]: sources[1],
     }
-    drift_step = 112
+    drift_after_round = 10
+    trap_after_round = 14
     observations: list[Observation] = []
     event_id = 0
+
     for round_index in range(18):
-        for context_index, context in enumerate(contexts):
-            family = "A" if context_index < 6 else "B"
+        for context in contexts:
+            family = context_family[context]
             truth = truth_by_context[context]
-            reports: dict[str, str] = {}
-            for source_index, source in enumerate(sources):
-                reliability = reliabilities[source][family]
-                if source == sources[0] and event_id >= drift_step and family == "B":
-                    reliability = 0.34
-                if source in (sources[2], sources[3]) and rng.random() < 0.82:
-                    parent = copy_parent[source]
-                    observed = reports.get(parent)
-                    if observed is None:
-                        observed = _report(
-                            rng,
-                            truth,
-                            relations,
-                            reliabilities[parent][family],
-                        )
+
+            source0_reliability = reliabilities[sources[0]][family]
+            if round_index >= drift_after_round and family == "B":
+                source0_reliability = 0.34
+
+            root_reliability = reliabilities[sources[1]][family]
+            if round_index >= trap_after_round and context in trap_contexts:
+                root_reliability = 0.10
+
+            claims = {
+                sources[0]: _report(
+                    rng, truth, relations, source0_reliability
+                ),
+                sources[1]: _report(
+                    rng, truth, relations, root_reliability
+                ),
+                sources[4]: _report(
+                    rng,
+                    truth,
+                    relations,
+                    reliabilities[sources[4]][family],
+                ),
+            }
+            for source in (sources[2], sources[3]):
+                if rng.random() < 0.90:
+                    claims[source] = claims[sources[1]]
                 else:
-                    observed = _report(rng, truth, relations, reliability)
-                reports[source] = observed
+                    own_reliability = (
+                        root_reliability
+                        if context in trap_contexts
+                        and round_index >= trap_after_round
+                        else reliabilities[source][family]
+                    )
+                    claims[source] = _report(
+                        rng, truth, relations, own_reliability
+                    )
+
+            # Reporting order is randomized per context/round so a recency
+            # mechanism cannot succeed merely because one source is always last.
+            source_order = list(sources)
+            rng.shuffle(source_order)
+            for source in source_order:
                 observations.append(
                     Observation(
                         event_id=f"A{event_id:05d}",
@@ -201,39 +234,75 @@ def _stage_a(seed: int) -> HiddenWorld:
                         arrival_time=event_id,
                         source_id=source,
                         context=context,
-                        observed_relation=observed,
-                        tags=("source-discovery", family),
+                        observed_relation=claims[source],
+                        tags=(
+                            "source-discovery",
+                            family,
+                            "trap" if context in trap_contexts else "control",
+                        ),
                     )
                 )
                 event_id += 1
 
-    # Queries include deceptive contexts where copied majority can oppose truth.
-    queries = tuple(
-        Query(
-            query_id=f"AQ{i:03d}",
-            query_time=len(observations) - 1,
-            context=context,
-            expected_relation=truth_by_context[context],
-            kind="source-weighted-current-truth",
-            tags=("hidden-reliability",),
+    events_per_round = len(contexts) * len(sources)
+    checkpoint_time = 8 * events_per_round - 1
+    final_time = len(observations) - 1
+    queries = []
+    for index, context in enumerate(contexts):
+        queries.append(
+            Query(
+                query_id=f"AQP{index:03d}",
+                query_time=checkpoint_time,
+                context=context,
+                expected_relation=truth_by_context[context],
+                kind="pre-drift-source-truth",
+                tags=("checkpoint",),
+            )
         )
-        for i, context in enumerate(contexts)
-    )
+        queries.append(
+            Query(
+                query_id=f"AQF{index:03d}",
+                query_time=final_time,
+                context=context,
+                expected_relation=truth_by_context[context],
+                kind="post-drift-source-truth",
+                tags=(
+                    "final",
+                    "trap" if context in trap_contexts else "control",
+                ),
+            )
+        )
+
     oracle = {
         "relation_vocab": relations,
         "truth_by_context": {"|".join(k): v for k, v in truth_by_context.items()},
+        "context_family": {"|".join(k): v for k, v in context_family.items()},
+        "trap_contexts": [list(context) for context in sorted(trap_contexts)],
         "source_profiles": reliabilities,
         "copy_parent": copy_parent,
         "drift": {
             "source": sources[0],
             "family": "B",
-            "after_event": drift_step,
+            "after_round": drift_after_round,
             "reliability": 0.34,
         },
+        "copied_majority_trap": {
+            "root_source": sources[1],
+            "after_round": trap_after_round,
+            "root_reliability": 0.10,
+            "copy_probability": 0.90,
+        },
         "learner_receives_source_reliability": False,
+        "learner_receives_copy_graph": False,
     }
-    return HiddenWorld(PROTOCOL, "A", seed, tuple(observations), queries, oracle)
-
+    return HiddenWorld(
+        PROTOCOL,
+        "A",
+        seed,
+        tuple(observations),
+        tuple(queries),
+        oracle,
+    )
 
 def _stage_b(seed: int) -> HiddenWorld:
     """Delayed, missing, duplicated, and recurrent temporal evidence."""
