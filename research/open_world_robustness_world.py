@@ -570,4 +570,145 @@ def _stage_e(seed: int, *, scale: str) -> HiddenWorld:
                 observed_relation=observed,
                 tags=(
                     "hidden-physics",
-                    f"phase-{ph
+                    f"phase-{phase}",
+                    "source-drift" if phase == 1 else "normal-source",
+                ),
+            )
+        )
+        event_counter += 1
+
+    observations.sort(key=lambda row: (row.arrival_time, row.event_time, row.event_id))
+    queries: list[Query] = []
+    heldout_list = sorted(heldout)
+    for phase, (_start, end, offset) in enumerate(regime_schedule):
+        for i, context in enumerate(heldout_list[:4]):
+            queries.append(
+                Query(
+                    query_id=f"EQ{phase}{i:02d}",
+                    query_time=end,
+                    context=context,
+                    expected_relation=truth_for(context, offset),
+                    kind="unseen-composition-under-open-world-dynamics",
+                    tags=(
+                        "heldout-context",
+                        "regime-recurrence" if phase == 3 else "novel-regime",
+                    ),
+                )
+            )
+    # Ambiguous query deliberately has no resolvable answer at the boundary.
+    queries.append(
+        Query(
+            query_id="EQAMB",
+            query_time=regime_schedule[1][1],
+            context=heldout_list[5],
+            expected_relation=None,
+            kind="epistemic-ambiguity",
+            answerable=False,
+            tags=("correct:unresolved",),
+        )
+    )
+    oracle = {
+        "order": order,
+        "token_for_latent": token_for_latent,
+        "composition": "latent(a+b+regime_offset) mod 7",
+        "regime_schedule": regime_schedule,
+        "source_reliability": base_reliability,
+        "copy_parent": copy_parent,
+        "heldout_contexts": [list(c) for c in heldout_list],
+        "source_drift": {
+            "source": sources[0],
+            "phase": 1,
+            "reliability": 0.45,
+        },
+        "contains": (
+            "source-conflict",
+            "source-drift",
+            "missingness",
+            "delays",
+            "novel-regimes",
+            "regime-recurrence",
+            "heldout-composition",
+            "epistemic-ambiguity",
+        ),
+    }
+    return HiddenWorld(PROTOCOL, "E", seed, tuple(observations), tuple(queries), oracle)
+
+
+def build_world(stage: str, seed: int, *, scale: str = "development") -> HiddenWorld:
+    if stage not in STAGES:
+        raise ValueError(f"unknown stage: {stage}")
+    if scale not in {"development", "official"}:
+        raise ValueError("scale must be development or official")
+    if stage == "A":
+        return _stage_a(seed)
+    if stage == "B":
+        return _stage_b(seed)
+    if stage == "C":
+        return _stage_c(seed)
+    if stage == "D":
+        return _stage_d(seed, scale=scale)
+    return _stage_e(seed, scale=scale)
+
+
+def build_suite(
+    *,
+    material: str,
+    count: int = 3,
+    stages: Iterable[str] = STAGES,
+    scale: str = "development",
+) -> tuple[HiddenWorld, ...]:
+    if count < 1:
+        raise ValueError("count must be positive")
+    if scale == "official":
+        material = validate_official_material(material)
+    selected = tuple(stages)
+    worlds = []
+    for stage in selected:
+        if stage not in STAGES:
+            raise ValueError(f"unknown stage: {stage}")
+        for index in range(count):
+            worlds.append(
+                build_world(
+                    stage,
+                    derive_seed(material, stage, index),
+                    scale=scale,
+                )
+            )
+    return tuple(worlds)
+
+
+def suite_integrity(worlds: Iterable[HiddenWorld]) -> dict[str, Any]:
+    rows = tuple(worlds)
+    if not rows:
+        raise ValueError("suite must not be empty")
+    fingerprints = [world.fingerprint() for world in rows]
+    stage_counts = {stage: 0 for stage in STAGES}
+    for world in rows:
+        stage_counts[world.stage] += 1
+
+    checks = {
+        "protocol_exact": all(world.protocol == PROTOCOL for world in rows),
+        "unique_world_fingerprints": len(fingerprints) == len(set(fingerprints)),
+        "nonempty_observations": all(world.observations for world in rows),
+        "nonempty_queries": all(world.queries for world in rows),
+        "arrival_not_before_event": all(
+            obs.arrival_time >= obs.event_time
+            for world in rows
+            for obs in world.observations
+        ),
+        "oracle_not_in_public_payload": all(
+            "oracle" not in world.public_payload() for world in rows
+        ),
+        "all_contexts_opaque": all(
+            all(token and not token.isspace() for token in obs.context)
+            for world in rows
+            for obs in world.observations
+        ),
+    }
+    return {
+        "protocol": PROTOCOL,
+        "worlds": len(rows),
+        "stage_counts": stage_counts,
+        "checks": checks,
+        "passed": all(checks.values()),
+    }
