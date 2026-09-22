@@ -465,26 +465,41 @@ See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
 
 ---
 
-## A8. Open-World Robustness v1 — next scientific milestone
+## A8. Open-World Robustness v1 — Phase 1 in progress
 
-Stress the combined adaptive loop rather than add another deterministic
-primitive.
+The next scientific milestone is now a preregistered **integrated falsification
+campaign**, not another isolated deterministic primitive.
 
-The campaign should vary:
+Phase 1 defines five benchmark stages without changing Cortex:
 
-- stochastic observation corruption;
-- missing evidence;
-- novelty persistence;
-- gradual versus abrupt regime change;
-- simultaneous compound novelty;
-- evidence reliability;
-- memory pressure;
-- planning consequences under uncertain attribution.
+- **OWR-A — Epistemic Sources:** hidden contextual source reliability,
+  correlated/copying sources, and source drift;
+- **OWR-B — Temporal Disorder:** missing, delayed, duplicated, and out-of-order
+  evidence with \`A -> B -> C -> A\` regime recurrence;
+- **OWR-C — Compound Novelty:** simultaneous type/relation/regime changes plus
+  a deliberately unresolved compound ambiguity;
+- **OWR-D — Memory & Interference:** long mostly-distractor streams, bounded
+  pressure, long-horizon recall, and regime reactivation;
+- **OWR-E — Autonomous Hidden Physics World:** an untouched composite exam with
+  opaque relation symbols, a hidden cyclic composition law, source conflict,
+  delays, missingness, regime change, recurrence, held-out compositions, and
+  epistemic ambiguity.
 
-Primary metrics should include calibration, false-certainty, attribution
-precision/coverage, unresolved precision, structural false-edit rate,
-revision/recovery latency, unnecessary-replan rate, plan regret, and the point
-at which abstention begins before wrong structural revision dominates.
+The benchmark generator keeps learner-facing observations and queries separate
+from the hidden evaluator oracle. Expected answers, hidden source reliability,
+copying graphs, latent laws, regime schedules, ambiguity labels, and harness
+tags are never exposed through the public payload.
+
+Development worlds use explicit development seed material. Official worlds will
+be derived only after the candidate and benchmark are frozen, using the merge
+commit SHA as seed material. OWR-E is reserved as the composite examination and
+must not become an iterative tuning target.
+
+Phase 1 freezes **benchmark construction and information boundaries only**.
+Cortex performance gates will be frozen after development characterization and
+before any official run.
+
+See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md).
 
 ---
 

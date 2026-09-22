@@ -1,0 +1,35 @@
+name: cortex-open-world-robustness-v1
+
+on:
+  workflow_dispatch:
+    inputs:
+      worlds_per_stage:
+        description: Development worlds per OWR stage
+        required: false
+        default: "3"
+
+jobs:
+  benchmark-construction:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install pytest
+      - name: Benchmark-world unit tests
+        run: pytest tests/test_open_world_robustness.py -q
+      - name: Development construction campaign
+        run: >-
+          python research/open_world_robustness_campaign.py
+          --mode development
+          --worlds-per-stage \${{ inputs.worlds_per_stage }}
+          --output open-world-robustness-v1-construction.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cortex-open-world-robustness-v1-construction
+          path: open-world-robustness-v1-construction.json
