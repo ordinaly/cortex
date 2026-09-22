@@ -22,6 +22,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: python scripts/check_version_consistency.py
+      - run: python scripts/audit_repo.py
 
   rust-core:
     runs-on: ubuntu-latest
