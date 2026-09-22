@@ -224,6 +224,24 @@ fixed-vocabulary contexts remained at 192 regime cells.
 See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
+
+## Open-World Robustness v1 — benchmark construction
+
+The next autonomy milestone is now an integrated open-world robustness program.
+
+Phase 1 adds a benchmark-only harness with five stages: hidden source
+reliability and dependence (OWR-A), temporal disorder and recurrence (OWR-B),
+compound novelty (OWR-C), long-stream memory interference (OWR-D), and an
+untouched composite Hidden Physics exam (OWR-E).
+
+No Cortex behavior is changed in this phase. Learner-facing payloads exclude
+hidden source reliability, copying graphs, latent laws, regime schedules,
+expected answers, ambiguity labels, and harness tags. Development worlds are
+reproducible; official worlds will be derived from the frozen merge commit SHA
+only after Cortex adapters, metrics, and performance gates are preregistered.
+
+See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md).
+
 ## What is stable today
 
 ### Native runtime
