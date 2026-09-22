@@ -181,7 +181,7 @@ def _source_claim_sequences(world: HiddenWorld, query_time: int):
     return sequences
 
 
-def _dependency_groups(world: HiddenWorld, query_time: int, threshold: float = 0.91):
+def _dependency_groups(world: HiddenWorld, query_time: int, threshold: float = 0.88):
     """Infer highly dependent source groups using public calibration agreement."""
     sequences = _source_claim_sequences(world, query_time)
     sources = sorted(sequences)
