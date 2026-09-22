@@ -9,7 +9,6 @@ on:
       - "tests/test_novelty_aware_replanning.py"
       - "docs/NOVELTY_AWARE_REPLANNING_V1_PROTOCOL.md"
       - ".github/workflows/novelty-aware-replanning-preflight.yml"
-      - ".github/workflows/ci.yml"
 
 jobs:
   development:
