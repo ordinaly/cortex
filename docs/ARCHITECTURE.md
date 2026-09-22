@@ -249,8 +249,11 @@ graph whose nodes are pairs:
 ```
 
 Only relation/orientation transitions admitted at the current evidence
-resolution are materialized. The stateless LPU then executes exact reachability
-on that temporary graph and returns a witness.
+resolution are materialized. Relational composition is defined over
+signature-constrained walks: an entity may validly reappear at a later
+signature depth. Native Cortex execution and the layered LPU executor therefore
+share the same revisit semantics. The stateless LPU then executes exact
+reachability on that temporary graph and returns a witness.
 
 The authority ordering is:
 
