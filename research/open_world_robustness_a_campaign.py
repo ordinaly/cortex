@@ -293,12 +293,9 @@ def _oracle_reliability(world: HiddenWorld, observation) -> float:
     if "transfer-trap" in observation.tags:
         if observation.source_id == root:
             return 0.02
-        # Copy children are omitted by the oracle dependence collapse.
-        profile = {
-            source: (0.96 if index == 0 else 0.94 if index == 4 else 0.55)
-            for index, source in enumerate(sorted(sources))
-        }
-        return float(profile.get(observation.source_id, 0.55))
+        # Copy children are removed before this function is used. The remaining
+        # independent sources are both intentionally strong on fresh targets.
+        return 0.95
 
     if "transfer-control" in observation.tags:
         # Exact values need not match the generator; these are evaluator-only
