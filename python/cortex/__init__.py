@@ -80,6 +80,17 @@ from .controller_calibration import (
     select_precision_threshold,
 )
 from .autonomy import ObservationFrame, TrainingReport, train_dataset
+from .closed_articulation_loop import (
+    BackgroundCandidate,
+    ClosedArticulationLoop,
+    ClosedLoopPolicy,
+    ClosedLoopRead,
+    ClosedLoopSnapshot,
+    EvidenceAtom,
+    MemoryActivation,
+    MemoryBasin,
+    StructuralChange,
+)
 from .autonomy_campaign import (
     KnowledgeTimeline,
     PolicyExecution,
@@ -126,6 +137,15 @@ from .knowledge import (
 
 __all__ = [
     "Articulation",
+    "BackgroundCandidate",
+    "ClosedArticulationLoop",
+    "ClosedLoopPolicy",
+    "ClosedLoopRead",
+    "ClosedLoopSnapshot",
+    "EvidenceAtom",
+    "MemoryActivation",
+    "MemoryBasin",
+    "StructuralChange",
     "ArticulationRead",
     "Cortex",
     "CortexRead",
