@@ -102,8 +102,14 @@ while preserving per-context chronology.
 Two provenance streams may enter the same dependence class when they have enough
 overlap and sufficiently high repeated agreement.
 
-A dependence class shares one unit of current evidence weight. This is
-compression of redundant evidence, not a learned truth score.
+Once a class exists, reports at the same context-local observation ordinal are
+consolidated before they reach foreground plasticity. The class therefore
+contributes at most one foreground event for that ordinal. Raw reports still
+enter historical memory with fractional effective mass, so the audit trail is
+preserved while redundant evidence no longer advances the foreground clock
+multiple times.
+
+This is compression of redundant evidence, not a learned truth score.
 
 ### Temporal provenance
 
