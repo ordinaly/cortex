@@ -40,6 +40,8 @@ class ClosedLoopPolicy:
     residual_window: int = 6
     compound_min_events: int = 3
     late_event_tolerance: int = 0
+    temporal_disorder_decay: float = 0.75
+    temporal_guard_threshold: float | None = None
 
     def __post_init__(self) -> None:
         if self.active_budget < 1:
@@ -75,6 +77,21 @@ class ClosedLoopPolicy:
             raise ValueError("compound_min_events must be positive")
         if self.late_event_tolerance < 0:
             raise ValueError("late_event_tolerance must be non-negative")
+        if (
+            not isfinite(self.temporal_disorder_decay)
+            or not 0.0 <= self.temporal_disorder_decay < 1.0
+        ):
+            raise ValueError("temporal_disorder_decay must lie in [0,1)")
+        if (
+            self.temporal_guard_threshold is not None
+            and (
+                not isfinite(self.temporal_guard_threshold)
+                or self.temporal_guard_threshold <= 0.0
+            )
+        ):
+            raise ValueError(
+                "temporal_guard_threshold must be positive when enabled"
+            )
 
     @property
     def total_budget(self) -> int:
@@ -170,6 +187,8 @@ class ClosedLoopRead:
     latent_basins: int
     coarsened_basins: int
     coarsened_mass: float
+    temporal_disorder_pressure: float
+    temporal_guarded: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -205,6 +224,7 @@ class ClosedArticulationLoop:
         self._basins: dict[tuple[ContextKey, str], MemoryBasin] = {}
         self._next_basin_id = 0
         self._event_frontier: dict[ContextKey, int] = {}
+        self._temporal_disorder: dict[ContextKey, float] = {}
         self._claims: dict[str, dict[Fingerprint, str]] = defaultdict(dict)
         self._claim_event_times: dict[
             str, dict[Fingerprint, int]
@@ -811,6 +831,16 @@ class ClosedArticulationLoop:
         )
         self._event_frontier[atom.context] = max(frontier, atom.event_time)
 
+        disorder_pressure = (
+            self._temporal_disorder.get(atom.context, 0.0)
+            * self.policy.temporal_disorder_decay
+        )
+        if historical_only:
+            disorder_pressure += 1.0
+        if disorder_pressure <= 1.0e-12:
+            disorder_pressure = 0.0
+        self._temporal_disorder[atom.context] = disorder_pressure
+
         tracker = self._trackers.get(atom.context)
         previous_relation = (
             tracker.accepted_relation if tracker is not None else None
@@ -878,6 +908,19 @@ class ClosedArticulationLoop:
             accepted = snap.accepted_relation
             state = snap.state
 
+        temporal_guarded = False
+        threshold = self.policy.temporal_guard_threshold
+        if (
+            threshold is not None
+            and disorder_pressure + 1.0e-12 >= threshold
+            and state is ArticulationState.EXECUTE
+        ):
+            # Temporal disorder is learner-visible uncertainty about whether
+            # arrival order represents the current world. The guard changes
+            # execution permission only; it never rewrites accepted history.
+            state = ArticulationState.UNRESOLVED
+            temporal_guarded = True
+
         state_counts = self.snapshot
         return ClosedLoopRead(
             context=atom.context,
@@ -895,6 +938,8 @@ class ClosedArticulationLoop:
             latent_basins=state_counts.latent_basins,
             coarsened_basins=state_counts.coarsened_basins,
             coarsened_mass=state_counts.coarsened_mass,
+            temporal_disorder_pressure=disorder_pressure,
+            temporal_guarded=temporal_guarded,
         )
 
     def consume(
