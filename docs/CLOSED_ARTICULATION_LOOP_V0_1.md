@@ -95,8 +95,9 @@ Each basin retains:
 
 ### Learner-visible provenance redundancy
 
-The loop compares provenance streams only where they make claims about the same
-opaque context at the same event time.
+The loop compares provenance streams only where they make claims about the same opaque context at the same local
+observation ordinal. This makes the comparison insensitive to reporting order
+while preserving per-context chronology.
 
 Two provenance streams may enter the same dependence class when they have enough
 overlap and sufficiently high repeated agreement.
