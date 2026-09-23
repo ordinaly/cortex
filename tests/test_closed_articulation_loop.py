@@ -198,12 +198,29 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
     loop = ClosedArticulationLoop(policy)
 
     # Learn that copy-a and copy-b are one redundant stream.
+    copied = ("A", "B", "A", "B")
+    independent_a = ("A", "A", "B", "B")
+    independent_b = ("B", "A", "A", "B")
     for step in range(4):
         context = (f"cal-{step}",)
-        loop.observe(_atom(context, "T", step, provenance="copy-a"))
-        loop.observe(_atom(context, "T", step, provenance="copy-b"))
-        loop.observe(_atom(context, "T", step, provenance="independent-a"))
-        loop.observe(_atom(context, "T", step, provenance="independent-b"))
+        loop.observe(_atom(context, copied[step], step, provenance="copy-a"))
+        loop.observe(_atom(context, copied[step], step, provenance="copy-b"))
+        loop.observe(
+            _atom(
+                context,
+                independent_a[step],
+                step,
+                provenance="independent-a",
+            )
+        )
+        loop.observe(
+            _atom(
+                context,
+                independent_b[step],
+                step,
+                provenance="independent-b",
+            )
+        )
 
     assert any(
         group == frozenset({"copy-a", "copy-b"})
