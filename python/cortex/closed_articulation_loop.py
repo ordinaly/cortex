@@ -196,6 +196,7 @@ class ClosedArticulationLoop:
         self._next_basin_id = 0
         self._event_frontier: dict[ContextKey, int] = {}
         self._claims: dict[str, dict[Fingerprint, str]] = defaultdict(dict)
+        self._provenance_context_ordinals: dict[tuple[str, ContextKey], int] = {}
         self._recurrence_streak: dict[tuple[ContextKey, str], int] = {}
         self._residuals: deque[_ResidualEvent] = deque()
         self._coordinate_values: dict[int, set[str]] = defaultdict(set)
@@ -580,9 +581,12 @@ class ClosedArticulationLoop:
         novel_coordinates = self._novel_coordinates(atom)
 
         if atom.relation is not None:
+            ordinal_key = (atom.provenance, atom.context)
+            ordinal = self._provenance_context_ordinals.get(ordinal_key, 0)
             self._claims[atom.provenance][
-                (atom.context, atom.event_time)
+                (atom.context, ordinal)
             ] = atom.relation
+            self._provenance_context_ordinals[ordinal_key] = ordinal + 1
         source_weight = self._provenance_weight(atom.provenance)
 
         frontier = self._event_frontier.get(atom.context, -1)
