@@ -10,7 +10,7 @@ on opaque contexts, values, provenance, event time, and memory pressure.
 """
 from __future__ import annotations
 
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
 from math import isfinite, log1p
 from typing import Iterable
@@ -197,6 +197,9 @@ class ClosedArticulationLoop:
         self._event_frontier: dict[ContextKey, int] = {}
         self._claims: dict[str, dict[Fingerprint, str]] = defaultdict(dict)
         self._provenance_context_ordinals: dict[tuple[str, ContextKey], int] = {}
+        self._emitted_dependence_groups: set[
+            tuple[Fingerprint, tuple[str, ...]]
+        ] = set()
         self._recurrence_streak: dict[tuple[ContextKey, str], int] = {}
         self._residuals: deque[_ResidualEvent] = deque()
         self._coordinate_values: dict[int, set[str]] = defaultdict(set)
@@ -580,6 +583,7 @@ class ClosedArticulationLoop:
 
         novel_coordinates = self._novel_coordinates(atom)
 
+        ordinal = None
         if atom.relation is not None:
             ordinal_key = (atom.provenance, atom.context)
             ordinal = self._provenance_context_ordinals.get(ordinal_key, 0)
@@ -587,7 +591,51 @@ class ClosedArticulationLoop:
                 (atom.context, ordinal)
             ] = atom.relation
             self._provenance_context_ordinals[ordinal_key] = ordinal + 1
-        source_weight = self._provenance_weight(atom.provenance)
+
+        groups = self.provenance_groups()
+        provenance_group = next(
+            (
+                group
+                for group in groups
+                if atom.provenance in group
+            ),
+            frozenset((atom.provenance,)),
+        )
+        source_weight = 1.0 / len(provenance_group)
+
+        # Downward dependence compression is stronger than merely attenuating
+        # repeated reports. Once a dependence class is learned, one local
+        # observation ordinal contributes at most one foreground event.
+        foreground_relation = atom.relation
+        if (
+            atom.relation is not None
+            and ordinal is not None
+            and len(provenance_group) > 1
+        ):
+            fingerprint = (atom.context, ordinal)
+            members = tuple(sorted(provenance_group))
+            emission_key = (fingerprint, members)
+            group_claims = [
+                self._claims[source].get(fingerprint)
+                for source in members
+            ]
+            if (
+                emission_key in self._emitted_dependence_groups
+                or any(value is None for value in group_claims)
+            ):
+                foreground_relation = None
+            else:
+                counts = Counter(group_claims)
+                top = max(counts.values())
+                winners = sorted(
+                    relation
+                    for relation, count in counts.items()
+                    if count == top
+                )
+                foreground_relation = (
+                    winners[0] if len(winners) == 1 else None
+                )
+                self._emitted_dependence_groups.add(emission_key)
 
         frontier = self._event_frontier.get(atom.context, -1)
         historical_only = (
@@ -604,21 +652,41 @@ class ClosedArticulationLoop:
         _basin, prior_mass = self._update_memory(atom, source_weight)
 
         reactivated = False
-        if atom.relation is not None and not historical_only:
+        if foreground_relation is not None and not historical_only:
             if tracker is None:
                 tracker = RelationalRegimeTracker(self.regime_policy)
                 self._trackers[atom.context] = tracker
+            # A compressed dependence group contributes one foreground event.
+            # Singleton provenance keeps the ordinary confidence weight.
+            foreground_weight = (
+                float(atom.confidence)
+                if len(provenance_group) == 1
+                else 1.0
+            )
             snap = tracker.observe(
-                atom.relation,
+                foreground_relation,
                 bootstrap=atom.bootstrap or tracker.accepted_relation is None,
-                current_weight=float(atom.confidence) * source_weight,
+                current_weight=foreground_weight,
+            )
+            foreground_atom = (
+                atom
+                if foreground_relation == atom.relation
+                else EvidenceAtom(
+                    context=atom.context,
+                    relation=foreground_relation,
+                    event_time=atom.event_time,
+                    arrival_time=atom.arrival_time,
+                    provenance="+".join(sorted(provenance_group)),
+                    confidence=foreground_weight,
+                    bootstrap=atom.bootstrap,
+                )
             )
             reactivated = self._try_reactivate(
-                atom=atom,
+                atom=foreground_atom,
                 tracker=tracker,
                 prior_mass=prior_mass,
                 historical_only=historical_only,
-                source_weight=source_weight,
+                source_weight=foreground_weight,
             )
             if reactivated:
                 snap = tracker.snapshot
