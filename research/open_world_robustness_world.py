@@ -509,18 +509,24 @@ def _stage_b(seed: int) -> HiddenWorld:
 
 
 def _stage_c(seed: int) -> HiddenWorld:
-    """Compound structural novelty and deliberately ambiguous explanations."""
+    """Compound structural novelty with relation schema separated from outcome."""
     rng = Random(seed)
-    relations = _opaque_tokens(rng, "R", 4)
-    contexts = tuple((_opaque_tokens(rng, "N", 1)[0],) for _ in range(6))
+    outcomes = _opaque_tokens(rng, "R", 4)
+    predicates = _opaque_tokens(rng, "P", 2)
+    entities = _opaque_tokens(rng, "N", 7)
+    known_predicate, novel_predicate = predicates
+    contexts = tuple((entity, known_predicate) for entity in entities[:6])
+    novel_peer = (entities[6], novel_predicate)
+    compound_new = (entities[4], novel_predicate)
+    ambiguous = (entities[5], known_predicate)
     sources = _opaque_tokens(rng, "S", 2)
     observations: list[Observation] = []
     event_counter = 0
 
-    # Stable prelude.
+    # Stable prelude: four known entities under one known relation schema.
     for t in range(40):
         for i, context in enumerate(contexts[:4]):
-            truth = relations[i % 2]
+            truth = outcomes[i % 2]
             observations.append(
                 Observation(
                     event_id=f"C{event_counter:05d}",
@@ -535,18 +541,23 @@ def _stage_c(seed: int) -> HiddenWorld:
             )
             event_counter += 1
 
-    # Compound novelty: new contexts and new relation while old contexts shift.
+    # Compound phase:
+    # - two known contexts shift coherently under the known predicate -> regime;
+    # - two unseen entities appear under a novel predicate with shared behavior
+    #   -> new entity type + new relation schema;
+    # - one unseen entity under the known predicate follows the shifted outcome,
+    #   leaving new-type versus regime membership deliberately ambiguous.
     for t in range(40, 70):
-        for i, context in enumerate(contexts):
-            if i < 2:
-                truth = relations[2]  # regime component
-                tags = ("compound", "new-regime")
-            elif i < 4:
-                truth = relations[i % 2]
-                tags = ("compound", "stable-control")
-            else:
-                truth = relations[3]  # new type/context + new relation
-                tags = ("compound", "new-context", "new-relation")
+        rows = (
+            (contexts[0], outcomes[2], ("compound", "new-regime")),
+            (contexts[1], outcomes[2], ("compound", "new-regime")),
+            (contexts[2], outcomes[0], ("compound", "stable-control")),
+            (contexts[3], outcomes[1], ("compound", "stable-control")),
+            (compound_new, outcomes[3], ("compound", "new-context", "new-relation")),
+            (novel_peer, outcomes[3], ("compound", "new-context", "new-relation")),
+            (ambiguous, outcomes[2], ("compound", "ambiguous-type-regime")),
+        )
+        for context, truth, tags in rows:
             observations.append(
                 Observation(
                     event_id=f"C{event_counter:05d}",
@@ -565,22 +576,22 @@ def _stage_c(seed: int) -> HiddenWorld:
             "CQ000",
             69,
             contexts[0],
-            relations[2],
+            outcomes[2],
             "compound-novelty",
-            tags=("expected:new_regime", "expected:new_relation"),
+            tags=("expected:new_regime",),
         ),
         Query(
             "CQ001",
             69,
-            contexts[4],
-            relations[3],
+            compound_new,
+            outcomes[3],
             "compound-novelty",
             tags=("expected:new_entity_type", "expected:new_relation"),
         ),
         Query(
             "CQ002",
             52,
-            contexts[5],
+            ambiguous,
             None,
             "compound-ambiguity",
             answerable=False,
@@ -588,13 +599,22 @@ def _stage_c(seed: int) -> HiddenWorld:
         ),
     )
     oracle = {
+        "known_predicate": known_predicate,
+        "novel_predicate": novel_predicate,
+        "prelude_contexts": [list(value) for value in contexts[:4]],
+        "compound_new_type_contexts": [list(compound_new), list(novel_peer)],
+        "ambiguous_context": list(ambiguous),
         "expected_components": {
-            "CQ000": ("new_regime", "new_relation"),
+            "CQ000": ("new_regime",),
             "CQ001": ("new_entity_type", "new_relation"),
-            "CQ002": ("new_entity_type", "new_regime"),
+            "CQ002": tuple(),
+        },
+        "ambiguous_competitors": {
+            "CQ002": (("new_entity_type",), ("new_regime",)),
         },
         "ambiguous_queries": ("CQ002",),
-        "single-label-attribution_is_insufficient": True,
+        "single_label_attribution_is_insufficient": True,
+        "schema_outcome_separation": True,
     }
     return HiddenWorld(PROTOCOL, "C", seed, tuple(observations), queries, oracle)
 
