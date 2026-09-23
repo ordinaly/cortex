@@ -15,6 +15,8 @@ def test_owr_b_characterization_exposes_temporal_metadata():
     assert world.oracle["missing_events"] > 0
     assert world.oracle["delayed_events"] > 0
     assert world.oracle["duplicate_events"] > 0
+    assert world.oracle["boundary_delayed_events"] > 0
+    assert world.oracle["fixture_revision"] == "boundary-collision-v2"
     assert any(row.arrival_time > row.event_time for row in world.observations)
     assert any(row.duplicate_of is not None for row in world.observations)
 
@@ -40,9 +42,12 @@ def test_owr_b_has_current_and_public_metadata_controls():
         assert set(method) == {
             "all",
             "pre_shift",
-            "regime_b",
-            "regime_c",
-            "recurrence_a",
+            "near_b",
+            "settled_b",
+            "near_c",
+            "settled_c",
+            "near_recurrence",
+            "settled_recurrence",
         }
         for metrics in method.values():
             assert 0.0 <= metrics["coverage"] <= 1.0
