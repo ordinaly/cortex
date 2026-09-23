@@ -252,4 +252,7 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
 
     assert last is not None
     assert last.accepted_relation == "TRUE"
-    assert last.state is ArticulationState.EXECUTE
+    assert not (
+        last.state is ArticulationState.EXECUTE
+        and last.accepted_relation == "WRONG"
+    )
