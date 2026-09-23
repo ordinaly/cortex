@@ -27,5 +27,16 @@ jobs:
       - run: >-
           pytest
           tests/test_closed_articulation_loop.py
+          tests/test_closed_articulation_loop_campaign.py
           tests/test_regime_plasticity.py
           -q
+      - name: OWR A-D development probe
+        run: >-
+          python research/closed_articulation_loop_campaign.py
+          --worlds 12
+          --output closed-loop-owr-development.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closed-articulation-loop-v0.1-development
+          path: closed-loop-owr-development.json
