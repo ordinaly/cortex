@@ -7,6 +7,8 @@ on:
       - "python/cortex/regime_plasticity.py"
       - "python/cortex/__init__.py"
       - "tests/test_closed_articulation_loop.py"
+      - "research/closed_articulation_loop_campaign.py"
+      - "tests/test_closed_articulation_loop_campaign.py"
       - "docs/CLOSED_ARTICULATION_LOOP_V0_1.md"
       - ".github/workflows/closed-articulation-loop-v0-1.yml"
   workflow_dispatch:
