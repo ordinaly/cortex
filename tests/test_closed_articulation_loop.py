@@ -201,15 +201,18 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
     copied = ("A", "B", "A", "B")
     independent_a = ("A", "A", "B", "B")
     independent_b = ("B", "A", "A", "B")
+    context = ("cal",)
     for step in range(4):
-        context = (f"cal-{step}",)
-        loop.observe(_atom(context, copied[step], step, provenance="copy-a"))
-        loop.observe(_atom(context, copied[step], step, provenance="copy-b"))
+        base = step * 16
+        loop.observe(_atom(context, copied[step], base, provenance="copy-a"))
+        loop.observe(
+            _atom(context, copied[step], base + 1, provenance="copy-b")
+        )
         loop.observe(
             _atom(
                 context,
                 independent_a[step],
-                step,
+                base + 2,
                 provenance="independent-a",
             )
         )
@@ -217,7 +220,7 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
             _atom(
                 context,
                 independent_b[step],
-                step,
+                base + 3,
                 provenance="independent-b",
             )
         )
@@ -231,24 +234,30 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
     # two independent streams each contribute TRUE. The result should converge
     # to TRUE without counting the copied pair twice.
     last = None
-    event_time = 100
-    for _round in range(6):
+    for round_index in range(6):
+        base = 100 + round_index * 16
         last = loop.observe(
-            _atom(("target",), "WRONG", event_time, provenance="copy-a")
+            _atom(("target",), "WRONG", base, provenance="copy-a")
         )
-        event_time += 1
         last = loop.observe(
-            _atom(("target",), "WRONG", event_time, provenance="copy-b")
+            _atom(("target",), "WRONG", base + 1, provenance="copy-b")
         )
-        event_time += 1
         last = loop.observe(
-            _atom(("target",), "TRUE", event_time, provenance="independent-a")
+            _atom(
+                ("target",),
+                "TRUE",
+                base + 2,
+                provenance="independent-a",
+            )
         )
-        event_time += 1
         last = loop.observe(
-            _atom(("target",), "TRUE", event_time, provenance="independent-b")
+            _atom(
+                ("target",),
+                "TRUE",
+                base + 3,
+                provenance="independent-b",
+            )
         )
-        event_time += 1
 
     assert last is not None
     assert last.accepted_relation == "TRUE"
@@ -256,3 +265,36 @@ def test_dependent_provenance_is_compressed_before_foreground_update():
         last.state is ArticulationState.EXECUTE
         and last.accepted_relation == "WRONG"
     )
+
+
+def test_alternating_reporters_are_not_mistaken_for_one_episode():
+    policy = ClosedLoopPolicy(
+        dependence_min_overlap=4,
+        dependence_agreement=0.875,
+        episode_min_completed=3,
+        episode_separation_ratio=2.0,
+    )
+    loop = ClosedArticulationLoop(policy)
+
+    # Two sources alternate continuously with no burst/separation structure.
+    for ordinal in range(6):
+        loop.observe(
+            _atom(
+                ("ctx",),
+                "A",
+                2 * ordinal,
+                provenance="source-a",
+            )
+        )
+        loop.observe(
+            _atom(
+                ("ctx",),
+                "A",
+                2 * ordinal + 1,
+                provenance="source-b",
+            )
+        )
+
+    groups = loop.provenance_groups()
+    assert len(groups) >= 1
+    assert not loop._episodic_coreporting(groups)
