@@ -70,9 +70,14 @@ def test_stage_b_contains_delay_missingness_duplicates_and_recurrence():
 def test_stage_c_requires_compound_attribution_and_preserves_ambiguity():
     world = build_world("C", 13)
     components = world.oracle["expected_components"]
-    assert len(components["CQ000"]) > 1
+    assert components["CQ000"] == ("new_regime",)
     assert len(components["CQ001"]) > 1
+    assert world.oracle["schema_outcome_separation"] is True
     assert world.oracle["ambiguous_queries"] == ("CQ002",)
+    assert set(world.oracle["ambiguous_competitors"]["CQ002"]) == {
+        ("new_entity_type",),
+        ("new_regime",),
+    }
     ambiguous = next(q for q in world.queries if q.query_id == "CQ002")
     assert not ambiguous.answerable
     assert ambiguous.expected_relation is None

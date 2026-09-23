@@ -465,41 +465,53 @@ See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
 
 ---
 
-## A8. Open-World Robustness v1 — Phase 1 in progress
+## A8. Open-World Robustness v1 — A-D development characterization complete
 
-The next scientific milestone is now a preregistered **integrated falsification
-campaign**, not another isolated deterministic primitive.
+The integrated falsification campaign is now defined and development-tested
+through OWR-D without changing Cortex.
 
-Phase 1 defines five benchmark stages without changing Cortex:
+The five stages remain:
 
-- **OWR-A — Epistemic Sources:** hidden contextual source reliability,
-  correlated/copying sources, and source drift;
+- **OWR-A — Epistemic Sources:** hidden contextual reliability and source
+  dependence;
 - **OWR-B — Temporal Disorder:** missing, delayed, duplicated, and out-of-order
-  evidence with \`A -> B -> C -> A\` regime recurrence;
-- **OWR-C — Compound Novelty:** simultaneous type/relation/regime changes plus
-  a deliberately unresolved compound ambiguity;
-- **OWR-D — Memory & Interference:** long mostly-distractor streams, bounded
-  pressure, long-horizon recall, and regime reactivation;
-- **OWR-E — Autonomous Hidden Physics World:** an untouched composite exam with
-  opaque relation symbols, a hidden cyclic composition law, source conflict,
-  delays, missingness, regime change, recurrence, held-out compositions, and
-  epistemic ambiguity.
+  evidence with regime recurrence;
+- **OWR-C — Compound Novelty:** simultaneous structural causes plus preserved
+  ambiguity;
+- **OWR-D — Memory & Interference:** long mostly-distractor streams and real
+  native capacity pressure;
+- **OWR-E — Autonomous Hidden Physics World:** the untouched composite exam.
 
-The benchmark generator keeps learner-facing observations and queries separate
-from the hidden evaluator oracle. Expected answers, hidden source reliability,
-copying graphs, latent laws, regime schedules, ambiguity labels, and harness
-tags are never exposed through the public payload.
+Development findings on the frozen Cortex are now:
 
-Development worlds use explicit development seed material. Official worlds will
-be derived only after the candidate and benchmark are frozen, using the merge
-commit SHA as seed material. OWR-E is reserved as the composite examination and
-must not become an iterative tuning target.
+- **A:** conservative abstention under copied-majority conflict, but no
+  transferable source-dependence inference;
+- **B:** correct settled-regime execution but unsafe stale execution inside
+  delayed-evidence transition windows; event-time replay and duplicate collapse
+  are not sufficient fixes;
+- **C:** 1.000 local relation coverage/accuracy on the revised fixture, but no
+  compound structural-component output;
+- **D:** an accurate unbounded temporal reference but a hard native entity
+  capacity cliff instead of graceful degradation. The hosted native D result is
+  currently one world and is treated as a boundary confirmation, not a scaling
+  law.
 
-Phase 1 freezes **benchmark construction and information boundaries only**.
-Cortex performance gates will be frozen after development characterization and
-before any official run.
+Two development fixtures were deliberately corrected before official use:
+OWR-B v0 was rejected because a trivial recent vote solved it, and OWR-C was
+revised to separate relation-schema novelty from current outcome.
 
-See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md).
+No official seed has been generated. Performance gates remain unfrozen and
+OWR-E has not been used for tuning.
+
+The next milestone is **architectural synthesis from the A-D failure map**
+before adding any new Cortex mechanism. The working question is whether
+dependence, temporal provenance, explanatory coupling, and relevance should be
+represented as revisable higher-order relations over Cortex's own evidence,
+rather than patched as four benchmark-specific features.
+
+See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md),
+[OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md),
+and [OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
 
 ---
 

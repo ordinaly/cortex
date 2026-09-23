@@ -419,7 +419,12 @@ def _stage_a(seed: int) -> HiddenWorld:
     )
 
 def _stage_b(seed: int) -> HiddenWorld:
-    """Delayed, missing, duplicated, and recurrent temporal evidence."""
+    """Delayed, missing, duplicated, and recurrent temporal evidence.
+
+    Development revision v2 deliberately concentrates long delays near regime
+    boundaries so stale old-regime evidence collides with fresh new-regime
+    evidence. Queries include both near-boundary and settled checkpoints.
+    """
     rng = Random(seed)
     relations = _opaque_tokens(rng, "R", 3)
     contexts = tuple((_opaque_tokens(rng, "T", 1)[0],) for _ in range(8))
@@ -430,11 +435,13 @@ def _stage_b(seed: int) -> HiddenWorld:
         (85, 124, relations[2]),
         (125, 169, relations[0]),
     )
+    boundaries = (45, 85, 125)
     observations: list[Observation] = []
     event_counter = 0
     duplicates = 0
     missing = 0
     delayed = 0
+    boundary_delayed = 0
 
     def truth_at(t: int) -> str:
         for start, end, relation in schedule:
@@ -444,17 +451,26 @@ def _stage_b(seed: int) -> HiddenWorld:
 
     for event_time in range(170):
         truth = truth_at(event_time)
+        tail_before_boundary = any(
+            boundary - 8 <= event_time < boundary
+            for boundary in boundaries
+        )
         for context in contexts:
             eid = f"B{event_counter:05d}"
             event_counter += 1
-            if rng.random() < 0.18:
+            if rng.random() < 0.20:
                 observed = None
                 missing += 1
             else:
-                observed = truth if rng.random() < 0.94 else _flip_relation(
+                observed = truth if rng.random() < 0.92 else _flip_relation(
                     rng, truth, relations
                 )
-            delay = 0 if rng.random() < 0.57 else rng.randint(1, 9)
+
+            if tail_before_boundary and rng.random() < 0.86:
+                delay = rng.randint(7, 18)
+                boundary_delayed += 1
+            else:
+                delay = 0 if rng.random() < 0.58 else rng.randint(1, 10)
             delayed += int(delay > 0)
             arrival = event_time + delay
             observations.append(
@@ -465,16 +481,19 @@ def _stage_b(seed: int) -> HiddenWorld:
                     source_id=source,
                     context=context,
                     observed_relation=observed,
-                    tags=("temporal-disorder",),
+                    tags=(
+                        "temporal-disorder",
+                        "boundary-stale" if tail_before_boundary else "ordinary",
+                    ),
                 )
             )
-            if observed is not None and rng.random() < 0.07:
+            if observed is not None and rng.random() < 0.12:
                 duplicates += 1
                 observations.append(
                     Observation(
                         event_id=f"{eid}D",
                         event_time=event_time,
-                        arrival_time=arrival + rng.randint(1, 4),
+                        arrival_time=arrival + rng.randint(2, 6),
                         source_id=source,
                         context=context,
                         observed_relation=observed,
@@ -482,8 +501,10 @@ def _stage_b(seed: int) -> HiddenWorld:
                         tags=("temporal-disorder", "duplicate"),
                     )
                 )
+
     observations.sort(key=lambda row: (row.arrival_time, row.event_time, row.event_id))
-    checkpoints = (35, 70, 110, 160)
+    checkpoints = (35, 47, 52, 70, 87, 92, 110, 127, 132, 160)
+    near_boundary = {47, 52, 87, 92, 127, 132}
     queries = tuple(
         Query(
             query_id=f"BQ{q:03d}_{i}",
@@ -491,7 +512,10 @@ def _stage_b(seed: int) -> HiddenWorld:
             context=context,
             expected_relation=truth_at(q),
             kind="current-regime-under-temporal-disorder",
-            tags=("recurrence" if q == 160 else "temporal",),
+            tags=(
+                "near-boundary" if q in near_boundary else "settled",
+                "recurrence" if q >= 125 else "novel-regime",
+            ),
         )
         for q in checkpoints
         for i, context in enumerate(contexts)
@@ -501,26 +525,36 @@ def _stage_b(seed: int) -> HiddenWorld:
         "regime_schedule": schedule,
         "missing_events": missing,
         "delayed_events": delayed,
+        "boundary_delayed_events": boundary_delayed,
         "duplicate_events": duplicates,
         "event_time_distinct_from_arrival_time": True,
         "recurrence_relation": relations[0],
+        "checkpoints": checkpoints,
+        "near_boundary_checkpoints": tuple(sorted(near_boundary)),
+        "fixture_revision": "boundary-collision-v2",
     }
     return HiddenWorld(PROTOCOL, "B", seed, tuple(observations), queries, oracle)
 
 
 def _stage_c(seed: int) -> HiddenWorld:
-    """Compound structural novelty and deliberately ambiguous explanations."""
+    """Compound structural novelty with relation schema separated from outcome."""
     rng = Random(seed)
-    relations = _opaque_tokens(rng, "R", 4)
-    contexts = tuple((_opaque_tokens(rng, "N", 1)[0],) for _ in range(6))
+    outcomes = _opaque_tokens(rng, "R", 4)
+    predicates = _opaque_tokens(rng, "P", 2)
+    entities = _opaque_tokens(rng, "N", 7)
+    known_predicate, novel_predicate = predicates
+    contexts = tuple((entity, known_predicate) for entity in entities[:6])
+    novel_peer = (entities[6], novel_predicate)
+    compound_new = (entities[4], novel_predicate)
+    ambiguous = (entities[5], known_predicate)
     sources = _opaque_tokens(rng, "S", 2)
     observations: list[Observation] = []
     event_counter = 0
 
-    # Stable prelude.
+    # Stable prelude: four known entities under one known relation schema.
     for t in range(40):
         for i, context in enumerate(contexts[:4]):
-            truth = relations[i % 2]
+            truth = outcomes[i % 2]
             observations.append(
                 Observation(
                     event_id=f"C{event_counter:05d}",
@@ -535,18 +569,23 @@ def _stage_c(seed: int) -> HiddenWorld:
             )
             event_counter += 1
 
-    # Compound novelty: new contexts and new relation while old contexts shift.
+    # Compound phase:
+    # - two known contexts shift coherently under the known predicate -> regime;
+    # - two unseen entities appear under a novel predicate with shared behavior
+    #   -> new entity type + new relation schema;
+    # - one unseen entity under the known predicate follows the shifted outcome,
+    #   leaving new-type versus regime membership deliberately ambiguous.
     for t in range(40, 70):
-        for i, context in enumerate(contexts):
-            if i < 2:
-                truth = relations[2]  # regime component
-                tags = ("compound", "new-regime")
-            elif i < 4:
-                truth = relations[i % 2]
-                tags = ("compound", "stable-control")
-            else:
-                truth = relations[3]  # new type/context + new relation
-                tags = ("compound", "new-context", "new-relation")
+        rows = (
+            (contexts[0], outcomes[2], ("compound", "new-regime")),
+            (contexts[1], outcomes[2], ("compound", "new-regime")),
+            (contexts[2], outcomes[0], ("compound", "stable-control")),
+            (contexts[3], outcomes[1], ("compound", "stable-control")),
+            (compound_new, outcomes[3], ("compound", "new-context", "new-relation")),
+            (novel_peer, outcomes[3], ("compound", "new-context", "new-relation")),
+            (ambiguous, outcomes[2], ("compound", "ambiguous-type-regime")),
+        )
+        for context, truth, tags in rows:
             observations.append(
                 Observation(
                     event_id=f"C{event_counter:05d}",
@@ -565,22 +604,22 @@ def _stage_c(seed: int) -> HiddenWorld:
             "CQ000",
             69,
             contexts[0],
-            relations[2],
+            outcomes[2],
             "compound-novelty",
-            tags=("expected:new_regime", "expected:new_relation"),
+            tags=("expected:new_regime",),
         ),
         Query(
             "CQ001",
             69,
-            contexts[4],
-            relations[3],
+            compound_new,
+            outcomes[3],
             "compound-novelty",
             tags=("expected:new_entity_type", "expected:new_relation"),
         ),
         Query(
             "CQ002",
             52,
-            contexts[5],
+            ambiguous,
             None,
             "compound-ambiguity",
             answerable=False,
@@ -588,13 +627,22 @@ def _stage_c(seed: int) -> HiddenWorld:
         ),
     )
     oracle = {
+        "known_predicate": known_predicate,
+        "novel_predicate": novel_predicate,
+        "prelude_contexts": [list(value) for value in contexts[:4]],
+        "compound_new_type_contexts": [list(compound_new), list(novel_peer)],
+        "ambiguous_context": list(ambiguous),
         "expected_components": {
-            "CQ000": ("new_regime", "new_relation"),
+            "CQ000": ("new_regime",),
             "CQ001": ("new_entity_type", "new_relation"),
-            "CQ002": ("new_entity_type", "new_regime"),
+            "CQ002": tuple(),
+        },
+        "ambiguous_competitors": {
+            "CQ002": (("new_entity_type",), ("new_regime",)),
         },
         "ambiguous_queries": ("CQ002",),
-        "single-label-attribution_is_insufficient": True,
+        "single_label_attribution_is_insufficient": True,
+        "schema_outcome_separation": True,
     }
     return HiddenWorld(PROTOCOL, "C", seed, tuple(observations), queries, oracle)
 

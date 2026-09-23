@@ -225,31 +225,65 @@ See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 
-## Open-World Robustness v1 — development characterization
+## Open-World Robustness v1 — A-D development failure map complete
 
-The next autonomy milestone is an integrated open-world robustness program with
-five stages: hidden source reliability/dependence (OWR-A), temporal disorder
-and recurrence (OWR-B), compound novelty (OWR-C), long-stream memory
-interference (OWR-D), and an untouched composite Hidden Physics exam (OWR-E).
+Open-World Robustness v1 is the active autonomy investigation. Its five stages
+remain hidden source epistemics (OWR-A), temporal disorder and recurrence
+(OWR-B), compound novelty (OWR-C), long-stream memory interference (OWR-D), and
+the untouched composite Hidden Physics exam (OWR-E).
 
-Phase 1 froze benchmark construction and learner/oracle information boundaries
-without changing Cortex.
+Phase 1 froze benchmark construction and learner/oracle information boundaries.
+Development characterization of the current frozen Cortex is now complete for
+**OWR-A through OWR-D**, with no Cortex mechanism change and no official seed
+generation.
 
-**OWR-A development characterization is now complete.** On 48 fresh
-copied-majority target queries, current source-blind Cortex resolved **0/48**:
-it abstained rather than executing the false numerical majority. Across all
-queries it did resolve, accuracy remained **1.000**. In contrast, context-local
-majority resolved all 48 traps incorrectly, while a public-data
-dependence-collapsed baseline and the evaluator-only oracle both achieved
-**48/48** correct. This isolates a missing transferable source-dependence
-mechanism while preserving Cortex's conservative safety behavior.
+**OWR-A — source dependence.** On 48 fresh copied-majority target queries,
+current source-blind Cortex resolved 0/48, abstaining rather than executing the
+false numerical majority. Every Cortex-resolved query remained correct. A
+public-data dependence-collapsed baseline achieved 48/48, isolating missing
+transferable source-dependence inference.
 
-No official seed has been generated and OWR-A performance gates remain
-unfrozen. The next step is current-system development characterization on
-OWR-B through OWR-D before adding new Cortex mechanisms.
+**OWR-B — temporal disorder.** The first easy fixture was rejected because a
+recent-7 vote solved it. The hardened boundary-collision fixture exposed an
+unsafe transition window: near A -> B and B -> C, Cortex coverage was about
+0.20 and every resolved answer was stale/wrong; near C -> A recurrence,
+selective risk was 0.9787. After each regime settled, resolved accuracy returned
+to 1.000. Public event-time replay and duplicate collapse did not remove the
+failure, so simple timestamp bookkeeping is insufficient. Mean switch latency
+was 24.23 / 23.44 / 23.74 arrival-time steps for B / C / recurrent A, with no
+demonstrated recurrence advantage.
 
-See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md)
-and [OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md).
+**OWR-C — compound explanation.** The development fixture was corrected before
+official use to separate relation-schema novelty from current outcome. Cortex
+then achieved 1.000 local relation coverage and accuracy, but its current
+temporal surface has no compound structural-component output. A learner-visible
+structural control achieved 1.000 exact resolution on the declared compound
+cases and 1.000 abstention on the ambiguous case.
+
+**OWR-D — bounded memory.** The unbounded temporal reference retained 0.9231
+coverage, 1.000 resolved accuracy, and correct recurrence on the 3,000-event
+development stream. The actual bounded native knowledge path hit a hard
+capacity failure at every tested limit: 512 entities after 3.2% of the stream,
+2,048 after 14.8%, and 8,192 after 65.2%. This hosted result currently covers
+one full native world, so it establishes a capacity cliff but not a statistical
+scaling law.
+
+The resulting development failure map is:
+
+```text
+A  evidence dependence / source structure
+B  temporal provenance / transition uncertainty
+C  compound explanatory structure
+D  bounded relevance / memory pressure
+```
+
+Performance gates remain unfrozen, no official A-D worlds have been generated,
+and OWR-E remains untouched. The next step is architectural synthesis from this
+failure map before any Cortex mechanism is changed.
+
+See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md),
+[OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md),
+and [OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
 
 ## What is stable today
 
