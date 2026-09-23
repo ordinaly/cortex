@@ -203,7 +203,12 @@ class ClosedArticulationLoop:
         self._recurrence_streak: dict[tuple[ContextKey, str], int] = {}
         self._residuals: deque[_ResidualEvent] = deque()
         self._coordinate_values: dict[int, set[str]] = defaultdict(set)
+        self._coordinate_first_seen: dict[tuple[int, str], int] = {}
         self._relation_values: set[str] = set()
+        self._relation_first_seen: dict[str, int] = {}
+        self._bubbled_candidate_signatures: set[
+            tuple[tuple[str, str | None, str], ...]
+        ] = set()
         self._coarsened_basins = 0
         self._coarsened_mass = 0.0
         self._step = 0
@@ -294,9 +299,31 @@ class ClosedArticulationLoop:
 
     def _record_vocabulary(self, atom: EvidenceAtom) -> None:
         for index, value in enumerate(atom.context):
+            if value not in self._coordinate_values[index]:
+                self._coordinate_first_seen[(index, value)] = atom.arrival_time
             self._coordinate_values[index].add(value)
         if atom.relation is not None:
+            if atom.relation not in self._relation_values:
+                self._relation_first_seen[atom.relation] = atom.arrival_time
             self._relation_values.add(atom.relation)
+
+    def _recent_novelty_axes(self, atom: EvidenceAtom) -> tuple[str, ...]:
+        axes = []
+        for index, value in enumerate(atom.context):
+            first = self._coordinate_first_seen.get((index, value))
+            if (
+                first is not None
+                and atom.arrival_time - first <= self.policy.residual_window
+            ):
+                axes.append(f"context:{index}")
+        if atom.relation is not None:
+            first = self._relation_first_seen.get(atom.relation)
+            if (
+                first is not None
+                and atom.arrival_time - first <= self.policy.residual_window
+            ):
+                axes.append("relation")
+        return tuple(axes)
 
     def _update_memory(
         self,
@@ -336,22 +363,24 @@ class ClosedArticulationLoop:
 
     def _enforce_budget(self, *, protect: tuple[ContextKey, str]) -> None:
         active = [basin for basin in self._basins.values() if basin.active]
-        if len(active) > self.policy.active_budget:
+        while len(active) > self.policy.active_budget:
             demotable = [
                 basin
                 for basin in active
                 if (basin.context, basin.relation) != protect
             ]
-            if demotable:
-                victim = min(
-                    demotable,
-                    key=lambda row: (
-                        row.utility * log1p(row.effective_mass),
-                        row.last_arrival_time,
-                        row.basin_id,
-                    ),
-                )
-                victim.active = False
+            if not demotable:
+                break
+            victim = min(
+                demotable,
+                key=lambda row: (
+                    row.utility * log1p(row.effective_mass),
+                    row.last_arrival_time,
+                    row.basin_id,
+                ),
+            )
+            victim.active = False
+            active = [basin for basin in self._basins.values() if basin.active]
 
         while len(self._basins) > self.policy.total_budget:
             latent = [
@@ -440,7 +469,9 @@ class ClosedArticulationLoop:
             return self._background_candidate(atom.arrival_time)
 
         changes = []
-        for axis in novel_coordinates:
+        residual_novelty = set(novel_coordinates)
+        residual_novelty.update(self._recent_novelty_axes(atom))
+        for axis in sorted(residual_novelty):
             if axis == "relation":
                 after = atom.relation
             else:
@@ -523,6 +554,28 @@ class ClosedArticulationLoop:
         distinct_subjects = {change.subject for change in changes}
         compound = len(changes) >= 2 and len(distinct_subjects) >= 2
         eligible = compound and events >= self.policy.compound_min_events
+
+        # The bubbling boundary is event-like, not a continuous flag. Abstract
+        # strict novelty values to their axis so repeated new entities can
+        # support one structural pattern without creating one candidate per ID.
+        signature = tuple(
+            sorted(
+                {
+                    (
+                        change.axis,
+                        change.before,
+                        change.after if change.before is not None else "*",
+                    )
+                    for change in changes
+                }
+            )
+        )
+        if eligible:
+            if signature in self._bubbled_candidate_signatures:
+                eligible = False
+            else:
+                self._bubbled_candidate_signatures.add(signature)
+
         return BackgroundCandidate(
             changes=changes,
             support_events=events,
