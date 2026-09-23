@@ -54,9 +54,16 @@ def _partitions(rows):
     return {
         "all": list(rows),
         "pre_shift": [row for row in rows if row["query_time"] == 35],
-        "regime_b": [row for row in rows if row["query_time"] == 70],
-        "regime_c": [row for row in rows if row["query_time"] == 110],
-        "recurrence_a": [row for row in rows if row["query_time"] == 160],
+        "near_b": [row for row in rows if row["query_time"] in {47, 52}],
+        "settled_b": [row for row in rows if row["query_time"] == 70],
+        "near_c": [row for row in rows if row["query_time"] in {87, 92}],
+        "settled_c": [row for row in rows if row["query_time"] == 110],
+        "near_recurrence": [
+            row for row in rows if row["query_time"] in {127, 132}
+        ],
+        "settled_recurrence": [
+            row for row in rows if row["query_time"] == 160
+        ],
     }
 
 
@@ -283,7 +290,16 @@ def main():
     )
     results = [run_world(world) for world in worlds]
     methods = tuple(results[0]["metrics"])
-    partitions = ("all", "pre_shift", "regime_b", "regime_c", "recurrence_a")
+    partitions = (
+        "all",
+        "pre_shift",
+        "near_b",
+        "settled_b",
+        "near_c",
+        "settled_c",
+        "near_recurrence",
+        "settled_recurrence",
+    )
     aggregate = {
         method: {
             partition: _pool(results, method, partition)
@@ -304,6 +320,7 @@ def main():
         "protocol": PROTOCOL_B,
         "parent_protocol": PROTOCOL,
         "mode": "development-characterization",
+        "fixture_revision": "boundary-collision-v2",
         "worlds": len(worlds),
         "cortex_uses_event_time": False,
         "cortex_deduplicates_public_duplicates": False,
