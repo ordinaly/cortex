@@ -141,8 +141,8 @@ def _b_partitions(rows):
     }
 
 
-def _run_a(world: HiddenWorld):
-    loop = ClosedArticulationLoop()
+def _run_a(world: HiddenWorld, policy=None, regime_policy=None):
+    loop = ClosedArticulationLoop(policy, regime_policy=regime_policy)
     rows, candidates = _feed_query_stream(world, loop)
     return {
         "metrics": {
@@ -163,14 +163,14 @@ def _run_a(world: HiddenWorld):
     }
 
 
-def _run_b(world: HiddenWorld):
-    loop = ClosedArticulationLoop()
+def _run_b(world: HiddenWorld, policy=None, regime_policy=None):
+    loop = ClosedArticulationLoop(policy, regime_policy=regime_policy)
     rows, candidates = _feed_query_stream(world, loop)
     historical_only = 0
 
     # Re-run once as a pure stream to count late evidence explicitly; this is
     # learner-visible diagnostic state, not an oracle signal.
-    diagnostic = ClosedArticulationLoop()
+    diagnostic = ClosedArticulationLoop(policy, regime_policy=regime_policy)
     reactivations = 0
     for observation in sorted(
         world.observations,
@@ -200,8 +200,8 @@ def _run_b(world: HiddenWorld):
     }
 
 
-def _run_c(world: HiddenWorld):
-    loop = ClosedArticulationLoop()
+def _run_c(world: HiddenWorld, policy=None, regime_policy=None):
+    loop = ClosedArticulationLoop(policy, regime_policy=regime_policy)
     rows, candidates = _feed_query_stream(world, loop)
     answerable = [row for row in rows if row["answerable"]]
     compound = [
@@ -224,9 +224,9 @@ def _run_c(world: HiddenWorld):
     }
 
 
-def _run_d(world: HiddenWorld):
-    policy = ClosedLoopPolicy(active_budget=64, latent_budget=192)
-    loop = ClosedArticulationLoop(policy)
+def _run_d(world: HiddenWorld, policy=None, regime_policy=None):
+    policy = policy or ClosedLoopPolicy()
+    loop = ClosedArticulationLoop(policy, regime_policy=regime_policy)
     observations = sorted(
         world.observations,
         key=lambda row: (row.arrival_time, row.event_time, row.event_id),
@@ -277,15 +277,20 @@ def _run_d(world: HiddenWorld):
     }
 
 
-def run_world(world: HiddenWorld):
+def run_world(
+    world: HiddenWorld,
+    *,
+    policy: ClosedLoopPolicy | None = None,
+    regime_policy=None,
+):
     if world.stage == "A":
-        result = _run_a(world)
+        result = _run_a(world, policy, regime_policy)
     elif world.stage == "B":
-        result = _run_b(world)
+        result = _run_b(world, policy, regime_policy)
     elif world.stage == "C":
-        result = _run_c(world)
+        result = _run_c(world, policy, regime_policy)
     elif world.stage == "D":
-        result = _run_d(world)
+        result = _run_d(world, policy, regime_policy)
     else:
         raise ValueError("probe is restricted to OWR-A through OWR-D")
     return {
@@ -319,14 +324,14 @@ def _pool_metric(rows, path):
     }
 
 
-def campaign(worlds_per_stage: int, material: str):
+def campaign(worlds_per_stage: int, material: str, *, policy=None, regime_policy=None):
     worlds = build_suite(
         material=material,
         count=worlds_per_stage,
         stages=("A", "B", "C", "D"),
         scale="development",
     )
-    rows = [run_world(world) for world in worlds]
+    rows = [run_world(world, policy=policy, regime_policy=regime_policy) for world in worlds]
     by_stage = {
         stage: [row for row in rows if row["stage"] == stage]
         for stage in ("A", "B", "C", "D")
@@ -387,19 +392,19 @@ def campaign(worlds_per_stage: int, material: str):
         "protocol": PROBE,
         "parent_protocol": PROTOCOL,
         "mode": "development-probe",
-        "policy": ClosedLoopPolicy().__dict__ if hasattr(ClosedLoopPolicy(), "__dict__") else {
-            "active_budget": ClosedLoopPolicy().active_budget,
-            "latent_budget": ClosedLoopPolicy().latent_budget,
-            "utility_decay": ClosedLoopPolicy().utility_decay,
-            "dependence_min_overlap": ClosedLoopPolicy().dependence_min_overlap,
-            "dependence_agreement": ClosedLoopPolicy().dependence_agreement,
-            "episode_min_completed": ClosedLoopPolicy().episode_min_completed,
-            "episode_separation_ratio": ClosedLoopPolicy().episode_separation_ratio,
-            "recurrence_min_history": ClosedLoopPolicy().recurrence_min_history,
-            "recurrence_confirmations": ClosedLoopPolicy().recurrence_confirmations,
-            "residual_window": ClosedLoopPolicy().residual_window,
-            "compound_min_events": ClosedLoopPolicy().compound_min_events,
-            "late_event_tolerance": ClosedLoopPolicy().late_event_tolerance,
+        "policy": {
+            "active_budget": (policy or ClosedLoopPolicy()).active_budget,
+            "latent_budget": (policy or ClosedLoopPolicy()).latent_budget,
+            "utility_decay": (policy or ClosedLoopPolicy()).utility_decay,
+            "dependence_min_overlap": (policy or ClosedLoopPolicy()).dependence_min_overlap,
+            "dependence_agreement": (policy or ClosedLoopPolicy()).dependence_agreement,
+            "episode_min_completed": (policy or ClosedLoopPolicy()).episode_min_completed,
+            "episode_separation_ratio": (policy or ClosedLoopPolicy()).episode_separation_ratio,
+            "recurrence_min_history": (policy or ClosedLoopPolicy()).recurrence_min_history,
+            "recurrence_confirmations": (policy or ClosedLoopPolicy()).recurrence_confirmations,
+            "residual_window": (policy or ClosedLoopPolicy()).residual_window,
+            "compound_min_events": (policy or ClosedLoopPolicy()).compound_min_events,
+            "late_event_tolerance": (policy or ClosedLoopPolicy()).late_event_tolerance,
         },
         "worlds_per_stage": worlds_per_stage,
         "aggregate": aggregate,
