@@ -98,6 +98,9 @@ jobs:
           tests/test_open_world_novelty.py
           tests/test_novelty_aware_replanning.py
           tests/test_open_world_robustness.py
+          tests/test_open_world_robustness_b.py
+          tests/test_open_world_robustness_c.py
+          tests/test_open_world_robustness_d.py
           tests/test_open_world_robustness_a.py
           tests/test_cache_refresh_attribution.py
           tests/test_exact_semantic_geometry_fast_path.py
