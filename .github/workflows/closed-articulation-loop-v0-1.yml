@@ -1,0 +1,31 @@
+name: cortex-closed-articulation-loop-v0.1
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/closed_articulation_loop.py"
+      - "python/cortex/regime_plasticity.py"
+      - "python/cortex/__init__.py"
+      - "tests/test_closed_articulation_loop.py"
+      - "docs/CLOSED_ARTICULATION_LOOP_V0_1.md"
+      - ".github/workflows/closed-articulation-loop-v0-1.yml"
+  workflow_dispatch:
+
+jobs:
+  mechanism-invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0" pytest
+      - run: python -m pip install -e .
+      - run: >-
+          pytest
+          tests/test_closed_articulation_loop.py
+          tests/test_regime_plasticity.py
+          -q
