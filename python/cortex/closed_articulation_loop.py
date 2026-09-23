@@ -31,7 +31,7 @@ class ClosedLoopPolicy:
     latent_budget: int = 192
     utility_decay: float = 0.997
     dependence_min_overlap: int = 6
-    dependence_agreement: float = 0.95
+    dependence_agreement: float = 0.875
     recurrence_min_history: float = 5.0
     recurrence_confirmations: int = 3
     residual_window: int = 6
@@ -197,8 +197,8 @@ class ClosedArticulationLoop:
         self._event_frontier: dict[ContextKey, int] = {}
         self._claims: dict[str, dict[Fingerprint, str]] = defaultdict(dict)
         self._provenance_context_ordinals: dict[tuple[str, ContextKey], int] = {}
-        self._emitted_dependence_groups: set[
-            tuple[Fingerprint, tuple[str, ...]]
+        self._emitted_evidence_episodes: set[
+            tuple[Fingerprint, tuple[tuple[str, ...], ...]]
         ] = set()
         self._recurrence_streak: dict[tuple[ContextKey, str], int] = {}
         self._residuals: deque[_ResidualEvent] = deque()
@@ -283,6 +283,68 @@ class ClosedArticulationLoop:
             if provenance in group:
                 return 1.0 / len(group)
         return 1.0
+
+    def _episode_foreground_relation(
+        self,
+        atom: EvidenceAtom,
+        ordinal: int | None,
+        groups: tuple[frozenset[str], ...],
+    ) -> str | None:
+        """Compress a mature multi-provenance evidence episode to one update.
+
+        The grouping is learned from prior public claim overlap. Until every
+        known provenance stream has enough history, foreground processing stays
+        online and report-local. Once mature, one context-local ordinal becomes
+        one evidence episode: dependent sources collapse to one group vote and
+        the independent group votes form one foreground articulation.
+        """
+        if atom.relation is None or ordinal is None or len(groups) < 2:
+            return atom.relation
+
+        sources = tuple(sorted(self._claims))
+        if not sources or any(
+            len(self._claims[source]) < self.policy.dependence_min_overlap
+            for source in sources
+        ):
+            return atom.relation
+
+        fingerprint = (atom.context, ordinal)
+        structure = tuple(
+            sorted(tuple(sorted(group)) for group in groups)
+        )
+        emission_key = (fingerprint, structure)
+        if emission_key in self._emitted_evidence_episodes:
+            return None
+
+        group_votes = []
+        for group in groups:
+            member_claims = [
+                self._claims[source].get(fingerprint)
+                for source in sorted(group)
+            ]
+            if any(value is None for value in member_claims):
+                return None
+            counts = Counter(member_claims)
+            top = max(counts.values())
+            winners = sorted(
+                relation
+                for relation, count in counts.items()
+                if count == top
+            )
+            if len(winners) != 1:
+                self._emitted_evidence_episodes.add(emission_key)
+                return None
+            group_votes.append(winners[0])
+
+        self._emitted_evidence_episodes.add(emission_key)
+        counts = Counter(group_votes)
+        top = max(counts.values())
+        winners = sorted(
+            relation
+            for relation, count in counts.items()
+            if count == top
+        )
+        return winners[0] if len(winners) == 1 else None
 
     def _decay_utility(self) -> None:
         for basin in self._basins.values():
@@ -656,39 +718,15 @@ class ClosedArticulationLoop:
         )
         source_weight = 1.0 / len(provenance_group)
 
-        # Downward dependence compression is stronger than merely attenuating
-        # repeated reports. Once a dependence class is learned, one local
-        # observation ordinal contributes at most one foreground event.
-        foreground_relation = atom.relation
-        if (
-            atom.relation is not None
-            and ordinal is not None
-            and len(provenance_group) > 1
-        ):
-            fingerprint = (atom.context, ordinal)
-            members = tuple(sorted(provenance_group))
-            emission_key = (fingerprint, members)
-            group_claims = [
-                self._claims[source].get(fingerprint)
-                for source in members
-            ]
-            if (
-                emission_key in self._emitted_dependence_groups
-                or any(value is None for value in group_claims)
-            ):
-                foreground_relation = None
-            else:
-                counts = Counter(group_claims)
-                top = max(counts.values())
-                winners = sorted(
-                    relation
-                    for relation, count in counts.items()
-                    if count == top
-                )
-                foreground_relation = (
-                    winners[0] if len(winners) == 1 else None
-                )
-                self._emitted_dependence_groups.add(emission_key)
+        # Downward articulation acts on the evidence bundle before foreground
+        # plasticity. Dependent streams collapse first; once provenance
+        # structure is mature, all independent groups for one local ordinal
+        # become one foreground evidence episode.
+        foreground_relation = self._episode_foreground_relation(
+            atom,
+            ordinal,
+            groups,
+        )
 
         frontier = self._event_frontier.get(atom.context, -1)
         historical_only = (
