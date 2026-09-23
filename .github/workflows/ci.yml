@@ -89,6 +89,7 @@ jobs:
           tests/test_autonomy_robustness.py
           tests/test_autonomy_temporal_phase_b.py
           tests/test_closed_articulation_loop.py
+          tests/test_closed_articulation_loop_campaign.py
           tests/test_semantic_grounding.py
           tests/test_semantic_revision.py
           tests/test_noisy_semantic_revision.py
