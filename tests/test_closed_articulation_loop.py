@@ -188,3 +188,51 @@ def test_memory_conditioning_is_context_local():
 
     assert {row.relation for row in a} == {"A"}
     assert {row.relation for row in b} == {"B"}
+
+
+def test_dependent_provenance_is_compressed_before_foreground_update():
+    policy = ClosedLoopPolicy(
+        dependence_min_overlap=4,
+        dependence_agreement=1.0,
+    )
+    loop = ClosedArticulationLoop(policy)
+
+    # Learn that copy-a and copy-b are one redundant stream.
+    for step in range(4):
+        context = (f"cal-{step}",)
+        loop.observe(_atom(context, "T", step, provenance="copy-a"))
+        loop.observe(_atom(context, "T", step, provenance="copy-b"))
+        loop.observe(_atom(context, "T", step, provenance="independent-a"))
+        loop.observe(_atom(context, "T", step, provenance="independent-b"))
+
+    assert any(
+        group == frozenset({"copy-a", "copy-b"})
+        for group in loop.provenance_groups()
+    )
+
+    # On a fresh context the copied pair contributes one WRONG event while the
+    # two independent streams each contribute TRUE. The result should converge
+    # to TRUE without counting the copied pair twice.
+    last = None
+    event_time = 100
+    for _round in range(6):
+        last = loop.observe(
+            _atom(("target",), "WRONG", event_time, provenance="copy-a")
+        )
+        event_time += 1
+        last = loop.observe(
+            _atom(("target",), "WRONG", event_time, provenance="copy-b")
+        )
+        event_time += 1
+        last = loop.observe(
+            _atom(("target",), "TRUE", event_time, provenance="independent-a")
+        )
+        event_time += 1
+        last = loop.observe(
+            _atom(("target",), "TRUE", event_time, provenance="independent-b")
+        )
+        event_time += 1
+
+    assert last is not None
+    assert last.accepted_relation == "TRUE"
+    assert last.state is ArticulationState.EXECUTE
