@@ -393,6 +393,8 @@ def campaign(worlds_per_stage: int, material: str):
             "utility_decay": ClosedLoopPolicy().utility_decay,
             "dependence_min_overlap": ClosedLoopPolicy().dependence_min_overlap,
             "dependence_agreement": ClosedLoopPolicy().dependence_agreement,
+            "episode_min_completed": ClosedLoopPolicy().episode_min_completed,
+            "episode_separation_ratio": ClosedLoopPolicy().episode_separation_ratio,
             "recurrence_min_history": ClosedLoopPolicy().recurrence_min_history,
             "recurrence_confirmations": ClosedLoopPolicy().recurrence_confirmations,
             "residual_window": ClosedLoopPolicy().residual_window,
