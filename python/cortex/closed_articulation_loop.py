@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass, field
 from math import isfinite, log1p
+from statistics import median
 from typing import Iterable
 
 from .articulation_controller import ArticulationState
@@ -32,6 +33,8 @@ class ClosedLoopPolicy:
     utility_decay: float = 0.997
     dependence_min_overlap: int = 6
     dependence_agreement: float = 0.875
+    episode_min_completed: int = 3
+    episode_separation_ratio: float = 2.0
     recurrence_min_history: float = 5.0
     recurrence_confirmations: int = 3
     residual_window: int = 6
@@ -52,6 +55,13 @@ class ClosedLoopPolicy:
             or not 0.0 <= self.dependence_agreement <= 1.0
         ):
             raise ValueError("dependence_agreement must lie in [0,1]")
+        if self.episode_min_completed < 2:
+            raise ValueError("episode_min_completed must be at least two")
+        if (
+            not isfinite(self.episode_separation_ratio)
+            or self.episode_separation_ratio <= 1.0
+        ):
+            raise ValueError("episode_separation_ratio must be greater than one")
         if (
             not isfinite(self.recurrence_min_history)
             or self.recurrence_min_history <= 0.0
@@ -196,6 +206,9 @@ class ClosedArticulationLoop:
         self._next_basin_id = 0
         self._event_frontier: dict[ContextKey, int] = {}
         self._claims: dict[str, dict[Fingerprint, str]] = defaultdict(dict)
+        self._claim_event_times: dict[
+            str, dict[Fingerprint, int]
+        ] = defaultdict(dict)
         self._provenance_context_ordinals: dict[tuple[str, ContextKey], int] = {}
         self._emitted_evidence_episodes: set[
             tuple[Fingerprint, tuple[tuple[str, ...], ...]]
@@ -284,6 +297,65 @@ class ClosedArticulationLoop:
                 return 1.0 / len(group)
         return 1.0
 
+    def _episodic_coreporting(
+        self,
+        groups: tuple[frozenset[str], ...],
+    ) -> bool:
+        """Infer whether provenance arrives in separated co-reporting bursts.
+
+        Dependence and simultaneity are different questions. Two sources may
+        agree strongly while alternating over time. Episode consolidation is
+        enabled only when repeated same-ordinal reports form compact temporal
+        bursts separated by materially larger gaps.
+        """
+        if len(groups) < 2:
+            return False
+        sources = tuple(sorted(self._claims))
+        if len(sources) < 2:
+            return False
+
+        by_context: dict[
+            ContextKey,
+            list[tuple[int, int, int]],
+        ] = defaultdict(list)
+        fingerprints = set.intersection(
+            *(
+                set(self._claim_event_times[source])
+                for source in sources
+            )
+        )
+        for context, ordinal in fingerprints:
+            times = [
+                self._claim_event_times[source][(context, ordinal)]
+                for source in sources
+            ]
+            by_context[context].append(
+                (ordinal, min(times), max(times))
+            )
+
+        spans = []
+        gaps = []
+        completed = 0
+        for rows in by_context.values():
+            rows.sort()
+            completed += len(rows)
+            for _ordinal, first_time, last_time in rows:
+                spans.append(max(1, last_time - first_time + 1))
+            for left, right in zip(rows, rows[1:]):
+                gap = right[1] - left[2]
+                if gap > 0:
+                    gaps.append(gap)
+
+        if (
+            completed < self.policy.episode_min_completed
+            or not spans
+            or not gaps
+        ):
+            return False
+        return median(gaps) >= (
+            self.policy.episode_separation_ratio * median(spans)
+        )
+
     def _episode_foreground_relation(
         self,
         atom: EvidenceAtom,
@@ -299,6 +371,8 @@ class ClosedArticulationLoop:
         the independent group votes form one foreground articulation.
         """
         if atom.relation is None or ordinal is None or len(groups) < 2:
+            return atom.relation
+        if not self._episodic_coreporting(groups):
             return atom.relation
 
         sources = tuple(sorted(self._claims))
@@ -702,9 +776,11 @@ class ClosedArticulationLoop:
         if atom.relation is not None:
             ordinal_key = (atom.provenance, atom.context)
             ordinal = self._provenance_context_ordinals.get(ordinal_key, 0)
-            self._claims[atom.provenance][
-                (atom.context, ordinal)
-            ] = atom.relation
+            fingerprint = (atom.context, ordinal)
+            self._claims[atom.provenance][fingerprint] = atom.relation
+            self._claim_event_times[atom.provenance][
+                fingerprint
+            ] = atom.event_time
             self._provenance_context_ordinals[ordinal_key] = ordinal + 1
 
         groups = self.provenance_groups()
