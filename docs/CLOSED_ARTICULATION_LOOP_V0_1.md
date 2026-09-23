@@ -1,6 +1,6 @@
 # Closed Articulation Loop v0.1
 
-Status: **research prototype / generic invariants under validation**.
+Status: **research prototype / generic invariants passed / A-D development probe complete**.
 
 This prototype completes, at the research layer, the missing feedback path between
 foreground articulation, downward consolidation, memory, and later
@@ -102,8 +102,15 @@ while preserving per-context chronology.
 Two provenance streams may enter the same dependence class when they have enough
 overlap and sufficiently high repeated agreement.
 
-Once provenance structure is mature, downward articulation operates on the
-whole context-local evidence episode before foreground plasticity. Reports from
+Dependence does not by itself imply simultaneity. The loop separately learns
+whether aligned multi-source reports arrive in compact temporal bursts separated
+by materially larger gaps. Only that burst/separation geometry enables
+episode-level foreground consolidation, preventing continuously alternating
+reporters from being mistaken for one simultaneous evidence packet.
+
+Once both provenance structure and episode structure are mature, downward
+articulation operates on the whole context-local evidence episode before
+foreground plasticity. Reports from
 one inferred dependence class first collapse to one group vote; the remaining
 independent group votes are then combined into one foreground articulation for
 that ordinal. A tied episode stays unresolved rather than advancing the
@@ -209,8 +216,9 @@ The first scientific question is narrower:
 > Does this generic closed-loop mechanism satisfy its own invariants and then
 > improve more than one OWR failure without benchmark-specific rules?
 
-Only after the generic invariants pass should adapters be added for A-D
-development worlds.
+The generic invariants passed before the A-D development adapter was evaluated.
+The adapter uses one unchanged default policy across all four stages and
+consumes only learner-visible observation fields during execution.
 
 ## Initial invariants
 
@@ -226,3 +234,121 @@ The test suite requires:
 - conditioned activation remains context-local.
 
 These are mechanism invariants, not OWR performance gates.
+
+
+## A-D development probe
+
+The first integrated probe used 12 development worlds per OWR stage with one
+unchanged ClosedLoopPolicy. Hidden oracle fields were used only after execution
+for scoring. No official seed was generated and OWR-E remained untouched.
+
+### OWR-A — evidence dependence
+
+The frozen source-blind Cortex had previously preserved safety by resolving
+0/48 copied-majority traps. The closed loop instead learned redundant
+provenance structure from calibration history, consolidated mature evidence
+episodes before foreground plasticity, and achieved:
+
+| partition | coverage | resolved accuracy | selective risk |
+|---|---:|---:|---:|
+| all | 0.7500 | 0.9921 | 0.0079 |
+| calibration | 0.7396 | 0.9859 | 0.0141 |
+| fresh targets | 0.7639 | **1.0000** | **0.0000** |
+| target controls | 0.9167 | **1.0000** | **0.0000** |
+| copied-majority traps | **0.6875** | **1.0000** | **0.0000** |
+
+Thus 33 of 48 trap queries were answered correctly and none incorrectly.
+Coverage remains deliberately incomplete: unresolved evidence episodes do not
+force a foreground relation.
+
+### OWR-B — temporal disorder
+
+The event-time frontier and guarded recurrence path substantially reduce the
+unsafe transition behavior measured in the frozen system.
+
+| partition | coverage | resolved accuracy | selective risk |
+|---|---:|---:|---:|
+| all | 0.5021 | 0.8983 | 0.1017 |
+| near A -> B | 0.1094 | 0.3810 | 0.6190 |
+| settled B | 0.7396 | **1.0000** | **0.0000** |
+| near B -> C | 0.2604 | 0.7200 | 0.2800 |
+| settled C | 0.8021 | 0.9870 | 0.0130 |
+| near C -> A recurrence | 0.5833 | 0.8214 | 0.1786 |
+| settled recurrence | 0.9063 | 0.9885 | 0.0115 |
+
+The previous frozen selective risks near the three transition regions were
+1.0000, 1.0000, and 0.9787 respectively. The generic loop therefore produces a
+large improvement, but **OWR-B is not solved**: near the first transition,
+resolved errors remain unacceptably common.
+
+### OWR-C — compound background structure
+
+After learning temporal episode geometry separately from provenance dependence,
+the loop preserves the existing local relation result:
+
+```text
+local relation coverage  = 1.000
+local relation accuracy  = 1.000
+selective risk           = 0.000
+```
+
+Every one of the 12 worlds also produced generic multi-subject compound
+background candidates. Pattern-selective bubbling reduced the earlier noisy
+prototype behavior to two eligible compound candidate patterns per world.
+
+The mechanism still does **not** emit benchmark semantic labels such as
+`new_entity_type` or `new_relation`. The result therefore demonstrates
+generic joint structural candidate formation, not completed OWR-C semantic
+attribution.
+
+### OWR-D — bounded research memory
+
+With the same default loop, the 3,000-event development streams complete without
+a research-layer capacity exception:
+
+```text
+hard failure rate       = 0.000
+mean stored basins      = 256.0
+mean coarsened basins   = 2254.17
+query coverage          = 0.7756
+resolved accuracy       = 1.000
+selective risk          = 0.000
+```
+
+This is the intended accordion behavior at the research-memory layer: pressure
+reduces represented distinctions and therefore coverage rather than producing
+confidently wrong answers or unbounded growth.
+
+It is **not yet a fix for the native entity-capacity cliff**. Native structured
+knowledge ingestion still allocates physical entities before this research loop
+can coarsen them. Promotion requires a native integration point where downward
+memory decisions can influence representation allocation.
+
+## Development conclusion
+
+One generic closed-loop mechanism improves more than one independent failure
+without introducing OWR stage labels:
+
+```text
+foreground articulation
+        |
+downward evidence / residual / temporal consolidation
+        |
+bounded active + latent memory
+        |
+conditioned activation
+        |
+guarded bubbling
+        |
+future articulation
+```
+
+The strongest evidence is currently OWR-A and the bounded research behavior in
+OWR-D. OWR-B improves substantially but retains unsafe transition cases.
+OWR-C gains a generic joint-candidate representation but not semantic component
+attribution.
+
+The next engineering question is therefore not another benchmark-specific
+patch. It is whether the closed-loop semantics should be integrated deeper into
+the native representation lifecycle while preserving the frozen runtime as the
+differential reference.
