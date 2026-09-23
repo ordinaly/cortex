@@ -441,6 +441,68 @@ See [PLASTICITY_FRONTIER_V1.md](PLASTICITY_FRONTIER_V1.md),
 and
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
+
+### Research overlay — closed articulation loop v0.1
+
+The stable runtime above intentionally remains open-loop with respect to fuzzy
+historical reconstruction: the 12-D articulation state is sent independently to
+historical memory and continual reasoning.
+
+The current autonomy research line now tests the complementary feedback path
+without changing `spec-v0.9.5`:
+
+```text
+learner-visible evidence
+        |
+foreground relational articulation
+        |
+downward consolidation
+  - repeated evidence -> memory basin
+  - redundant provenance -> one evidential contribution
+  - late evidence -> historical-only contribution
+  - residual changes -> background candidate
+        |
+bounded memory
+  - active basins
+  - latent basins
+  - low-utility coarsening
+        |
+present-conditioned activation
+        |
+guarded bubbling / recurrence
+        |
+future foreground articulation
+```
+
+This is not a self-model and it does not introduce a fixed semantic ontology.
+Contexts, relations, and provenance IDs remain opaque. Provenance dependence is
+learned from repeated public claim agreement; evidence-episode consolidation is
+enabled only when the stream also exhibits repeated compact co-reporting bursts
+separated by larger temporal gaps. Dependence and simultaneity are therefore
+distinct learned structures.
+
+Memory cannot execute a relation by itself. A historical basin may be
+reactivated only after real fresh evidence confirms it for several observations.
+The reactivation transition changes current articulation state without
+fabricating historical or fast evidence.
+
+The same research policy was probed on OWR-A through OWR-D. It safely recovered
+33/48 copied-majority traps in OWR-A, materially reduced OWR-B transition risk,
+preserved 1.000 local relation accuracy while forming generic compound
+background candidates in OWR-C, and remained bounded at 256 memory basins under
+the OWR-D development streams with 1.000 resolved query accuracy.
+
+Two boundaries remain explicit:
+
+1. OWR-B still contains unsafe transition cases, so temporal articulation is not
+   complete.
+2. Research-layer memory coarsening does not yet control native entity
+   allocation. The native OWR-D capacity cliff therefore remains until a
+   representation-lifecycle integration is validated.
+
+See [CLOSED_ARTICULATION_LOOP_V0_1.md](CLOSED_ARTICULATION_LOOP_V0_1.md).
+
+
 ---
 
 ## 3. One frame through Cortex

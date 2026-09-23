@@ -275,6 +275,29 @@ class RelationalRegimeTracker:
             historical_evidence=dict(sorted(self._history.items())),
         )
 
+    def reactivate_from_memory(self, relation: str) -> RegimeSnapshot:
+        """Reactivate a previously evidenced regime without fabricating evidence.
+
+        This is an opt-in research hook for the closed articulation loop. It
+        changes only the current articulation state. Durable history and fast
+        evidence are left untouched, so memory can condition articulation
+        without being mistaken for a new observation.
+        """
+        relation = str(relation)
+        if not relation:
+            raise ValueError("relation must be non-empty")
+        if self._history.get(relation, 0) < 1:
+            raise ValueError(
+                "memory reactivation requires previously observed historical evidence"
+            )
+        self._accepted = relation
+        self._state = ArticulationState.EXECUTE
+        self._suspected = False
+        self._challenger = None
+        self._confirmation_streak = 0
+        self._pressure = 0.0
+        return self._snapshot()
+
     def observe(
         self,
         relation: str,

@@ -465,53 +465,45 @@ See [NOVELTY_AWARE_REPLANNING_V1.md](NOVELTY_AWARE_REPLANNING_V1.md).
 
 ---
 
-## A8. Open-World Robustness v1 — A-D development characterization complete
+## A8. Open-World Robustness v1 — closed articulation loop v0.1
 
-The integrated falsification campaign is now defined and development-tested
-through OWR-D without changing Cortex.
+The A-D development failure map motivated one shared architectural experiment
+rather than four benchmark-specific patches.
 
-The five stages remain:
+**Closed Articulation Loop v0.1** is now the development candidate. It adds a
+research-only feedback path between foreground articulation, downward evidence
+and residual consolidation, bounded active/latent memory, conditioned
+activation, and guarded future re-articulation.
 
-- **OWR-A — Epistemic Sources:** hidden contextual reliability and source
-  dependence;
-- **OWR-B — Temporal Disorder:** missing, delayed, duplicated, and out-of-order
-  evidence with regime recurrence;
-- **OWR-C — Compound Novelty:** simultaneous structural causes plus preserved
-  ambiguity;
-- **OWR-D — Memory & Interference:** long mostly-distractor streams and real
-  native capacity pressure;
-- **OWR-E — Autonomous Hidden Physics World:** the untouched composite exam.
+The same default policy was evaluated across 12 development worlds per OWR
+stage:
 
-Development findings on the frozen Cortex are now:
+- **A / source structure:** copied-majority traps reach **0.6875 coverage at
+  1.000 resolved accuracy**, compared with zero safe coverage in the frozen
+  Cortex characterization;
+- **B / temporal structure:** overall selective risk drops from about **0.319
+  to 0.102**, with substantial reductions at all three regime boundaries,
+  although the first transition remains unsafe;
+- **C / explanatory structure:** local relation coverage/accuracy remains
+  **1.000 / 1.000**, while generic multi-subject background candidates emerge
+  in every world without hard novelty labels;
+- **D / bounded relevance:** the research loop remains bounded at **256 stored
+  basins**, coarsens roughly **2254** distinctions per 3,000-event stream on
+  average, and retains **1.000 resolved accuracy** at **0.7756 coverage**.
 
-- **A:** conservative abstention under copied-majority conflict, but no
-  transferable source-dependence inference;
-- **B:** correct settled-regime execution but unsafe stale execution inside
-  delayed-evidence transition windows; event-time replay and duplicate collapse
-  are not sufficient fixes;
-- **C:** 1.000 local relation coverage/accuracy on the revised fixture, but no
-  compound structural-component output;
-- **D:** an accurate unbounded temporal reference but a hard native entity
-  capacity cliff instead of graceful degradation. The hosted native D result is
-  currently one world and is treated as a boundary confirmation, not a scaling
-  law.
+The research result supports the functional value of closing the
+articulation-memory loop, but it does not yet justify promotion into the frozen
+runtime. OWR-B retains unsafe transition cases, OWR-C does not yet attach
+semantic component labels, and OWR-D's native entity-capacity cliff remains
+below the research loop.
 
-Two development fixtures were deliberately corrected before official use:
-OWR-B v0 was rejected because a trivial recent vote solved it, and OWR-C was
-revised to separate relation-schema novelty from current outcome.
+No official OWR seed has been generated and OWR-E remains untouched.
 
-No official seed has been generated. Performance gates remain unfrozen and
-OWR-E has not been used for tuning.
+The next step is to evaluate the smallest **native representation-lifecycle
+integration point** for these semantics, while keeping the current frozen
+runtime as the differential reference rather than rewriting it in place.
 
-The next milestone is **architectural synthesis from the A-D failure map**
-before adding any new Cortex mechanism. The working question is whether
-dependence, temporal provenance, explanatory coupling, and relevance should be
-represented as revisable higher-order relations over Cortex's own evidence,
-rather than patched as four benchmark-specific features.
-
-See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md),
-[OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md),
-and [OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
+See [CLOSED_ARTICULATION_LOOP_V0_1.md](CLOSED_ARTICULATION_LOOP_V0_1.md).
 
 ---
 
