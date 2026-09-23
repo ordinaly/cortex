@@ -225,65 +225,60 @@ See
 [AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md](AUTONOMY_ROBUSTNESS_TEMPORAL_PLASTICITY_V1.md).
 
 
-## Open-World Robustness v1 — A-D development failure map complete
+## Open-World Robustness v1 — closed-loop synthesis v0.1
 
-Open-World Robustness v1 is the active autonomy investigation. Its five stages
-remain hidden source epistemics (OWR-A), temporal disorder and recurrence
-(OWR-B), compound novelty (OWR-C), long-stream memory interference (OWR-D), and
-the untouched composite Hidden Physics exam (OWR-E).
+Open-World Robustness v1 remains the active autonomy investigation. OWR-A
+through OWR-D were first characterized on the frozen Cortex, exposing evidence
+dependence, temporal provenance, compound explanation, and bounded-memory
+failures. OWR-E remains untouched.
 
-Phase 1 froze benchmark construction and learner/oracle information boundaries.
-Development characterization of the current frozen Cortex is now complete for
-**OWR-A through OWR-D**, with no Cortex mechanism change and no official seed
-generation.
-
-**OWR-A — source dependence.** On 48 fresh copied-majority target queries,
-current source-blind Cortex resolved 0/48, abstaining rather than executing the
-false numerical majority. Every Cortex-resolved query remained correct. A
-public-data dependence-collapsed baseline achieved 48/48, isolating missing
-transferable source-dependence inference.
-
-**OWR-B — temporal disorder.** The first easy fixture was rejected because a
-recent-7 vote solved it. The hardened boundary-collision fixture exposed an
-unsafe transition window: near A -> B and B -> C, Cortex coverage was about
-0.20 and every resolved answer was stale/wrong; near C -> A recurrence,
-selective risk was 0.9787. After each regime settled, resolved accuracy returned
-to 1.000. Public event-time replay and duplicate collapse did not remove the
-failure, so simple timestamp bookkeeping is insufficient. Mean switch latency
-was 24.23 / 23.44 / 23.74 arrival-time steps for B / C / recurrent A, with no
-demonstrated recurrence advantage.
-
-**OWR-C — compound explanation.** The development fixture was corrected before
-official use to separate relation-schema novelty from current outcome. Cortex
-then achieved 1.000 local relation coverage and accuracy, but its current
-temporal surface has no compound structural-component output. A learner-visible
-structural control achieved 1.000 exact resolution on the declared compound
-cases and 1.000 abstention on the ambiguous case.
-
-**OWR-D — bounded memory.** The unbounded temporal reference retained 0.9231
-coverage, 1.000 resolved accuracy, and correct recurrence on the 3,000-event
-development stream. The actual bounded native knowledge path hit a hard
-capacity failure at every tested limit: 512 entities after 3.2% of the stream,
-2,048 after 14.8%, and 8,192 after 65.2%. This hosted result currently covers
-one full native world, so it establishes a capacity cliff but not a statistical
-scaling law.
-
-The resulting development failure map is:
+The first shared architectural response is now implemented as the research-only
+**Closed Articulation Loop v0.1**. It completes the missing interaction:
 
 ```text
-A  evidence dependence / source structure
-B  temporal provenance / transition uncertainty
-C  compound explanatory structure
-D  bounded relevance / memory pressure
+foreground articulation
+    -> downward consolidation
+    -> active / latent bounded memory
+    -> conditioned activation
+    -> guarded bubbling
+    -> future articulation
 ```
 
-Performance gates remain unfrozen, no official A-D worlds have been generated,
-and OWR-E remains untouched. The next step is architectural synthesis from this
-failure map before any Cortex mechanism is changed.
+The mechanism has no OWR stage labels, no hidden source truth, and no self-model.
+It infers provenance redundancy from repeated public agreement, separately
+learns whether reports form temporally separated evidence episodes, preserves
+late evidence as history without automatically rewriting foreground state,
+forms generic compound residual candidates, reactivates sufficiently supported
+historical basins only after fresh confirmation, and coarsens low-utility memory
+distinctions under pressure.
 
-See [OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md](OPEN_WORLD_ROBUSTNESS_V1_PROTOCOL.md),
+On one unchanged policy across 12 development worlds per stage:
+
+- **OWR-A:** copied-majority traps improved from frozen safe coverage 0/48 to
+  **33/48 correct, 0 wrong** (0.6875 coverage, 1.000 resolved accuracy).
+- **OWR-B:** overall selective risk fell from about **0.319 to 0.102**. The
+  three near-transition risks fell from **1.000 / 1.000 / 0.979** to
+  **0.619 / 0.280 / 0.179**. This is a large improvement but the first
+  transition remains unsafe and OWR-B is not solved.
+- **OWR-C:** local relation coverage/accuracy remains **1.000 / 1.000** and
+  every world forms generic multi-subject compound background candidates.
+  Semantic component labels are intentionally not emitted yet.
+- **OWR-D:** the research memory completes every 3,000-event stream with
+  **256 stored basins**, about **2254 coarsened distinctions** on average,
+  **0.7756 query coverage**, **1.000 resolved accuracy**, and no hard
+  research-layer failure.
+
+The OWR-D result does **not** remove the native entity-capacity cliff: native
+structured ingestion still allocates physical entities before the research
+memory can coarsen them. Native integration is a separate engineering step.
+
+No official OWR seeds have been generated, performance gates remain unfrozen,
+and OWR-E has not been used for tuning.
+
+See [CLOSED_ARTICULATION_LOOP_V0_1.md](CLOSED_ARTICULATION_LOOP_V0_1.md),
 [OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md),
-and [OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
+and
+[OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
 
 ## What is stable today
 
