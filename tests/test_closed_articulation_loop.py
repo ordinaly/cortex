@@ -298,3 +298,40 @@ def test_alternating_reporters_are_not_mistaken_for_one_episode():
     groups = loop.provenance_groups()
     assert len(groups) >= 1
     assert not loop._episodic_coreporting(groups)
+
+
+def test_temporal_disorder_guard_suspends_execution_without_rewriting_history():
+    policy = ClosedLoopPolicy(
+        temporal_disorder_decay=0.5,
+        temporal_guard_threshold=1.0,
+    )
+    loop = ClosedArticulationLoop(policy)
+
+    first = loop.observe(_atom(("ctx",), "A", 10, arrival_time=10))
+    assert first.state is ArticulationState.EXECUTE
+
+    late = loop.observe(_atom(("ctx",), "A", 5, arrival_time=11))
+    assert late.historical_only
+    assert late.accepted_relation == "A"
+    assert late.temporal_disorder_pressure == 1.0
+    assert late.temporal_guarded
+    assert late.state is ArticulationState.UNRESOLVED
+
+    fresh = loop.observe(_atom(("ctx",), "A", 11, arrival_time=12))
+    assert not fresh.historical_only
+    assert fresh.temporal_disorder_pressure == 0.5
+    assert not fresh.temporal_guarded
+    assert fresh.accepted_relation == "A"
+    assert fresh.state is ArticulationState.EXECUTE
+
+
+def test_temporal_disorder_guard_is_disabled_by_default():
+    loop = ClosedArticulationLoop()
+
+    loop.observe(_atom(("ctx",), "A", 10, arrival_time=10))
+    late = loop.observe(_atom(("ctx",), "A", 5, arrival_time=11))
+
+    assert late.historical_only
+    assert late.temporal_disorder_pressure > 0.0
+    assert not late.temporal_guarded
+    assert late.state is ArticulationState.EXECUTE
