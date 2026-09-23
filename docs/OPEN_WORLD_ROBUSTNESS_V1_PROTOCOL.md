@@ -1,6 +1,6 @@
 # Cortex Open-World Robustness v1
 
-Status: **Phase 1 preregistration / benchmark construction**.
+Status: **Phase 2 development characterization complete for OWR-A through OWR-D; no official run yet**.
 
 Protocol ID: \`open-world-robustness-v1\`.
 
@@ -204,6 +204,49 @@ Primary future metrics:
 
 Hard capacity exhaustion must not be converted silently into confident wrong
 answers.
+
+## Development characterization checkpoint — OWR-A through OWR-D
+
+Current Cortex has now been characterized on development worlds for OWR-A
+through OWR-D without adding or tuning a Cortex mechanism.
+
+The measured failure map is:
+
+```text
+A  evidence dependence / source structure
+B  temporal provenance / transition uncertainty
+C  compound explanatory structure
+D  bounded relevance / memory pressure
+```
+
+Important development-only corrections occurred before any official run:
+
+- the first OWR-B fixture was rejected because a trivial recent-7 vote solved
+  it; the accepted development fixture concentrates delayed stale evidence near
+  regime boundaries and queries both collision and settled windows;
+- OWR-C was revised to represent context as `(entity, relation-schema)`, so
+  relation-schema novelty is not conflated with a changed current outcome.
+
+The accepted OWR-B development run shows perfect resolved accuracy once each
+regime settles, but near the first two transition boundaries every resolved
+Cortex answer is stale/wrong; near recurrence selective risk is 0.9787. Public
+event-time replay and explicit duplicate collapse do not remove that failure.
+
+OWR-C shows 1.000 local relation coverage/accuracy but no current compound
+structural-component output. A public-data discriminability control resolves
+the declared compound cases exactly and preserves the ambiguous case as
+unresolved.
+
+OWR-D confirms a hard bounded native capacity cliff in the hosted development
+world: 512 / 2,048 / 8,192 entity limits process about 3.2% / 14.8% / 65.2% of
+the 3,000-event stream before failure. The one-world native result is treated as
+a boundary confirmation rather than a statistical scaling estimate.
+
+Performance gates remain unfrozen. No official A-D seed has been generated.
+OWR-E remains untouched.
+
+See [OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_A_DEVELOPMENT.md)
+and [OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md](OPEN_WORLD_ROBUSTNESS_BCD_DEVELOPMENT.md).
 
 ### OWR-E — Autonomous Hidden Physics World
 
