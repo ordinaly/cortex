@@ -227,3 +227,8 @@ __all__ = [
     "native_version",
     "train_dataset",
 ]
+
+
+# Opt-in predictive research interface; no change to native runtime allocation.
+from .predictive_memory import (PredictiveMemory, PredictiveMemoryPolicy, PredictiveEvidenceAdapter)
+__all__ += ["PredictiveMemory", "PredictiveMemoryPolicy", "PredictiveEvidenceAdapter"]

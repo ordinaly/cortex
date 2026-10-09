@@ -2334,3 +2334,25 @@ For autonomous ingestion, articulation, and temporal plasticity:
 For software/specification/protocol versioning:
 
 - [VERSIONING.md](VERSIONING.md)
+
+
+## Finite predictive oracle and experimental memory (SL-Bench v0.1)
+
+`research/sl_bench/oracle.py` is an evaluator-only exact rational implementation
+of finite probe-relative predictive quotienting, strongly lumpable stable
+refinement, and exhaustive cell-count/distortion frontiers. It can return
+explicit pair/probe witnesses against a proposed compression. It is never
+imported by the online learner.
+
+`cortex.predictive_memory` supplies an opt-in bounded binary-probe estimator and
+`PredictiveEvidenceAdapter` for `EvidenceAtom`. Predictions precede updates;
+late events are excluded from current-profile learning. Per-context evidence is
+retained under optional cell pooling to allow reopening. LRU eviction is explicit
+information loss, not recoverable coarsening. The default adapter disables
+folding because the pilot did not show a net advantage. It is a separate
+research prediction interface, not a replacement for `ClosedArticulationLoop`
+or the native entity representation lifecycle.
+
+See [contract and limitations](SL_BENCH_V0_1.md) and
+[measured ablations](SL_BENCH_V0_1_RESULTS.md). The new oracle's finite-horizon
+scope does not establish arbitrary-horizon, causal, or whole-theory adequacy.
