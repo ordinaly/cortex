@@ -310,3 +310,8 @@ reject aggressive folding as a default improvement: active cells shrink, but
 retained evidence does not, and adversarial prediction loss increases. The
 adapter therefore defaults to no folding. This work does not change the native
 runtime or establish whole-theory correctness.
+
+The [v0.2 joint-trace extension](docs/SL_BENCH_TRACES_V0_2.md) adds bounded
+multi-step action-conditioned prediction. It tests hidden temporal correlations
+and delayed distinctions against the exact oracle, with an independent-noise
+control to expose the cost of unnecessary detail.

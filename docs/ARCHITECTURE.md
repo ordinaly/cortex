@@ -2356,3 +2356,11 @@ or the native entity representation lifecycle.
 See [contract and limitations](SL_BENCH_V0_1.md) and
 [measured ablations](SL_BENCH_V0_1_RESULTS.md). The new oracle's finite-horizon
 scope does not establish arbitrary-horizon, causal, or whole-theory adequacy.
+
+`cortex.TracePredictiveMemory` extends the experimental interface to categorical
+joint output words under declared action probes. Completed reset trials update
+bounded prefix statistics; prediction precedes observation. The evaluator alone
+knows hidden states and exact continuation distributions. Empirical partition
+proposals do not alter predictions or discard evidence. See the
+[v0.2 contract](SL_BENCH_TRACES_V0_2.md) for the finite-domain caps, source-model
+assumptions and the distinction between observed contexts and learned states.
