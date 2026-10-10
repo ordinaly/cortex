@@ -234,3 +234,5 @@ from .predictive_memory import (PredictiveMemory, PredictiveMemoryPolicy, Predic
 __all__ += ["PredictiveMemory", "PredictiveMemoryPolicy", "PredictiveEvidenceAdapter"]
 from .trace_memory import TracePredictiveMemory
 __all__ += ["TracePredictiveMemory"]
+from .accordion_memory import AccordionMemory, AccordionPolicy
+__all__ += ["AccordionMemory", "AccordionPolicy"]

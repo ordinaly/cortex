@@ -315,3 +315,8 @@ The [v0.2 joint-trace extension](docs/SL_BENCH_TRACES_V0_2.md) adds bounded
 multi-step action-conditioned prediction. It tests hidden temporal correlations
 and delayed distinctions against the exact oracle, with an independent-noise
 control to expose the cost of unnecessary detail.
+
+The [v0.3 physical accordion experiment](docs/SL_BENCH_ACCORDION_V0_3.md)
+releases full windows, keeps bounded witnesses, and accepts folds only when
+estimated total retained size decreases. It shows storage and local-drift gains
+in limited synthetic cases, with higher computation cost; it remains opt-in.

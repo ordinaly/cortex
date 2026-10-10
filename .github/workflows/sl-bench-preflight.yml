@@ -4,6 +4,7 @@ on:
     paths:
       - 'python/cortex/predictive_memory.py'
       - 'python/cortex/trace_memory.py'
+      - 'python/cortex/accordion_memory.py'
       - 'research/sl_bench/**'
       - 'tests/test_sl_*.py'
       - '.github/workflows/sl-bench-preflight.yml'
