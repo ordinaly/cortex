@@ -1,0 +1,2492 @@
+{
+  "version": "sl-bench-traces-v0.2",
+  "train_trials": 4096,
+  "test_trials": 1024,
+  "seeds": [
+    200,
+    201,
+    202,
+    203,
+    204,
+    205,
+    206,
+    207
+  ],
+  "summary": {
+    "correlation": {
+      "joint_action": {
+        "log_loss": 0.7203264028231807,
+        "mean_profile_tv": 0.03859492765953799,
+        "max_profile_tv": 0.11574986402916931,
+        "fit_seconds": 0.017668590625049774,
+        "retained_object_bytes": 739617,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 112,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_blind": {
+        "log_loss": 1.0432965913348329,
+        "mean_profile_tv": 0.2340086074454005,
+        "max_profile_tv": 0.5365384615384615,
+        "fit_seconds": 0.02041245225004218,
+        "retained_object_bytes": 217240,
+        "contexts": 4,
+        "retained_traces": 3072,
+        "count_entries": 32,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_action_budget": {
+        "log_loss": 0.7635205234284655,
+        "mean_profile_tv": 0.07761952651939898,
+        "max_profile_tv": 0.18610576923076924,
+        "fit_seconds": 0.0192013732499845,
+        "retained_object_bytes": 260805,
+        "contexts": 4,
+        "retained_traces": 2688,
+        "count_entries": 112,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "factorized_action": {
+        "log_loss": 2.0910632178688644,
+        "mean_profile_tv": 0.5712943144519136,
+        "max_profile_tv": 0.7499778994225313,
+        "fit_seconds": 0.017668590625049774,
+        "retained_object_bytes": 739617,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 112,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "oracle": {
+        "log_loss": 0.6931471805599453
+      },
+      "uniform": {
+        "log_loss": 2.0794415416798357
+      },
+      "partition_passes": 8,
+      "exact_minimum_cell_count_hits": 8
+    },
+    "delayed_action": {
+      "joint_action": {
+        "log_loss": 1.4123338974532746,
+        "mean_profile_tv": 0.05272901241837426,
+        "max_profile_tv": 0.11515593007068062,
+        "fit_seconds": 0.02046513750002532,
+        "retained_object_bytes": 740373.5,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 208,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_blind": {
+        "log_loss": 1.740363315971651,
+        "mean_profile_tv": 0.17299770950402116,
+        "max_profile_tv": 0.5326923076923077,
+        "fit_seconds": 0.021737079125017544,
+        "retained_object_bytes": 218884,
+        "contexts": 4,
+        "retained_traces": 3072,
+        "count_entries": 48,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_action_budget": {
+        "log_loss": 1.458069514257892,
+        "mean_profile_tv": 0.09752589566046199,
+        "max_profile_tv": 0.21336538461538462,
+        "fit_seconds": 0.022851031625009455,
+        "retained_object_bytes": 266844,
+        "contexts": 4,
+        "retained_traces": 2688,
+        "count_entries": 208,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "factorized_action": {
+        "log_loss": 1.4078498488061246,
+        "mean_profile_tv": 0.04449888861695122,
+        "max_profile_tv": 0.11159464152337642,
+        "fit_seconds": 0.02046513750002532,
+        "retained_object_bytes": 740373.5,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 208,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "oracle": {
+        "log_loss": 1.3862943611198906
+      },
+      "uniform": {
+        "log_loss": 2.0794415416798357
+      },
+      "partition_passes": 8,
+      "exact_minimum_cell_count_hits": 8
+    },
+    "noisy_correlation": {
+      "joint_action": {
+        "log_loss": 1.6051111177128776,
+        "mean_profile_tv": 0.05625740786534161,
+        "max_profile_tv": 0.14583457993815627,
+        "fit_seconds": 0.018715933000009954,
+        "retained_object_bytes": 744795,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 335.25,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_blind": {
+        "log_loss": 1.7225562690110117,
+        "mean_profile_tv": 0.1698025109109513,
+        "max_profile_tv": 0.37932692307692306,
+        "fit_seconds": 0.019631180125031733,
+        "retained_object_bytes": 219960,
+        "contexts": 4,
+        "retained_traces": 3072,
+        "count_entries": 56,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_action_budget": {
+        "log_loss": 1.6411680046371184,
+        "mean_profile_tv": 0.10139328464902445,
+        "max_profile_tv": 0.20884615384615382,
+        "fit_seconds": 0.021758184750012788,
+        "retained_object_bytes": 277244,
+        "contexts": 4,
+        "retained_traces": 2688,
+        "count_entries": 314.75,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "factorized_action": {
+        "log_loss": 2.0906794411204674,
+        "mean_profile_tv": 0.3668483758183974,
+        "max_profile_tv": 0.4816302488420824,
+        "fit_seconds": 0.018715933000009954,
+        "retained_object_bytes": 744795,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 335.25,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "oracle": {
+        "log_loss": 1.5763940059638646
+      },
+      "uniform": {
+        "log_loss": 2.0794415416798357
+      },
+      "partition_passes": 8,
+      "exact_minimum_cell_count_hits": 8
+    },
+    "null": {
+      "joint_action": {
+        "log_loss": 2.1035128300630777,
+        "mean_profile_tv": 0.06642448262433756,
+        "max_profile_tv": 0.13680525173832023,
+        "fit_seconds": 0.019117118250022713,
+        "retained_object_bytes": 744382,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 336,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_blind": {
+        "log_loss": 2.093313694963346,
+        "mean_profile_tv": 0.05349221499852664,
+        "max_profile_tv": 0.0875,
+        "fit_seconds": 0.021566358999962176,
+        "retained_object_bytes": 219792,
+        "contexts": 4,
+        "retained_traces": 3072,
+        "count_entries": 56,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "joint_action_budget": {
+        "log_loss": 2.1472279969962744,
+        "mean_profile_tv": 0.11190604675936308,
+        "max_profile_tv": 0.23557692307692307,
+        "fit_seconds": 0.022350502874985523,
+        "retained_object_bytes": 278950.5,
+        "contexts": 4,
+        "retained_traces": 2688,
+        "count_entries": 335.875,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "factorized_action": {
+        "log_loss": 2.0877517218145965,
+        "mean_profile_tv": 0.046774601034430936,
+        "max_profile_tv": 0.1140239149824098,
+        "fit_seconds": 0.019117118250022713,
+        "retained_object_bytes": 744382,
+        "contexts": 4,
+        "retained_traces": 10149.25,
+        "count_entries": 336,
+        "trials": 4096,
+        "evictions": 0
+      },
+      "oracle": {
+        "log_loss": 2.0794415416798357
+      },
+      "uniform": {
+        "log_loss": 2.0794415416798357
+      },
+      "partition_passes": 8,
+      "exact_minimum_cell_count_hits": 8
+    }
+  },
+  "runs": [
+    {
+      "seed": 200,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7254791027704675,
+          "mean_profile_tv": 0.03676327389138369,
+          "max_profile_tv": 0.10472972972972971,
+          "fit_seconds": 0.01719390699986434,
+          "retained_object_bytes": 738921,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0363495847364235,
+          "mean_profile_tv": 0.23580393003069683,
+          "max_profile_tv": 0.5307692307692308,
+          "fit_seconds": 0.01795721900020908,
+          "retained_object_bytes": 217357,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7635926584694983,
+          "mean_profile_tv": 0.07536078717201167,
+          "max_profile_tv": 0.22115384615384615,
+          "fit_seconds": 0.01811333199998444,
+          "retained_object_bytes": 260401,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.1065337291083113,
+          "mean_profile_tv": 0.5717039584618914,
+          "max_profile_tv": 0.75,
+          "fit_seconds": 0.01719390699986434,
+          "retained_object_bytes": 738921,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 201,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7178864483231684,
+          "mean_profile_tv": 0.03130882911207367,
+          "max_profile_tv": 0.09756097560975606,
+          "fit_seconds": 0.018082247000165808,
+          "retained_object_bytes": 738781,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0404196585550396,
+          "mean_profile_tv": 0.23069214892126844,
+          "max_profile_tv": 0.5346153846153846,
+          "fit_seconds": 0.017924466000067696,
+          "retained_object_bytes": 217221,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7537550488495044,
+          "mean_profile_tv": 0.06699245907154071,
+          "max_profile_tv": 0.1826923076923077,
+          "fit_seconds": 0.019873689999940325,
+          "retained_object_bytes": 261321,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0842129060510373,
+          "mean_profile_tv": 0.5713813358481153,
+          "max_profile_tv": 0.75,
+          "fit_seconds": 0.018082247000165808,
+          "retained_object_bytes": 738781,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 202,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7226445074504877,
+          "mean_profile_tv": 0.04067708719575751,
+          "max_profile_tv": 0.11851851851851854,
+          "fit_seconds": 0.01786043700008122,
+          "retained_object_bytes": 738681,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0567278699148097,
+          "mean_profile_tv": 0.2271239769791937,
+          "max_profile_tv": 0.5461538461538461,
+          "fit_seconds": 0.02457585399997697,
+          "retained_object_bytes": 217337,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7695794466752489,
+          "mean_profile_tv": 0.07828703184570532,
+          "max_profile_tv": 0.20192307692307696,
+          "fit_seconds": 0.01818322500002978,
+          "retained_object_bytes": 259269,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.097645413581369,
+          "mean_profile_tv": 0.5701371635820182,
+          "max_profile_tv": 0.75,
+          "fit_seconds": 0.01786043700008122,
+          "retained_object_bytes": 738681,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 203,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.721511014221899,
+          "mean_profile_tv": 0.04200676731789024,
+          "max_profile_tv": 0.13071895424836602,
+          "fit_seconds": 0.016268013000171777,
+          "retained_object_bytes": 740301,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0344812133331767,
+          "mean_profile_tv": 0.22903953796633192,
+          "max_profile_tv": 0.5499999999999999,
+          "fit_seconds": 0.017690143999971042,
+          "retained_object_bytes": 217229,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7622660163565081,
+          "mean_profile_tv": 0.08102573446961203,
+          "max_profile_tv": 0.16346153846153844,
+          "fit_seconds": 0.01876932899995154,
+          "retained_object_bytes": 260773,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.094553376069811,
+          "mean_profile_tv": 0.5696287031357875,
+          "max_profile_tv": 0.75,
+          "fit_seconds": 0.016268013000171777,
+          "retained_object_bytes": 740301,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 204,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7209213763659185,
+          "mean_profile_tv": 0.03681973538815389,
+          "max_profile_tv": 0.08799999999999998,
+          "fit_seconds": 0.016651392000085252,
+          "retained_object_bytes": 739577,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0591373091712577,
+          "mean_profile_tv": 0.24587354400493483,
+          "max_profile_tv": 0.5192307692307693,
+          "fit_seconds": 0.02304577200015956,
+          "retained_object_bytes": 217205,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7638557700921014,
+          "mean_profile_tv": 0.07794320475442926,
+          "max_profile_tv": 0.16346153846153844,
+          "fit_seconds": 0.020641621000095256,
+          "retained_object_bytes": 260749,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.09254545428004,
+          "mean_profile_tv": 0.5732717704441719,
+          "max_profile_tv": 0.7499588477366256,
+          "fit_seconds": 0.016651392000085252,
+          "retained_object_bytes": 739577,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 205,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7186468398114424,
+          "mean_profile_tv": 0.04314228953305602,
+          "max_profile_tv": 0.12109375,
+          "fit_seconds": 0.019883387999925617,
+          "retained_object_bytes": 740113,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0351079704300212,
+          "mean_profile_tv": 0.23759550707790686,
+          "max_profile_tv": 0.5269230769230769,
+          "fit_seconds": 0.023757944999942993,
+          "retained_object_bytes": 217153,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7685709487963776,
+          "mean_profile_tv": 0.08493846714509981,
+          "max_profile_tv": 0.20192307692307696,
+          "fit_seconds": 0.01903651199995693,
+          "retained_object_bytes": 261337,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0859633998839677,
+          "mean_profile_tv": 0.5711697268217234,
+          "max_profile_tv": 0.7499588477366256,
+          "fit_seconds": 0.019883387999925617,
+          "retained_object_bytes": 740113,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 206,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7153718426302579,
+          "mean_profile_tv": 0.040349200801738,
+          "max_profile_tv": 0.17410714285714288,
+          "fit_seconds": 0.01758787700009634,
+          "retained_object_bytes": 740141,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0370337251370503,
+          "mean_profile_tv": 0.2304142167367215,
+          "max_profile_tv": 0.5423076923076924,
+          "fit_seconds": 0.01787336500001402,
+          "retained_object_bytes": 217209,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7604338024014828,
+          "mean_profile_tv": 0.08651295133437992,
+          "max_profile_tv": 0.21,
+          "fit_seconds": 0.02008091399989098,
+          "retained_object_bytes": 260865,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0764543092324015,
+          "mean_profile_tv": 0.5707487195509888,
+          "max_profile_tv": 0.7499534999069998,
+          "fit_seconds": 0.01758787700009634,
+          "retained_object_bytes": 740141,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 207,
+      "family": "correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 0.7201500910118048,
+          "mean_profile_tv": 0.03769223803625089,
+          "max_profile_tv": 0.09126984126984126,
+          "fit_seconds": 0.017821464000007836,
+          "retained_object_bytes": 740421,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.0471153994008842,
+          "mean_profile_tv": 0.23552599784614986,
+          "max_profile_tv": 0.5423076923076924,
+          "fit_seconds": 0.020474852999996074,
+          "retained_object_bytes": 217209,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 32,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 0.7661104957870031,
+          "mean_profile_tv": 0.06989557636241311,
+          "max_profile_tv": 0.14423076923076925,
+          "fit_seconds": 0.018912363000026744,
+          "retained_object_bytes": 261725,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.090597154743979,
+          "mean_profile_tv": 0.5723131377706127,
+          "max_profile_tv": 0.749952,
+          "fit_seconds": 0.017821464000007836,
+          "retained_object_bytes": 740421,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 112,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 0.6931471805599453
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 200,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4095599490195778,
+          "mean_profile_tv": 0.05551071017407341,
+          "max_profile_tv": 0.109375,
+          "fit_seconds": 0.025429688000031092,
+          "retained_object_bytes": 739613,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7289539210154572,
+          "mean_profile_tv": 0.17626416053707702,
+          "max_profile_tv": 0.5269230769230769,
+          "fit_seconds": 0.022445025000024543,
+          "retained_object_bytes": 218821,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4589124580087927,
+          "mean_profile_tv": 0.10445377326754879,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.021886429999995016,
+          "retained_object_bytes": 266281,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.404840984639035,
+          "mean_profile_tv": 0.04875841463001884,
+          "max_profile_tv": 0.1077880859375,
+          "fit_seconds": 0.025429688000031092,
+          "retained_object_bytes": 739613,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 201,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4114958927958887,
+          "mean_profile_tv": 0.04850743581230762,
+          "max_profile_tv": 0.14227642276422764,
+          "fit_seconds": 0.017906909000203086,
+          "retained_object_bytes": 739581,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.743988727060922,
+          "mean_profile_tv": 0.17225341017984216,
+          "max_profile_tv": 0.5307692307692308,
+          "fit_seconds": 0.018951012000115952,
+          "retained_object_bytes": 218849,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4523180813084005,
+          "mean_profile_tv": 0.09295918367346939,
+          "max_profile_tv": 0.21153846153846154,
+          "fit_seconds": 0.021870992999993177,
+          "retained_object_bytes": 267309,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4070915947925235,
+          "mean_profile_tv": 0.03938004491145367,
+          "max_profile_tv": 0.14009518143961927,
+          "fit_seconds": 0.017906909000203086,
+          "retained_object_bytes": 739581,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 202,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4098130658857244,
+          "mean_profile_tv": 0.04935294316264829,
+          "max_profile_tv": 0.11971830985915492,
+          "fit_seconds": 0.01894093900000371,
+          "retained_object_bytes": 739309,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.755664938241656,
+          "mean_profile_tv": 0.17263831393774384,
+          "max_profile_tv": 0.5423076923076923,
+          "fit_seconds": 0.020064297000089937,
+          "retained_object_bytes": 218821,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4572224613890439,
+          "mean_profile_tv": 0.10279897398519848,
+          "max_profile_tv": 0.18,
+          "fit_seconds": 0.019230706999906033,
+          "retained_object_bytes": 265281,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4075605255164225,
+          "mean_profile_tv": 0.04376417175078712,
+          "max_profile_tv": 0.11813132315016858,
+          "fit_seconds": 0.01894093900000371,
+          "retained_object_bytes": 739309,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 203,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4042185530776081,
+          "mean_profile_tv": 0.04440947110679397,
+          "max_profile_tv": 0.09496124031007751,
+          "fit_seconds": 0.020539776999839887,
+          "retained_object_bytes": 740925,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7261716695412463,
+          "mean_profile_tv": 0.16838701219752708,
+          "max_profile_tv": 0.5461538461538461,
+          "fit_seconds": 0.019317163999858167,
+          "retained_object_bytes": 218821,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4492446421986647,
+          "mean_profile_tv": 0.09114249271137027,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.028405185000110578,
+          "retained_object_bytes": 266809,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4031799942541516,
+          "mean_profile_tv": 0.03885133434470136,
+          "max_profile_tv": 0.08716732880516043,
+          "fit_seconds": 0.020539776999839887,
+          "retained_object_bytes": 740925,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 204,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.409581241922506,
+          "mean_profile_tv": 0.05261812725577926,
+          "max_profile_tv": 0.10267857142857142,
+          "fit_seconds": 0.01684559600016655,
+          "retained_object_bytes": 740197,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.750281777659095,
+          "mean_profile_tv": 0.17528400625405421,
+          "max_profile_tv": 0.5153846153846153,
+          "fit_seconds": 0.018838650000134294,
+          "retained_object_bytes": 218905,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4443317951797392,
+          "mean_profile_tv": 0.09285223704866563,
+          "max_profile_tv": 0.2,
+          "fit_seconds": 0.020660278999912407,
+          "retained_object_bytes": 266893,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4050955417598419,
+          "mean_profile_tv": 0.0444340576636067,
+          "max_profile_tv": 0.09857871720116618,
+          "fit_seconds": 0.01684559600016655,
+          "retained_object_bytes": 740197,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 205,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4142120985231825,
+          "mean_profile_tv": 0.05673020461587946,
+          "max_profile_tv": 0.1163793103448276,
+          "fit_seconds": 0.018895880000172838,
+          "retained_object_bytes": 740841,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7270908092953148,
+          "mean_profile_tv": 0.1650924634138823,
+          "max_profile_tv": 0.5230769230769231,
+          "fit_seconds": 0.02029734500001723,
+          "retained_object_bytes": 218933,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4633367982922507,
+          "mean_profile_tv": 0.09699932720340884,
+          "max_profile_tv": 0.21153846153846156,
+          "fit_seconds": 0.01911882399986098,
+          "retained_object_bytes": 267365,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.408688130088516,
+          "mean_profile_tv": 0.04330121367061648,
+          "max_profile_tv": 0.10844584889399593,
+          "fit_seconds": 0.018895880000172838,
+          "retained_object_bytes": 740841,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 206,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4214638415664682,
+          "mean_profile_tv": 0.0570449589674731,
+          "max_profile_tv": 0.12222222222222222,
+          "fit_seconds": 0.026388267999891468,
+          "retained_object_bytes": 741233,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.748416689565594,
+          "mean_profile_tv": 0.17725719217891872,
+          "max_profile_tv": 0.5384615384615384,
+          "fit_seconds": 0.03362550099996042,
+          "retained_object_bytes": 218961,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4824256797511737,
+          "mean_profile_tv": 0.10259040704193766,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.0312827750001361,
+          "retained_object_bytes": 266893,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4141907238584577,
+          "mean_profile_tv": 0.04460230469979907,
+          "max_profile_tv": 0.12052126200274348,
+          "fit_seconds": 0.026388267999891468,
+          "retained_object_bytes": 741233,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 207,
+      "family": "delayed_action",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.4183265368352418,
+          "mean_profile_tv": 0.05765824825203893,
+          "max_profile_tv": 0.11363636363636365,
+          "fit_seconds": 0.018774042999893936,
+          "retained_object_bytes": 741289,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.742337995393922,
+          "mean_profile_tv": 0.17680511733312385,
+          "max_profile_tv": 0.5384615384615384,
+          "fit_seconds": 0.02035763899993981,
+          "retained_object_bytes": 218961,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 48,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.4567641979350716,
+          "mean_profile_tv": 0.09641077035209689,
+          "max_profile_tv": 0.21153846153846154,
+          "fit_seconds": 0.02035306000016135,
+          "retained_object_bytes": 267921,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 1.4121512955400497,
+          "mean_profile_tv": 0.05289956726462652,
+          "max_profile_tv": 0.11202938475665751,
+          "fit_seconds": 0.018774042999893936,
+          "retained_object_bytes": 741289,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 208,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.3862943611198906
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 4,
+        "minimum_feasible_cells": 4,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 200,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.6195826747208533,
+          "mean_profile_tv": 0.05726726147310081,
+          "max_profile_tv": 0.13326771653543307,
+          "fit_seconds": 0.018477926000059597,
+          "retained_object_bytes": 744213,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7196449057405092,
+          "mean_profile_tv": 0.17396357149320682,
+          "max_profile_tv": 0.4123076923076923,
+          "fit_seconds": 0.01911137700017207,
+          "retained_object_bytes": 220037,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6481731401236777,
+          "mean_profile_tv": 0.10114207221350077,
+          "max_profile_tv": 0.2269230769230769,
+          "fit_seconds": 0.022434583999938695,
+          "retained_object_bytes": 276321,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 310,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.1014423654855343,
+          "mean_profile_tv": 0.3665202217919905,
+          "max_profile_tv": 0.48193337299226646,
+          "fit_seconds": 0.018477926000059597,
+          "retained_object_bytes": 744213,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.5904477068317442
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 201,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.593378710018241,
+          "mean_profile_tv": 0.054521412429397884,
+          "max_profile_tv": 0.14643410852713182,
+          "fit_seconds": 0.017102762999911647,
+          "retained_object_bytes": 743985,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7173643449281,
+          "mean_profile_tv": 0.17834922866775185,
+          "max_profile_tv": 0.3853846153846154,
+          "fit_seconds": 0.019060555000123713,
+          "retained_object_bytes": 219953,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6175649837318316,
+          "mean_profile_tv": 0.10111459968602825,
+          "max_profile_tv": 0.22999999999999998,
+          "fit_seconds": 0.019761077000111982,
+          "retained_object_bytes": 278049,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 315,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0883845637819825,
+          "mean_profile_tv": 0.3681911671209045,
+          "max_profile_tv": 0.48075950151900304,
+          "fit_seconds": 0.017102762999911647,
+          "retained_object_bytes": 743985,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.5659176107714452
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 202,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.636413154320265,
+          "mean_profile_tv": 0.05344609899901993,
+          "max_profile_tv": 0.12962962962962965,
+          "fit_seconds": 0.01780087499992078,
+          "retained_object_bytes": 743657,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7575372375487626,
+          "mean_profile_tv": 0.15613298715280435,
+          "max_profile_tv": 0.3823076923076923,
+          "fit_seconds": 0.019743758999993588,
+          "retained_object_bytes": 219953,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6803153241075697,
+          "mean_profile_tv": 0.0990614487553263,
+          "max_profile_tv": 0.18846153846153846,
+          "fit_seconds": 0.024744492000081664,
+          "retained_object_bytes": 275465,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 320,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0947026100330057,
+          "mean_profile_tv": 0.3662704744437875,
+          "max_profile_tv": 0.482378892733564,
+          "fit_seconds": 0.01780087499992078,
+          "retained_object_bytes": 743657,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.6068011042052768
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 203,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.6250088733107362,
+          "mean_profile_tv": 0.05492253580877526,
+          "max_profile_tv": 0.14705882352941174,
+          "fit_seconds": 0.018392278999954215,
+          "retained_object_bytes": 745301,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7406796575319274,
+          "mean_profile_tv": 0.16584099925652726,
+          "max_profile_tv": 0.3730769230769231,
+          "fit_seconds": 0.01949733100013873,
+          "retained_object_bytes": 219897,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6609433148640858,
+          "mean_profile_tv": 0.09831324287956941,
+          "max_profile_tv": 0.17615384615384613,
+          "fit_seconds": 0.02113109600009011,
+          "retained_object_bytes": 276833,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 313,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0819841675198636,
+          "mean_profile_tv": 0.3654200368521419,
+          "max_profile_tv": 0.4822510522670361,
+          "fit_seconds": 0.018392278999954215,
+          "retained_object_bytes": 745301,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.6088452788769683
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 204,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.6307783450650875,
+          "mean_profile_tv": 0.056936301800800684,
+          "max_profile_tv": 0.141,
+          "fit_seconds": 0.016785002999995413,
+          "retained_object_bytes": 744713,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 334,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7467554169433661,
+          "mean_profile_tv": 0.175527776148082,
+          "max_profile_tv": 0.3576923076923077,
+          "fit_seconds": 0.018254476000038267,
+          "retained_object_bytes": 219925,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6705773898170306,
+          "mean_profile_tv": 0.10027192195559542,
+          "max_profile_tv": 0.19538461538461538,
+          "fit_seconds": 0.02168802199980746,
+          "retained_object_bytes": 276209,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 314,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.096364509697328,
+          "mean_profile_tv": 0.36893161757593995,
+          "max_profile_tv": 0.481189446366782,
+          "fit_seconds": 0.016785002999995413,
+          "retained_object_bytes": 744713,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 334,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.5884035321600525
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 205,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.5478126373974816,
+          "mean_profile_tv": 0.05723446769844501,
+          "max_profile_tv": 0.1134375,
+          "fit_seconds": 0.01806843100007427,
+          "retained_object_bytes": 745329,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.6940879325009144,
+          "mean_profile_tv": 0.17169711988008973,
+          "max_profile_tv": 0.4023076923076923,
+          "fit_seconds": 0.021636536999949385,
+          "retained_object_bytes": 220065,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.5981307907147524,
+          "mean_profile_tv": 0.10395800627943484,
+          "max_profile_tv": 0.1923076923076923,
+          "fit_seconds": 0.020649186999889935,
+          "retained_object_bytes": 279181,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 320,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0796617914166045,
+          "mean_profile_tv": 0.3670413036326469,
+          "max_profile_tv": 0.4810288065843621,
+          "fit_seconds": 0.01806843100007427,
+          "retained_object_bytes": 745329,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.5311666413526885
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 206,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.6429826610446139,
+          "mean_profile_tv": 0.061147953962353147,
+          "max_profile_tv": 0.19642857142857142,
+          "fit_seconds": 0.025102615000150763,
+          "retained_object_bytes": 745553,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.7285442326319271,
+          "mean_profile_tv": 0.16941196377898937,
+          "max_profile_tv": 0.35846153846153844,
+          "fit_seconds": 0.02186909299985018,
+          "retained_object_bytes": 219869,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.6714119233886051,
+          "mean_profile_tv": 0.10560551693204755,
+          "max_profile_tv": 0.25,
+          "fit_seconds": 0.023201473000199258,
+          "retained_object_bytes": 277073,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 311,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.090133351142639,
+          "mean_profile_tv": 0.36619097826420083,
+          "max_profile_tv": 0.4818365472910927,
+          "fit_seconds": 0.025102615000150763,
+          "retained_object_bytes": 745553,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.600668580190202
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 207,
+      "family": "noisy_correlation",
+      "methods": {
+        "joint_action": {
+          "log_loss": 1.5449318858257426,
+          "mean_profile_tv": 0.054583230750840206,
+          "max_profile_tv": 0.15942028985507245,
+          "fit_seconds": 0.01799757200001295,
+          "retained_object_bytes": 745609,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 1.675836424262587,
+          "mean_profile_tv": 0.1674964409101591,
+          "max_profile_tv": 0.3630769230769231,
+          "fit_seconds": 0.01787631299998793,
+          "retained_object_bytes": 219981,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 1.5822271703493942,
+          "mean_profile_tv": 0.10167946849069297,
+          "max_profile_tv": 0.2115384615384615,
+          "fit_seconds": 0.0204555469999832,
+          "retained_object_bytes": 278821,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 315,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.092762169886782,
+          "mean_profile_tv": 0.36622120686556703,
+          "max_profile_tv": 0.48166437098255277,
+          "fit_seconds": 0.01799757200001295,
+          "retained_object_bytes": 745609,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 1.518901593322539
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 2,
+        "minimum_feasible_cells": 2,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 200,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.101516758742034,
+          "mean_profile_tv": 0.0679391492383678,
+          "max_profile_tv": 0.13918439716312056,
+          "fit_seconds": 0.017161503000124867,
+          "retained_object_bytes": 743625,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.1040988598048713,
+          "mean_profile_tv": 0.05868174295465942,
+          "max_profile_tv": 0.08846153846153845,
+          "fit_seconds": 0.022255853999922692,
+          "retained_object_bytes": 219673,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.159429596737656,
+          "mean_profile_tv": 0.119048553487329,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.022047638000003644,
+          "retained_object_bytes": 278405,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.08811056341915,
+          "mean_profile_tv": 0.052130298435027735,
+          "max_profile_tv": 0.11631965637207031,
+          "fit_seconds": 0.017161503000124867,
+          "retained_object_bytes": 743625,
+          "contexts": 4,
+          "retained_traces": 10143,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 201,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.1154409506284035,
+          "mean_profile_tv": 0.06465209069006989,
+          "max_profile_tv": 0.14939024390243902,
+          "fit_seconds": 0.019048097999984748,
+          "retained_object_bytes": 743593,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.08426449354262,
+          "mean_profile_tv": 0.047802860729292726,
+          "max_profile_tv": 0.07307692307692307,
+          "fit_seconds": 0.020945908999919993,
+          "retained_object_bytes": 219701,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1433683314272405,
+          "mean_profile_tv": 0.1073822605965463,
+          "max_profile_tv": 0.25,
+          "fit_seconds": 0.020706234000044788,
+          "retained_object_bytes": 279377,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0877308250929456,
+          "mean_profile_tv": 0.04269039452046383,
+          "max_profile_tv": 0.13414634146341464,
+          "fit_seconds": 0.019048097999984748,
+          "retained_object_bytes": 743593,
+          "contexts": 4,
+          "retained_traces": 10134,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 202,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.0911804337942974,
+          "mean_profile_tv": 0.06118282282431893,
+          "max_profile_tv": 0.13293650793650796,
+          "fit_seconds": 0.01836772799993014,
+          "retained_object_bytes": 743405,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.095602988969547,
+          "mean_profile_tv": 0.05066029195972187,
+          "max_profile_tv": 0.07692307692307691,
+          "fit_seconds": 0.01829081400001087,
+          "retained_object_bytes": 219785,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1348552654221327,
+          "mean_profile_tv": 0.12014100695223144,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.026797943000019586,
+          "retained_object_bytes": 277533,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0827663789851347,
+          "mean_profile_tv": 0.043913039305580805,
+          "max_profile_tv": 0.11267605633802824,
+          "fit_seconds": 0.01836772799993014,
+          "retained_object_bytes": 743405,
+          "contexts": 4,
+          "retained_traces": 10145,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 203,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.090628944104888,
+          "mean_profile_tv": 0.058065702172610124,
+          "max_profile_tv": 0.12595419847328243,
+          "fit_seconds": 0.017980349000026763,
+          "retained_object_bytes": 744937,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.0863650684590684,
+          "mean_profile_tv": 0.0475078913184062,
+          "max_profile_tv": 0.0923076923076923,
+          "fit_seconds": 0.022880418999875474,
+          "retained_object_bytes": 219785,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1425840398474665,
+          "mean_profile_tv": 0.10848452567840322,
+          "max_profile_tv": 0.23076923076923075,
+          "fit_seconds": 0.02254339599994637,
+          "retained_object_bytes": 279089,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.080070522079808,
+          "mean_profile_tv": 0.03813311607044336,
+          "max_profile_tv": 0.0832475820008895,
+          "fit_seconds": 0.017980349000026763,
+          "retained_object_bytes": 744937,
+          "contexts": 4,
+          "retained_traces": 10158,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 204,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.0948845965300356,
+          "mean_profile_tv": 0.06931667890927067,
+          "max_profile_tv": 0.14102564102564102,
+          "fit_seconds": 0.020707530999970913,
+          "retained_object_bytes": 744209,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.092240298285845,
+          "mean_profile_tv": 0.05660268757273553,
+          "max_profile_tv": 0.08846153846153845,
+          "fit_seconds": 0.022570617999917886,
+          "retained_object_bytes": 219841,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1255892970951495,
+          "mean_profile_tv": 0.10607339089481946,
+          "max_profile_tv": 0.21153846153846154,
+          "fit_seconds": 0.021511701999997968,
+          "retained_object_bytes": 278961,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.08417909757144,
+          "mean_profile_tv": 0.048091383209047614,
+          "max_profile_tv": 0.12386115160349856,
+          "fit_seconds": 0.020707530999970913,
+          "retained_object_bytes": 744209,
+          "contexts": 4,
+          "retained_traces": 10147,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 205,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.1132308471145493,
+          "mean_profile_tv": 0.07018585248192843,
+          "max_profile_tv": 0.15185185185185185,
+          "fit_seconds": 0.01893943000004583,
+          "retained_object_bytes": 744825,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.097100215981694,
+          "mean_profile_tv": 0.05355400187542075,
+          "max_profile_tv": 0.09999999999999999,
+          "fit_seconds": 0.020684325000047465,
+          "retained_object_bytes": 219897,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1679893630787133,
+          "mean_profile_tv": 0.1097053711594528,
+          "max_profile_tv": 0.25,
+          "fit_seconds": 0.018678377000014734,
+          "retained_object_bytes": 279269,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 335,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0916656762889945,
+          "mean_profile_tv": 0.044592822882127056,
+          "max_profile_tv": 0.1074074074074074,
+          "fit_seconds": 0.01893943000004583,
+          "retained_object_bytes": 744825,
+          "contexts": 4,
+          "retained_traces": 10151,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 206,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.1064740269701745,
+          "mean_profile_tv": 0.06959847763399275,
+          "max_profile_tv": 0.12809917355371897,
+          "fit_seconds": 0.019535986000164485,
+          "retained_object_bytes": 745189,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.0956278120186647,
+          "mean_profile_tv": 0.06077367569540223,
+          "max_profile_tv": 0.09615384615384615,
+          "fit_seconds": 0.020626669999955993,
+          "retained_object_bytes": 219841,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1567021836358546,
+          "mean_profile_tv": 0.11718518726171787,
+          "max_profile_tv": 0.23076923076923078,
+          "fit_seconds": 0.02032307900003616,
+          "retained_object_bytes": 279081,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0933420226974926,
+          "mean_profile_tv": 0.048586361490025716,
+          "max_profile_tv": 0.11481481481481481,
+          "fit_seconds": 0.019535986000164485,
+          "retained_object_bytes": 745189,
+          "contexts": 4,
+          "retained_traces": 10157,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    },
+    {
+      "seed": 207,
+      "family": "null",
+      "methods": {
+        "joint_action": {
+          "log_loss": 2.1147460826202393,
+          "mean_profile_tv": 0.07045508704414186,
+          "max_profile_tv": 0.126,
+          "fit_seconds": 0.02119632099993396,
+          "retained_object_bytes": 745273,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_blind": {
+          "log_loss": 2.091209822644458,
+          "mean_profile_tv": 0.05235456788257439,
+          "max_profile_tv": 0.08461538461538462,
+          "fit_seconds": 0.024276263000047038,
+          "retained_object_bytes": 219813,
+          "contexts": 4,
+          "retained_traces": 3072,
+          "count_entries": 56,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "joint_action_budget": {
+          "log_loss": 2.1473058987259837,
+          "mean_profile_tv": 0.10722807804440458,
+          "max_profile_tv": 0.25,
+          "fit_seconds": 0.026195653999820934,
+          "retained_object_bytes": 279889,
+          "contexts": 4,
+          "retained_traces": 2688,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "factorized_action": {
+          "log_loss": 2.0941486883818055,
+          "mean_profile_tv": 0.05605939236273137,
+          "max_profile_tv": 0.11971830985915496,
+          "fit_seconds": 0.02119632099993396,
+          "retained_object_bytes": 745273,
+          "contexts": 4,
+          "retained_traces": 10159,
+          "count_entries": 336,
+          "trials": 4096,
+          "evictions": 0
+        },
+        "oracle": {
+          "log_loss": 2.0794415416798357
+        },
+        "uniform": {
+          "log_loss": 2.0794415416798357
+        }
+      },
+      "partition_audit": {
+        "passed": true,
+        "epsilon": "1/4",
+        "distortion": "0",
+        "cells": 1,
+        "minimum_feasible_cells": 1,
+        "excess_cells": 0,
+        "witnesses": []
+      },
+      "unresolved": 0
+    }
+  ],
+  "interpretation": "Frozen fitted joint distributions; observed reset contexts; no learned state discovery; exact finite profiles score proposals; predictions are not pooled"
+}

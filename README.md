@@ -299,3 +299,24 @@ Cortex is licensed under the **Apache License, Version 2.0**.
 Original author and project creator: **Arnold von Bauer-Gauss**.
 
 See `LICENSE`, `NOTICE`, and `AUTHORS.md`.
+
+
+### Finite Sigma–Lambda oracle and SL-Bench
+
+The opt-in [SL-Bench v0.1 research module](docs/SL_BENCH_V0_1.md) provides an exact
+finite predictive oracle, adversarial streams, a bounded approximate learner,
+and a binary `EvidenceAtom` prediction adapter. [Pilot results](docs/SL_BENCH_V0_1_RESULTS.md)
+reject aggressive folding as a default improvement: active cells shrink, but
+retained evidence does not, and adversarial prediction loss increases. The
+adapter therefore defaults to no folding. This work does not change the native
+runtime or establish whole-theory correctness.
+
+The [v0.2 joint-trace extension](docs/SL_BENCH_TRACES_V0_2.md) adds bounded
+multi-step action-conditioned prediction. It tests hidden temporal correlations
+and delayed distinctions against the exact oracle, with an independent-noise
+control to expose the cost of unnecessary detail.
+
+The [v0.3 physical accordion experiment](docs/SL_BENCH_ACCORDION_V0_3.md)
+releases full windows, keeps bounded witnesses, and accepts folds only when
+estimated total retained size decreases. It shows storage and local-drift gains
+in limited synthetic cases, with higher computation cost; it remains opt-in.
