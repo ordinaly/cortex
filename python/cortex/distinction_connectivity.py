@@ -121,6 +121,17 @@ class HystereticDistinctionGraph:
             if probe in self.population.active
         )
 
+    def _ordered_edges(self) -> tuple[ProbeEdge, ...]:
+        return tuple(
+            sorted(
+                self.edges,
+                key=lambda edge: (
+                    self.connectivity.economy._index[edge[0]],
+                    self.connectivity.economy._index[edge[1]],
+                ),
+            )
+        )
+
     def step(self) -> tuple[ProbeEdge, ...]:
         self.steps += 1
         vertices = self.vertices
@@ -143,21 +154,14 @@ class HystereticDistinctionGraph:
                 self.edges.add(edge)
                 self.activations += 1
 
-        return tuple(
-            sorted(
-                self.edges,
-                key=lambda edge: (
-                    self.connectivity.economy._index[edge[0]],
-                    self.connectivity.economy._index[edge[1]],
-                ),
-            )
-        )
+        return self._ordered_edges()
 
     @property
     def weighted_edges(self) -> tuple[tuple[Probe, Probe, float], ...]:
+        """Read current edge weights without mutating graph state."""
         return tuple(
             (left, right, self.connectivity.complementarity(left, right))
-            for left, right in self.step()
+            for left, right in self._ordered_edges()
         )
 
     @property
@@ -170,13 +174,7 @@ class HystereticDistinctionGraph:
                     self.connectivity.economy._index[left],
                     self.connectivity.economy._index[right],
                 )
-                for left, right in sorted(
-                    self.edges,
-                    key=lambda edge: (
-                        self.connectivity.economy._index[edge[0]],
-                        self.connectivity.economy._index[edge[1]],
-                    ),
-                )
+                for left, right in self._ordered_edges()
             ),
             "activations": self.activations,
             "retirements": self.retirements,
