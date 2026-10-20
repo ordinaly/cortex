@@ -1,17 +1,21 @@
 """Research-only higher-order composition over learned distinction neurons.
 
 A filled 2-simplex must represent more than the presence of its three edges.
-For a probe triple sigma and two contexts x,y, define
+For a probe triple sigma and two contexts x,y, this module looks for a
+*sufficient* witness of three-way irreducibility:
+
+1. every pairwise face remains below a small face-distinguishability tolerance;
+2. the synchronized full triple is nevertheless distinguishable.
+
+For such a witness we score
 
     R_sigma(x,y) = [D_sigma(x,y) - D_boundary(x,y)]_+
 
-where D_sigma is total-variation distance between synchronized joint responses
-of all three probes and D_boundary is the supremum of the three pairwise-face
-TV distances.  The triple score is the supremum of R_sigma over supported
-context pairs.
+where D_boundary is the largest pairwise-face TV distance. Context pairs that
+are already distinguishable on any face contribute zero higher-order residual.
 
-This implements a conservative operational notion of three-way irreducibility.
-It is not claimed to be a canonical information-theoretic synergy measure.
+This is deliberately conservative. It detects pure higher-order structure such
+as parity, but it is not claimed to be a complete or canonical synergy measure.
 """
 from __future__ import annotations
 
@@ -99,22 +103,33 @@ class JointDistinctionMemory:
 
     def boundary_distance(self, left: Hashable, right: Hashable, triple: Iterable[Iterable]) -> float:
         triple = self._ordered(triple, size=3)
-        return max(
-            self.distance(left, right, face)
-            for face in combinations(triple, 2)
-        )
+        return max(self.distance(left, right, face) for face in combinations(triple, 2))
 
-    def residual(self, left: Hashable, right: Hashable, triple: Iterable[Iterable]) -> float:
+    def residual(
+        self,
+        left: Hashable,
+        right: Hashable,
+        triple: Iterable[Iterable],
+        *,
+        face_tolerance: float,
+    ) -> float:
         triple = self._ordered(triple, size=3)
-        joint = self.distance(left, right, triple)
         boundary = self.boundary_distance(left, right, triple)
+        if boundary > face_tolerance:
+            return 0.0
+        joint = self.distance(left, right, triple)
         return max(0.0, joint - boundary)
 
-    def irreducibility(self, triple: Iterable[Iterable]) -> float:
+    def irreducibility(self, triple: Iterable[Iterable], *, face_tolerance: float) -> float:
         triple = self._ordered(triple, size=3)
         return max(
             (
-                self.residual(left, right, triple)
+                self.residual(
+                    left,
+                    right,
+                    triple,
+                    face_tolerance=face_tolerance,
+                )
                 for left, right in combinations(self.economy.contexts, 2)
                 if min(self.support(left), self.support(right)) >= self.min_samples
             ),
@@ -124,11 +139,16 @@ class JointDistinctionMemory:
 
 @dataclass(frozen=True, slots=True)
 class HigherOrderDistinctionPolicy:
+    face_tolerance: float = 0.12
     simplex_on: float = 0.25
     simplex_off: float = 0.15
 
     def __post_init__(self) -> None:
-        for name, value in (("simplex_on", self.simplex_on), ("simplex_off", self.simplex_off)):
+        for name, value in (
+            ("face_tolerance", self.face_tolerance),
+            ("simplex_on", self.simplex_on),
+            ("simplex_off", self.simplex_off),
+        ):
             if not isfinite(float(value)) or not 0.0 <= float(value) <= 1.0:
                 raise ValueError(f"{name} must be finite and lie in [0,1]")
         if self.simplex_off > self.simplex_on:
@@ -160,9 +180,7 @@ class HystereticDistinctionComplex:
         return rows[0], rows[1], rows[2]
 
     def _faces(self, triple: ProbeTriple) -> tuple[ProbeEdge, ProbeEdge, ProbeEdge]:
-        faces = []
-        for left, right in combinations(triple, 2):
-            faces.append(self.graph.connectivity._pair(left, right))
+        faces = tuple(self.graph.connectivity._pair(left, right) for left, right in combinations(triple, 2))
         return faces[0], faces[1], faces[2]
 
     def candidate_triangles(self) -> tuple[ProbeTriple, ...]:
@@ -172,6 +190,12 @@ class HystereticDistinctionComplex:
             if all(face in self.graph.edges for face in self._faces(triple)):
                 candidates.append(triple)
         return tuple(candidates)
+
+    def score(self, triple: Iterable[Iterable]) -> float:
+        return self.memory.irreducibility(
+            self._triple(triple),
+            face_tolerance=self.policy.face_tolerance,
+        )
 
     def step(self) -> tuple[ProbeTriple, ...]:
         self.steps += 1
@@ -184,7 +208,7 @@ class HystereticDistinctionComplex:
                 self.retirements += 1
 
         for triple in candidates:
-            score = self.memory.irreducibility(triple)
+            score = self.score(triple)
             if triple in self.triangles:
                 if score < self.policy.simplex_off:
                     self.triangles.remove(triple)
@@ -193,6 +217,9 @@ class HystereticDistinctionComplex:
                 self.triangles.add(triple)
                 self.activations += 1
 
+        return self._ordered_triangles()
+
+    def _ordered_triangles(self) -> tuple[ProbeTriple, ...]:
         return tuple(
             sorted(
                 self.triangles,
@@ -202,7 +229,8 @@ class HystereticDistinctionComplex:
 
     @property
     def weighted_triangles(self) -> tuple[tuple[ProbeTriple, float], ...]:
-        return tuple((triple, self.memory.irreducibility(triple)) for triple in self.step())
+        """Read current simplex weights without mutating complex state."""
+        return tuple((triple, self.score(triple)) for triple in self._ordered_triangles())
 
     @property
     def snapshot(self) -> dict:
@@ -212,10 +240,7 @@ class HystereticDistinctionComplex:
             "triangles": len(self.triangles),
             "triangle_indices": tuple(
                 tuple(self.memory.economy._index[probe] for probe in triple)
-                for triple in sorted(
-                    self.triangles,
-                    key=lambda row: tuple(self.memory.economy._index[probe] for probe in row),
-                )
+                for triple in self._ordered_triangles()
             ),
             "activations": self.activations,
             "retirements": self.retirements,
