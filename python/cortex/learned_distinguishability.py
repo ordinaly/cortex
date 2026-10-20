@@ -66,6 +66,9 @@ class EmpiricalTraceDistinguishability:
             window=window,
             action_conditioned=True,
         )
+        # Cumulative direct-observation ledger is retained only for accounting.
+        # Statistical support must match the bounded samples that actually drive
+        # the current predictor, exposed by TracePredictiveMemory.support().
         self._support: dict[Hashable, dict[tuple, int]] = defaultdict(
             lambda: defaultdict(int)
         )
@@ -82,14 +85,20 @@ class EmpiricalTraceDistinguishability:
     def observe(self, context: Hashable, probe: Iterable, outcomes: Iterable) -> None:
         probe = tuple(probe)
         self.memory.observe(context, probe, tuple(outcomes))
-        # The trace memory can evict a context. Keep the support ledger aligned.
+        # The trace memory can evict a context. Keep the accounting ledger aligned.
         for stale in tuple(self._support):
             if stale not in self.memory.rows:
                 del self._support[stale]
         self._support[context][probe] += 1
 
     def support(self, context: Hashable, probe: Iterable) -> int:
-        return self._support.get(context, {}).get(tuple(probe), 0)
+        """Retained sample count used by the current predictive distribution.
+
+        This deliberately does not use cumulative historical observation count:
+        once a sliding-window sample is discarded it must no longer shrink the
+        confidence radius of the current empirical response.
+        """
+        return self.memory.support(context, tuple(probe))
 
     def _radius(self, count: int) -> float:
         if count < self.policy.min_samples:
@@ -174,12 +183,18 @@ class EmpiricalTraceDistinguishability:
 
     @property
     def snapshot(self) -> dict:
+        retained = sum(
+            self.memory.support(context, probe)
+            for context in self.contexts
+            for probe in self.probes
+        )
         return {
             "contexts": len(self.contexts),
             "probes": len(self.probes),
             "observations": sum(
                 count for rows in self._support.values() for count in rows.values()
             ),
+            "retained_support": retained,
             "epsilon": self.policy.epsilon,
             "min_samples": self.policy.min_samples,
             "confidence": self.policy.confidence,
