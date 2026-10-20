@@ -1,0 +1,25 @@
+name: cortex-probe-economy-v0.3
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/probe_economy.py"
+      - "python/cortex/learned_distinguishability.py"
+      - "research/five_operator_bench/probe_economy.py"
+      - "tests/test_probe_economy.py"
+      - "tests/test_probe_economy_bench.py"
+      - "docs/PROBE_ECONOMY_V0_3.md"
+      - ".github/workflows/probe-economy-v0-3.yml"
+  workflow_dispatch:
+
+jobs:
+  probe-economy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: PYTHONPATH=python:. pytest tests/test_probe_economy.py tests/test_probe_economy_bench.py tests/test_learned_distinguishability.py tests/test_learned_distinguishability_noise.py -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.probe_economy
