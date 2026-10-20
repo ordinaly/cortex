@@ -1,0 +1,30 @@
+name: cortex-learned-distinguishability-noise-v0.2
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/learned_distinguishability.py"
+      - "research/five_operator_bench/learn_delta_noise.py"
+      - "research/sl_bench/trace_worlds.py"
+      - "tests/test_learned_distinguishability_noise.py"
+      - "tests/test_learned_distinguishability.py"
+      - "docs/LEARNED_DISTINGUISHABILITY_NOISE_V0_2.md"
+      - ".github/workflows/learned-distinguishability-noise-v0-2.yml"
+  workflow_dispatch:
+
+jobs:
+  noisy-delta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: >-
+          PYTHONPATH=python:.
+          pytest
+          tests/test_learned_distinguishability_noise.py
+          tests/test_learned_distinguishability.py
+          -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.learn_delta_noise
