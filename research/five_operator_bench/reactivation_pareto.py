@@ -201,7 +201,6 @@ def run_reactivation_pareto(seeds=tuple(range(12))):
         (0.40, 0.55, 0.70),
         (8, 16),
     ):
-        key = (gap, window, threshold, escalation)
         config = {
             "gap": gap,
             "window": window,
@@ -219,11 +218,10 @@ def run_reactivation_pareto(seeds=tuple(range(12))):
             )
             for seed in seeds
         ]
-        sparse_key = gap
-        if sparse_key not in sparse_cache:
+        if gap not in sparse_cache:
             # Detection parameters do not affect sparse scheduling or the main
             # learner, so one sparse baseline per sentinel gap is sufficient.
-            sparse_cache[sparse_key] = [
+            sparse_cache[gap] = [
                 _run(
                     seed,
                     gap=gap,
@@ -234,7 +232,7 @@ def run_reactivation_pareto(seeds=tuple(range(12))):
                 )
                 for seed in seeds
             ]
-        summaries.append(_summarize(config, rows, sparse_cache[sparse_key]))
+        summaries.append(_summarize(config, rows, sparse_cache[gap]))
 
     eligible = [
         row for row in summaries
@@ -261,10 +259,13 @@ def run_reactivation_pareto(seeds=tuple(range(12))):
         and row["mean_speedup_vs_sparse"] > 1.0
         and row["mean_query_saving"] > 0.0
     ]
+    # Cortex should prefer attention safety over raw reaction speed. Among
+    # equally safe candidates, then prefer faster recovery and query economy.
     safe.sort(
         key=lambda row: (
-            -row["mean_speedup_vs_sparse"],
             row["false_trigger_rate"],
+            row["false_activation_rate"],
+            -row["mean_speedup_vs_sparse"],
             -row["mean_query_saving"],
         )
     )
