@@ -11,6 +11,8 @@ on:
       - "research/five_operator_bench/higher_order_irreducibility.py"
       - "tests/test_simplicial_integration.py"
       - "tests/test_simplicial_integration_bench.py"
+      - "docs/SIMPLICIAL_INTEGRATION_V1_0.md"
+      - "docs/SIMPLICIAL_INTEGRATION_V1_0_RESULTS.md"
       - ".github/workflows/cortex-simplicial-integration-v1-0.yml"
   workflow_dispatch:
 
