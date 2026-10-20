@@ -1,0 +1,26 @@
+name: cortex-latent-reactivation-pareto-v0.6
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/trace_memory.py"
+      - "python/cortex/learned_distinguishability.py"
+      - "python/cortex/latent_probe_reactivation.py"
+      - "research/five_operator_bench/reactivation_pareto.py"
+      - "tests/test_retained_confidence_support.py"
+      - "tests/test_reactivation_pareto.py"
+      - "docs/LATENT_REACTIVATION_PARETO_V0_6.md"
+      - ".github/workflows/latent-reactivation-pareto-v0-6.yml"
+  workflow_dispatch:
+
+jobs:
+  reactivation-pareto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: PYTHONPATH=python:. pytest tests/test_retained_confidence_support.py tests/test_reactivation_pareto.py tests/test_latent_probe_reactivation.py tests/test_probe_sampling.py -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.reactivation_pareto
