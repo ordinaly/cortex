@@ -1,0 +1,26 @@
+name: cortex-geometric-temporal-transport-v1.1
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/geometric_temporal_transport.py"
+      - "python/cortex/simplicial_integration.py"
+      - "research/five_operator_bench/geometric_temporal_transport.py"
+      - "tests/test_geometric_temporal_transport.py"
+      - "tests/test_geometric_temporal_transport_bench.py"
+      - "docs/GEOMETRIC_TEMPORAL_TRANSPORT_V1_1.md"
+      - "docs/GEOMETRIC_TEMPORAL_TRANSPORT_V1_1_RESULTS.md"
+      - ".github/workflows/cortex-geometric-temporal-transport-v1-1.yml"
+  workflow_dispatch:
+
+jobs:
+  geometric-temporal-transport:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: PYTHONPATH=python:. pytest tests/test_geometric_temporal_transport.py tests/test_geometric_temporal_transport_bench.py tests/test_simplicial_integration.py -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.geometric_temporal_transport
