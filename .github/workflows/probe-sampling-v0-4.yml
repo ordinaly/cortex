@@ -1,0 +1,25 @@
+name: cortex-probe-sampling-v0.4
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/probe_sampling.py"
+      - "python/cortex/probe_economy.py"
+      - "research/five_operator_bench/probe_sampling.py"
+      - "tests/test_probe_sampling.py"
+      - "tests/test_probe_sampling_bench.py"
+      - "docs/PROBE_SAMPLING_V0_4.md"
+      - ".github/workflows/probe-sampling-v0-4.yml"
+  workflow_dispatch:
+
+jobs:
+  probe-sampling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: PYTHONPATH=python:. pytest tests/test_probe_sampling.py tests/test_probe_sampling_bench.py tests/test_probe_economy.py tests/test_probe_economy_bench.py -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.probe_sampling
