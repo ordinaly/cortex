@@ -34,6 +34,12 @@ class TracePredictiveMemory:
     def _key(self, probe):
         return probe if self.action_conditioned else len(probe)
 
+    def support(self, context, probe):
+        """Number of retained samples that actually determine this prediction."""
+        probe=self._probe(probe)
+        row=self.rows.get(context,{}).get(self._key(probe))
+        return len(row[0]) if row else 0
+
     def predict(self, context, probe):
         probe=self._probe(probe)
         row=self.rows.get(context,{}).get(self._key(probe))
