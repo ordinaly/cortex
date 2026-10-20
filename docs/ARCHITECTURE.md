@@ -2334,3 +2334,40 @@ For autonomous ingestion, articulation, and temporal plasticity:
 For software/specification/protocol versioning:
 
 - [VERSIONING.md](VERSIONING.md)
+
+
+## Finite predictive oracle and experimental memory (SL-Bench v0.1)
+
+`research/sl_bench/oracle.py` is an evaluator-only exact rational implementation
+of finite probe-relative predictive quotienting, strongly lumpable stable
+refinement, and exhaustive cell-count/distortion frontiers. It can return
+explicit pair/probe witnesses against a proposed compression. It is never
+imported by the online learner.
+
+`cortex.predictive_memory` supplies an opt-in bounded binary-probe estimator and
+`PredictiveEvidenceAdapter` for `EvidenceAtom`. Predictions precede updates;
+late events are excluded from current-profile learning. Per-context evidence is
+retained under optional cell pooling to allow reopening. LRU eviction is explicit
+information loss, not recoverable coarsening. The default adapter disables
+folding because the pilot did not show a net advantage. It is a separate
+research prediction interface, not a replacement for `ClosedArticulationLoop`
+or the native entity representation lifecycle.
+
+See [contract and limitations](SL_BENCH_V0_1.md) and
+[measured ablations](SL_BENCH_V0_1_RESULTS.md). The new oracle's finite-horizon
+scope does not establish arbitrary-horizon, causal, or whole-theory adequacy.
+
+`cortex.TracePredictiveMemory` extends the experimental interface to categorical
+joint output words under declared action probes. Completed reset trials update
+bounded prefix statistics; prediction precedes observation. The evaluator alone
+knows hidden states and exact continuation distributions. Empirical partition
+proposals do not alter predictions or discard evidence. See the
+[v0.2 contract](SL_BENCH_TRACES_V0_2.md) for the finite-domain caps, source-model
+assumptions and the distinction between observed contexts and learned states.
+
+`cortex.AccordionMemory` adds an independent experimental binary fold/witness/
+reopen cycle. Accepted folds physically discard full per-context windows after
+a complete retained-size gate; reopening uses witnesses only. This is not yet
+action-conditioned or connected to native memory allocation. See the
+[v0.3 contract](SL_BENCH_ACCORDION_V0_3.md) and
+[storage/accuracy/compute results](SL_BENCH_ACCORDION_V0_3_RESULTS.md).

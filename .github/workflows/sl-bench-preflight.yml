@@ -1,0 +1,24 @@
+name: SL-Bench finite oracle preflight
+on:
+  pull_request:
+    paths:
+      - 'python/cortex/predictive_memory.py'
+      - 'python/cortex/trace_memory.py'
+      - 'python/cortex/accordion_memory.py'
+      - 'research/sl_bench/**'
+      - 'tests/test_sl_*.py'
+      - '.github/workflows/sl-bench-preflight.yml'
+  workflow_dispatch:
+jobs:
+  oracle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Exact oracle and bounded learner invariants
+        env:
+          PYTHONPATH: python:.
+        run: python -m unittest discover -s tests -p 'test_sl_*.py' -v

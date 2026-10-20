@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "claim_id": "sl-traces-v0.2",
+  "repository": {
+    "commit": "11c2d8e50ca37dab07f25741919b2f699e6aba67",
+    "dirty": true
+  },
+  "command": "PYTHONPATH=python:. python -m research.sl_bench.run_traces --output benchmarks/results/sl_bench_traces_v0_2.json",
+  "environment": {
+    "software": [
+      "3.12.14"
+    ],
+    "hardware": "Linux-6.18.44-x86_64-with-glibc2.39"
+  },
+  "mathematics": {
+    "assertion_tested": "Finite learned joint profiles distinguish correlation and delayed/action witnesses",
+    "coefficient_domain": "rational oracle; binary64 estimator",
+    "conventions": "Current emission then transition; independent reset trials; horizon 3",
+    "inputs": [
+      {
+        "path": "python/cortex/trace_memory.py",
+        "sha256": "bcf70e9fc688b77f50da9d49fe931303bf811544784242e34a8ef9f4b75941d4"
+      },
+      {
+        "path": "research/sl_bench/run_traces.py",
+        "sha256": "c5a102c96b3d44cfae2b500e90d170d16e66ae10e7f7d6c3b3bcd595e76ba0d4"
+      },
+      {
+        "path": "research/sl_bench/trace_worlds.py",
+        "sha256": "cd4ee34f0315bb09b0b2d13b01ac254c7535de1f4ca63d4424af8b11c56c1775"
+      },
+      {
+        "path": "research/sl_bench/oracle.py",
+        "sha256": "6fa441d84331300a91399aea4b855b3eb6735d1bdce9ad1c381d41056263d52b"
+      },
+      {
+        "path": "tests/test_sl_trace_memory.py",
+        "sha256": "e73ac7706898a00c55859ce22b51a1fb6acd7a422cdff5d7231bd99ba6597143"
+      }
+    ],
+    "bounds": {
+      "states": 8,
+      "contexts": 4,
+      "horizon": 3,
+      "seeds": [
+        200,
+        201,
+        202,
+        203,
+        204,
+        205,
+        206,
+        207
+      ],
+      "training": 4096,
+      "heldout": 1024,
+      "window_per_probe": 256
+    },
+    "non_claims": [
+      "No state discovery",
+      "No compression promotion",
+      "No universal dynamic sufficiency",
+      "No real-data validation of this extension"
+    ]
+  },
+  "randomness": {
+    "used": true,
+    "generator": "random.Random MT19937; holdout seed=100000+seed",
+    "seed": 200
+  },
+  "run": {
+    "started_at": "2026-10-09T06:54:32.419143+00:00",
+    "runtime_seconds": 10.898604160999867,
+    "exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "benchmarks/results/sl_bench_traces_v0_2.json",
+      "sha256": "4019eb5baffa1257525b8b0fcbf6c47ba52e2d3f16034af820886c70c91fa611"
+    }
+  ],
+  "checks": [
+    "Source hashes unchanged before/after",
+    "Heldout is prediction-only",
+    "Exact mixture-profile audit"
+  ],
+  "result": "Completed finite sampled campaign",
+  "residual_risks": [
+    "Known reset contexts",
+    "Small fixed world family",
+    "No process-enforced resource caps",
+    "Categorical counts scale exponentially in horizon"
+  ]
+}

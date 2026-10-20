@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "claim_id": "sl-accordion-v0.3",
+  "repository": {
+    "commit": "1ff2bb7817a543b69c205207d080cad50ad03f40",
+    "dirty": true
+  },
+  "command": "PYTHONPATH=python:. python -m research.sl_bench.run_accordion --output benchmarks/results/sl_bench_accordion_v0_3.json",
+  "environment": {
+    "software": [
+      "3.12.14"
+    ],
+    "hardware": "Linux-6.18.44-x86_64-with-glibc2.39"
+  },
+  "mathematics": {
+    "assertion_tested": "Retained storage and prediction tradeoff of physical binary folding",
+    "coefficient_domain": "binary64 probabilities/loss; integer samples",
+    "conventions": "Prequential, bounded witnesses, empirical complete-link eligibility; no statistical certificate",
+    "inputs": [
+      {
+        "path": "python/cortex/__init__.py",
+        "sha256": "5d7f017a325bf6d06119af7342d26fa4a2895203b65a83bad615c5e192c62e31"
+      },
+      {
+        "path": "python/cortex/accordion_memory.py",
+        "sha256": "1695bf53a519c6e946bf6b139509af95a19d757e8490c7e515de530b993709dc"
+      },
+      {
+        "path": "research/sl_bench/run_accordion.py",
+        "sha256": "fb8f79743d75b4bc2fdcc66b8bd6d75d986047d7bbf708aeb2db040aa8641bc2"
+      },
+      {
+        "path": "research/sl_bench/run_traces.py",
+        "sha256": "c5a102c96b3d44cfae2b500e90d170d16e66ae10e7f7d6c3b3bcd595e76ba0d4"
+      },
+      {
+        "path": "tests/test_sl_accordion.py",
+        "sha256": "1ddbc979e15711042d88555d53cca5af178de8ee67e7a4ab155bf4b3a3934d29"
+      }
+    ],
+    "bounds": {
+      "seeds": [
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307
+      ],
+      "families": 5,
+      "methods": 3,
+      "events": 24000,
+      "policy": {
+        "window": 256,
+        "witness": 32,
+        "max_contexts": 32,
+        "fold_every": 256,
+        "fold_tolerance": 0.1,
+        "reopen_threshold": 0.3,
+        "folding": true,
+        "reopening": true,
+        "min_retained_saving": 0.05
+      }
+    },
+    "non_claims": [
+      "No lossless recovery",
+      "No universal sufficiency",
+      "No native promotion",
+      "No streaming domain transfer"
+    ]
+  },
+  "randomness": {
+    "used": true,
+    "generator": "random.Random MT19937",
+    "seed": 300
+  },
+  "run": {
+    "started_at": "2026-10-10T06:05:28.945129+00:00",
+    "runtime_seconds": 9.013080615999996,
+    "exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "benchmarks/results/sl_bench_accordion_v0_3.json",
+      "sha256": "9705a391a4eb9effb918d1d7d53b2acdee3fb341a8b8e5e19f3994f727dff119"
+    }
+  ],
+  "checks": [
+    "Input hashes identical before/after",
+    "Paired streams",
+    "Total object graph includes witnesses and summaries"
+  ],
+  "result": "Completed bounded campaign",
+  "residual_risks": [
+    "Fixed binary contexts",
+    "Small generator family",
+    "Empirical thresholds uncalibrated",
+    "Object size not RSS or peak",
+    "No enforced process caps"
+  ]
+}
