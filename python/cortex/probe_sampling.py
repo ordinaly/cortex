@@ -18,7 +18,6 @@ provides the sampling substrate needed for later latent-probe rediscovery tests.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import isfinite
 from typing import Iterable
 
 from .probe_economy import HystereticProbePopulation, Probe, ProbeEconomy
@@ -94,16 +93,14 @@ class ProbeSamplingScheduler:
             self._due[probe] = self.tick
 
         if latent:
-            # Stagger first/transition sentinel deadlines across the available
-            # latent service slots. Existing latent deadlines are never pushed
-            # later merely because the active basis changed.
+            # Stagger only newly-latent probes. A probe that remains latent keeps
+            # its existing next sentinel deadline; otherwise repeated status
+            # synchronization would accidentally pull it forward every tick.
             for index, probe in enumerate(latent):
-                proposed = self.tick + 1 + index // max(1, capacity)
                 was_latent = probe in self._status and not self._status[probe]
                 if was_latent and probe in self._due:
-                    self._due[probe] = min(self._due[probe], proposed)
-                else:
-                    self._due[probe] = proposed
+                    continue
+                self._due[probe] = self.tick + 1 + index // max(1, capacity)
 
         current_active = set(active)
         self._status = {probe: probe in current_active for probe in self.economy.probes}
