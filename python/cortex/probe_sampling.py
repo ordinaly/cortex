@@ -12,8 +12,10 @@ The v0.4 scheduler is deliberately simple and auditable:
 - if the requested active/latent service rates are infeasible, the scheduler
   rejects the policy instead of silently starving latent questions.
 
-This does not yet infer new probes or interpret sentinel observations. It only
-provides the sampling substrate needed for later latent-probe rediscovery tests.
+v0.5 adds an optional priority-latent input. It does not change the ordinary
+v0.4 schedule; it only lets an external reactivation monitor temporarily spend
+available latent capacity on probes whose sentinel evidence has become
+suspicious.
 """
 from __future__ import annotations
 
@@ -59,6 +61,7 @@ class ProbeSamplingScheduler:
         self.total_queries = 0
         self.active_queries = 0
         self.latent_queries = 0
+        self.priority_queries = 0
         self._due: dict[Probe, int] = {}
         self._last_sample: dict[Probe, int] = {}
         self._status: dict[Probe, bool] = {}
@@ -105,20 +108,45 @@ class ProbeSamplingScheduler:
         current_active = set(active)
         self._status = {probe: probe in current_active for probe in self.economy.probes}
 
-    def step(self) -> tuple[Probe, ...]:
-        """Return the probes to query at the current tick and advance time."""
+    def step(self, *, priority_latent: Iterable[Iterable] = ()) -> tuple[Probe, ...]:
+        """Return the probes to query at the current tick and advance time.
+
+        ``priority_latent`` is a bounded escalation hook for v0.5. Priority
+        probes must currently be latent and fit inside the latent service
+        capacity. They are sampled before ordinary due sentinels; active probes
+        remain non-preemptible.
+        """
         self._sync_status()
         active = self._ordered_active()
         latent = self._ordered_latent()
+        latent_set = set(latent)
         capacity = self._validate_feasibility(active, latent)
 
+        priority: list[Probe] = []
+        for raw in priority_latent:
+            probe = self.economy._check_probe(raw)
+            if probe not in latent_set:
+                raise ValueError("priority probes must currently be latent")
+            if probe not in priority:
+                priority.append(probe)
+        if len(priority) > capacity:
+            raise ValueError("priority latent probes exceed available query capacity")
+
         selected: list[Probe] = list(active)
+        selected.extend(priority)
+        remaining = capacity - len(priority)
         due_latent = sorted(
-            (probe for probe in latent if self._due.get(probe, self.tick + 1) <= self.tick),
+            (
+                probe
+                for probe in latent
+                if probe not in priority
+                and self._due.get(probe, self.tick + 1) <= self.tick
+            ),
             key=lambda probe: (self._due[probe], self.economy._index[probe]),
         )
-        selected.extend(due_latent[:capacity])
+        selected.extend(due_latent[:remaining])
 
+        priority_set = set(priority)
         for probe in selected:
             if probe in self._last_sample:
                 gap = self.tick - self._last_sample[probe]
@@ -129,6 +157,8 @@ class ProbeSamplingScheduler:
                 self._due[probe] = self.tick + 1
             else:
                 self.latent_queries += 1
+                if probe in priority_set:
+                    self.priority_queries += 1
                 self._due[probe] = self.tick + self.policy.latent_max_gap
 
         self.total_queries += len(selected)
@@ -163,6 +193,7 @@ class ProbeSamplingScheduler:
             "total_queries": self.total_queries,
             "active_queries": self.active_queries,
             "latent_queries": self.latent_queries,
+            "priority_queries": self.priority_queries,
             "uniform_query_baseline": self.uniform_query_baseline,
             "relative_query_saving": self.relative_query_saving,
             "max_latent_observed_gap": max(
