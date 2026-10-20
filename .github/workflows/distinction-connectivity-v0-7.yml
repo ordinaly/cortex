@@ -1,0 +1,25 @@
+name: cortex-distinction-connectivity-v0.7
+
+on:
+  pull_request:
+    paths:
+      - "python/cortex/distinction_connectivity.py"
+      - "python/cortex/probe_economy.py"
+      - "research/five_operator_bench/distinction_connectivity.py"
+      - "tests/test_distinction_connectivity.py"
+      - "tests/test_distinction_connectivity_bench.py"
+      - "docs/DISTINCTION_CONNECTIVITY_V0_7.md"
+      - ".github/workflows/distinction-connectivity-v0-7.yml"
+  workflow_dispatch:
+
+jobs:
+  distinction-connectivity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install --upgrade pip pytest
+      - run: PYTHONPATH=python:. pytest tests/test_distinction_connectivity.py tests/test_distinction_connectivity_bench.py tests/test_probe_economy.py tests/test_probe_economy_bench.py -q
+      - run: PYTHONPATH=python:. python -m research.five_operator_bench.distinction_connectivity
