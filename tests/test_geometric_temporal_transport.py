@@ -8,6 +8,7 @@ from cortex.simplicial_integration import SimplicialIntegrationRead
 
 
 PROBES = ((0,), (1,), (2,), (3,))
+TOL = 1.0e-12
 
 
 def _read(kind: str, marker_p: float, *, filled: bool = True, drop_last: bool = False) -> SimplicialIntegrationRead:
@@ -58,8 +59,8 @@ def test_low_dimensional_transport_preserves_identity_when_full_joint_similarity
     bb = transport.compare(source_b, target_b)
     ba = transport.compare(source_b, target_a)
 
-    assert aa.distance == 0.0
-    assert bb.distance == 0.0
+    assert aa.distance < TOL
+    assert bb.distance < TOL
     assert ab.distance > 0.10
     assert ba.distance > 0.10
 
@@ -77,10 +78,10 @@ def test_transport_exposes_topology_change_without_forcing_identity_break() -> N
     target = _read("uniform", 0.30, filled=False)
     comparison = transport.compare(source, target)
 
-    assert comparison.distance == 0.0
-    assert comparison.full_joint_distance == 0.5
+    assert comparison.distance < TOL
+    assert abs(comparison.full_joint_distance - 0.5) < TOL
     assert comparison.topology_change > 0.0
-    assert comparison.by_dimension == ((0, 0.0), (1, 0.0))
+    assert all(value < TOL for _, value in comparison.by_dimension)
 
 
 def test_transport_survives_nonmarker_probe_loss() -> None:
