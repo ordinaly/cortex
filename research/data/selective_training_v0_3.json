@@ -1,0 +1,5065 @@
+{
+  "version": "selective-training-v0.3",
+  "seeds": [
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49
+  ],
+  "validation_n": 64,
+  "evaluation_n": 512,
+  "epsilon": 0.2,
+  "bonus": 0.1,
+  "margin": 0.02,
+  "min_cell": 4,
+  "summary": [
+    {
+      "signal": true,
+      "budget": 64,
+      "policy": "active",
+      "adopted": 10,
+      "error_rate": 0.1201171875,
+      "brier": 0.1060592042568969,
+      "total_queries": 640.0,
+      "total_loss": 0.2451171875
+    },
+    {
+      "signal": true,
+      "budget": 64,
+      "policy": "random",
+      "adopted": 8,
+      "error_rate": 0.1384765625,
+      "brier": 0.11761397796118919,
+      "total_queries": 640.0,
+      "total_loss": 0.2634765625
+    },
+    {
+      "signal": true,
+      "budget": 64,
+      "policy": "exhaustive",
+      "adopted": 6,
+      "error_rate": 0.184375,
+      "brier": 0.12904509109827347,
+      "total_queries": 640.0,
+      "total_loss": 0.309375
+    },
+    {
+      "signal": true,
+      "budget": 128,
+      "policy": "active",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09436242584498925,
+      "total_queries": 704.0,
+      "total_loss": 0.2373046875
+    },
+    {
+      "signal": true,
+      "budget": 128,
+      "policy": "random",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09607885083142505,
+      "total_queries": 704.0,
+      "total_loss": 0.2373046875
+    },
+    {
+      "signal": true,
+      "budget": 128,
+      "policy": "exhaustive",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09679729220074688,
+      "total_queries": 704.0,
+      "total_loss": 0.2373046875
+    },
+    {
+      "signal": true,
+      "budget": 256,
+      "policy": "active",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09155764646436242,
+      "total_queries": 832.0,
+      "total_loss": 0.2623046875
+    },
+    {
+      "signal": true,
+      "budget": 256,
+      "policy": "random",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09294182411727576,
+      "total_queries": 832.0,
+      "total_loss": 0.2623046875
+    },
+    {
+      "signal": true,
+      "budget": 256,
+      "policy": "exhaustive",
+      "adopted": 10,
+      "error_rate": 0.0998046875,
+      "brier": 0.09208826221724482,
+      "total_queries": 832.0,
+      "total_loss": 0.2623046875
+    },
+    {
+      "signal": false,
+      "budget": 64,
+      "policy": "active",
+      "adopted": 0,
+      "error_rate": 0.3060546875,
+      "brier": 0.1819745317727623,
+      "total_queries": 640.0,
+      "total_loss": 0.4310546875
+    },
+    {
+      "signal": false,
+      "budget": 64,
+      "policy": "random",
+      "adopted": 0,
+      "error_rate": 0.3060546875,
+      "brier": 0.1819745317727623,
+      "total_queries": 640.0,
+      "total_loss": 0.4310546875
+    },
+    {
+      "signal": false,
+      "budget": 64,
+      "policy": "exhaustive",
+      "adopted": 0,
+      "error_rate": 0.3060546875,
+      "brier": 0.1819745317727623,
+      "total_queries": 640.0,
+      "total_loss": 0.4310546875
+    },
+    {
+      "signal": false,
+      "budget": 128,
+      "policy": "active",
+      "adopted": 0,
+      "error_rate": 0.316796875,
+      "brier": 0.17590553399617043,
+      "total_queries": 704.0,
+      "total_loss": 0.454296875
+    },
+    {
+      "signal": false,
+      "budget": 128,
+      "policy": "random",
+      "adopted": 0,
+      "error_rate": 0.316796875,
+      "brier": 0.17590553399617043,
+      "total_queries": 704.0,
+      "total_loss": 0.454296875
+    },
+    {
+      "signal": false,
+      "budget": 128,
+      "policy": "exhaustive",
+      "adopted": 0,
+      "error_rate": 0.316796875,
+      "brier": 0.17590553399617043,
+      "total_queries": 704.0,
+      "total_loss": 0.454296875
+    },
+    {
+      "signal": false,
+      "budget": 256,
+      "policy": "active",
+      "adopted": 0,
+      "error_rate": 0.3138671875,
+      "brier": 0.17363904065636354,
+      "total_queries": 832.0,
+      "total_loss": 0.4763671875
+    },
+    {
+      "signal": false,
+      "budget": 256,
+      "policy": "random",
+      "adopted": 0,
+      "error_rate": 0.3138671875,
+      "brier": 0.17363904065636354,
+      "total_queries": 832.0,
+      "total_loss": 0.4763671875
+    },
+    {
+      "signal": false,
+      "budget": 256,
+      "policy": "exhaustive",
+      "adopted": 0,
+      "error_rate": 0.3138671875,
+      "brier": 0.17363904065636354,
+      "total_queries": 832.0,
+      "total_loss": 0.4763671875
+    }
+  ],
+  "cases": [
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05853050983118751,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.1015625,
+      "brier": 0.09620646719323886,
+      "total_loss": 0.2265625,
+      "exploration_queries": 13,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 21,
+          "probe_1": 9
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05253026678506716,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.1015625,
+      "brier": 0.1018607346620058,
+      "total_loss": 0.2265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 21
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05847803404963611,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.1015625,
+      "brier": 0.10076022455016354,
+      "total_loss": 0.2265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.05655735535160262,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.333984375,
+      "brier": 0.1560884607196773,
+      "total_loss": 0.458984375,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 11,
+          "probe_1": 19
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.02708236384797454,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.333984375,
+      "brier": 0.1975632655767743,
+      "total_loss": 0.458984375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.11041165506558837,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.130859375,
+      "brier": 0.1190750763007519,
+      "total_loss": 0.255859375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.08211316031620727,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.123046875,
+      "brier": 0.1290426660505805,
+      "total_loss": 0.248046875,
+      "exploration_queries": 16,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 11
+        },
+        "1": {
+          "probe_0": 31,
+          "probe_1": 9
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.07223515879707344,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.306640625,
+      "brier": 0.17693471773571415,
+      "total_loss": 0.431640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 11
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 21
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.07258994163173317,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.306640625,
+      "brier": 0.17693471773571415,
+      "total_loss": 0.431640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.023614360663651184,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.072265625,
+      "brier": 0.07059398376384887,
+      "total_loss": 0.197265625,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 3,
+          "probe_1": 27
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.027244371041743713,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.072265625,
+      "brier": 0.07431146244247246,
+      "total_loss": 0.197265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 11,
+          "probe_1": 23
+        },
+        "1": {
+          "probe_0": 9,
+          "probe_1": 21
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.016401968004722142,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.287109375,
+      "brier": 0.1579168107774517,
+      "total_loss": 0.412109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.042056528361537115,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.099609375,
+      "brier": 0.10363526047673981,
+      "total_loss": 0.224609375,
+      "exploration_queries": 14,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 12
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 5
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.03455057599590949,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.099609375,
+      "brier": 0.11205570004694655,
+      "total_loss": 0.224609375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 10,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 25,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.04227582509439148,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.099609375,
+      "brier": 0.10435661533131776,
+      "total_loss": 0.224609375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07968183686593738,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.099609375,
+      "brier": 0.10807856807002311,
+      "total_loss": 0.224609375,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 21
+        },
+        "1": {
+          "probe_0": 6,
+          "probe_1": 22
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08352097741220219,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.099609375,
+      "brier": 0.10566777166595867,
+      "total_loss": 0.224609375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 26,
+          "probe_1": 10
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.07902347528635184,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.31640625,
+      "brier": 0.17173112760657253,
+      "total_loss": 0.44140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 14,
+          "probe_1": 14
+        },
+        "1": {
+          "probe_0": 18,
+          "probe_1": 18
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.09834611808308034,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.09765625,
+      "brier": 0.09518977139861574,
+      "total_loss": 0.22265625,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 21,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 18,
+          "probe_1": 8
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.08535440250318878,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.09765625,
+      "brier": 0.10486450818120223,
+      "total_loss": 0.22265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 20,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.0955381765094123,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.09765625,
+      "brier": 0.10006010477645755,
+      "total_loss": 0.22265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.06481820902849093,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.0859375,
+      "brier": 0.1024092743100507,
+      "total_loss": 0.2109375,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 6,
+          "probe_1": 25
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.06164826532369146,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.0859375,
+      "brier": 0.10297553168402816,
+      "total_loss": 0.2109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 21,
+          "probe_1": 12
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.05965028297820506,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.31640625,
+      "brier": 0.17538603363177216,
+      "total_loss": 0.44140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 20,
+          "probe_1": 20
+        },
+        "1": {
+          "probe_0": 12,
+          "probe_1": 12
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.04499089159930028,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.095703125,
+      "brier": 0.10714517797299093,
+      "total_loss": 0.220703125,
+      "exploration_queries": 11,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 21,
+          "probe_1": 9
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.051843545903604495,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.095703125,
+      "brier": 0.10303451357394858,
+      "total_loss": 0.220703125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 11
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05333041814331765,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.095703125,
+      "brier": 0.09835373542878305,
+      "total_loss": 0.220703125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.0739309762604199,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.091796875,
+      "brier": 0.09220241261320314,
+      "total_loss": 0.216796875,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 23,
+          "probe_1": 9
+        },
+        "1": {
+          "probe_0": 9,
+          "probe_1": 23
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.0634264279362693,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.091796875,
+      "brier": 0.09687157404284105,
+      "total_loss": 0.216796875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08269890561923299,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.091796875,
+      "brier": 0.08587646484375025,
+      "total_loss": 0.216796875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05421725520357341,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.1015625,
+      "brier": 0.092647110954221,
+      "total_loss": 0.2390625,
+      "exploration_queries": 31,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 28
+        },
+        "1": {
+          "probe_0": 50,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.0546731340392562,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.1015625,
+      "brier": 0.0930602679852502,
+      "total_loss": 0.2390625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 27,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05951739801951936,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.1015625,
+      "brier": 0.09538898744400215,
+      "total_loss": 0.2390625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 30
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 34
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.09262834821428571,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.130859375,
+      "brier": 0.12121023995535682,
+      "total_loss": 0.268359375,
+      "exploration_queries": 31,
+      "allocation": {
+        "0": {
+          "probe_0": 33,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 42
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07347085770582742,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.130859375,
+      "brier": 0.13115998321816444,
+      "total_loss": 0.268359375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 30,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.0790653516701102,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.130859375,
+      "brier": 0.12648130054316242,
+      "total_loss": 0.268359375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.09905098204633961,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.123046875,
+      "brier": 0.11030733226151897,
+      "total_loss": 0.260546875,
+      "exploration_queries": 27,
+      "allocation": {
+        "0": {
+          "probe_0": 25,
+          "probe_1": 33
+        },
+        "1": {
+          "probe_0": 59,
+          "probe_1": 11
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.09172654829224718,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.123046875,
+      "brier": 0.11353132751262239,
+      "total_loss": 0.260546875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 27,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 36
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.0964149694700099,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.123046875,
+      "brier": 0.10980097702990063,
+      "total_loss": 0.260546875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 29,
+          "probe_1": 29
+        },
+        "1": {
+          "probe_0": 35,
+          "probe_1": 35
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.02462377245512038,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.072265625,
+      "brier": 0.06925511235513668,
+      "total_loss": 0.209765625,
+      "exploration_queries": 21,
+      "allocation": {
+        "0": {
+          "probe_0": 37,
+          "probe_1": 30
+        },
+        "1": {
+          "probe_0": 7,
+          "probe_1": 54
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.02287646369700124,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.072265625,
+      "brier": 0.07132440476190505,
+      "total_loss": 0.209765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 24,
+          "probe_1": 37
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.027836607766202996,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.072265625,
+      "brier": 0.06865029356884188,
+      "total_loss": 0.209765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 35,
+          "probe_1": 35
+        },
+        "1": {
+          "probe_0": 29,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.0440818943931467,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09679455792384017,
+      "total_loss": 0.237109375,
+      "exploration_queries": 28,
+      "allocation": {
+        "0": {
+          "probe_0": 34,
+          "probe_1": 24
+        },
+        "1": {
+          "probe_0": 61,
+          "probe_1": 9
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.049259692963810206,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09370957881286876,
+      "total_loss": 0.237109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 24,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 40,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.04873053487611573,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09118365296293113,
+      "total_loss": 0.237109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.10041417185898267,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09371626420454537,
+      "total_loss": 0.237109375,
+      "exploration_queries": 27,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 9,
+          "probe_1": 46
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.09593509238068915,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09772429580672735,
+      "total_loss": 0.237109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 44,
+          "probe_1": 29
+        },
+        "1": {
+          "probe_0": 24,
+          "probe_1": 31
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.09658391042085189,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.099609375,
+      "brier": 0.09665555836383409,
+      "total_loss": 0.237109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.11517329667667052,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.09765625,
+      "brier": 0.08946033476304832,
+      "total_loss": 0.23515625,
+      "exploration_queries": 18,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 45,
+          "probe_1": 10
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.1036096541018918,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.09765625,
+      "brier": 0.09149360573270716,
+      "total_loss": 0.23515625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 27
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.10346675406864125,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.09765625,
+      "brier": 0.09514949314730327,
+      "total_loss": 0.23515625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07838633197186622,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.0859375,
+      "brier": 0.08881582857621788,
+      "total_loss": 0.2234375,
+      "exploration_queries": 26,
+      "allocation": {
+        "0": {
+          "probe_0": 35,
+          "probe_1": 32
+        },
+        "1": {
+          "probe_0": 8,
+          "probe_1": 53
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07382460049314796,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.0859375,
+      "brier": 0.09091531899214356,
+      "total_loss": 0.2234375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 28
+        },
+        "1": {
+          "probe_0": 32,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07583701852719883,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.0859375,
+      "brier": 0.09373045081496836,
+      "total_loss": 0.2234375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.061667470811897884,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.095703125,
+      "brier": 0.0948176725891566,
+      "total_loss": 0.233203125,
+      "exploration_queries": 23,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 39
+        },
+        "1": {
+          "probe_0": 46,
+          "probe_1": 12
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.06758421105630617,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.095703125,
+      "brier": 0.09435001269561615,
+      "total_loss": 0.233203125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 39
+        },
+        "1": {
+          "probe_0": 29,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.07015974679384894,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.095703125,
+      "brier": 0.09156924662488163,
+      "total_loss": 0.233203125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08235345783622441,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.091796875,
+      "brier": 0.08659980486685057,
+      "total_loss": 0.229296875,
+      "exploration_queries": 20,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 22
+        },
+        "1": {
+          "probe_0": 11,
+          "probe_1": 56
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08476810983738053,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.091796875,
+      "brier": 0.08351971279624536,
+      "total_loss": 0.229296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 37,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07025215848241195,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.091796875,
+      "brier": 0.0993629615076433,
+      "total_loss": 0.229296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05568074484320125,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.1015625,
+      "brier": 0.09370544950821323,
+      "total_loss": 0.2640625,
+      "exploration_queries": 57,
+      "allocation": {
+        "0": {
+          "probe_0": 82,
+          "probe_1": 57
+        },
+        "1": {
+          "probe_0": 97,
+          "probe_1": 20
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.049770027655523366,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.1015625,
+      "brier": 0.09149964626454282,
+      "total_loss": 0.2640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 67,
+          "probe_1": 72
+        },
+        "1": {
+          "probe_0": 58,
+          "probe_1": 59
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05536892593486879,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.1015625,
+      "brier": 0.09563871837797625,
+      "total_loss": 0.2640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 73,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 55
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.10467122446560394,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.130859375,
+      "brier": 0.11501052685798674,
+      "total_loss": 0.293359375,
+      "exploration_queries": 61,
+      "allocation": {
+        "0": {
+          "probe_0": 72,
+          "probe_1": 56
+        },
+        "1": {
+          "probe_0": 24,
+          "probe_1": 104
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.09590257076458655,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.130859375,
+      "brier": 0.11811267415614307,
+      "total_loss": 0.293359375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 68,
+          "probe_1": 60
+        },
+        "1": {
+          "probe_0": 64,
+          "probe_1": 64
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.09504546371460706,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.130859375,
+      "brier": 0.11812277743563249,
+      "total_loss": 0.293359375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.1001806377276751,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.123046875,
+      "brier": 0.10864665006046398,
+      "total_loss": 0.285546875,
+      "exploration_queries": 48,
+      "allocation": {
+        "0": {
+          "probe_0": 58,
+          "probe_1": 64
+        },
+        "1": {
+          "probe_0": 118,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.09734978058970616,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.123046875,
+      "brier": 0.11042566904971172,
+      "total_loss": 0.285546875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 51,
+          "probe_1": 71
+        },
+        "1": {
+          "probe_0": 68,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.10000916418900445,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.123046875,
+      "brier": 0.10862556301677363,
+      "total_loss": 0.285546875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 65
+        },
+        "1": {
+          "probe_0": 63,
+          "probe_1": 63
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.021989042871145448,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.072265625,
+      "brier": 0.06733764476865138,
+      "total_loss": 0.234765625,
+      "exploration_queries": 50,
+      "allocation": {
+        "0": {
+          "probe_0": 69,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 11,
+          "probe_1": 114
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.02092887554814467,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.072265625,
+      "brier": 0.06821525288751652,
+      "total_loss": 0.234765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 59,
+          "probe_1": 72
+        },
+        "1": {
+          "probe_0": 59,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.02078154103178036,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.072265625,
+      "brier": 0.06769937359140284,
+      "total_loss": 0.234765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 65
+        },
+        "1": {
+          "probe_0": 63,
+          "probe_1": 63
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.04893885649662549,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.09369533233999085,
+      "total_loss": 0.262109375,
+      "exploration_queries": 50,
+      "allocation": {
+        "0": {
+          "probe_0": 63,
+          "probe_1": 56
+        },
+        "1": {
+          "probe_0": 122,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05147114993484173,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.0919192476859328,
+      "total_loss": 0.262109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 53,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 79,
+          "probe_1": 58
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.05293262410937408,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.09103771897436297,
+      "total_loss": 0.262109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 62,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 66,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.1067916056469591,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.09107909014642807,
+      "total_loss": 0.262109375,
+      "exploration_queries": 52,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 18,
+          "probe_1": 100
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.10449542224826319,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.0926615322309526,
+      "total_loss": 0.262109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 75,
+          "probe_1": 63
+        },
+        "1": {
+          "probe_0": 57,
+          "probe_1": 61
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.10576812783198469,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.099609375,
+      "brier": 0.09101297178103619,
+      "total_loss": 0.262109375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 77,
+          "probe_1": 77
+        },
+        "1": {
+          "probe_0": 51,
+          "probe_1": 51
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.1129832911416691,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.09765625,
+      "brier": 0.08920828177326266,
+      "total_loss": 0.26015625,
+      "exploration_queries": 49,
+      "allocation": {
+        "0": {
+          "probe_0": 79,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 95,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.10262711252869902,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.09765625,
+      "brier": 0.0918161863848589,
+      "total_loss": 0.26015625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 69,
+          "probe_1": 77
+        },
+        "1": {
+          "probe_0": 56,
+          "probe_1": 54
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.10120355724619562,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.09765625,
+      "brier": 0.09390333260221517,
+      "total_loss": 0.26015625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 73,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 55
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07213896980764549,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.0859375,
+      "brier": 0.08515055780724358,
+      "total_loss": 0.2484375,
+      "exploration_queries": 47,
+      "allocation": {
+        "0": {
+          "probe_0": 63,
+          "probe_1": 70
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 109
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.06686752326719651,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.0859375,
+      "brier": 0.09006762410258755,
+      "total_loss": 0.2484375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 61
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.07416657352393097,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.0859375,
+      "brier": 0.08254026356618382,
+      "total_loss": 0.2484375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 62,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 66,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.06875956436308503,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.095703125,
+      "brier": 0.08761676256849547,
+      "total_loss": 0.258203125,
+      "exploration_queries": 51,
+      "allocation": {
+        "0": {
+          "probe_0": 68,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 103,
+          "probe_1": 18
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.07078160658955276,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.095703125,
+      "brier": 0.08913004293873145,
+      "total_loss": 0.258203125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 64,
+          "probe_1": 71
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_0",
+      "adopted": "probe_0",
+      "validation_gain": 0.06797114323851311,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.095703125,
+      "brier": 0.08786348921968844,
+      "total_loss": 0.258203125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08434807234442065,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.091796875,
+      "brier": 0.08412616881288829,
+      "total_loss": 0.254296875,
+      "exploration_queries": 47,
+      "allocation": {
+        "0": {
+          "probe_0": 75,
+          "probe_1": 52
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 113
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.08377167436639694,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.091796875,
+      "brier": 0.08557036547178012,
+      "total_loss": 0.254296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 61,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 67,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": true,
+      "proposed": "probe_1",
+      "adopted": "probe_1",
+      "validation_gain": 0.079567283934,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.091796875,
+      "brier": 0.08443841360717635,
+      "total_loss": 0.254296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 67,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 61,
+          "probe_1": 61
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.005297274154104173,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.322265625,
+      "brier": 0.18591459297839497,
+      "total_loss": 0.447265625,
+      "exploration_queries": 13,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 11
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.007409749473801958,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.322265625,
+      "brier": 0.18591459297839497,
+      "total_loss": 0.447265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 21
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.0018848453362539537,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.322265625,
+      "brier": 0.18591459297839497,
+      "total_loss": 0.447265625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.05934788613952508,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.32421875,
+      "brier": 0.18762597919982119,
+      "total_loss": 0.44921875,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 3,
+          "probe_1": 27
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.04823937861854332,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.32421875,
+      "brier": 0.18762597919982119,
+      "total_loss": 0.44921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.015937138846507718,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.32421875,
+      "brier": 0.18762597919982119,
+      "total_loss": 0.44921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.016772946063707387,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.306640625,
+      "brier": 0.1813325706268709,
+      "total_loss": 0.431640625,
+      "exploration_queries": 16,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 11
+        },
+        "1": {
+          "probe_0": 20,
+          "probe_1": 20
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.026068893583176177,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.306640625,
+      "brier": 0.1813325706268709,
+      "total_loss": 0.431640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 11
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 21
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.02921293660174571,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.306640625,
+      "brier": 0.1813325706268709,
+      "total_loss": 0.431640625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.004346047355695788,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.27734375,
+      "brier": 0.1573064592149517,
+      "total_loss": 0.40234375,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.00663342887972608,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.27734375,
+      "brier": 0.1573064592149517,
+      "total_loss": 0.40234375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 11,
+          "probe_1": 23
+        },
+        "1": {
+          "probe_0": 9,
+          "probe_1": 21
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.009178544148055634,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.27734375,
+      "brier": 0.1573064592149517,
+      "total_loss": 0.40234375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.0004472424808124066,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3125,
+      "brier": 0.19654637810304684,
+      "total_loss": 0.4375,
+      "exploration_queries": 14,
+      "allocation": {
+        "0": {
+          "probe_0": 13,
+          "probe_1": 12
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 25
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.024649783902164355,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3125,
+      "brier": 0.19654637810304684,
+      "total_loss": 0.4375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 10,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 25,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.007646742609180542,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3125,
+      "brier": 0.19654637810304684,
+      "total_loss": 0.4375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.0016607746580780242,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3359375,
+      "brier": 0.19501237760657228,
+      "total_loss": 0.4609375,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 21
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 12
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.001409578143353371,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3359375,
+      "brier": 0.19501237760657228,
+      "total_loss": 0.4609375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 26,
+          "probe_1": 10
+        },
+        "1": {
+          "probe_0": 14,
+          "probe_1": 14
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.005007035377054793,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.3359375,
+      "brier": 0.19501237760657228,
+      "total_loss": 0.4609375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 14,
+          "probe_1": 14
+        },
+        "1": {
+          "probe_0": 18,
+          "probe_1": 18
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.017574906576783605,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.279296875,
+      "brier": 0.1809790039062497,
+      "total_loss": 0.404296875,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 21,
+          "probe_1": 17
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.03531524035395408,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.279296875,
+      "brier": 0.1809790039062497,
+      "total_loss": 0.404296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 20,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.01969081798094582,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.279296875,
+      "brier": 0.1809790039062497,
+      "total_loss": 0.404296875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 19,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 13,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.017152060376492195,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.326171875,
+      "brier": 0.18578117825987206,
+      "total_loss": 0.451171875,
+      "exploration_queries": 15,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.01339952854778849,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.326171875,
+      "brier": 0.18578117825987206,
+      "total_loss": 0.451171875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 21,
+          "probe_1": 12
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.02416866562970459,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.326171875,
+      "brier": 0.18578117825987206,
+      "total_loss": 0.451171875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 20,
+          "probe_1": 20
+        },
+        "1": {
+          "probe_0": 12,
+          "probe_1": 12
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.03920583994904206,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.30078125,
+      "brier": 0.1823187934027771,
+      "total_loss": 0.42578125,
+      "exploration_queries": 11,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 18
+        },
+        "1": {
+          "probe_0": 15,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.04058015046296296,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.30078125,
+      "brier": 0.1823187934027771,
+      "total_loss": 0.42578125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 19
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 11
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.026662661176155494,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.30078125,
+      "brier": 0.1823187934027771,
+      "total_loss": 0.42578125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 15,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 17
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.004112500793568529,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.275390625,
+      "brier": 0.1669279844290661,
+      "total_loss": 0.400390625,
+      "exploration_queries": 9,
+      "allocation": {
+        "0": {
+          "probe_0": 23,
+          "probe_1": 9
+        },
+        "1": {
+          "probe_0": 17,
+          "probe_1": 15
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0007572522405494364,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.275390625,
+      "brier": 0.1669279844290661,
+      "total_loss": 0.400390625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 17,
+          "probe_1": 15
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 13
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 64,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.006173293570712013,
+      "discovery_queries": 64,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 640,
+      "error_rate": 0.275390625,
+      "brier": 0.1669279844290661,
+      "total_loss": 0.400390625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 16,
+          "probe_1": 16
+        },
+        "1": {
+          "probe_0": 16,
+          "probe_1": 16
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.00037725717869792547,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.322265625,
+      "brier": 0.1879681043388433,
+      "total_loss": 0.459765625,
+      "exploration_queries": 31,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 28
+        },
+        "1": {
+          "probe_0": 32,
+          "probe_1": 32
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.010726102853869025,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.322265625,
+      "brier": 0.1879681043388433,
+      "total_loss": 0.459765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 27,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.003198896112240427,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.322265625,
+      "brier": 0.1879681043388433,
+      "total_loss": 0.459765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 30
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 34
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.012078593148304687,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.32421875,
+      "brier": 0.18956597222222135,
+      "total_loss": 0.46171875,
+      "exploration_queries": 31,
+      "allocation": {
+        "0": {
+          "probe_0": 33,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 21,
+          "probe_1": 37
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.03089112146083924,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.32421875,
+      "brier": 0.18956597222222135,
+      "total_loss": 0.46171875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 30,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.022072615138514082,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.32421875,
+      "brier": 0.18956597222222135,
+      "total_loss": 0.46171875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.029706632653061223,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.17971788194444555,
+      "total_loss": 0.444140625,
+      "exploration_queries": 27,
+      "allocation": {
+        "0": {
+          "probe_0": 25,
+          "probe_1": 33
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 36
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.007038166767187746,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.17971788194444555,
+      "total_loss": 0.444140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 27,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 34,
+          "probe_1": 36
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.009336006791916858,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.17971788194444555,
+      "total_loss": 0.444140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 29,
+          "probe_1": 29
+        },
+        "1": {
+          "probe_0": 35,
+          "probe_1": 35
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.002160341233528567,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.1584625688255762,
+      "total_loss": 0.444140625,
+      "exploration_queries": 21,
+      "allocation": {
+        "0": {
+          "probe_0": 37,
+          "probe_1": 30
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.005048312695037057,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.1584625688255762,
+      "total_loss": 0.444140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 24,
+          "probe_1": 37
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.004484315756562593,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.306640625,
+      "brier": 0.1584625688255762,
+      "total_loss": 0.444140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 35,
+          "probe_1": 35
+        },
+        "1": {
+          "probe_0": 29,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.001464162383779572,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3125,
+      "brier": 0.17155415099344143,
+      "total_loss": 0.45,
+      "exploration_queries": 28,
+      "allocation": {
+        "0": {
+          "probe_0": 34,
+          "probe_1": 24
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 42
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.011536609310184352,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3125,
+      "brier": 0.17155415099344143,
+      "total_loss": 0.45,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 24,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 40,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.0037835718690991957,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3125,
+      "brier": 0.17155415099344143,
+      "total_loss": 0.45,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.05201181498312259,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3359375,
+      "brier": 0.1724923774622963,
+      "total_loss": 0.4734375,
+      "exploration_queries": 27,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 37
+        },
+        "1": {
+          "probe_0": 19,
+          "probe_1": 36
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.004677753318802367,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3359375,
+      "brier": 0.1724923774622963,
+      "total_loss": 0.4734375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 44,
+          "probe_1": 29
+        },
+        "1": {
+          "probe_0": 24,
+          "probe_1": 31
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.028252179336397034,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.3359375,
+      "brier": 0.1724923774622963,
+      "total_loss": 0.4734375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.007830397998299298,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.357421875,
+      "brier": 0.18321955505540233,
+      "total_loss": 0.494921875,
+      "exploration_queries": 18,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 25,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.008613894721975478,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.357421875,
+      "brier": 0.18321955505540233,
+      "total_loss": 0.494921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 34
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 27
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0007350112167017102,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.357421875,
+      "brier": 0.18321955505540233,
+      "total_loss": 0.494921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 36,
+          "probe_1": 36
+        },
+        "1": {
+          "probe_0": 28,
+          "probe_1": 28
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.010638347789923215,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.326171875,
+      "brier": 0.1779739061880095,
+      "total_loss": 0.463671875,
+      "exploration_queries": 26,
+      "allocation": {
+        "0": {
+          "probe_0": 35,
+          "probe_1": 32
+        },
+        "1": {
+          "probe_0": 27,
+          "probe_1": 34
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.024959903481921984,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.326171875,
+      "brier": 0.1779739061880095,
+      "total_loss": 0.463671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 28
+        },
+        "1": {
+          "probe_0": 32,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.010996780189716763,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.326171875,
+      "brier": 0.1779739061880095,
+      "total_loss": 0.463671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.023182132227891155,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.30078125,
+      "brier": 0.17683919270833356,
+      "total_loss": 0.43828125,
+      "exploration_queries": 23,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 39
+        },
+        "1": {
+          "probe_0": 38,
+          "probe_1": 20
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.01125179398148148,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.30078125,
+      "brier": 0.17683919270833356,
+      "total_loss": 0.43828125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 39
+        },
+        "1": {
+          "probe_0": 29,
+          "probe_1": 29
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.017308464578881137,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.30078125,
+      "brier": 0.17683919270833356,
+      "total_loss": 0.43828125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.004974752550454825,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.275390625,
+      "brier": 0.16126163022313467,
+      "total_loss": 0.412890625,
+      "exploration_queries": 20,
+      "allocation": {
+        "0": {
+          "probe_0": 39,
+          "probe_1": 22
+        },
+        "1": {
+          "probe_0": 35,
+          "probe_1": 32
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.00020332954436031212,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.275390625,
+      "brier": 0.16126163022313467,
+      "total_loss": 0.412890625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 30,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 37,
+          "probe_1": 30
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 128,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.0011782070980968402,
+      "discovery_queries": 128,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 704,
+      "error_rate": 0.275390625,
+      "brier": 0.16126163022313467,
+      "total_loss": 0.412890625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 31,
+          "probe_1": 31
+        },
+        "1": {
+          "probe_0": 33,
+          "probe_1": 33
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.00018480433170423973,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.322265625,
+      "brier": 0.18102280061554435,
+      "total_loss": 0.484765625,
+      "exploration_queries": 57,
+      "allocation": {
+        "0": {
+          "probe_0": 82,
+          "probe_1": 57
+        },
+        "1": {
+          "probe_0": 59,
+          "probe_1": 58
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0004956115353799836,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.322265625,
+      "brier": 0.18102280061554435,
+      "total_loss": 0.484765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 67,
+          "probe_1": 72
+        },
+        "1": {
+          "probe_0": 58,
+          "probe_1": 59
+        }
+      }
+    },
+    {
+      "seed": 40,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.001859558722910482,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.322265625,
+      "brier": 0.18102280061554435,
+      "total_loss": 0.484765625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 73,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 55
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.008804058073587714,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.32421875,
+      "brier": 0.19066914755917194,
+      "total_loss": 0.48671875,
+      "exploration_queries": 61,
+      "allocation": {
+        "0": {
+          "probe_0": 72,
+          "probe_1": 56
+        },
+        "1": {
+          "probe_0": 63,
+          "probe_1": 65
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.011034869821469458,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.32421875,
+      "brier": 0.19066914755917194,
+      "total_loss": 0.48671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 68,
+          "probe_1": 60
+        },
+        "1": {
+          "probe_0": 64,
+          "probe_1": 64
+        }
+      }
+    },
+    {
+      "seed": 41,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.004356522459669313,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.32421875,
+      "brier": 0.19066914755917194,
+      "total_loss": 0.48671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.003997816402560458,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.306640625,
+      "brier": 0.1766477901527308,
+      "total_loss": 0.469140625,
+      "exploration_queries": 48,
+      "allocation": {
+        "0": {
+          "probe_0": 58,
+          "probe_1": 64
+        },
+        "1": {
+          "probe_0": 65,
+          "probe_1": 69
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.010275552341453924,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.306640625,
+      "brier": 0.1766477901527308,
+      "total_loss": 0.469140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 51,
+          "probe_1": 71
+        },
+        "1": {
+          "probe_0": 68,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 42,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.01872767584385532,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.306640625,
+      "brier": 0.1766477901527308,
+      "total_loss": 0.469140625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 65
+        },
+        "1": {
+          "probe_0": 63,
+          "probe_1": 63
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0018142928331654161,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.27734375,
+      "brier": 0.15694168150368754,
+      "total_loss": 0.43984375,
+      "exploration_queries": 50,
+      "allocation": {
+        "0": {
+          "probe_0": 69,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 67,
+          "probe_1": 58
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -5.6195708718389795e-05,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.27734375,
+      "brier": 0.15694168150368754,
+      "total_loss": 0.43984375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 59,
+          "probe_1": 72
+        },
+        "1": {
+          "probe_0": 59,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.0013249825410505446,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.27734375,
+      "brier": 0.15694168150368754,
+      "total_loss": 0.43984375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 65
+        },
+        "1": {
+          "probe_0": 63,
+          "probe_1": 63
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.004726748012392209,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3125,
+      "brier": 0.16819110283521793,
+      "total_loss": 0.475,
+      "exploration_queries": 50,
+      "allocation": {
+        "0": {
+          "probe_0": 63,
+          "probe_1": 56
+        },
+        "1": {
+          "probe_0": 83,
+          "probe_1": 54
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.002981850133559905,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3125,
+      "brier": 0.16819110283521793,
+      "total_loss": 0.475,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 53,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 79,
+          "probe_1": 58
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0010003621539259532,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3125,
+      "brier": 0.16819110283521793,
+      "total_loss": 0.475,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 62,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 66,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.015505996086949664,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3359375,
+      "brier": 0.1718728326291461,
+      "total_loss": 0.4984375,
+      "exploration_queries": 52,
+      "allocation": {
+        "0": {
+          "probe_0": 65,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 36,
+          "probe_1": 82
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.019685660810112336,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3359375,
+      "brier": 0.1718728326291461,
+      "total_loss": 0.4984375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 75,
+          "probe_1": 63
+        },
+        "1": {
+          "probe_0": 57,
+          "probe_1": 61
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.00966037496758568,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.3359375,
+      "brier": 0.1718728326291461,
+      "total_loss": 0.4984375,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 77,
+          "probe_1": 77
+        },
+        "1": {
+          "probe_0": 51,
+          "probe_1": 51
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.011525566601310175,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.357421875,
+      "brier": 0.18303393616740746,
+      "total_loss": 0.519921875,
+      "exploration_queries": 49,
+      "allocation": {
+        "0": {
+          "probe_0": 79,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 56,
+          "probe_1": 54
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.003096752214404989,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.357421875,
+      "brier": 0.18303393616740746,
+      "total_loss": 0.519921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 69,
+          "probe_1": 77
+        },
+        "1": {
+          "probe_0": 56,
+          "probe_1": 54
+        }
+      }
+    },
+    {
+      "seed": 46,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.013735032282178759,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.357421875,
+      "brier": 0.18303393616740746,
+      "total_loss": 0.519921875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 73,
+          "probe_1": 73
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 55
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.0004749242858305178,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.326171875,
+      "brier": 0.17235285288065838,
+      "total_loss": 0.488671875,
+      "exploration_queries": 47,
+      "allocation": {
+        "0": {
+          "probe_0": 63,
+          "probe_1": 70
+        },
+        "1": {
+          "probe_0": 61,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.003085334314594812,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.326171875,
+      "brier": 0.17235285288065838,
+      "total_loss": 0.488671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 61
+        }
+      }
+    },
+    {
+      "seed": 47,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": 0.00201166206559763,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.326171875,
+      "brier": 0.17235285288065838,
+      "total_loss": 0.488671875,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 62,
+          "probe_1": 62
+        },
+        "1": {
+          "probe_0": 66,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": -0.013038117688599755,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.30078125,
+      "brier": 0.1750258449602187,
+      "total_loss": 0.46328125,
+      "exploration_queries": 51,
+      "allocation": {
+        "0": {
+          "probe_0": 68,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 68,
+          "probe_1": 53
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.004708931599378656,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.30078125,
+      "brier": 0.1750258449602187,
+      "total_loss": 0.46328125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 64,
+          "probe_1": 71
+        },
+        "1": {
+          "probe_0": 55,
+          "probe_1": 66
+        }
+      }
+    },
+    {
+      "seed": 48,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.004735703423370815,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.30078125,
+      "brier": 0.1750258449602187,
+      "total_loss": 0.46328125,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 66,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 62,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "active",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.005081248434198081,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.275390625,
+      "brier": 0.16063241725985242,
+      "total_loss": 0.437890625,
+      "exploration_queries": 47,
+      "allocation": {
+        "0": {
+          "probe_0": 75,
+          "probe_1": 52
+        },
+        "1": {
+          "probe_0": 66,
+          "probe_1": 63
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "random",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_1",
+      "adopted": null,
+      "validation_gain": -0.0006963519416266382,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.275390625,
+      "brier": 0.16063241725985242,
+      "total_loss": 0.437890625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 61,
+          "probe_1": 66
+        },
+        "1": {
+          "probe_0": 67,
+          "probe_1": 62
+        }
+      }
+    },
+    {
+      "seed": 49,
+      "policy": "exhaustive",
+      "budget": 256,
+      "signal": false,
+      "proposed": "probe_0",
+      "adopted": null,
+      "validation_gain": 0.004721820054237025,
+      "discovery_queries": 256,
+      "validation_queries": 64,
+      "evaluation_queries": 512,
+      "total_queries": 832,
+      "error_rate": 0.275390625,
+      "brier": 0.16063241725985242,
+      "total_loss": 0.437890625,
+      "exploration_queries": 0,
+      "allocation": {
+        "0": {
+          "probe_0": 67,
+          "probe_1": 67
+        },
+        "1": {
+          "probe_0": 61,
+          "probe_1": 61
+        }
+      }
+    }
+  ]
+}
