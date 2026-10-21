@@ -2381,3 +2381,13 @@ It preserves competing explanations and reports impossible observations explicit
 Candidates and kernels are supplied; autonomous discovery, native runtime wiring,
 and compression remain deferred. Existing geometric compatibility scores are not
 automatically interpreted as environment transition probabilities.
+
+## Question learning v0.2 — bounded research experiment
+
+The [question-learning experiment](CORTEX_QUESTION_LEARNING_V0_2.md) learns conditional outcome laws from
+acquired observations, validates one proposed distinction on fresh evidence, and
+uses the finite possibility reference to choose paid questions. Ten held-out
+learnable seeds show 10.12% decision error versus 25.10% for random questioning
+at the same evaluation query count; ten noise-only controls reject refinement.
+Initial learning still queries both supplied probes. Sensor invention, noisy
+observation models, online structural revision and native integration are deferred.
