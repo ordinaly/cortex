@@ -2371,3 +2371,13 @@ a complete retained-size gate; reopening uses witnesses only. This is not yet
 action-conditioned or connected to native memory allocation. See the
 [v0.3 contract](SL_BENCH_ACCORDION_V0_3.md) and
 [storage/accuracy/compute results](SL_BENCH_ACCORDION_V0_3_RESULTS.md).
+
+## Possibility Geometry v0.1 — finite research oracle
+
+An opt-in [possibility reference layer](CORTEX_POSSIBILITY_GEOMETRY_V0_1.md) now implements exact rational
+probability transport, observation-conditioned updates, coherent finite-trace
+probes, predictive neighbourhoods, and an exact partition closure check.
+It preserves competing explanations and reports impossible observations explicitly.
+Candidates and kernels are supplied; autonomous discovery, native runtime wiring,
+and compression remain deferred. Existing geometric compatibility scores are not
+automatically interpreted as environment transition probabilities.

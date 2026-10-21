@@ -320,3 +320,13 @@ The [v0.3 physical accordion experiment](docs/SL_BENCH_ACCORDION_V0_3.md)
 releases full windows, keeps bounded witnesses, and accepts folds only when
 estimated total retained size decreases. It shows storage and local-drift gains
 in limited synthetic cases, with higher computation cost; it remains opt-in.
+
+## Possibility Geometry v0.1 — finite research oracle
+
+An opt-in [possibility reference layer](docs/CORTEX_POSSIBILITY_GEOMETRY_V0_1.md) now implements exact rational
+probability transport, observation-conditioned updates, coherent finite-trace
+probes, predictive neighbourhoods, and an exact partition closure check.
+It preserves competing explanations and reports impossible observations explicitly.
+Candidates and kernels are supplied; autonomous discovery, native runtime wiring,
+and compression remain deferred. Existing geometric compatibility scores are not
+automatically interpreted as environment transition probabilities.
