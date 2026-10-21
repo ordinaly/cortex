@@ -2391,3 +2391,12 @@ learnable seeds show 10.12% decision error versus 25.10% for random questioning
 at the same evaluation query count; ten noise-only controls reject refinement.
 Initial learning still queries both supplied probes. Sensor invention, noisy
 observation models, online structural revision and native integration are deferred.
+
+## Selective training v0.3 — partial observation experiment
+
+[Selective acquisition during learning](CORTEX_SELECTIVE_TRAINING_V0_3.md) now updates only acquired
+properties, retains random exploration, and validates a frozen proposal on fresh
+evidence. At 64 discovery queries, ten-seed mean error is 12.01% active versus
+13.85% random and 18.44% exhaustive at equal total acquisition costs. At larger
+budgets their decision error converges. Stopping rules, noisy sensors, changing
+regimes and native integration remain deferred.

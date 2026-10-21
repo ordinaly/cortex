@@ -11,7 +11,10 @@ jobs:
         with:
           python-version: '3.11'
       - run: python research/question_learning_campaign.py --output question-learning-v0.2.json
+      - run: python research/selective_training_campaign.py --output selective-training-v0.3.json
       - uses: actions/upload-artifact@v4
         with:
           name: question-learning-v0.2
-          path: question-learning-v0.2.json
+          path: |
+            question-learning-v0.2.json
+            selective-training-v0.3.json
