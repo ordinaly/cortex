@@ -1,0 +1,17 @@
+name: Question learning v0.2 campaign
+on:
+  workflow_dispatch:
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python research/question_learning_campaign.py --output question-learning-v0.2.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: question-learning-v0.2
+          path: question-learning-v0.2.json

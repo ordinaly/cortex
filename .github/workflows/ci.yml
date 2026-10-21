@@ -112,6 +112,7 @@ jobs:
           tests/test_lazy_distance_materialization.py
           tests/test_post_lazy_stage_profile.py
           tests/test_single_buffer_kernel_refresh.py
+          tests/test_question_learning.py
           tests/test_possibility_geometry.py
           tests/test_versioning.py
           -q

@@ -1,0 +1,1376 @@
+{
+  "version": "question-learning-v0.2",
+  "seeds": [
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "design": {
+    "discovery_n": 512,
+    "validation_n": 512,
+    "evaluation_n": 512,
+    "query_cost": 0.1,
+    "validation_margin": 0.02,
+    "training": "fixed full-probe exploration, frozen before validation",
+    "evaluation": "frozen model; matched random acquisition count"
+  },
+  "summary": {
+    "learnable": {
+      "adopted": 10,
+      "cases": 10,
+      "policies": {
+        "active": {
+          "queries": 260.6,
+          "error_rate": 0.101171875,
+          "brier": 0.09125073105280421,
+          "log_loss": 0.32924860381752297,
+          "total_loss": 0.1520703125
+        },
+        "random_matched": {
+          "queries": 260.6,
+          "error_rate": 0.2509765625,
+          "brier": 0.15249565283083183,
+          "log_loss": 0.4698791075663159,
+          "total_loss": 0.301875
+        },
+        "none": {
+          "queries": 0.0,
+          "error_rate": 0.3009765625,
+          "brier": 0.17206299066383185,
+          "log_loss": 0.5142643662685996,
+          "total_loss": 0.3009765625
+        },
+        "all": {
+          "queries": 1024.0,
+          "error_rate": 0.101171875,
+          "brier": 0.0915516664043445,
+          "log_loss": 0.33070593160197415,
+          "total_loss": 0.301171875
+        }
+      }
+    },
+    "no_distinction": {
+      "adopted": 0,
+      "cases": 10,
+      "policies": {
+        "active": {
+          "queries": 0.0,
+          "error_rate": 0.3103515625,
+          "brier": 0.1728389188270372,
+          "log_loss": 0.5158192127585266,
+          "total_loss": 0.3103515625
+        },
+        "random_matched": {
+          "queries": 0.0,
+          "error_rate": 0.3103515625,
+          "brier": 0.1728389188270372,
+          "log_loss": 0.5158192127585266,
+          "total_loss": 0.3103515625
+        },
+        "none": {
+          "queries": 0.0,
+          "error_rate": 0.3103515625,
+          "brier": 0.1728389188270372,
+          "log_loss": 0.5158192127585266,
+          "total_loss": 0.3103515625
+        },
+        "all": {
+          "queries": 1024.0,
+          "error_rate": 0.3103515625,
+          "brier": 0.1728389188270372,
+          "log_loss": 0.5158192127585266,
+          "total_loss": 0.5103515625
+        }
+      }
+    }
+  },
+  "cases": [
+    {
+      "seed": 20,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": "probe_0",
+        "discovery_gain": 0.07292023595077889,
+        "validation_gain": 0.08859512562112687,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_0"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 272,
+          "errors": 54,
+          "error_rate": 0.10546875,
+          "brier": 0.09447901550709378,
+          "log_loss": 0.3376035911186877,
+          "cost_per_episode": 0.053125000000000006,
+          "total_loss": 0.15859375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 272,
+          "errors": 126,
+          "error_rate": 0.24609375,
+          "brier": 0.15504522054428282,
+          "log_loss": 0.47593616614993584,
+          "cost_per_episode": 0.053125000000000006,
+          "total_loss": 0.29921875
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 156,
+          "error_rate": 0.3046875,
+          "brier": 0.17210987330170596,
+          "log_loss": 0.5133263286822403,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.3046875
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 54,
+          "error_rate": 0.10546875,
+          "brier": 0.09445894136194759,
+          "log_loss": 0.3374058377109514,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.30546875
+        }
+      }
+    },
+    {
+      "seed": 21,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": "probe_1",
+        "discovery_gain": 0.07742190958921483,
+        "validation_gain": 0.0786777126971181,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_1"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 241,
+          "errors": 48,
+          "error_rate": 0.09375,
+          "brier": 0.08559005430669141,
+          "log_loss": 0.31409518708245504,
+          "cost_per_episode": 0.0470703125,
+          "total_loss": 0.1408203125
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 241,
+          "errors": 133,
+          "error_rate": 0.259765625,
+          "brier": 0.154965786067606,
+          "log_loss": 0.4768712378851453,
+          "cost_per_episode": 0.0470703125,
+          "total_loss": 0.3068359375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 153,
+          "error_rate": 0.298828125,
+          "brier": 0.17239454748075062,
+          "log_loss": 0.5169230095708558,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.298828125
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 48,
+          "error_rate": 0.09375,
+          "brier": 0.08606454983392335,
+          "log_loss": 0.3167452924926831,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.29375
+        }
+      }
+    },
+    {
+      "seed": 22,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": "probe_0",
+        "discovery_gain": 0.08557470453373993,
+        "validation_gain": 0.09391976462527249,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_0"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 256,
+          "errors": 46,
+          "error_rate": 0.08984375,
+          "brier": 0.08149890164106566,
+          "log_loss": 0.3004747536604222,
+          "cost_per_episode": 0.05,
+          "total_loss": 0.13984375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 256,
+          "errors": 106,
+          "error_rate": 0.20703125,
+          "brier": 0.134604789301833,
+          "log_loss": 0.4205537092674034,
+          "cost_per_episode": 0.05,
+          "total_loss": 0.25703125
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 136,
+          "error_rate": 0.265625,
+          "brier": 0.15707403873429474,
+          "log_loss": 0.472735675377759,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.265625
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 46,
+          "error_rate": 0.08984375,
+          "brier": 0.08163979827822443,
+          "log_loss": 0.3014117452842526,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.28984375
+        }
+      }
+    },
+    {
+      "seed": 23,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": "probe_1",
+        "discovery_gain": 0.07309463553818622,
+        "validation_gain": 0.07361799669903633,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_1"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 43,
+          "error_rate": 0.083984375,
+          "brier": 0.07802547990151266,
+          "log_loss": 0.2941685733875868,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.1341796875
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 112,
+          "error_rate": 0.21875,
+          "brier": 0.14099950513855977,
+          "log_loss": 0.4402459227150942,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.2689453125
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 142,
+          "error_rate": 0.27734375,
+          "brier": 0.16343731880144033,
+          "log_loss": 0.4923752359899814,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.27734375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 43,
+          "error_rate": 0.083984375,
+          "brier": 0.07829388937488817,
+          "log_loss": 0.29539147395390186,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.283984375
+        }
+      }
+    },
+    {
+      "seed": 24,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": "probe_0",
+        "discovery_gain": 0.08978722382043776,
+        "validation_gain": 0.08253299472418865,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_0"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 268,
+          "errors": 58,
+          "error_rate": 0.11328125,
+          "brier": 0.10140976300057983,
+          "log_loss": 0.3591080626640038,
+          "cost_per_episode": 0.05234375,
+          "total_loss": 0.165625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 268,
+          "errors": 128,
+          "error_rate": 0.25,
+          "brier": 0.1559250214240961,
+          "log_loss": 0.47976514117244756,
+          "cost_per_episode": 0.05234375,
+          "total_loss": 0.30234375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 155,
+          "error_rate": 0.302734375,
+          "brier": 0.1748644899662875,
+          "log_loss": 0.5219641419762222,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.302734375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 58,
+          "error_rate": 0.11328125,
+          "brier": 0.10141470469218718,
+          "log_loss": 0.3591440275231202,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.31328125
+        }
+      }
+    },
+    {
+      "seed": 25,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": "probe_1",
+        "discovery_gain": 0.07996496174699703,
+        "validation_gain": 0.07456913034626152,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_1"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 278,
+          "errors": 62,
+          "error_rate": 0.12109375,
+          "brier": 0.10683693424384473,
+          "log_loss": 0.3710803718216149,
+          "cost_per_episode": 0.054296875,
+          "total_loss": 0.175390625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 278,
+          "errors": 152,
+          "error_rate": 0.296875,
+          "brier": 0.164002596082076,
+          "log_loss": 0.49857682840023326,
+          "cost_per_episode": 0.054296875,
+          "total_loss": 0.351171875
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 186,
+          "error_rate": 0.36328125,
+          "brier": 0.18303358065789216,
+          "log_loss": 0.5414753446470274,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.36328125
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 62,
+          "error_rate": 0.12109375,
+          "brier": 0.10705238002117169,
+          "log_loss": 0.37194358135154937,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.32109375
+        }
+      }
+    },
+    {
+      "seed": 26,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": "probe_0",
+        "discovery_gain": 0.08151893457992591,
+        "validation_gain": 0.08159263453010576,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_0"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 234,
+          "errors": 47,
+          "error_rate": 0.091796875,
+          "brier": 0.08381533948189132,
+          "log_loss": 0.3089857694067558,
+          "cost_per_episode": 0.045703125000000004,
+          "total_loss": 0.1375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 234,
+          "errors": 127,
+          "error_rate": 0.248046875,
+          "brier": 0.14576854462253083,
+          "log_loss": 0.4561785067119504,
+          "cost_per_episode": 0.045703125000000004,
+          "total_loss": 0.29375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 139,
+          "error_rate": 0.271484375,
+          "brier": 0.16065334184952104,
+          "log_loss": 0.4872970165894506,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.271484375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 47,
+          "error_rate": 0.091796875,
+          "brier": 0.08559704543073429,
+          "log_loss": 0.31640013928391986,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.291796875
+        }
+      }
+    },
+    {
+      "seed": 27,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": "probe_1",
+        "discovery_gain": 0.08168070940138841,
+        "validation_gain": 0.08693554779012598,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_1"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 286,
+          "errors": 56,
+          "error_rate": 0.109375,
+          "brier": 0.09750648487576649,
+          "log_loss": 0.34571758719531326,
+          "cost_per_episode": 0.055859375,
+          "total_loss": 0.165234375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 286,
+          "errors": 143,
+          "error_rate": 0.279296875,
+          "brier": 0.16451326632690735,
+          "log_loss": 0.49973772585768594,
+          "cost_per_episode": 0.055859375,
+          "total_loss": 0.33515625
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 166,
+          "error_rate": 0.32421875,
+          "brier": 0.18459317686654525,
+          "log_loss": 0.544868680885724,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.32421875
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 56,
+          "error_rate": 0.109375,
+          "brier": 0.09730444852306684,
+          "log_loss": 0.3447768963715041,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.309375
+        }
+      }
+    },
+    {
+      "seed": 28,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": "probe_0",
+        "discovery_gain": 0.06674165497805652,
+        "validation_gain": 0.09575998535328796,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_0"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 58,
+          "error_rate": 0.11328125,
+          "brier": 0.10107822662365536,
+          "log_loss": 0.3564428867071473,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.1634765625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 128,
+          "error_rate": 0.25,
+          "brier": 0.1552203589117094,
+          "log_loss": 0.4795487348857637,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.3001953125
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 155,
+          "error_rate": 0.302734375,
+          "brier": 0.1803019670872889,
+          "log_loss": 0.5375318031567711,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.302734375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 58,
+          "error_rate": 0.11328125,
+          "brier": 0.10140003787118423,
+          "log_loss": 0.3587909220948402,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.31328125
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "signal": true,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": "probe_1",
+        "discovery_gain": 0.07756395645301943,
+        "validation_gain": 0.07575426335981635,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "adopted"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": "probe_1"
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 46,
+          "error_rate": 0.08984375,
+          "brier": 0.08226711094594087,
+          "log_loss": 0.3048092551312427,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.1400390625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 257,
+          "errors": 130,
+          "error_rate": 0.25390625,
+          "brier": 0.15391143988871708,
+          "log_loss": 0.47137710261749993,
+          "cost_per_episode": 0.050195312500000006,
+          "total_loss": 0.3041015625
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 153,
+          "error_rate": 0.298828125,
+          "brier": 0.1721675718925921,
+          "log_loss": 0.514146425809965,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.298828125
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 46,
+          "error_rate": 0.08984375,
+          "brier": 0.08229086865611723,
+          "log_loss": 0.30504939995301844,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.28984375
+        }
+      }
+    },
+    {
+      "seed": 20,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": null,
+        "discovery_gain": 0.00027257474597005405,
+        "validation_gain": -0.001033848343755174,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 158,
+          "error_rate": 0.30859375,
+          "brier": 0.1731553384733156,
+          "log_loss": 0.515244559325231,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.30859375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 158,
+          "error_rate": 0.30859375,
+          "brier": 0.1731553384733156,
+          "log_loss": 0.515244559325231,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.30859375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 158,
+          "error_rate": 0.30859375,
+          "brier": 0.1731553384733156,
+          "log_loss": 0.515244559325231,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.30859375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 158,
+          "error_rate": 0.30859375,
+          "brier": 0.1731553384733156,
+          "log_loss": 0.515244559325231,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.50859375
+        }
+      }
+    },
+    {
+      "seed": 21,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": null,
+        "discovery_gain": 0.0010023031766166089,
+        "validation_gain": -0.0015272733005042005,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 149,
+          "error_rate": 0.291015625,
+          "brier": 0.17221443268276215,
+          "log_loss": 0.5167170806001979,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.291015625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 149,
+          "error_rate": 0.291015625,
+          "brier": 0.17221443268276215,
+          "log_loss": 0.5167170806001979,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.291015625
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 149,
+          "error_rate": 0.291015625,
+          "brier": 0.17221443268276215,
+          "log_loss": 0.5167170806001979,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.291015625
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 149,
+          "error_rate": 0.291015625,
+          "brier": 0.17221443268276215,
+          "log_loss": 0.5167170806001979,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.491015625
+        }
+      }
+    },
+    {
+      "seed": 22,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": null,
+        "discovery_gain": 0.0019258111743191643,
+        "validation_gain": 0.0009840801757604093,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 156,
+          "error_rate": 0.3046875,
+          "brier": 0.15913114389373006,
+          "log_loss": 0.4767451307775636,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.3046875
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 156,
+          "error_rate": 0.3046875,
+          "brier": 0.15913114389373006,
+          "log_loss": 0.4767451307775636,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.3046875
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 156,
+          "error_rate": 0.3046875,
+          "brier": 0.15913114389373006,
+          "log_loss": 0.4767451307775636,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.3046875
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 156,
+          "error_rate": 0.3046875,
+          "brier": 0.15913114389373006,
+          "log_loss": 0.4767451307775636,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.5046875
+        }
+      }
+    },
+    {
+      "seed": 23,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": null,
+        "discovery_gain": 0.0005376223907378083,
+        "validation_gain": -0.0005150054860360697,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 148,
+          "error_rate": 0.2890625,
+          "brier": 0.16383109660590148,
+          "log_loss": 0.49288405782909167,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.2890625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 148,
+          "error_rate": 0.2890625,
+          "brier": 0.16383109660590148,
+          "log_loss": 0.49288405782909167,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.2890625
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 148,
+          "error_rate": 0.2890625,
+          "brier": 0.16383109660590148,
+          "log_loss": 0.49288405782909167,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.2890625
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 148,
+          "error_rate": 0.2890625,
+          "brier": 0.16383109660590148,
+          "log_loss": 0.49288405782909167,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.4890625
+        }
+      }
+    },
+    {
+      "seed": 24,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": null,
+        "discovery_gain": 0.00011498567153867737,
+        "validation_gain": 0.00028522952786795195,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 157,
+          "error_rate": 0.306640625,
+          "brier": 0.17510802153299546,
+          "log_loss": 0.5228809472380659,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.306640625
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 157,
+          "error_rate": 0.306640625,
+          "brier": 0.17510802153299546,
+          "log_loss": 0.5228809472380659,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.306640625
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 157,
+          "error_rate": 0.306640625,
+          "brier": 0.17510802153299546,
+          "log_loss": 0.5228809472380659,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.306640625
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 157,
+          "error_rate": 0.306640625,
+          "brier": 0.17510802153299546,
+          "log_loss": 0.5228809472380659,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.506640625
+        }
+      }
+    },
+    {
+      "seed": 25,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": null,
+        "discovery_gain": 0.0016851520934625056,
+        "validation_gain": -0.0010835433126948413,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.18456471684628345,
+          "log_loss": 0.5444520646572242,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.18456471684628345,
+          "log_loss": 0.5444520646572242,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.18456471684628345,
+          "log_loss": 0.5444520646572242,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.18456471684628345,
+          "log_loss": 0.5444520646572242,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.533984375
+        }
+      }
+    },
+    {
+      "seed": 26,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": null,
+        "discovery_gain": 0.0012021530993629465,
+        "validation_gain": -0.0019892315573764112,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 143,
+          "error_rate": 0.279296875,
+          "brier": 0.16163037153032958,
+          "log_loss": 0.48904779029082357,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.279296875
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 143,
+          "error_rate": 0.279296875,
+          "brier": 0.16163037153032958,
+          "log_loss": 0.48904779029082357,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.279296875
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 143,
+          "error_rate": 0.279296875,
+          "brier": 0.16163037153032958,
+          "log_loss": 0.48904779029082357,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.279296875
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 143,
+          "error_rate": 0.279296875,
+          "brier": 0.16163037153032958,
+          "log_loss": 0.48904779029082357,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.479296875
+        }
+      }
+    },
+    {
+      "seed": 27,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": null,
+        "discovery_gain": 0.0006927963881360667,
+        "validation_gain": -0.000184211255461648,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 185,
+          "error_rate": 0.361328125,
+          "brier": 0.18545560924888552,
+          "log_loss": 0.5465389998045913,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.361328125
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 185,
+          "error_rate": 0.361328125,
+          "brier": 0.18545560924888552,
+          "log_loss": 0.5465389998045913,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.361328125
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 185,
+          "error_rate": 0.361328125,
+          "brier": 0.18545560924888552,
+          "log_loss": 0.5465389998045913,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.361328125
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 185,
+          "error_rate": 0.361328125,
+          "brier": 0.18545560924888552,
+          "log_loss": 0.5465389998045913,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.561328125
+        }
+      }
+    },
+    {
+      "seed": 28,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_0",
+        "adopted": null,
+        "discovery_gain": 0.00044074764884389724,
+        "validation_gain": -0.0005744166649539951,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 151,
+          "error_rate": 0.294921875,
+          "brier": 0.18032001042050558,
+          "log_loss": 0.537877667249354,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.294921875
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 151,
+          "error_rate": 0.294921875,
+          "brier": 0.18032001042050558,
+          "log_loss": 0.537877667249354,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.294921875
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 151,
+          "error_rate": 0.294921875,
+          "brier": 0.18032001042050558,
+          "log_loss": 0.537877667249354,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.294921875
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 151,
+          "error_rate": 0.294921875,
+          "brier": 0.18032001042050558,
+          "log_loss": 0.537877667249354,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.494921875
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "signal": false,
+      "decision": {
+        "proposed": "probe_1",
+        "adopted": null,
+        "discovery_gain": 0.0004138009821813085,
+        "validation_gain": 0.000684737471200831,
+        "margin": 0.02,
+        "discovery_count": 512,
+        "validation_count": 512,
+        "status": "rejected"
+      },
+      "acquisition_queries": {
+        "discovery": 1024,
+        "validation": 1024
+      },
+      "choices": {
+        "0": null,
+        "1": null
+      },
+      "policies": {
+        "active": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.17297844703566306,
+          "log_loss": 0.5158038298131233,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "random_matched": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.17297844703566306,
+          "log_loss": 0.5158038298131233,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "none": {
+          "episodes": 512,
+          "queries": 0,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.17297844703566306,
+          "log_loss": 0.5158038298131233,
+          "cost_per_episode": 0.0,
+          "total_loss": 0.333984375
+        },
+        "all": {
+          "episodes": 512,
+          "queries": 1024,
+          "errors": 171,
+          "error_rate": 0.333984375,
+          "brier": 0.17297844703566306,
+          "log_loss": 0.5158038298131233,
+          "cost_per_episode": 0.2,
+          "total_loss": 0.533984375
+        }
+      }
+    }
+  ]
+}
