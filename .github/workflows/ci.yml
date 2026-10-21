@@ -95,6 +95,7 @@ jobs:
           tests/test_noisy_semantic_revision.py
           tests/test_latent_concept_induction.py
           tests/test_concept_semantic_integration.py
+          tests/test_compositional_language.py
           tests/test_proof_dependency.py
           tests/test_planning_replanning.py
           tests/test_open_world_novelty.py

@@ -2400,3 +2400,12 @@ evidence. At 64 discovery queries, ten-seed mean error is 12.01% active versus
 13.85% random and 18.44% exhaustive at equal total acquisition costs. At larger
 budgets their decision error converges. Stopping rules, noisy sensors, changing
 regimes and native integration remain deferred.
+
+## Compositional language v0.1 — typed relational expressions
+
+The [composition research layer](CORTEX_COMPOSITIONAL_LANGUAGE_V0_1.md) abstracts bounded motifs into named
+expressions, composes their typed roles, and proposes relational rule schemas
+from examples. It reuses the existing proof-dependency engine for context-local
+derivations, conflicts and retractions. Fresh validation is separate from proposal.
+Candidate motifs, primitive invariants and role types remain supplied; autonomous
+mining, probabilistic rule calibration and native promotion remain deferred.
