@@ -813,3 +813,13 @@ Cortex currently supports claims about:
 - the published native and research performance campaigns.
 
 It does not yet support claims of universal logic, general superiority to neural networks, or broad real-world dominance.
+
+## Possibility Geometry v0.1 — finite research oracle
+
+An opt-in [possibility reference layer](CORTEX_POSSIBILITY_GEOMETRY_V0_1.md) now implements exact rational
+probability transport, observation-conditioned updates, coherent finite-trace
+probes, predictive neighbourhoods, and an exact partition closure check.
+It preserves competing explanations and reports impossible observations explicitly.
+Candidates and kernels are supplied; autonomous discovery, native runtime wiring,
+and compression remain deferred. Existing geometric compatibility scores are not
+automatically interpreted as environment transition probabilities.
