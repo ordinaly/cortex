@@ -1,0 +1,33 @@
+name: cortex-closed-articulation-loop-v0.2-confirmation
+
+on:
+  pull_request:
+    paths:
+      - "research/closed_articulation_loop_confirmation.py"
+      - "docs/CLOSED_ARTICULATION_LOOP_V0_2_CONFIRMATION.md"
+      - ".github/workflows/closed-articulation-loop-v0.2-confirmation.yml"
+  workflow_dispatch:
+
+jobs:
+  confirm-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: Swatinem/rust-cache@v2
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install "maturin==1.15.0"
+      - run: python -m pip install -e .
+      - name: Independent confirmation panel
+        run: >-
+          python research/closed_articulation_loop_confirmation.py
+          --worlds 20
+          --output closed-loop-v0.2-confirmation.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: closed-articulation-loop-v0.2-confirmation
+          path: closed-loop-v0.2-confirmation.json
