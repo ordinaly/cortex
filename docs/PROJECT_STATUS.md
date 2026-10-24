@@ -851,3 +851,14 @@ from examples. It reuses the existing proof-dependency engine for context-local
 derivations, conflicts and retractions. Fresh validation is separate from proposal.
 Candidate motifs, primitive invariants and role types remain supplied; autonomous
 mining, probabilistic rule calibration and native promotion remain deferred.
+
+## Autonomous pattern discovery v0.1
+
+The [bounded discovery research layer](CORTEX_PATTERN_DISCOVERY_V0_1.md) now enumerates connected
+patterns from context-local assumed facts, abstracts recurring motifs, and
+selects predictive rules using separate validation episodes and an explicit
+syntax cost. Candidate motifs no longer need to be supplied in this layer.
+Primitive symbols, types, episode boundaries and observed outcome queries remain
+inputs. The synthetic demo transfers to unseen entities; changing the underlying
+rule exposes the need for future online revision. Native controller promotion
+and measured storage compression remain deferred.
