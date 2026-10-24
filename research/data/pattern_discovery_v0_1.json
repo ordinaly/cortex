@@ -1,0 +1,44 @@
+{
+  "examined": 20,
+  "motifs_discovered": 1,
+  "rules_proposed": 1,
+  "rules_retained": 1,
+  "complexity_cost": 0.9,
+  "validation": {
+    "correct": 4,
+    "wrong": 0,
+    "abstained": 0,
+    "baseline_loss": 4.0,
+    "loss": 0.0
+  },
+  "test": {
+    "correct": 8,
+    "wrong": 0,
+    "abstained": 0,
+    "baseline_loss": 8.0,
+    "loss": 0.0
+  },
+  "no_rules_ablation": {
+    "correct": 0,
+    "wrong": 0,
+    "abstained": 8,
+    "baseline_loss": 8.0,
+    "loss": 8.0
+  },
+  "reversed_roles": {
+    "correct": 0,
+    "wrong": 0,
+    "abstained": 8,
+    "baseline_loss": 8.0,
+    "loss": 8.0
+  },
+  "changed_world": {
+    "correct": 0,
+    "wrong": 8,
+    "abstained": 0,
+    "baseline_loss": 8.0,
+    "loss": 16.0
+  },
+  "counterexample_validation_retained": 0,
+  "high_cost_retained": 0
+}

@@ -253,6 +253,28 @@ class RuleExample:
             atom.literal('example')
 
 
+def canonical_implication(example):
+    """Canonical typed body/head shape for one positive, ground observation."""
+    if example.observed.polarity != 1 or len(example.premises) > 4:
+        raise ValueError('positive proposal and bounded premises required')
+    best = None
+    for order in permutations(example.premises):
+        mapping, body = {}, []
+        for atom in order:
+            for term in atom.terms:
+                if term not in mapping:
+                    mapping[term] = Variable(f'v{len(mapping)}', term.kind)
+            body.append(Atom(atom.symbol, tuple(mapping[t] for t in atom.terms), atom.polarity))
+        if any(t not in mapping for t in example.observed.terms):
+            raise ValueError('conclusion introduces unbound entity')
+        head = Atom(example.observed.symbol, tuple(mapping[t] for t in example.observed.terms))
+        key = dumps([(a.symbol.name, a.symbol.version, a.symbol.roles, a.polarity,
+                      [(t.name, t.kind) for t in a.terms]) for a in (*body, head)], separators=(',', ':'))
+        if best is None or key < best[0]:
+            best = key, tuple(body), head
+    return best
+
+
 def propose_rule(examples):
     """Abstract a shared implication from bounded, caller-selected positive cases.
 
@@ -261,26 +283,7 @@ def propose_rule(examples):
     examples = tuple(examples)
     if len(examples) < 2 or len({e.evidence_id for e in examples}) != len(examples):
         raise ValueError('at least two distinct proposal examples required')
-    proposals = []
-    for example in examples:
-        if example.observed.polarity != 1 or len(example.premises) > 4:
-            raise ValueError('positive proposal and bounded premises required')
-        best = None
-        for order in permutations(example.premises):
-            mapping, body = {}, []
-            for atom in order:
-                for term in atom.terms:
-                    if term not in mapping:
-                        mapping[term] = Variable(f'v{len(mapping)}', term.kind)
-                body.append(Atom(atom.symbol, tuple(mapping[t] for t in atom.terms), atom.polarity))
-            if any(t not in mapping for t in example.observed.terms):
-                raise ValueError('conclusion introduces unbound entity')
-            head = Atom(example.observed.symbol, tuple(mapping[t] for t in example.observed.terms))
-            key = dumps([(a.symbol.name, a.symbol.version, a.symbol.roles, a.polarity,
-                          [(t.name, t.kind) for t in a.terms]) for a in (*body, head)], separators=(',', ':'))
-            if best is None or key < best[0]:
-                best = key, tuple(body), head
-        proposals.append(best)
+    proposals = [canonical_implication(example) for example in examples]
     if any(p[0] != proposals[0][0] for p in proposals):
         raise ValueError('examples disagree on role/equality structure')
     key, body, head = proposals[0]
