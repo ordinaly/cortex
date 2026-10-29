@@ -862,3 +862,14 @@ Primitive symbols, types, episode boundaries and observed outcome queries remain
 inputs. The synthetic demo transfers to unseen entities; changing the underlying
 rule exposes the need for future online revision. Native controller promotion
 and measured storage compression remain deferred.
+
+## Counterexample-driven rule revision v0.1
+
+The [revision research layer](CORTEX_RULE_REVISION_V0_1.md) predicts before consuming labels,
+records proof-backed counterexamples, quarantines implicated rules, and validates
+replacements on later disjoint evidence blocks. Unaffected rules stay active.
+Observed context predicates can narrow a rule; hidden context discovery and
+retrieval are not implemented. Immediate suspension and a two-counterexample
+window policy are compared with frozen rules and periodic relearning. Native
+controller integration, calibrated noise handling and negative-head learning
+remain deferred.
