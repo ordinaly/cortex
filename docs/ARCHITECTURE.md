@@ -2431,3 +2431,11 @@ retrieval are not implemented. Immediate suspension and a two-counterexample
 window policy are compared with frozen rules and periodic relearning. Native
 controller integration, calibrated noise handling and negative-head learning
 remain deferred.
+
+## Perception adapter v0.1
+
+The [model-neutral perception boundary](CORTEX_PERCEPTION_ADAPTER_V0_1.md) binds observation
+features to persistent IDs while keeping names and directed relation proposals
+as separate evidence. It supports bounded local-video decoding and explicit
+statement acceptance. A controlled video fixture passes with the frozen Python
+reference core; neural perception and natural-video accuracy remain untested.
