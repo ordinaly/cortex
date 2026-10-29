@@ -1,0 +1,145 @@
+{
+  "seeds": 3,
+  "episodes_per_run": 48,
+  "queries_per_episode": 2,
+  "error_cost": 2,
+  "abstention_cost": 1,
+  "mean_results": {
+    "stationary": {
+      "frozen": {
+        "correct": 96.0,
+        "wrong": 0.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 0.0
+      },
+      "periodic": {
+        "correct": 96.0,
+        "wrong": 0.0,
+        "abstained": 0.0,
+        "searches": 6.0,
+        "examined": 384.0,
+        "loss": 0.0
+      },
+      "targeted": {
+        "correct": 96.0,
+        "wrong": 0.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 0.0
+      },
+      "two_strikes": {
+        "correct": 96.0,
+        "wrong": 0.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 0.0
+      }
+    },
+    "scope": {
+      "frozen": {
+        "correct": 76.0,
+        "wrong": 20.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 40.0
+      },
+      "periodic": {
+        "correct": 76.0,
+        "wrong": 4.0,
+        "abstained": 16.0,
+        "searches": 6.0,
+        "examined": 384.0,
+        "loss": 24.0
+      },
+      "targeted": {
+        "correct": 72.0,
+        "wrong": 1.0,
+        "abstained": 23.0,
+        "searches": 1.0,
+        "examined": 52.0,
+        "loss": 25.0
+      },
+      "two_strikes": {
+        "correct": 72.0,
+        "wrong": 2.0,
+        "abstained": 22.0,
+        "searches": 1.0,
+        "examined": 52.0,
+        "loss": 26.0
+      }
+    },
+    "reversal": {
+      "frozen": {
+        "correct": 56.0,
+        "wrong": 40.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 80.0
+      },
+      "periodic": {
+        "correct": 56.0,
+        "wrong": 8.0,
+        "abstained": 32.0,
+        "searches": 6.0,
+        "examined": 384.0,
+        "loss": 48.0
+      },
+      "targeted": {
+        "correct": 56.0,
+        "wrong": 1.0,
+        "abstained": 39.0,
+        "searches": 5.0,
+        "examined": 260.0,
+        "loss": 41.0
+      },
+      "two_strikes": {
+        "correct": 56.0,
+        "wrong": 2.0,
+        "abstained": 38.0,
+        "searches": 5.0,
+        "examined": 260.0,
+        "loss": 42.0
+      }
+    },
+    "isolated_noise": {
+      "frozen": {
+        "correct": 95.0,
+        "wrong": 1.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 2.0
+      },
+      "periodic": {
+        "correct": 95.0,
+        "wrong": 1.0,
+        "abstained": 0.0,
+        "searches": 6.0,
+        "examined": 384.0,
+        "loss": 2.0
+      },
+      "targeted": {
+        "correct": 88.0,
+        "wrong": 1.0,
+        "abstained": 7.0,
+        "searches": 1.0,
+        "examined": 52.0,
+        "loss": 9.0
+      },
+      "two_strikes": {
+        "correct": 95.0,
+        "wrong": 1.0,
+        "abstained": 0.0,
+        "searches": 0.0,
+        "examined": 0.0,
+        "loss": 2.0
+      }
+    }
+  }
+}
